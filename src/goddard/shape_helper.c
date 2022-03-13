@@ -802,8 +802,8 @@ void get_OBJ_shape(struct ObjShape *shape) {
         clear_buf_to_cr();
     }
 
-    shape->vtxGroup = make_group_of_type(OBJ_TYPE_VERTICES, (struct GdObj *) vtxArr[0], NULL);
-    shape->faceGroup = make_group_of_type(OBJ_TYPE_FACES, (struct GdObj *) faceArr[0], NULL);
+    shape->vtxGroup  = make_group_of_type(OBJ_TYPE_VERTICES, (struct GdObj *)  vtxArr[0], NULL);
+    shape->faceGroup = make_group_of_type(OBJ_TYPE_FACES,    (struct GdObj *) faceArr[0], NULL);
 }
 
 /* @ 247760 for 0x124; orig name: func_80198F90 */
@@ -812,7 +812,7 @@ struct ObjGroup *group_faces_in_mtl_grp(struct ObjGroup *mtlGroup, struct GdObj 
     struct ObjMaterial *curObjAsMtl;
     struct ObjGroup *newGroup;
     struct GdObj *curObj;
-    register struct ListNode *node;
+    struct ListNode *node;
     struct GdObj *curLinkedObj;
 
     newGroup = make_group(0);
@@ -842,20 +842,17 @@ struct ObjGroup *group_faces_in_mtl_grp(struct ObjGroup *mtlGroup, struct GdObj 
 /* @ 247884 for 0x13c; orig name: func_801990B4 */
 struct ObjMaterial *find_or_add_new_mtl(struct ObjGroup *group, UNUSED s32 a1, f32 r, f32 g, f32 b) {
     struct ObjMaterial *newMtl;
-    register struct ListNode *node;
+    struct ListNode *node;
     struct ObjMaterial *foundMtl;
 
     for (node = group->firstMember; node != NULL; node = node->next) {
         foundMtl = (struct ObjMaterial *) node->obj;
 
-        if (foundMtl->header.type == OBJ_TYPE_MATERIALS) {
-            if (foundMtl->Kd.r == r) {
-                if (foundMtl->Kd.g == g) {
-                    if (foundMtl->Kd.b == b) {
-                        return foundMtl;
-                    }
-                }
-            }
+        if (foundMtl->header.type == OBJ_TYPE_MATERIALS
+         && foundMtl->Kd.r == r
+         && foundMtl->Kd.g == g
+         && foundMtl->Kd.b == b) {
+            return foundMtl;
         }
     }
 

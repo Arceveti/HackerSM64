@@ -295,15 +295,15 @@ void func_80192CCC(struct ObjNet *net) {
 void convert_gd_verts_to_Vn(struct ObjGroup *grp) {
     Vtx *vn;       // 28
     u8 nx, ny, nz; // 24, 25, 26
-    register struct VtxLink *vtxlink; // a1
+    struct VtxLink *vtxlink; // a1
 #ifndef GBI_FLOATS
-    register s16 *vnPos;              // a2
+    s16 *vnPos;              // a2
 #endif
-    register s16 x;                   // a3
-    register s16 y;                   // t0
-    register s16 z;                   // t1
-    register struct ObjVertex *vtx;   // t2
-    register struct ListNode *link;      // t3
+    s16 x;                   // a3
+    s16 y;                   // t0
+    s16 z;                   // t1
+    struct ObjVertex *vtx;   // t2
+    struct ListNode *link;      // t3
     struct GdObj *obj;                // sp4
 
     for (link = grp->firstMember; link != NULL; link = link->next) {
@@ -339,15 +339,15 @@ void convert_gd_verts_to_Vn(struct ObjGroup *grp) {
 
 /* 241AB4 -> 241BCC; orig name: func_801932E4 */
 void convert_gd_verts_to_Vtx(struct ObjGroup *grp) {
-    register struct VtxLink *vtxlink; // a1
+    struct VtxLink *vtxlink; // a1
 #ifndef GBI_FLOATS
-    register s16 *vtxcoords;          // a2
+    s16 *vtxcoords;          // a2
 #endif
-    register s16 x;                   // a3
-    register s16 y;                   // t0
-    register s16 z;                   // t1
-    register struct ObjVertex *vtx;   // t2
-    register struct ListNode *link;      // t3
+    s16 x;                   // a3
+    s16 y;                   // t0
+    s16 z;                   // t1
+    struct ObjVertex *vtx;   // t2
+    struct ListNode *link;      // t3
     struct GdObj *obj;                // sp4
 
     for (link = grp->firstMember; link != NULL; link = link->next) {
@@ -450,7 +450,7 @@ void move_nets(struct ObjGroup *group) {
 
 /* 241F0C -> 242018 */
 void func_8019373C(struct ObjNet *net) {
-    register struct ListNode *link;
+    struct ListNode *link;
     struct ObjVertex *vtx;
 
     switch (net->netType) {

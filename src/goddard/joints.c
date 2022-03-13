@@ -48,7 +48,7 @@ void set_joint_vecs(struct ObjJoint *j, f32 x, f32 y, f32 z);
 void grabbable_joint_update_func(struct ObjJoint *self) {
     Mat4f *attObjMtx;
     struct GdVec3f offset;  // difference between current position and initial position
-    register struct ListNode *att;
+    struct ListNode *att;
     struct GdObj *attobj;
 
     // The joint acts somewhat like a spring in that the further it is moved
@@ -127,17 +127,15 @@ void eye_joint_update_func(struct ObjJoint *self) {
     Mat4f *sp5C;
     struct GdVec3f sp50;
     struct GdVec3f sp44;
-    register struct ListNode *att;
+    struct ListNode *att;
     struct GdObj *attobj;
 
     if (sCurrentMoveCamera == NULL) {
         return;
     }
 
-    if (self->rootAnimator != NULL) {
-        if (self->rootAnimator->state != 7) {
-            return;
-        }
+    if (self->rootAnimator != NULL && self->rootAnimator->state != 7) {
+        return;
     }
 
     set_cur_dynobj((struct GdObj *)self);

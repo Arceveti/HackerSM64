@@ -75,12 +75,12 @@ void move_skin(struct ObjNet *net) {
 
 /* @ 230064 for 0x13C*/
 void func_80181894(struct ObjJoint *joint) {
-    register struct ObjGroup *weightGroup; // baseGroup? weights Only?
+    struct ObjGroup *weightGroup; // baseGroup? weights Only?
     struct GdVec3f stackVec;
-    register struct ObjWeight *curWeight;
-    register struct ObjVertex *connectedVtx;
-    register struct ListNode *link;
-    register f32 scaleFactor;
+    struct ObjWeight *curWeight;
+    struct ObjVertex *connectedVtx;
+    struct ListNode *link;
+    f32 scaleFactor;
     struct GdObj *linkedObj;
 
     weightGroup = joint->weightGrp;

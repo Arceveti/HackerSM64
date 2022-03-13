@@ -152,9 +152,9 @@ struct GMemBlock *make_mem_block(u32 blockType, u8 permFlag) {
  * @retval  0    `ptr` did not point to a valid memory block
  */
 u32 gd_free_mem(void *ptr) {
-    register struct GMemBlock *curBlock;
+    struct GMemBlock *curBlock;
     u32 bytesFreed;
-    register u8 *targetBlock = ptr;
+    u8 *targetBlock = ptr;
 
     for (curBlock = sUsedBlockListHead; curBlock != NULL; curBlock = curBlock->next) {
         if (targetBlock == curBlock->ptr) {
