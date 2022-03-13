@@ -71,8 +71,8 @@ void reset_net(struct ObjNet *net) {
     if (grp != NULL) {
         apply_to_obj_types_in_group(OBJ_TYPE_JOINTS, (applyproc_t) reset_joint, grp);
         apply_to_obj_types_in_group(OBJ_TYPE_JOINTS, (applyproc_t) func_80191220, grp);
-        apply_to_obj_types_in_group(OBJ_TYPE_BONES, (applyproc_t) func_8018FB58, grp);
-        apply_to_obj_types_in_group(OBJ_TYPE_BONES, (applyproc_t) func_8018FA68, grp);
+        apply_to_obj_types_in_group(OBJ_TYPE_BONES,  (applyproc_t) func_8018FB58, grp);
+        apply_to_obj_types_in_group(OBJ_TYPE_BONES,  (applyproc_t) func_8018FA68, grp);
     }
 }
 
@@ -91,7 +91,7 @@ void func_801922FC(struct ObjNet *net) {
 
     gGdSkinNet = net;
     // TODO: netype constants?
-    if (net->netType == 4) {
+    if (net->netType == NET_TYPE_DYNAMIC_BONES) {
         if (net->shapePtr != NULL) {
             D_801B9E38 = &net->mat128;
             scale_verts(net->shapePtr->vtxGroup);
@@ -119,7 +119,7 @@ struct ObjNet *make_net(UNUSED s32 flags, struct ObjShape *shapedata, struct Obj
     net->unk1C8 = a2;
     net->unk1CC = a3;
     net->unk1D0 = a4;
-    net->netType = 0;
+    net->netType = NET_TYPE_DEFAULT;
     net->ctrlType = 0;
     net->unk21C = NULL;
     net->unk3C = 1;
@@ -381,7 +381,7 @@ void convert_net_verts(struct ObjNet *net) {
     }
 
     switch (net->netType) {
-        case 2:
+        case NET_TYPE_SCALED_VERTICES:
             if (net->shapePtr != NULL) {
                 convert_gd_verts_to_Vtx(net->shapePtr->scaledVtxGroup);
             }
@@ -410,28 +410,28 @@ void move_net(struct ObjNet *net) {
     gGdSkinNet = net;
 
     switch (net->netType) {
-        case 1:
+        case NET_TYPE_SHAPE:
             break;
-        case 7:
+        case NET_TYPE_UNKNOWN:
             func_80192CCC(net);
             break;
-        case 4:
+        case NET_TYPE_DYNAMIC_BONES:
             restart_timer("move_bones");
             move_bonesnet(net);
             split_timer("move_bones");
             break;
-        case 2:
+        case NET_TYPE_SCALED_VERTICES:
             restart_timer("move_skin");
             move_skin(net);
             split_timer("move_skin");
             break;
-        case 3:
+        case NET_TYPE_JOINTS:
             move_joints_in_net(net);
             break;
-        case 5:
+        case NET_TYPE_PARTICLES:
             func_801823A0(net);
             break;
-        case 6:
+        case NET_TYPE_STUB:
             break;
         default:
             fatal_printf("move_net(%d(%d)): Undefined net type", net->id, net->netType);
@@ -454,7 +454,7 @@ void func_8019373C(struct ObjNet *net) {
     struct ObjVertex *vtx;
 
     switch (net->netType) {
-        case 2:
+        case NET_TYPE_SCALED_VERTICES:
             if (net->shapePtr != NULL) {
                 net->shapePtr->scaledVtxGroup = make_group(0);
                 for (link = net->shapePtr->vtxGroup->firstMember; link != NULL; link = link->next) {

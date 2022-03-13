@@ -329,16 +329,16 @@ struct ObjShape {
  * 0x10 - Use vtx position as vtx normal? (`chk_shapegen`)
  */
 
-/* netTypes
- * 0 - default?
- * 1 - shape net
- * 2 - something about the shape unk24 group having vertices too?
- * 3 - joints?
- * 4 - dynamic net? bone net?
- * 5 - particle net?
- * 6 - stub
- * 7 -
- */
+enum GdNetTypes {
+    /* 0x00 */ NET_TYPE_DEFAULT,
+    /* 0x01 */ NET_TYPE_SHAPE,
+    /* 0x02 */ NET_TYPE_SCALED_VERTICES, // something about the shape unk24 group having vertices too?
+    /* 0x03 */ NET_TYPE_JOINTS,
+    /* 0x04 */ NET_TYPE_DYNAMIC_BONES,
+    /* 0x05 */ NET_TYPE_PARTICLES,
+    /* 0x06 */ NET_TYPE_STUB,
+    /* 0x07 */ NET_TYPE_UNKNOWN,
+};
 
 struct ObjNet {
     /* 0x000 */ struct GdObj header;

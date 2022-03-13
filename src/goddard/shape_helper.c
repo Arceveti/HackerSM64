@@ -1149,7 +1149,7 @@ struct ObjNet *make_netfromshape(struct ObjShape *shape) {
     apply_to_obj_types_in_group(OBJ_TYPE_FACES, (applyproc_t) Unknown80199E88, shape->faceGroup);
     D_801BAD08 = make_group_of_type(OBJ_TYPE_PLANES, (struct GdObj *) D_801BAC78, NULL);
     newNet = make_net(0, shape, NULL, D_801BAD08, shape->vtxGroup);
-    newNet->netType = 1;
+    newNet->netType = NET_TYPE_SHAPE;
 
     return newNet;
 }
@@ -1391,7 +1391,7 @@ s32 load_mario_head(void (*aniFn)(struct ObjAnimator *)) {
 
     sp48 = make_group_of_type(OBJ_TYPE_JOINTS, sp38, NULL);
     sp54 = make_net(0, NULL, sp48, NULL, NULL);
-    sp54->netType = 3;
+    sp54->netType = NET_TYPE_JOINTS;
     addto_group(gMarioFaceGrp, &sp48->header);
     addto_groupfirst(gMarioFaceGrp, &sp54->header);
 
