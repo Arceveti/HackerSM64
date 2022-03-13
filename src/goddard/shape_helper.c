@@ -45,9 +45,7 @@ static struct GdAnimTransform unusedAnimData3[] = {
 
 UNUSED static struct AnimDataInfo unusedAnim3 = { ARRAY_COUNT(unusedAnimData3), GD_ANIM_SCALE3F_ROT3F_POS3F_2, unusedAnimData3 };
 
-UNUSED static s32 sUnref801A838C[6] = { 0 };
 struct ObjShape *sSimpleShape = NULL;
-UNUSED static s32 sUnref801A83A8[31] = { 0 };
 UNUSED static struct DynList sSimpleDylist[8] = { // unused
     BeginList(),
     StartGroup("simpleg"),
@@ -82,35 +80,24 @@ UNUSED static struct DynList sDynlist801A8604[4] = {
 static f64 D_801A8668 = 0.0;
 
 // bss
-UNUSED static u8 sUnrefSpaceB00[0x2C];    // @ 801BAB00
 static struct ObjGroup *sCubeShapeGroup;  // @ 801BAB2C
-UNUSED static u8 sUnrefSpaceB30[0xC];     // @ 801BAB30
 static struct ObjShape *sCubeShape;       // @ 801BAB3C
-UNUSED static u8 sUnrefSpaceB40[0x8];     // @ 801BAB40
 static char sGdLineBuf[0x100];            // @ 801BAB48
 static s32 sGdLineBufCsr;                 // @ 801BAC48
 static struct GdFile *sGdShapeFile;       // @ 801BAC4C
 static struct ObjShape *sGdShapeListHead; // @ 801BAC50
 static u32 sGdShapeCount;                 // @ 801BAC54
-UNUSED static u8 sUnrefSpaceC58[0x8];     // @ 801BAC58
 static struct GdVec3f D_801BAC60;
-UNUSED static u32 sUnrefSpaceC6C;         // @ 801BAC6C
-UNUSED static u32 sUnrefSpaceC70;         // @ 801BAC70
 static struct ObjPlane *D_801BAC74;
 static struct ObjPlane *D_801BAC78; // sShapeNetHead?
-UNUSED static u8 sUnrefSpaceC80[0x1C];    // @ 801BAC80
 static struct ObjFace *D_801BAC9C;
 static struct ObjFace *D_801BACA0;
-UNUSED static u8 sUnrefSpaceCA8[0x10];    // @ 801BACA8
 /// factor for scaling vertices in an `ObjShape` when calling `scale_verts_in_shape()`
 static struct GdVec3f sVertexScaleFactor;
 /// factor for translating vertices in an `ObjShape` when calling `translate_verts_in_shape()`
 static struct GdVec3f sVertexTranslateOffset;
-UNUSED static u8 sUnrefSpaceCD8[0x30];    // @ 801BACD8
 static struct ObjGroup *D_801BAD08; // group of planes from make_netfromshape
-UNUSED static u8 sUnrefSpaceD10[0x20];    // @ 801BAD10
 static struct GdVec3f sShapeCenter;   // printed with "c="
-UNUSED static u8 sUnrefSpaceD40[0x120];   // @ 801BAD40
 
 // Forward Declarations
 struct ObjMaterial *find_or_add_new_mtl(struct ObjGroup *, s32, f32, f32, f32);
@@ -329,12 +316,12 @@ s8 load_next_line_into_buf(void) {
 
 /* @ 2462E4 for 0x38; orig name: func_80197B14 */
 s32 is_line_end(char c) {
-    return c == '\r' || c == '\n';
+    return (c == '\r' || c == '\n');
 }
 
 /* @ 24631C for 0x38; orig name: func_80197B4C */
 s32 is_white_space(char c) {
-    return c == ' ' || c == '\t';
+    return (c == ' ' || c == '\t');
 }
 
 /* @ 246354 for 0xEC; orig name: func_80197B84 */
@@ -351,7 +338,6 @@ s32 scan_to_next_non_whitespace(void) {
 
         if (curChar == '\x1a') { //'SUB' character: "soft EOF" in older systems
             return FALSE;
-            continue; // unreachable
         }
 
         if (is_line_end(curChar)) {
@@ -376,7 +362,6 @@ s32 is_next_buf_word(char *a0) {
     for (curChar = get_and_advance_buf(); curChar != '\0'; curChar = get_and_advance_buf()) {
         if (is_white_space(curChar) || is_line_end(curChar)) {
             break;
-            continue; // unreachable + nonsensical
         }
         wordBuf[bufLength] = curChar;
         bufLength++;
