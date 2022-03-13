@@ -1010,9 +1010,6 @@ void chk_shapegen(struct ObjShape *shape) {
 
             oldObjHead = gGdObjectList;
             for (i = 0; i < facedata->count; i++) {
-                //! @bug Call to `make_face_with_colour()` compiles incorrectly
-                //!      due to Goddard only declaring the functions,
-                //!      not prototyping the functions
                 face = make_face_with_colour(1.0f, 1.0f, 1.0f);
                 face->mtlId = (s32) facedata->data[i][0];
                 add_3_vtx_to_face(face, vtxbuf[facedata->data[i][1]], vtxbuf[facedata->data[i][2]],
