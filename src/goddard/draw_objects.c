@@ -49,8 +49,7 @@ static struct GdColour sClrYellow       =   { 1.0f, 1.0f, 0.0f };   // @ 801A80D
 static struct GdColour sLightColours[1] = { { 1.0f, 1.0f, 0.0f } }; // @ 801A80E8
 static struct GdColour *sSelectedColour = &sClrRed;                 // @ 801A80F4
 struct ObjCamera *gViewUpdateCamera = NULL;                         // @ 801A80F8
-UNUSED static void *sUnref801A80FC = NULL;
-static s32 sUnreadShapeFlag = 0;       // @ 801A8100
+// @ 801A8100
 struct GdColour *sColourPalette[5] = { // @ 801A8104
     &sClrWhite, &sClrYellow, &sClrRed, &sClrBlack, &sClrBlack
 };
@@ -58,18 +57,6 @@ struct GdColour *sWhiteBlack[2] = {
     //@ 801A8118
     &sClrWhite,
     &sClrBlack,
-};
-UNUSED static Mat4f sUnref801A8120 = {
-    { 1.0f, 0.0f, 0.0f, 0.0f },
-    { 0.0f, 0.0f, 0.0f, 0.0f },
-    { 0.0f, 0.0f, 1.0f, 0.0f },
-    { 0.0f, 0.0f, 0.0f, 1.0f }
-};
-UNUSED static Mat4f sUnrefIden801A8160 = {
-    { 1.0f, 0.0f, 0.0f, 0.0f },
-    { 0.0f, 1.0f, 0.0f, 0.0f },
-    { 0.0f, 0.0f, 1.0f, 0.0f },
-    { 0.0f, 0.0f, 0.0f, 1.0f }
 };
 static s32 sLightDlCounter = 1; // @ 801A81A0
 
@@ -118,7 +105,7 @@ void Unknown801781DC(struct ObjZone *zone) {
     f32 sp30;
     f32 sp2C;
     struct ObjLight *light;
-    register struct ListNode *link = zone->unk30->firstMember; // s0 (24)
+    struct ListNode *link = zone->unk30->firstMember; // s0 (24)
     struct GdObj *obj;                                 // 20
 
     while (link != NULL) {
@@ -154,7 +141,7 @@ void draw_shape(struct ObjShape *shape, s32 flag, f32 c, f32 d, f32 e, // "sweep
                 f32 i, f32 j, f32 k, // translate shape
                 f32 l, f32 m, f32 n, // rotate x, y, z
                 s32 colorIdx, Mat4f *rotMtx) {
-    struct GdVec3f sp1C;
+    struct GdVec3f offset;
 
     restart_timer("drawshape");
     sUpdateViewState.shapesDrawn++;
@@ -163,31 +150,25 @@ void draw_shape(struct ObjShape *shape, s32 flag, f32 c, f32 d, f32 e, // "sweep
         return;
     }
 
-    sp1C.x = sp1C.y = sp1C.z = 0.0f;
-    if (flag & SHAPE_FLAG_2) {
+    offset.x = offset.y = offset.z = 0.0f;
+    if (flag & SHAPE_FLAG_TRANSLATE) {
         gd_dl_load_trans_matrix(f, g, h);
-        sp1C.x += f;
-        sp1C.y += g;
-        sp1C.z += h;
+        offset.x += f;
+        offset.y += g;
+        offset.z += h;
     }
 
     if ((flag & SHAPE_FLAG_10) && rotMtx != NULL) {
         gd_dl_load_matrix(rotMtx);
-        sp1C.x += (*rotMtx)[3][0];
-        sp1C.y += (*rotMtx)[3][1];
-        sp1C.z += (*rotMtx)[3][2];
+        offset.x += (*rotMtx)[3][0];
+        offset.y += (*rotMtx)[3][1];
+        offset.z += (*rotMtx)[3][2];
     }
 
-    if (flag & SHAPE_FLAG_8) {
-        if (m != 0.0f) {
-            func_8019F2C4(m, 121);
-        }
-        if (l != 0.0f) {
-            func_8019F2C4(l, 120);
-        }
-        if (n != 0.0f) {
-            func_8019F2C4(n, 122);
-        }
+    if (flag & SHAPE_FLAG_ROTATE) {
+        if (m != 0.0f) gd_dl_rotate(m, GD_Y_AXIS);
+        if (l != 0.0f) gd_dl_rotate(l, GD_X_AXIS);
+        if (n != 0.0f) gd_dl_rotate(n, GD_Z_AXIS);
     }
 
     if (colorIdx != 0) {
@@ -205,20 +186,20 @@ void draw_shape(struct ObjShape *shape, s32 flag, f32 c, f32 d, f32 e, // "sweep
 
     if (sNumActiveLights != 0 && shape->mtlGroup != NULL) {
         if (rotMtx != NULL) {
-            sp1C.x = (*rotMtx)[3][0];
-            sp1C.y = (*rotMtx)[3][1];
-            sp1C.z = (*rotMtx)[3][2];
+            offset.x = (*rotMtx)[3][0];
+            offset.y = (*rotMtx)[3][1];
+            offset.z = (*rotMtx)[3][2];
         } else {
-            sp1C.x = sp1C.y = sp1C.z = 0.0f;
+            offset.x = offset.y = offset.z = 0.0f;
         }
-        update_shaders(shape, &sp1C);
+        update_shaders(shape, &offset);
     }
 
-    if (flag & SHAPE_FLAG_4) {
+    if (flag & SHAPE_FLAG_MUL_TRANS_MTX) {
         gd_dl_mul_trans_matrix(i, j, k);
     }
 
-    if (flag & SHAPE_FLAG_1) {
+    if (flag & SHAPE_FLAG_SCALE) {
         gd_dl_scale(c, d, e);
     }
 
@@ -239,7 +220,7 @@ void draw_shape_2d(struct ObjShape *shape, s32 flag, UNUSED f32 c, UNUSED f32 d,
         return;
     }
 
-    if (flag & SHAPE_FLAG_2) {
+    if (flag & SHAPE_FLAG_TRANSLATE) {
         sp1C.x = f;
         sp1C.y = g;
         sp1C.z = h;
@@ -561,7 +542,7 @@ void draw_net(struct ObjNet *self) {
     }
 
     if (net->shapePtr != NULL) {
-        draw_shape(net->shapePtr, 0x10, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f,
+        draw_shape(net->shapePtr, SHAPE_FLAG_10, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f,
                    0.0f, 0.0f, 0.0f, 0.0f, 0.0f, netColor, &net->mat168);
     }
 
@@ -721,7 +702,6 @@ void check_grabbable_click(struct GdObj *input) {
 void drawscene(enum SceneType process, struct ObjGroup *interactables, struct ObjGroup *lightgrp) {
     restart_timer("drawscene");
     imin("draw_scene()");
-    sUnreadShapeFlag = 0;
     sUpdateViewState.unreadCounter = 0;
     restart_timer("draw1");
     set_gd_mtx_parameters(G_MTX_PROJECTION | G_MTX_MUL | G_MTX_PUSH);
@@ -795,7 +775,6 @@ void draw_nothing(UNUSED struct GdObj *nop) {
 void draw_shape_faces(struct ObjShape *shape) {
     sUpdateViewState.mtlDlNum = 0;
     sUpdateViewState.unreadCounter = 0;
-    sUnreadShapeFlag = (s32) shape->flag & SHAPE_FLAG_1;
     set_render_alpha(shape->alpha);
     if (shape->dlNums[gGdFrameBufNum] != 0) {
         draw_indexed_dl(shape->dlNums[gGdFrameBufNum], shape->unk50);
@@ -866,7 +845,7 @@ void draw_bone(struct GdObj *obj) {
     bone->header.drawFlags &= ~OBJ_HIGHLIGHTED;
 
     if (sSceneProcessType != FIND_PICKS) {
-        draw_shape(bone->shapePtr, 0x1B, scale.x, scale.y, scale.z, bone->worldPos.x, bone->worldPos.y,
+        draw_shape(bone->shapePtr, (SHAPE_FLAG_SCALE | SHAPE_FLAG_TRANSLATE | SHAPE_FLAG_ROTATE | SHAPE_FLAG_10), scale.x, scale.y, scale.z, bone->worldPos.x, bone->worldPos.y,
                    bone->worldPos.z, 0.0f, 0.0f, 0.0f, bone->unk28.x, bone->unk28.y, bone->unk28.z, colour,
                    &bone->mat70);
     }
@@ -890,7 +869,7 @@ void draw_joint(struct GdObj *obj) {
         colour = joint->colourNum;
     }
 
-    draw_shape(boneShape, 0x10, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f,
+    draw_shape(boneShape, SHAPE_FLAG_10, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f,
                colour, &joint->mat128);
 }
 
@@ -1036,7 +1015,7 @@ void create_shape_mtl_gddls(struct ObjShape *shape) {
  * @note Not called
  */
 void unref_8017AEDC(struct ObjGroup *grp) {
-    register struct ListNode *link = grp->firstMember;
+    struct ListNode *link = grp->firstMember;
 
     while (link != NULL) {
         struct GdObj *obj = link->obj;
@@ -1107,9 +1086,9 @@ void create_gddl_for_shapes(struct ObjGroup *grp) {
  */
 void map_face_materials(struct ObjGroup *faces, struct ObjGroup *mtls) {
     struct ObjFace *face;
-    register struct ListNode *linkFaces;
+    struct ListNode *linkFaces;
     struct GdObj *temp;
-    register struct ListNode *linkMtls;
+    struct ListNode *linkMtls;
     struct ObjMaterial *mtl;
 
     linkFaces = faces->firstMember;
@@ -1147,7 +1126,7 @@ void map_face_materials(struct ObjGroup *faces, struct ObjGroup *mtls) {
 static void calc_vtx_normal(struct ObjVertex *vtx, struct ObjGroup *facegrp) {
     s32 i;
     s32 faceCount;
-    register struct ListNode *node;
+    struct ListNode *node;
     struct ObjFace *curFace;
 
     vtx->normal.x = vtx->normal.y = vtx->normal.z = 0.0f;
@@ -1227,9 +1206,9 @@ static void find_thisface_verts(struct ObjFace *face, struct ObjGroup *vertexGrp
  *       a very similar task...
  */
 void map_vertices(struct ObjGroup *facegrp, struct ObjGroup *vtxgrp) {
-    register struct ListNode *faceNode;
+    struct ListNode *faceNode;
     struct ObjFace *curFace;
-    register struct ListNode *vtxNode;
+    struct ListNode *vtxNode;
     struct ObjVertex *vtx;
 
     imin("map_vertices");

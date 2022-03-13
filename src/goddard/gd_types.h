@@ -291,12 +291,12 @@ struct ObjParticle {
 }; /* sizeof = 0xC0 */
 
 enum GdShapeFlags {
-    SHAPE_FLAGS_NONE = 0x0,
-    SHAPE_FLAG_1     = 0x01,
-    SHAPE_FLAG_2     = 0x02,
-    SHAPE_FLAG_4     = 0x04,
-    SHAPE_FLAG_8     = 0x08,
-    SHAPE_FLAG_10    = 0x10
+    SHAPE_FLAGS_NONE         = 0x0,
+    SHAPE_FLAG_SCALE         = (1 << 0), // 0x01
+    SHAPE_FLAG_TRANSLATE     = (1 << 1), // 0x02
+    SHAPE_FLAG_MUL_TRANS_MTX = (1 << 2), // 0x04
+    SHAPE_FLAG_ROTATE        = (1 << 3), // 0x08
+    SHAPE_FLAG_10            = (1 << 4), // 0x10
 };
 
 /**

@@ -48,8 +48,7 @@ struct GdVec3f D_801B9E28;
 f32 D_801B9E34;
 Mat4f *D_801B9E38;
 struct ObjParticle *D_801B9E3C;
-s32 D_801B9E40;
-s32 D_801B9E44;
+s32 sParticleId = 0;
 Mat4f *D_801B9E48;
 struct ObjCamera *gGdCameraList; // @ 801B9E4C
 void *D_801B9E50;
@@ -430,7 +429,7 @@ void reset_plane(struct ObjPlane *plane) {
     f32 sp44;
     s32 i;
     s32 sp30;
-    register f32 sp28;
+    f32 sp28;
 
     imin("reset_plane");
 
@@ -1284,7 +1283,7 @@ void move_animator(struct ObjAnimator *animObj) {
     f32 dt;
     f32 scale = 0.1f;
     struct AnimMtxVec *sp28;
-    register struct ListNode *link;
+    struct ListNode *link;
     struct GdObj *linkedObj;
 
     if (animObj->controlFunc != NULL) {
@@ -1767,7 +1766,6 @@ void reset_nets_and_gadgets(struct ObjGroup *group) {
 
 /* @ 22FD08 for 0x9C; orig name: func_80181538*/
 void null_obj_lists(void) {
-    D_801B9E44 = 0;
     gGdObjCount = 0;
     gGdGroupCount = 0;
     gGdPlaneCount = 0;

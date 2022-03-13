@@ -3,6 +3,7 @@
 #include "debug_utils.h"
 #include "draw_objects.h"
 #include "dynlist_proc.h"
+#include "gd_macros.h"
 #include "gd_math.h"
 #include "gd_types.h"
 #include "macros.h"
@@ -47,14 +48,14 @@ void Unknown80181D14(struct ObjFace *face);
 void func_80181EB0(struct Connection *cxn);
 void func_80182088(struct Connection *cxn);
 void move_particle(struct ObjParticle *ptc);
-int func_80182778(struct ObjParticle *ptc);
+s32 func_80182778(struct ObjParticle *ptc);
 void func_80182A08(struct ObjParticle *ptc, struct GdVec3f *b);
 void func_801838D0(struct ObjParticle *ptc);
 void Unknown801835C8(struct ObjParticle *ptc);
 
 static void connect_vertices(struct ObjVertex *vtx1, struct ObjVertex *vtx2) {
     struct Connection *newConn;
-    register struct ListNode *link;
+    struct ListNode *link;
 
     if (vtx1 == vtx2) {
         return;
@@ -173,7 +174,7 @@ void func_80182088(struct Connection *cxn) {
 
 /* 230B70 -> 230CC0 */
 void func_801823A0(struct ObjNet *net) {
-    register struct ListNode *link;
+    struct ListNode *link;
     struct Connection *cxn;
 
     gGdSkinNet = net;
@@ -212,7 +213,7 @@ struct ObjParticle *make_particle(u32 flags, s32 colourNum, f32 x, f32 y, f32 z)
     particle->colourNum = colourNum;
     particle->flags = (flags | PTC_FLAG_8);
     particle->timeout = -1;
-    particle->id = D_801B9E40; /* should this be D_801B9E40++? */
+    particle->id = sParticleId; /* should this be sParticleId++? */
     particle->shapePtr = NULL;
     particle->unkB0 = 1;
     return particle;
@@ -241,7 +242,8 @@ struct Connection *make_connection(struct ObjVertex *vtx1, struct ObjVertex *vtx
     // Duplicate conditional. Possibly should've checked `vtx2`;
     // Also, this shouldn't be called with particle types...
     if (vtx1->header.type == OBJ_TYPE_PARTICLES && vtx1->header.type == OBJ_TYPE_PARTICLES) {
-        if ((((struct ObjParticle *) vtx1)->flags & PTC_FLAG_4) && (((struct ObjParticle *) vtx2)->flags & PTC_FLAG_4)) {
+        if ((((struct ObjParticle *) vtx1)->flags & PTC_FLAG_4)
+         && (((struct ObjParticle *) vtx2)->flags & PTC_FLAG_4)) {
             conn->unk28 |= 0x1;
         }
     }
@@ -250,7 +252,7 @@ struct Connection *make_connection(struct ObjVertex *vtx1, struct ObjVertex *vtx
 }
 
 /* 230F48 -> 2311D8 */
-int func_80182778(struct ObjParticle *ptc) {
+s32 func_80182778(struct ObjParticle *ptc) {
     s32 sp4 = 0;
 
     if (ptc->unk7C->animSeqNum == 2 && ptc->unk74 == 1) {
@@ -280,7 +282,7 @@ int func_80182778(struct ObjParticle *ptc) {
 
 /* 2311D8 -> 231454 */
 void func_80182A08(struct ObjParticle *ptc, struct GdVec3f *b) {
-    register struct ListNode *link;
+    struct ListNode *link;
     struct ObjParticle *sp20;
 
     if (ptc->subParticlesGrp != NULL) {
@@ -311,7 +313,6 @@ void func_80182A08(struct ObjParticle *ptc, struct GdVec3f *b) {
 
 /* 231454 -> 231D40; orig name: Unknown80182C84 */
 void move_particle(struct ObjParticle *ptc) {
-    f32 sp7C;
     struct GdVec3f sp64;
     struct ObjParticle *sp60;
     s32 i;
@@ -352,12 +353,11 @@ void move_particle(struct ObjParticle *ptc) {
         ptc->pos.y = sp64.y;
         ptc->pos.z = sp64.z;
     }
-    sp7C = -0.4f;
     ptc->pos.x += ptc->unk38.x;
     ptc->pos.y += ptc->unk38.y;
     ptc->pos.z += ptc->unk38.z;
     if (ptc->flags & PTC_FLAG_1) {
-        ptc->unk38.y += sp7C;
+        ptc->unk38.y -= 0.4f;
     }
     func_801838D0(ptc);
     switch (ptc->unkB0) {
@@ -397,7 +397,7 @@ void move_particle(struct ObjParticle *ptc) {
         switch (ptc->unk64) {
             case 1:
                 if (func_80182778(ptc) && ptc->subParticlesGrp != NULL) {
-                    register struct ListNode *link;
+                    struct ListNode *link;
 
                     if (ptc->unk80 != NULL) {
                         ptc->unk80->unk3C |= LIGHT_UNK01;
@@ -453,12 +453,11 @@ void move_particles_in_grp(struct ObjGroup *group) {
     stop_timer("particles");
 }
 
-#define ABS(x) ((x) < 0.0f ? -(x) : (x))
 /* 231D98 -> 232040 */
 void Unknown801835C8(struct ObjParticle *ptc) {
-    struct GdVec3f sp54;
-    f32 sp50;
-    register struct ListNode *link;
+    struct GdVec3f d;
+    f32 mag;
+    struct ListNode *link;
 
     gd_printf("p(%d)=", ptc->attachedObjsGrp->memberCount);
     link = ptc->attachedObjsGrp->firstMember;
@@ -466,18 +465,18 @@ void Unknown801835C8(struct ObjParticle *ptc) {
         // FIXME: types
         struct ObjParticle *sp48 = (struct ObjParticle *) link->obj;
 
-        sp54.x = sp48->pos.x - ptc->pos.x;
-        sp54.y = sp48->pos.y - ptc->pos.y;
-        sp54.z = sp48->pos.z - ptc->pos.z;
-        sp50 = 150.0f - (ABS(sp54.x) + ABS(sp54.y) + ABS(sp54.z));
-        gd_printf(",%f ", sp50);
-        sp50 *= 0.00000005f;
-        ptc->pos.x += sp50 * sp54.x;
-        ptc->pos.y += sp50 * sp54.y;
-        ptc->pos.z += sp50 * sp54.z;
-        sp48->pos.x -= sp50 * sp54.x;
-        sp48->pos.y -= sp50 * sp54.y;
-        sp48->pos.z -= sp50 * sp54.z;
+        d.x = sp48->pos.x - ptc->pos.x;
+        d.y = sp48->pos.y - ptc->pos.y;
+        d.z = sp48->pos.z - ptc->pos.z;
+        mag = 150.0f - (ABS(d.x) + ABS(d.y) + ABS(d.z));
+        gd_printf(",%f ", mag);
+        mag *= 0.00000005f;
+        ptc->pos.x += mag * d.x;
+        ptc->pos.y += mag * d.y;
+        ptc->pos.z += mag * d.z;
+        sp48->pos.x -= mag * d.x;
+        sp48->pos.y -= mag * d.y;
+        sp48->pos.z -= mag * d.z;
         link = link->next;
     }
     gd_printf("\n");

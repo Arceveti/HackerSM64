@@ -308,14 +308,6 @@ static Vtx_t gd_vertex_star[] = {
     {{-64, 128, 0}, 0, {  0,   0}, {0x00, 0x00, 0x7F}},
 };
 
-//! no references to these vertices
-UNUSED static Vtx_t gd_unused_vertex[] = {
-    {{16384, 0,     0}, 0, {0, 16384}, {0x00, 0x00, 0x00}},
-    {{    0, 0, 16384}, 0, {0,     0}, {0x00, 0x00, 0x40}},
-    {{    0, 0,     0}, 0, {0,     0}, {0x00, 0x00, 0x00}},
-    {{    0, 0,     0}, 0, {0,     0}, {0x00, 0x00, 0x00}},
-};
-
 static Gfx gd_dl_star_common[] = {
     gsDPSetCombineMode(G_CC_DECALRGBA, G_CC_DECALRGBA),
     gsSPClearGeometryMode(G_TEXTURE_GEN | G_TEXTURE_GEN_LINEAR),
@@ -1696,11 +1688,11 @@ void gd_dl_scale(f32 x, f32 y, f32 z) {
 }
 
 /* 24DA94 -> 24DAE8 */
-void func_8019F2C4(f32 arg0, s8 arg1) {
+void gd_dl_rotate(f32 ang, s8 axis) {
     Mat4f mtx; // 18
 
     gd_set_identity_mat4(&mtx);
-    gd_absrot_mat4(&mtx, arg1 - 120, -arg0);
+    gd_absrot_mat4(&mtx, axis, -ang);
     gd_dl_mul_matrix(&mtx);
 }
 
@@ -2880,14 +2872,14 @@ void update_cursor(void) {
 
 /* 253728 -> 2538E0 */
 void Unknown801A4F58(void) {
-    register s16 *cbufOff; // a0
-    register s16 *cbufOn;  // a1
-    register u16 *zbuf;    // a2
-    register s16 colour;   // a3
-    register s16 r;        // t0
-    register s16 g;        // t1
-    register s16 b;        // t2
-    register s32 i;        // t3
+    s16 *cbufOff; // a0
+    s16 *cbufOn;  // a1
+    u16 *zbuf;    // a2
+    s16 colour;   // a3
+    s16 r;        // t0
+    s16 g;        // t1
+    s16 b;        // t2
+    s32 i;        // t3
 
     cbufOff = sScreenView->colourBufs[gGdFrameBufNum ^ 1];
     cbufOn = sScreenView->colourBufs[gGdFrameBufNum];
@@ -2896,9 +2888,9 @@ void Unknown801A4F58(void) {
     for (i = 0; i < (320 * 240); i++) { // L801A4FCC
         colour = cbufOff[i];
         if (colour) {
-            r = (s16)(colour >> 11 & 0x1F);
-            g = (s16)(colour >> 6 & 0x1F);
-            b = (s16)(colour >> 1 & 0x1F);
+            r = (s16)((colour >> 11) & 0x1F);
+            g = (s16)((colour >>  6) & 0x1F);
+            b = (s16)((colour >>  1) & 0x1F);
             if (--r < 0) {
                 r = 0;
             }
@@ -3592,12 +3584,12 @@ void func_801A71CC(struct ObjNet *net) {
     f32 spA8;
     struct GdBoundingBox bbox;
     struct ObjZone *sp88;
-    register struct ListNode *link;  // s0 (84)
+    struct ListNode *link;  // s0 (84)
     s32 sp80;                     // linked planes contained in zone?
     s32 sp7C;                     // linked planes in net count?
-    register struct ListNode *link1; // s1 (78)
-    register struct ListNode *link2; // s2 (74)
-    register struct ListNode *link3; // s3 (70)
+    struct ListNode *link1; // s1 (78)
+    struct ListNode *link2; // s2 (74)
+    struct ListNode *link3; // s3 (70)
     struct GdVec3f sp64;
     struct ObjPlane *plane; // 5c
     struct ObjZone *linkedZone; // 54
