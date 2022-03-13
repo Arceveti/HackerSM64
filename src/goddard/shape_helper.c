@@ -680,9 +680,9 @@ void get_3DG1_shape(struct ObjShape *shape) {
 
         calc_face_normal(newFace);
 
-        tempNormal.x = newFace->normal.x > 0.0f ? 1.0f : 0.0f;
-        tempNormal.y = newFace->normal.y > 0.0f ? 1.0f : 0.0f;
-        tempNormal.z = newFace->normal.z > 0.0f ? 1.0f : 0.0f;
+        tempNormal.x = (newFace->normal.x > 0.0f) ? 1.0f : 0.0f;
+        tempNormal.y = (newFace->normal.y > 0.0f) ? 1.0f : 0.0f;
+        tempNormal.z = (newFace->normal.z > 0.0f) ? 1.0f : 0.0f;
 
         shape->faceCount++;
 
@@ -890,8 +890,6 @@ void read_ARK_shape(struct ObjShape *shape, char *fileName) {
     struct ObjVertex *sp3C;        // newly made vtx
     struct ObjVertex *sp38 = NULL; // first made vtx
     struct ObjMaterial *sp34;      // found or new mtl for face
-    UNUSED s32 sp30 = 0;
-    UNUSED s32 sp2C = 0;
 
     shape->mtlGroup = make_group(0);
 

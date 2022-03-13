@@ -168,18 +168,18 @@ struct ObjBone {
     /* 0x014 */ struct GdVec3f worldPos;   // "position"?? from dead code in draw_bone
     /* 0x020 */ struct ObjBone *prev;   // maybe, based on make_bone
     /* 0x024 */ struct ObjBone *next;   // maybe, based on make_bone
-    /* 0x028 */ struct GdVec3f unk28;   // "rotation"?? from dead code in draw_bone
+    /* 0x028 */ struct GdVec3f rotation;   // maybe, from dead code in draw_bone
     /* 0x034 */ u8  filler1[12];
     /* 0x040 */ struct GdVec3f unk40;
     /* 0x04C */ u8  filler2[12];
-    /* 0x058 */ struct GdVec3f unk58;  // orientation?
+    /* 0x058 */ struct GdVec3f direction;  // orientation?
     /* 0x064 */ struct GdVec3f unk64;
     /* 0x070 */ Mat4f mat70;
     /* 0x0B0 */ Mat4f matB0;
     /* 0x0F0 */ struct ObjShape *shapePtr; // from dead code in draw_bone
-    /* 0x0F4 */ f32 unkF4;              // also length?
-    /* 0x0F8 */ f32 unkF8;              // length?
-    /* 0x0FC */ f32 unkFC;              // also length?
+    /* 0x0F4 */ f32 length1;               // also length?
+    /* 0x0F8 */ f32 length;                // length?
+    /* 0x0FC */ f32 length2;               // also length?
     /* 0x100 */ s32 colourNum;             // "colour"
     /* 0x104 */ s32 flags;
     /* 0x108 */ s32 id;

@@ -234,7 +234,7 @@ void move_bonesnet(struct ObjNet *net) {
     sp24 = net->unk1C8;
 
     if (sp24 != NULL) {
-        apply_to_obj_types_in_group(OBJ_TYPE_JOINTS, (applyproc_t) func_801913C0, sp24);
+        apply_to_obj_types_in_group(OBJ_TYPE_JOINTS, (applyproc_t) func_80181894, sp24);
     }
     imout();
 }
@@ -279,14 +279,13 @@ void func_80192CCC(struct ObjNet *net) {
     if (group != NULL) {
         apply_to_obj_types_in_group(OBJ_TYPE_JOINTS, (applyproc_t) func_80191220, group);
         apply_to_obj_types_in_group(OBJ_TYPE_JOINTS, (applyproc_t) func_801913F0, group);
-        apply_to_obj_types_in_group(OBJ_TYPE_JOINTS, (applyproc_t) stub_joints_2, group);
         apply_to_obj_types_in_group(OBJ_TYPE_JOINTS, (applyproc_t) func_801911A8, group);
     }
 
     collision_something_801926A4(net);
     gd_mult_mat4f(&net->mat128, &D_801B9DC8, &net->mat128);
     if (group != NULL) {
-        apply_to_obj_types_in_group(OBJ_TYPE_JOINTS, (applyproc_t) func_801913C0, group);
+        apply_to_obj_types_in_group(OBJ_TYPE_JOINTS, (applyproc_t) func_80181894, group);
         apply_to_obj_types_in_group(OBJ_TYPE_BONES,  (applyproc_t) func_8018FA68, group);
     }
 }

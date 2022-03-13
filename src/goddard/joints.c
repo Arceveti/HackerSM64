@@ -295,12 +295,12 @@ void func_8018F328(struct ObjBone *b) {
     b->worldPos.y = (joint1->worldPos.y + joint2->worldPos.y) / 2.0f;
     b->worldPos.z = (joint1->worldPos.z + joint2->worldPos.z) / 2.0f;
 
-    b->unk58.x = joint2->worldPos.x - joint1->worldPos.x;
-    b->unk58.y = joint2->worldPos.y - joint1->worldPos.y;
-    b->unk58.z = joint2->worldPos.z - joint1->worldPos.z;
+    b->direction.x = joint2->worldPos.x - joint1->worldPos.x;
+    b->direction.y = joint2->worldPos.y - joint1->worldPos.y;
+    b->direction.z = joint2->worldPos.z - joint1->worldPos.z;
 
-    gd_normalize_vec3f(&b->unk58);
-    gd_create_origin_lookat(&b->matB0, &b->unk58, 0.0f);
+    gd_normalize_vec3f(&b->direction);
+    gd_create_origin_lookat(&b->matB0, &b->direction, 0.0f);
 }
 
 /* 23DC9C -> 23DCF0 */
@@ -337,9 +337,9 @@ void func_8018F520(struct ObjBone *b) {
     b->worldPos.y = (joint1->worldPos.y + joint2->worldPos.y) / 2.0f;
     b->worldPos.z = (joint1->worldPos.z + joint2->worldPos.z) / 2.0f;
 
-    sp90.x = b->unk58.x;
-    sp90.y = b->unk58.y;
-    sp90.z = b->unk58.z;
+    sp90.x = b->direction.x;
+    sp90.y = b->direction.y;
+    sp90.z = b->direction.z;
 
     sp6C.x = sp90.x;
     sp6C.y = sp90.y;
@@ -352,7 +352,7 @@ void func_8018F520(struct ObjBone *b) {
     b->unk64.y = sp90.y;
     b->unk64.z = sp90.z;
 
-    sp68 = 5.4f / b->unkF8;
+    sp68 = 5.4f / b->length;
     sp6C.x *= sp68;
     sp6C.y *= sp68;
     sp6C.z *= sp68;
@@ -445,10 +445,9 @@ void func_8018FB58(struct ObjBone *b) {
     vec.x = j1->worldPos.x - j2->worldPos.x;
     vec.y = j1->worldPos.y - j2->worldPos.y;
     vec.z = j1->worldPos.z - j2->worldPos.z;
-
-    b->unkF8 = gd_sqrt_d(SQ(vec.x) + SQ(vec.y) + SQ(vec.z));
-    b->unkF4 = b->unkF8;
-    b->unkFC = b->unkF8;
+    b->length = gd_vec3f_magnitude(&vec);
+    // b->length1 = b->length;
+    // b->length2 = b->length;
     func_8018F328(b);
 }
 
@@ -495,7 +494,7 @@ struct ObjBone *make_bone(s32 flags, struct ObjJoint *j1, struct ObjJoint *j2, U
     gd_set_identity_mat4(&b->mat70);
     b->spring = 0.8f;
     b->unk114 = 0.9f;
-    b->unkF8 = 100.0f;
+    b->length = 100.0f;
 
     if (j1 != NULL && j2 != NULL) {
         add_joint2bone(b, j1);
@@ -563,33 +562,34 @@ s32 func_8018FFE8(struct ObjBone **a0, struct ObjJoint **a1, struct ObjJoint *a2
 /* 23E938 -> 23EBB8 */
 void func_80190168(struct ObjBone *b, UNUSED struct ObjJoint *a1, UNUSED struct ObjJoint *a2,
                    struct GdVec3f *a3) {
-    struct GdVec3f sp7C;
-    f32 sp60;
-    f32 sp5C;
-    f32 sp58;
+    struct GdVec3f vec;
+    f32 limit;
+    f32 spring;
+    f32 mag;
 
     return;
 
     //! dead code
 
-    b->unk58.x = sp7C.x;
-    b->unk58.y = sp7C.y;
-    b->unk58.z = sp7C.z;
+    b->direction.x = vec.x;
+    b->direction.y = vec.y;
+    b->direction.z = vec.z;
 
     if (b->flags & BONE_FLAG_8) {
-        sp58 = gd_vec3f_magnitude(&sp7C);
-        if (sp58 == 0.0f) {
-            sp58 = 1.0f;
+        mag = gd_vec3f_magnitude(&vec);
+        if (mag == 0.0f) {
+            mag = 1.0f;
         }
-        sp60 = (b->unkF8 / sp58) * b->spring;
+        limit = (b->length / mag) * b->spring;
     }
 
     if (b->flags & BONE_FLAG_4) {
-        if (sp60 > (sp58 = gd_vec3f_magnitude(&sp7C))) {
-            sp5C = b->spring;
-            a3->x *= sp5C;
-            a3->y *= sp5C;
-            a3->z *= sp5C;
+        mag = gd_vec3f_magnitude(&vec);
+        if (limit > mag) {
+            spring = b->spring;
+            a3->x *= spring;
+            a3->y *= spring;
+            a3->z *= spring;
         } else {
             a3->x = 0.0f;
             a3->y = 0.0f;
@@ -598,11 +598,12 @@ void func_80190168(struct ObjBone *b, UNUSED struct ObjJoint *a1, UNUSED struct 
     }
 
     if (b->flags & BONE_FLAG_2) {
-        if (sp60 < (sp58 = gd_vec3f_magnitude(&sp7C))) {
-            sp5C = b->spring;
-            a3->x *= sp5C;
-            a3->y *= sp5C;
-            a3->z *= sp5C;
+        mag = gd_vec3f_magnitude(&vec);
+        if (limit < mag) {
+            spring = b->spring;
+            a3->x *= spring;
+            a3->y *= spring;
+            a3->z *= spring;
         } else {
             a3->x = 0.0f;
             a3->y = 0.0f;
@@ -921,11 +922,6 @@ void func_80191220(struct ObjJoint *j) {
     gGdCounter.ctr0++;
 }
 
-/* 23FB90 -> 23FBC0 */
-void func_801913C0(struct ObjJoint *j) {
-    func_80181894(j);
-}
-
 /* 23FBC0 -> 23FCC8 */
 void func_801913F0(struct ObjJoint *j) {
     // hmm...
@@ -942,10 +938,6 @@ void func_801913F0(struct ObjJoint *j) {
     j->unk30.z = j->worldPos.z;
 
     gd_copy_mat4f(&gGdSkinNet->mat128, &j->matE8);
-}
-
-/* 23FCC8 -> 23FCDC */
-void stub_joints_2(UNUSED struct ObjJoint *j) {
 }
 
 /* 23FCDC -> 23FDD4; not called */

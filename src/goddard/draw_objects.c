@@ -835,18 +835,22 @@ void draw_bone(struct GdObj *obj) {
     //! dead code
     scale.x = 1.0f;
     scale.y = 1.0f;
-    scale.z = bone->unkF8 / 50.0f;
+    scale.z = bone->length / 50.0f;
 
     if (bone->header.drawFlags & OBJ_HIGHLIGHTED) {
+        bone->header.drawFlags &= ~OBJ_HIGHLIGHTED;
         colour = COLOUR_YELLOW;
     } else {
         colour = bone->colourNum;
     }
-    bone->header.drawFlags &= ~OBJ_HIGHLIGHTED;
 
     if (sSceneProcessType != FIND_PICKS) {
-        draw_shape(bone->shapePtr, (SHAPE_FLAG_SCALE | SHAPE_FLAG_TRANSLATE | SHAPE_FLAG_ROTATE | SHAPE_FLAG_10), scale.x, scale.y, scale.z, bone->worldPos.x, bone->worldPos.y,
-                   bone->worldPos.z, 0.0f, 0.0f, 0.0f, bone->unk28.x, bone->unk28.y, bone->unk28.z, colour,
+        draw_shape(bone->shapePtr, (SHAPE_FLAG_SCALE | SHAPE_FLAG_TRANSLATE | SHAPE_FLAG_ROTATE | SHAPE_FLAG_10),
+                   scale.x, scale.y, scale.z,
+                   bone->worldPos.x, bone->worldPos.y, bone->worldPos.z,
+                   0.0f, 0.0f, 0.0f,
+                   bone->rotation.x, bone->rotation.y, bone->rotation.z,
+                   colour,
                    &bone->mat70);
     }
 }
