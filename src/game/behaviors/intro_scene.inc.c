@@ -14,7 +14,7 @@ void spawn_child_obj_relative(struct Object *parent, s16 xOffset, s16 yOffset, s
     obj->oPosY += yOffset;
 
     if (gCutsceneTimer > 700) {
-        obj->oPosY += -150.0f;
+        obj->oPosY -= 150.0f;
     }
 
     obj->oPosZ += zOffset;

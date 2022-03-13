@@ -72,27 +72,27 @@ void cap_sink_quicksand(void) {
     switch (o->oAction) {
         case CAP_ACT_QUICKSAND:
             if (o->oTimer < 10) {
-                o->oGraphYOffset += -1.0f;
+                o->oGraphYOffset -= 1.0f;
                 o->oFaceAnglePitch = 0x2000;
             }
             break;
 
         case CAP_ACT_MOVING_QUICKSAND:
             if (o->oTimer < 10) {
-                o->oGraphYOffset += -3.0f;
+                o->oGraphYOffset -= 3.0f;
             }
             o->oFaceAnglePitch = 0x2000;
             break;
 
         case CAP_ACT_INSTANT_QUICKSAND:
-            o->oGraphYOffset += -1.0f;
+            o->oGraphYOffset -= 1.0f;
             if (o->oTimer > 20) {
                 obj_mark_for_deletion(o);
             }
             break;
 
         case CAP_ACT_INSTANT_MOVING_QUICKSAND:
-            o->oGraphYOffset += -6.0f;
+            o->oGraphYOffset -= 6.0f;
             if (o->oTimer > 20) {
                 obj_mark_for_deletion(o);
             }
