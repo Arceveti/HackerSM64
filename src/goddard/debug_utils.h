@@ -35,6 +35,13 @@ union PrintVal {
     s64 pad;
 };
 
+enum GdFileFlags {
+    GD_FILE_FLAGS_NONE  = 0x0,
+    GD_FILE_FLAG_WRITE  = (1 << 0), // 0x01
+    GD_FILE_FLAG_BINARY = (1 << 1), // 0x02
+    GD_FILE_FLAG_EOF    = (1 << 2), // 0x04
+};
+
 /* based on fields set in gd_fopen; gd_malloc_perm(84) for size */
 struct GdFile {
     /* 0x00 */ u8  filler1[4];

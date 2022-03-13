@@ -25,7 +25,7 @@ static s32 sTimerGadgetColours[7] = {
     COLOUR_PINK
 };
 static s32 sNumActiveMemTrackers = 0;   // @ 801A82A0
-static u32 sPrimarySeed = 0x12345678;   // @ 801A82A4
+static u32 sPrimarySeed   = 0x12345678; // @ 801A82A4
 static u32 sSecondarySeed = 0x58374895; // @ 801A82A8
 
 // bss
@@ -529,7 +529,7 @@ f32 gd_rand_float(void) {
 
     for (i = 0; i < 4; i++) {
         if (sPrimarySeed & 0x80000000) {
-            sPrimarySeed = sPrimarySeed << 1 | 1;
+            sPrimarySeed = (sPrimarySeed << 1 | 1);
         } else {
             sPrimarySeed <<= 1;
         }
@@ -569,7 +569,7 @@ s32 gd_atoi(const char *str) {
             isNegative = TRUE;
         } else {
             curval = cur - '0';
-            out += curval & 0xFF;
+            out += (curval & 0xFF);
 
             if (*str == '\0' || *str == '.' || *str < '0' || *str > '9') {
                 break;
@@ -666,14 +666,11 @@ static s32 int_sci_notation(s32 base, s32 significand) {
 
 /* 23C1C8 -> 23C468; orig name: func_8018D9F8 */
 UNUSED char *sprint_val_withspecifiers(char *str, union PrintVal val, char *specifiers) {
-    s32 fracPart; // sp3C
-    s32 intPart;  // sp38
-    s32 intPrec;  // sp34
-    s32 fracPrec; // sp30
-    char cur; // sp2B
-
-    fracPrec = 6;
-    intPrec = 6;
+    s32 fracPart;     // sp3C
+    s32 intPart;      // sp38
+    s32 intPrec  = 6; // sp34
+    s32 fracPrec = 6; // sp30
+    char cur;         // sp2B
 
     while ((cur = *specifiers++)) {
         if (cur == 'd') {
@@ -718,7 +715,7 @@ void ascii_to_uppercase(char *str) {
 
     while ((c = *str)) {
         if (c >= 'a' && c <= 'z') {
-            *str = c & 0xDF;
+            *str = (c & 0xDF);
         }
         str++;
     }
@@ -774,7 +771,7 @@ s32 gd_str_not_equal(const char *str1, const char *str2) {
         }
     }
 
-    return *str1 != '\0' || *str2 != '\0';
+    return (*str1 != '\0' || *str2 != '\0');
 }
 
 /* 23C728 -> 23C7B8; orig name; func_8018DF58 */
@@ -792,12 +789,12 @@ s32 gd_str_contains(const char *str1, const char *str2) {
 
 /* 23C7B8 -> 23C7DC; orig name: func_8018DFE8 */
 s32 gd_feof(struct GdFile *f) {
-    return f->flags & 0x4;
+    return (f->flags & GD_FILE_FLAG_EOF);
 }
 
 /* 23C7DC -> 23C7FC; orig name: func_8018E00C */
 void gd_set_feof(struct GdFile *f) {
-    f->flags |= 0x4;
+    f->flags |= GD_FILE_FLAG_EOF;
 }
 
 /* 23C7FC -> 23CA0C */
@@ -808,9 +805,7 @@ struct GdFile *gd_fopen(const char *filename, const char *mode) {
     struct UnkBufThing buf; // sp24
     u8 *bufbytes;           // sp20
     u8 *fileposptr;         // sp1C
-    s32 filecsr;            // sp18
-
-    filecsr = 0;
+    s32 filecsr = 0;        // sp18
 
     while (TRUE) {
         bufbytes = (u8 *) &buf;
@@ -843,12 +838,13 @@ struct GdFile *gd_fopen(const char *filename, const char *mode) {
 
     f->stream = (s8 *) fileposptr;
     f->size = buf.size;
-    f->pos = f->flags = 0;
+    f->flags = GD_FILE_FLAGS_NONE;
+    f->pos = 0;
     if (gd_str_contains(mode, "w")) {
-        f->flags |= 0x1;
+        f->flags |= GD_FILE_FLAG_WRITE;
     }
     if (gd_str_contains(mode, "b")) {
-        f->flags |= 0x2;
+        f->flags |= GD_FILE_FLAG_BINARY;
     }
 
     return f;
@@ -888,7 +884,7 @@ u32 gd_get_file_size(struct GdFile *f) {
 
 /* 23CB70 -> 23CBA8; orig name: func_8018E3A0 */
 s32 is_newline(char c) {
-    return c == '\r' || c == '\n';
+    return (c == '\r' || c == '\n');
 }
 
 /* 23CBA8 -> 23CCF0; orig name: func_8018E3D8 */
@@ -914,6 +910,7 @@ s32 gd_fread_line(char *buf, u32 size, struct GdFile *f) {
             break;
         }
     }
+
     buf[pos++] = '\0';
 
     return pos;
