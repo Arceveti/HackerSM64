@@ -26,11 +26,6 @@ struct Unk801B9E68 {
     /* 0x04 */ u8 filler[20];
 }; /* sizeof() = 0x18 */
 
-struct Unk8017F3CC {
-    /*0x00*/ u8 filler[32];
-    /*0x20*/ struct GdVec3f unk20;
-};
-
 // data
 f32 D_801A81C0 = 0.0f;
 f32 D_801A81C4 = 0.0f;
@@ -46,10 +41,7 @@ struct ObjGroup *sCurrentMoveGrp; // @ 801B9E14
 struct GdVec3f D_801B9E18;
 struct GdVec3f D_801B9E28;
 f32 D_801B9E34;
-Mat4f *D_801B9E38;
-struct ObjParticle *D_801B9E3C;
 s32 sParticleId = 0;
-Mat4f *D_801B9E48;
 struct ObjCamera *gGdCameraList; // @ 801B9E4C
 void *D_801B9E50;
 struct ObjGroup *gGdGroupList;  // @ 801B9E54
@@ -115,10 +107,6 @@ void get_some_bounding_box(struct GdBoundingBox *a0) {
     a0->maxX = gSomeBoundingBox.maxX;
     a0->maxY = gSomeBoundingBox.maxY;
     a0->maxZ = gSomeBoundingBox.maxZ;
-}
-
-/* @ 22A6A0 for 0x24 */
-void stub_objects_1(UNUSED struct ObjGroup *a0, UNUSED struct GdObj *a1) {
 }
 
 /**
@@ -424,59 +412,55 @@ struct ObjValPtr *make_valptr(struct GdObj *obj, s32 flag, enum ValPtrType type,
 
 /* @ 22B1DC for 0x430 */
 void reset_plane(struct ObjPlane *plane) {
-    struct ObjFace *sp4C;
-    f32 sp48;
-    f32 sp44;
+    struct ObjFace *face;
+    f32 maxNorm;
+    f32 norm;
     s32 i;
-    s32 sp30;
-    f32 sp28;
+    s32 maxNormID;
 
     imin("reset_plane");
 
-    sp4C = plane->unk40;
-    calc_face_normal(sp4C);
-    plane->unk1C = gd_dot_vec3f(&sp4C->vertices[0]->pos, &sp4C->normal);
-    sp48 = 0.0f;
+    face = plane->face;
+    calc_face_normal(face);
+    plane->unk1C = gd_dot_vec3f(&face->vertices[0]->pos, &face->normal);
+    maxNorm = 0.0f;
 
-    sp28 = sp4C->normal.x < 0.0f ? -sp4C->normal.x : sp4C->normal.x;
-    sp44 = sp28;
-    if (sp44 > sp48) {
-        sp30 = 0;
-        sp48 = sp44;
+    norm = ABS(face->normal.x);
+    if (norm > maxNorm) {
+        maxNormID = GD_X_AXIS;
+        maxNorm = norm;
     }
 
-    sp28 = sp4C->normal.y < 0.0f ? -sp4C->normal.y : sp4C->normal.y;
-    sp44 = sp28;
-    if (sp44 > sp48) {
-        sp30 = 1;
-        sp48 = sp44;
+    norm = ABS(face->normal.y);
+    if (norm > maxNorm) {
+        maxNormID = GD_Y_AXIS;
+        maxNorm = norm;
     }
 
-    sp28 = sp4C->normal.z < 0.0f ? -sp4C->normal.z : sp4C->normal.z;
-    sp44 = sp28;
-    if (sp44 > sp48) {
-        sp30 = 2;
+    norm = ABS(face->normal.z);
+    if (norm > maxNorm) {
+        maxNormID = GD_Z_AXIS;
     }
 
-    switch (sp30) {
-        case 0:
-            plane->unk20 = 1;
-            plane->unk24 = 2;
+    switch (maxNormID) {
+        case GD_X_AXIS:
+            plane->axis1 = GD_Y_AXIS;
+            plane->axis2 = GD_Z_AXIS;
             break;
-        case 1:
-            plane->unk20 = 0;
-            plane->unk24 = 2;
+        case GD_Y_AXIS:
+            plane->axis1 = GD_X_AXIS;
+            plane->axis2 = GD_Z_AXIS;
             break;
-        case 2:
-            plane->unk20 = 0;
-            plane->unk24 = 1;
+        case GD_Z_AXIS:
+            plane->axis1 = GD_X_AXIS;
+            plane->axis2 = GD_Y_AXIS;
             break;
     }
 
     reset_bounding_box();
 
-    for (i = 0; i < sp4C->vtxCount; i++) {
-        add_obj_pos_to_bounding_box(&sp4C->vertices[i]->header);
+    for (i = 0; i < face->vtxCount; i++) {
+        add_obj_pos_to_bounding_box(&face->vertices[i]->header);
     }
 
     plane->boundingBox.minX = gSomeBoundingBox.minX;
@@ -502,20 +486,20 @@ void reset_plane(struct ObjPlane *plane) {
 }
 
 /* @ 22B60C for 0x94; orig name: func_8017CE3C */
-struct ObjPlane *make_plane(s32 inZone, struct ObjFace *a1) {
+struct ObjPlane *make_plane(s32 inZone, struct ObjFace *face) {
     struct ObjPlane *newPlane = (struct ObjPlane *) make_object(OBJ_TYPE_PLANES);
 
     gGdPlaneCount++;
     newPlane->id = gGdPlaneCount;
     newPlane->unk18 = inZone;
-    newPlane->unk40 = a1;
+    newPlane->face = face;
     reset_plane(newPlane);
 
     return newPlane;
 }
 
 /* @ 22B6A0 for 0x21C; orig name: func_8017CED0 */
-struct ObjCamera *make_camera(s32 flags, struct GdObj *a1) {
+struct ObjCamera *make_camera(s32 flags, struct GdObj *obj) {
     struct ObjCamera *newCam;
     struct ObjCamera *oldCameraHead;
 
@@ -532,8 +516,8 @@ struct ObjCamera *make_camera(s32 flags, struct GdObj *a1) {
         oldCameraHead->prev = newCam;
     }
 
-    newCam->flags = flags | 0x10;
-    newCam->unk30 = a1;
+    newCam->flags = (flags | CAMERA_FLAG_UNK_10);
+    newCam->unk30 = obj;
     gd_set_identity_mat4(&newCam->unk64);
     gd_set_identity_mat4(&newCam->unkA8);
 
@@ -591,9 +575,9 @@ struct ObjLight *make_light(s32 flags, char *name, s32 id) {
     }
 
     newLight->id = id;
-    newLight->unk30 = 1.0f;
+    newLight->diffuseFac = 1.0f;
     newLight->unk4C = 0;
-    newLight->flags = flags | LIGHT_NEW_UNCOUNTED;
+    newLight->flags = (flags | LIGHT_NEW_UNCOUNTED);
     newLight->unk98 = 0;
     newLight->unk40 = 0;
 
@@ -867,18 +851,11 @@ s32 group_contains_obj(struct ObjGroup *group, struct GdObj *obj) {
     return FALSE;
 }
 
-/* @ 22C9B8 for 0x24 */
-s32 stub_objects_2(void) {
-    s32 sp4 = 0;
-    return sp4;
-}
-
 /**
  * Unused - called by __main__
  */
 s32 make_scene(void) {
-    s32 sp4 = 0;
-    return sp4;
+    return 0;
 }
 
 /* @ 22CA00 for 0x88 */
@@ -1175,17 +1152,15 @@ void transform_child_objects_recursive(struct GdObj *obj, struct GdObj *parentOb
 
 /* @ 22D9E0 for 0x1BC */
 s32 func_8017F210(struct GdObj *a0, struct GdObj *a1) {
-    struct ListNode *sp6C;
-    struct ObjGroup *sp68;
+    struct ListNode *link;
+    struct ObjGroup *grp;
     UNUSED Mat4f *sp60;
     Mat4f *sp5C;
     UNUSED Mat4f *sp58;
     Mat4f *sp54;
     Mat4f *sp50;
     struct GdVec3f sp2C;
-    s32 count = 0;
-
-    count++;
+    s32 count = 1;
 
     if (a1 != NULL) {
         set_cur_dynobj(a1);
@@ -1211,21 +1186,16 @@ s32 func_8017F210(struct GdObj *a0, struct GdObj *a1) {
     }
 
     set_cur_dynobj(a0);
-    sp68 = d_get_att_objgroup();
+    grp = d_get_att_objgroup();
 
-    if (sp68 != NULL) {
-        sp6C = sp68->firstMember;
-        while (sp6C != NULL) {
-            count += func_8017F210(sp6C->obj, a0);
-            sp6C = sp6C->next;
+    if (grp != NULL) {
+        link = grp->firstMember;
+        while (link != NULL) {
+            count += func_8017F210(link->obj, a0);
+            link = link->next;
         }
     }
     return count;
-}
-
-/* @ 22DB9C for 0x38; a0 might be ObjUnk200000* */
-void func_8017F3CC(struct Unk8017F3CC *a0) {
-    gd_rotate_and_translate_vec3f(&a0->unk20, D_801B9E48);
 }
 
 /**
@@ -1703,16 +1673,16 @@ void move_cameras_in_grp(struct ObjGroup *group) {
 /* @ 22F7DC for 0x36C*/
 void func_8018100C(struct ObjLight *light) {
     if (light->unk40 == 3) {
-        if (light->unk30 > 0.0f) {
-            light->unk30 -= 0.2f;
+        if (light->diffuseFac > 0.0f) {
+            light->diffuseFac -= 0.2f;
         }
 
-        if (light->unk30 < 0.0f) {
-            light->unk30 = 0.0f;
+        if (light->diffuseFac < 0.0f) {
+            light->diffuseFac = 0.0f;
         }
 
         if ((light->unk3C & LIGHT_UNK01) != 0) {
-            light->unk30 = 1.0f;
+            light->diffuseFac = 1.0f;
         }
 
         light->unk3C &= ~LIGHT_UNK01;

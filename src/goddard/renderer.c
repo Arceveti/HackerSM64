@@ -90,9 +90,6 @@ static OSMesg D_801BE848[10];
 u8 EUpad1[0x40];
 UNUSED static OSMesgQueue D_801BE8B0;
 static OSMesgQueue sGdDMAQueue; // @ 801BE8C8
-// static u32 unref_801be870[16];
-// static u32 unref_801be8e0[25];
-// static u32 unref_801be948[13];
 u8 EUpad2[0x64];
 static OSMesg sGdMesgBuf[1]; // @ 801BE944
 u8 EUpad3[0x34];
@@ -109,10 +106,8 @@ static u8 D_801BAEA0;
 static struct ObjGadget *sTimerGadgets[GD_NUM_TIMERS]; // @ 801BAEA8
 static u32 D_801BAF28;                                 // RAM addr offset?
 static s16 sTriangleBuf[13][8];                          // [[s16; 8]; 13]? vert indices?
-UNUSED static u32 unref_801bb000[3];
 static u8 *sMemBlockPoolBase; // @ 801BB00C
 static u32 sAllocMemory;      // @ 801BB010; malloc-ed bytes
-UNUSED static u32 unref_801bb014;
 static s32 D_801BB018;
 static s32 D_801BB01C;
 static void *sLoadedTextures[0x10];          // texture pointers
@@ -132,11 +127,8 @@ static s32 sVertexBufStartIndex;                  // Vtx start in GD Dl
 static struct ObjView *sCarSceneView;   // @ 801BB0D0
 static s32 sUpdateYoshiScene;           // @ 801BB0D4; update dl Vtx from ObjVertex?
 static s32 sUpdateMarioScene;           // @ 801BB0D8; update dl Vtx from ObjVertex?
-UNUSED static u32 unref_801bb0dc;
 static s32 sUpdateCarScene; // @ 801BB0E0; guess, not really used
-UNUSED static u32 unref_801bb0e4;
 static struct GdVec3f sTextDrawPos;  // position to draw text? only set in one function, never used
-UNUSED static u32 unref_801bb0f8[2];
 static Mtx sIdnMtx;           // @ 801BB100
 static Mat4f sInitIdnMat4;    // @ 801BB140
 static s8 sVtxCvrtNormBuf[3]; // @ 801BB180
@@ -166,21 +158,16 @@ static LookAt D_801BE7D0[3];
 #if defined(VERSION_JP) || defined(VERSION_US)
 static OSMesgQueue D_801BE830; // controller msg queue
 static OSMesg D_801BE848[10];
-UNUSED static u32 unref_801be870[16];
 UNUSED static OSMesgQueue D_801BE8B0;
 static OSMesgQueue sGdDMAQueue; // @ 801BE8C8
-UNUSED static u32 unref_801be8e0[25];
 static OSMesg sGdMesgBuf[1]; // @ 801BE944
-UNUSED static u32 unref_801be948[13];
 static OSMesg sGdDMACompleteMsg; // msg buf for D_801BE8B0 queue
 static OSIoMesg sGdDMAReqMesg;
 static struct ObjView *D_801BE994; // store if View flag 0x40 set
 #endif
 
 // data
-UNUSED static u32 unref_801a8670 = 0;
 static s32 D_801A8674 = 0;
-UNUSED static u32 unref_801a8678 = 0;
 static s32 D_801A867C = 0;
 static s32 D_801A8680 = 0;
 static f32 sTracked1FrameTime = 0.0f; // @ 801A8684
@@ -195,11 +182,9 @@ static struct GdTimer *D_801A86A4 = NULL; // timer for dlgen, dynamics, or rcp
 static struct GdTimer *D_801A86A8 = NULL; // timer for dlgen, dynamics, or rcp
 static struct GdTimer *D_801A86AC = NULL; // timer for dlgen, dynamics, or rcp
 s32 gGdFrameBufNum = 0;                      // @ 801A86B0
-UNUSED static u32 unref_801a86B4 = 0;
 static struct ObjShape *sHandShape = NULL; // @ 801A86B8
 static s32 D_801A86BC = 1;
 static s32 D_801A86C0 = 0; // gd_dl id for something?
-UNUSED static u32 unref_801a86C4 = 10;
 static s32 sMtxParamType = G_MTX_PROJECTION;
 UNUSED static struct GdVec3f D_801A86CC = { 1.0f, 1.0f, 1.0f };
 static struct ObjView *sActiveView = NULL;  // @ 801A86D8 current view? used when drawing dl
@@ -210,7 +195,6 @@ static struct ObjView *sMenuView = NULL; // @ 801A86E8
 static u32 sItemsInMenu = 0;             // @ 801A86EC
 static s32 sDebugViewsCount = 0;               // number of elements in the sDebugViews array
 static s32 sCurrDebugViewIndex = 0;             // @ 801A86F4; timing activate cool down counter?
-UNUSED static u32 unref_801a86F8 = 0;
 static struct GdDisplayList *sCurrentGdDl = NULL; // @ 801A86FC
 static u32 sGdDlCount = 0;                        // @ 801A8700
 static struct DynListBankInfo sDynLists[] = {     // @ 801A8704
@@ -3502,11 +3486,9 @@ struct GdObj *load_dynlist(struct DynList *dynlist) {
     void *allocPtr;
     uintptr_t dynlistSegStart;
     uintptr_t dynlistSegEnd;
-    s32 i;
+    s32 i = -1;
     s32 tlbEntries;
     struct GdObj *loadedList;
-
-    i = -1;
 
     // Make sure the dynlist exists
     while (sDynLists[++i].list != NULL) {
@@ -3650,9 +3632,7 @@ void func_801A71CC(struct ObjNet *net) {
             }
         }
 
-        if (sp80 == 0) {
-            stub_objects_1(net->unk21C, &linkedZone->header); // stubbed fatal function?
-        } else {
+        if (sp80 != 0) {
             gd_printf("%d/%d planes in zone %d\n", sp80, sp7C, i++);
         }
     }

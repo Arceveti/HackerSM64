@@ -28,10 +28,7 @@ extern struct ObjGroup* sCurrentMoveGrp;
 extern struct GdVec3f D_801B9E18;
 extern struct GdVec3f D_801B9E28;
 extern f32 D_801B9E34;
-extern Mat4f* D_801B9E38;                /* never read from */
-extern struct ObjParticle *D_801B9E3C;  /* never read from */
 extern s32 sParticleId;                  /* always 0 */
-extern Mat4f* D_801B9E48;
 extern struct ObjCamera* gGdCameraList;
 extern void* D_801B9E50;
 extern struct ObjGroup* gGdGroupList;
@@ -50,7 +47,6 @@ extern struct ObjGroup* gGdViewsGroup;
 void reset_bounding_box(void);
 void add_obj_pos_to_bounding_box(struct GdObj *a0);
 void get_some_bounding_box(struct GdBoundingBox *a0);
-void stub_objects_1(UNUSED struct ObjGroup *a0, UNUSED struct GdObj *a1);
 struct GdObj *make_object(enum ObjTypeFlag objFlag);
 struct ObjZone *make_zone(struct ObjGroup *a0, struct GdBoundingBox *a1, struct ObjGroup *a2);
 struct ObjUnk200000 *func_8017C7A0(struct ObjVertex *a0, struct ObjFace *a1);
@@ -58,8 +54,8 @@ struct ListNode *make_link_to_obj(struct ListNode *head, struct GdObj *a1);
 struct VtxLink *make_vtx_link(struct VtxLink *prevLink, Vtx *data);
 struct ObjValPtr *make_valptr(struct GdObj *obj, s32 flags, enum ValPtrType type, size_t offset);
 void reset_plane(struct ObjPlane *plane);
-struct ObjPlane *make_plane(s32 inZone, struct ObjFace *a1);
-struct ObjCamera *make_camera(s32 flags, struct GdObj *a1);
+struct ObjPlane *make_plane(s32 inZone, struct ObjFace *face);
+struct ObjCamera *make_camera(s32 flags, struct GdObj *obj);
 struct ObjMaterial *make_material(UNUSED s32 flags, char *name, s32 id);
 struct ObjLight *make_light(s32 flags, char *name, s32 id);
 struct ObjView *make_view(const char *name, s32 flags, s32 projectionType, s32 ulx, s32 uly, s32 lrx, s32 lry,
@@ -73,7 +69,6 @@ void addto_group(struct ObjGroup *group, struct GdObj *obj);
 void addto_groupfirst(struct ObjGroup *group, struct GdObj *obj);
 s32 group_contains_obj(struct ObjGroup *group, struct GdObj *obj);
 void show_details(enum ObjTypeFlag type);
-s32 stub_objects_2(void);
 s32 make_scene(void);
 void menu_cb_reset_positions(void);
 s32 apply_to_obj_types_in_group(s32 types, applyproc_t fn, struct ObjGroup *group);

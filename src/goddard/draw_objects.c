@@ -250,9 +250,9 @@ void draw_light(struct ObjLight *light) {
 
     if (light->flags & LIGHT_UNK02) {
         gd_set_identity_mat4(&sp54);
-        sp94.x = -light->unk80.x;
-        sp94.y = -light->unk80.y;
-        sp94.z = -light->unk80.z;
+        sp94.x = -light->direction.x;
+        sp94.y = -light->direction.y;
+        sp94.z = -light->direction.z;
         gd_create_origin_lookat(&sp54, &sp94, 0.0f);
         uMultiplier = light->unk38 / 45.0f;
         shape = gSpotShape;
@@ -275,7 +275,7 @@ void draw_material(struct ObjMaterial *mtl) {
     s32 mtlType = mtl->type; // 24
 
     if (mtlType == GD_MTL_SHINE_DL) {
-        if (sPhongLight != NULL && sPhongLight->unk30 > 0.0f) {
+        if (sPhongLight != NULL && sPhongLight->diffuseFac > 0.0f) {
             if (gViewUpdateCamera != NULL) {
                 gd_dl_hilite(mtl->gddlNumber, gViewUpdateCamera, &sPhongLight->position,
                               &sLightPositionOffset, &sPhongLightPosition, &sPhongLight->colour);
@@ -902,7 +902,7 @@ void draw_plane(struct GdObj *obj) {
     } else {
         sUseSelectedColor = FALSE;
     }
-    draw_face(plane->unk40);
+    draw_face(plane->face);
 }
 
 /**
@@ -935,14 +935,14 @@ void register_light(struct ObjLight *light) {
 }
 
 /* 229180 -> 229564 */
-void Proc8017A980(struct ObjLight *light) {
-    f32 sp24; // diffuse factor?
-    f32 sp20;
-    f32 sp1C;
+void update_lighting(struct ObjLight *light) {
+    f32 diffuseFac; // diffuse factor?
+    f32 facMul;
+    f32 diffuseThreshold;
 
-    light->colour.r = light->diffuse.r * light->unk30;
-    light->colour.g = light->diffuse.g * light->unk30;
-    light->colour.b = light->diffuse.b * light->unk30;
+    light->colour.r = light->diffuse.r * light->diffuseFac;
+    light->colour.g = light->diffuse.g * light->diffuseFac;
+    light->colour.b = light->diffuse.b * light->diffuseFac;
     sLightPositionCache[light->id].x = light->position.x - sLightPositionOffset.x;
     sLightPositionCache[light->id].y = light->position.y - sLightPositionOffset.y;
     sLightPositionCache[light->id].z = light->position.z - sLightPositionOffset.z;
@@ -953,27 +953,31 @@ void Proc8017A980(struct ObjLight *light) {
         sPhongLightPosition.z = sLightPositionCache[light->id].z;
         sPhongLight = light;
     }
-    sp24 = light->unk30;
+    diffuseFac = light->diffuseFac;
     if (light->flags & LIGHT_UNK02) {
-        sp20 = -gd_dot_vec3f(&sLightPositionCache[light->id], &light->unk80);
-        sp1C = 1.0f - light->unk38 / 90.0f;
-        if (sp20 > sp1C) {
-            sp20 = (sp20 - sp1C) * (1.0f / (1.0f - sp1C));
-            if (sp20 > 1.0f) {
-                sp20 = 1.0f;
-            } else if (sp20 < 0.0f) {
-                sp20 = 0.0f;
+        facMul = -gd_dot_vec3f(&sLightPositionCache[light->id], &light->direction);
+        diffuseThreshold = 1.0f - light->unk38 / 90.0f;
+        if (facMul > diffuseThreshold) {
+            facMul = (facMul - diffuseThreshold) * (1.0f / (1.0f - diffuseThreshold));
+            if (facMul > 1.0f) {
+                facMul = 1.0f;
+            } else if (facMul < 0.0f) {
+                facMul = 0.0f;
             }
         } else {
-            sp20 = 0.0f;
+            facMul = 0.0f;
         }
-        sp24 *= sp20;
+        diffuseFac *= facMul;
     }
     set_light_id(light->id);
-    gd_setproperty(GD_PROP_DIFUSE_COLOUR, light->diffuse.r * sp24, light->diffuse.g * sp24,
-                   light->diffuse.b * sp24);
-    gd_setproperty(GD_PROP_LIGHT_DIR, sLightPositionCache[light->id].x,
-                   sLightPositionCache[light->id].y, sLightPositionCache[light->id].z);
+    gd_setproperty(GD_PROP_DIFUSE_COLOUR,
+                   light->diffuse.r * diffuseFac,
+                   light->diffuse.g * diffuseFac,
+                   light->diffuse.b * diffuseFac);
+    gd_setproperty(GD_PROP_LIGHT_DIR,
+                   sLightPositionCache[light->id].x,
+                   sLightPositionCache[light->id].y,
+                   sLightPositionCache[light->id].z);
     gd_setproperty(GD_PROP_LIGHTING, 2.0f, 0.0f, 0.0f);
 }
 
@@ -986,7 +990,7 @@ void update_shaders(struct ObjShape *shape, struct GdVec3f *offset) {
     sLightPositionOffset.z = offset->z;
     sPhongLight = NULL;
     if (gGdLightGroup != NULL) {
-        apply_to_obj_types_in_group(OBJ_TYPE_LIGHTS, (applyproc_t) Proc8017A980, gGdLightGroup);
+        apply_to_obj_types_in_group(OBJ_TYPE_LIGHTS, (applyproc_t) update_lighting, gGdLightGroup);
     }
     if (shape->mtlGroup != NULL) {
         apply_to_obj_types_in_group(OBJ_TYPE_MATERIALS, (applyproc_t) apply_obj_draw_fn,
@@ -1007,25 +1011,6 @@ void create_shape_mtl_gddls(struct ObjShape *shape) {
     if (shape->mtlGroup != NULL) {
         apply_to_obj_types_in_group(OBJ_TYPE_MATERIALS, (applyproc_t) create_mtl_gddl_if_empty,
                                     shape->mtlGroup);
-    }
-}
-
-/**
- * Uncalled function that calls a stubbed function (`stub_objects_1()`) for all
- * `GdObj`s in @p grp
- *
- * @param grp Unknown group of objects
- * @return void
- * @note Not called
- */
-void unref_8017AEDC(struct ObjGroup *grp) {
-    struct ListNode *link = grp->firstMember;
-
-    while (link != NULL) {
-        struct GdObj *obj = link->obj;
-
-        stub_objects_1(grp, obj);
-        link = link->next;
     }
 }
 
@@ -1338,7 +1323,7 @@ void update_view(struct ObjView *view) {
         view->activeCam = gViewUpdateCamera;
 
         if (view->activeCam != NULL) {
-            gViewUpdateCamera->unk18C = view;
+            gViewUpdateCamera->view = view;
         }
     }
 

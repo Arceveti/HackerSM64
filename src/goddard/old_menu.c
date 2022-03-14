@@ -46,25 +46,25 @@ void get_objvalue(union ObjVarVal *dst, enum ValPtrType type, void *base, size_t
 }
 
 /* 239F78 -> 23A00C */
-void Unknown8018B7A8(void *a0) {
-    struct GdVec3f sp1C;
+void Unknown8018B7A8(void *ptr) {
+    struct GdVec3f pos;
 
-    set_cur_dynobj(a0);
-    d_get_init_pos(&sp1C);
+    set_cur_dynobj(ptr);
+    d_get_init_pos(&pos);
 
-    sp1C.x += sStaticVec.x;
-    sp1C.y += sStaticVec.y;
-    sp1C.z += sStaticVec.z;
-    d_set_world_pos(sp1C.x, sp1C.y, sp1C.z);
+    pos.x += sStaticVec.x;
+    pos.y += sStaticVec.y;
+    pos.z += sStaticVec.z;
+    d_set_world_pos(pos.x, pos.y, pos.z);
 }
 
 /* 23A190 -> 23A250 */
-struct ObjLabel *make_label(struct ObjValPtr *ptr, char *str, s32 a2, f32 x, f32 y, f32 z) {
+struct ObjLabel *make_label(struct ObjValPtr *ptr, char *str, s32 flags, f32 x, f32 y, f32 z) {
     struct ObjLabel *label = (struct ObjLabel *) make_object(OBJ_TYPE_LABELS);
     label->valfn = NULL;
     label->valptr = ptr;
     label->fmtstr = str;
-    label->unk24 = a2;
+    label->flags = flags;
     label->unk30 = 4;
     label->position.x = x;
     label->position.y = y;

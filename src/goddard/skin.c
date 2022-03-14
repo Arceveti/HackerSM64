@@ -16,7 +16,6 @@
 // bss
 struct ObjNet *gGdSkinNet; // @ 801BAAF0
 
-static s32 D_801BAAF4;
 static s32 sNetCount; // @ 801BAAF8
 
 /* 2406E0 -> 240894 */
@@ -60,7 +59,6 @@ void reset_net(struct ObjNet *net) {
     gd_print_bounding_box("net box: ", &net->boundingBox);
 
     gGdSkinNet = net;
-    D_801BAAF4 = 0;
     gd_set_identity_mat4(&net->mat168);
     gd_set_identity_mat4(&net->matE8);
     gd_rot_mat_about_vec(&net->matE8, &net->unk68); // set rot mtx to initial rotation?
@@ -70,7 +68,7 @@ void reset_net(struct ObjNet *net) {
     grp = net->unk1C8;
 
     if (grp != NULL) {
-        apply_to_obj_types_in_group(OBJ_TYPE_JOINTS, (applyproc_t) reset_joint, grp);
+        apply_to_obj_types_in_group(OBJ_TYPE_JOINTS, (applyproc_t) reset_joint,   grp);
         apply_to_obj_types_in_group(OBJ_TYPE_JOINTS, (applyproc_t) func_80191220, grp);
         apply_to_obj_types_in_group(OBJ_TYPE_BONES,  (applyproc_t) func_8018FB58, grp);
         apply_to_obj_types_in_group(OBJ_TYPE_BONES,  (applyproc_t) func_8018FA68, grp);
@@ -94,7 +92,6 @@ void func_801922FC(struct ObjNet *net) {
     // TODO: netype constants?
     if (net->netType == NET_TYPE_DYNAMIC_BONES) {
         if (net->shapePtr != NULL) {
-            D_801B9E38 = &net->mat128;
             scale_verts(net->shapePtr->vtxGroup);
         }
 
@@ -199,10 +196,10 @@ void collision_something_801926A4(struct ObjNet *net) {
 
 /* 2412A0 -> 24142C; not called */
 void func_80192AD0(struct ObjNet *net) {
-    struct ObjGroup *sp60 = net->unk1C8;
+    struct ObjGroup *grp = net->unk1C8;
     struct ObjNet *sp18;
 
-    if (sp60 == NULL) {
+    if (grp == NULL) {
         return;
     }
 
@@ -215,27 +212,27 @@ void func_80192AD0(struct ObjNet *net) {
     net->worldPos.x += net->unk1F0->worldPos.x;
     net->worldPos.y += net->unk1F0->worldPos.y;
     net->worldPos.z += net->unk1F0->worldPos.z;
-    net->unk200.x = 0.0f;
+    net->unk200.x =  0.0f;
     net->unk200.y = 10.0f;
     net->unk200.z = -4.0f;
     gd_rotate_and_translate_vec3f(&net->unk200, &sp18->mat128);
 
-    apply_to_obj_types_in_group(OBJ_TYPE_JOINTS, (applyproc_t) func_80191824, sp60);
-    func_80191E88(sp60);
-    apply_to_obj_types_in_group(OBJ_TYPE_BONES, (applyproc_t) func_8018F328, net->unk20C);
+    apply_to_obj_types_in_group(OBJ_TYPE_JOINTS, (applyproc_t) func_80191824, grp);
+    func_80191E88(grp);
+    apply_to_obj_types_in_group(OBJ_TYPE_BONES, (applyproc_t) func_8018F328, net->boneGrp);
 }
 
 /* 24142C -> 24149C; orig name: func_80192C5C */
 void move_bonesnet(struct ObjNet *net) {
-    struct ObjGroup *sp24;
+    struct ObjGroup *grp;
 
     imin("move_bonesnet");
     gd_set_identity_mat4(&D_801B9DC8);
 
-    sp24 = net->unk1C8;
+    grp = net->unk1C8;
 
-    if (sp24 != NULL) {
-        apply_to_obj_types_in_group(OBJ_TYPE_JOINTS, (applyproc_t) func_80181894, sp24);
+    if (grp != NULL) {
+        apply_to_obj_types_in_group(OBJ_TYPE_JOINTS, (applyproc_t) func_80181894, grp);
     }
     imout();
 }

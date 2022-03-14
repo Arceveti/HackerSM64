@@ -356,9 +356,8 @@ s32 scan_to_next_non_whitespace(void) {
 s32 is_next_buf_word(char *a0) {
     char curChar;
     char wordBuf[0xfc];
-    u32 bufLength;
+    u32 bufLength = 0;
 
-    bufLength = 0;
     for (curChar = get_and_advance_buf(); curChar != '\0'; curChar = get_and_advance_buf()) {
         if (is_white_space(curChar) || is_line_end(curChar)) {
             break;
@@ -1416,14 +1415,14 @@ struct ObjGroup *Unknown8019AB98(UNUSED u32 a0) {
     light1->diffuse.g = 0.0f;
     light1->diffuse.b = 0.0f;
 
-    light1->unk30 = 1.0f;
+    light1->diffuseFac = 1.0f;
 
     light1->unk68.x = 0.4f;
     light1->unk68.y = 0.9f;
 
-    light1->unk80.x = 4.0f;
-    light1->unk80.y = 4.0f;
-    light1->unk80.z = 2.0f;
+    light1->direction.x = 4.0f;
+    light1->direction.y = 4.0f;
+    light1->direction.z = 2.0f;
 
     light2 = make_light(0, NULL, 1);
     light2->position.x = 100.0f;
@@ -1434,11 +1433,11 @@ struct ObjGroup *Unknown8019AB98(UNUSED u32 a0) {
     light2->diffuse.g = 0.0f;
     light2->diffuse.b = 1.0f;
 
-    light2->unk30 = 1.0f;
+    light2->diffuseFac = 1.0f;
 
-    light2->unk80.x = -4.0f;
-    light2->unk80.y = 4.0f;
-    light2->unk80.z = -2.0f;
+    light2->direction.x = -4.0f;
+    light2->direction.y =  4.0f;
+    light2->direction.z = -2.0f;
 
     gGdLightGroup = make_group_of_type(OBJ_TYPE_LIGHTS, oldObjHead, NULL);
 
@@ -1463,7 +1462,7 @@ struct ObjGroup *Unknown8019ADC4(UNUSED u32 a0) {
     newLight->diffuse.g = 0.0f;
     newLight->diffuse.b = 0.0f;
 
-    newLight->unk30 = 1.0f;
+    newLight->diffuseFac = 1.0f;
 
     gGdLightGroup = make_group_of_type(OBJ_TYPE_LIGHTS, oldObjHead, NULL);
 

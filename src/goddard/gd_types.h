@@ -383,7 +383,7 @@ struct ObjNet {
     /* 0x1F0 */ struct ObjNet *unk1F0;  // or joint. guess from Unknown80192AD0
     /* 0x1F4 */ struct GdVec3f unk1F4;
     /* 0x200 */ struct GdVec3f unk200;
-    /* 0x20C */ struct ObjGroup *unk20C;
+    /* 0x20C */ struct ObjGroup *boneGrp;
     /* 0x210 */ s32 ctrlType;     // has no purpose
     /* 0x214 */ u8  filler2[8];
     /* 0x21C */ struct ObjGroup *unk21C;
@@ -394,10 +394,10 @@ struct ObjPlane {
     /* 0x14 */ u32 id;
     /* 0x18 */ s32 unk18; //bool;  contained within zone? (from its parent Net?)
     /* 0x1C */ f32 unk1C;
-    /* 0x20 */ s32 unk20;
-    /* 0x24 */ s32 unk24;
+    /* 0x20 */ s32 axis1;
+    /* 0x24 */ s32 axis2;
     /* 0x28 */ struct GdBoundingBox boundingBox;
-    /* 0x40 */ struct ObjFace* unk40;
+    /* 0x40 */ struct ObjFace* face;
 }; /* sizeof = 0x44*/
 
 struct ObjVertex {
@@ -460,7 +460,7 @@ struct ObjCamera {
     /* 0x178 */ f32 unk178;
     /* 0x17C */ f32 unk17C;
     /* 0x180 */ struct GdVec3f unk180;
-    /* 0x18C */ struct ObjView *unk18C; // view that has/is using this camera?
+    /* 0x18C */ struct ObjView *view; // view that has/is using this camera?
 }; /* sizeof = 0x190 */
 
 enum GdMtlTypes {
@@ -590,7 +590,7 @@ struct ObjLabel {
     /* 0x00 */ struct GdObj header;
     /* 0x14 */ struct GdVec3f position;
     /* 0x20 */ char *fmtstr;  // format string for displaying the value contained in `valptr`
-    /* 0x24 */ s32 unk24;  // always 8
+    /* 0x24 */ s32 flags;  // always 8
     /* 0x28 */ struct ObjValPtr *valptr;
     /* 0x2C */ valptrproc_t valfn;
     /* 0x30 */ s32 unk30;       // set to 3 or 4 in the code, but never actually used. could possibly be colourNum?
@@ -682,7 +682,7 @@ struct ObjLight {
     /* 0x20 */ char name[8];
     /* 0x28 */ u8  filler2[4];
     /* 0x2C */ s32 flags;
-    /* 0x30 */ f32 unk30;       // color (5C) = Kd (50) * 30
+    /* 0x30 */ f32 diffuseFac;       // color (5C) = Kd (50) * 30
     /* 0x34 */ u8  filler3[4];
     /* 0x38 */ f32 unk38; // calculated diffuse theta (in degrees?)
     /* 0x3C */ s32 unk3C;
@@ -693,8 +693,8 @@ struct ObjLight {
     /* 0x5C */ struct GdColour colour;
     /* 0x68 */ struct GdVec3f unk68;
     /* 0x74 */ struct GdVec3f position;
-    /* 0x80 */ struct GdVec3f unk80;
-    /* 0x8C */ struct GdVec3f unk8C;
+    /* 0x80 */ struct GdVec3f direction;
+    /* 0x8C */ struct GdVec3f unk8C; // unused
     /* 0x98 */ s32 unk98;
     /* 0x9C */ struct ObjShape *unk9C;
 }; /* sizeof = 0xA0 */
@@ -710,8 +710,8 @@ struct ObjZone {
 struct ObjUnk200000 {
     /* 0x00 */ struct GdObj header;
     /* 0x14 */ u8  filler[28];
-    /* 0x30 */ struct ObjVertex *unk30; //not sure; guessing for Unknown801781DC; 30 and 34 could switch with ObjZone
-    /* 0x34 */ struct ObjFace *unk34;   //not sure; guessing for Unknown801781DC
+    /* 0x30 */ struct ObjVertex *unk30; // not sure; guessing for Unknown801781DC; 30 and 34 could switch with ObjZone
+    /* 0x34 */ struct ObjFace *unk34;   // not sure; guessing for Unknown801781DC
 }; /* sizeof = 0x38*/
 
 #endif // GD_TYPES_H
