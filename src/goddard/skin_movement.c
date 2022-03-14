@@ -11,8 +11,8 @@
 
 /* bss */
 struct ObjWeight *sResetCurWeight;
-static Mat4f D_801B9EA8; // TODO: rename to sHead2Mtx?
-static struct ObjJoint *D_801B9EE8;  // set but not used
+static Mat4f sHead2Mtx; // TODO: rename to sHead2Mtx?
+s32 sResetWeightVtxNum;
 
 /* @ 22FDB0 for 0x180 */
 void func_801815E0(Mat4f *mtx) {
@@ -45,13 +45,13 @@ void func_801815E0(Mat4f *mtx) {
 
 /* @ 22FF30 for 0xDC */
 /* called with ObjNext->unk1A8 (variable obj ptr?) ->unk20 or ->unk24 ptr*/
-// TODO: figure out the proper object type for a0
-void scale_verts(struct ObjGroup *a0) {
+// TODO: figure out the proper object type for grp
+void scale_verts(struct ObjGroup *grp) {
     f32 scale;
     struct ListNode *link;
     struct ObjVertex *vtx;
 
-    for (link = a0->firstMember; link != NULL; link = link->next) {
+    for (link = grp->firstMember; link != NULL; link = link->next) {
         vtx = (struct ObjVertex *) link->obj;
 
         scale = vtx->scaleFactor;
@@ -116,7 +116,7 @@ void reset_weight_vtx(struct ObjVertex *vtx) {
         localVec.y = vtx->pos.y;
         localVec.z = vtx->pos.z;
 
-        gd_rotate_and_translate_vec3f(&localVec, &D_801B9EA8);
+        gd_rotate_and_translate_vec3f(&localVec, &sHead2Mtx);
         sResetCurWeight->vec20.x = localVec.x;
         sResetCurWeight->vec20.y = localVec.y;
         sResetCurWeight->vec20.z = localVec.z;
@@ -147,8 +147,7 @@ void reset_weight(struct ObjWeight *weight) {
 void reset_joint_weights(struct ObjJoint *joint) {
     struct ObjGroup *group;
 
-    gd_inverse_mat4f(&joint->matE8, &D_801B9EA8);
-    D_801B9EE8 = joint;
+    gd_inverse_mat4f(&joint->matE8, &sHead2Mtx);
     group = joint->weightGrp;
 
     if (group != NULL) {

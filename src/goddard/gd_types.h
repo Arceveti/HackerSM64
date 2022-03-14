@@ -183,7 +183,7 @@ struct ObjBone {
     /* 0x100 */ s32 colourNum;             // "colour"
     /* 0x104 */ s32 flags;
     /* 0x108 */ s32 id;
-    /* 0x10C */ struct ObjGroup *unk10C; // group of joints?
+    /* 0x10C */ struct ObjGroup *jointGrp; // group of joints?
     /* 0x110 */ f32 spring;
     /* 0x114 */ f32 unk114;
     /* 0x118 */ f32 unk118;
@@ -230,7 +230,7 @@ struct ObjJoint {
     /* 0x1B8 */ u8  filler3[4];
     /* 0x1BC */ s32 flags;     // "flags" - 0x2000 = grabbed
     /* 0x1C0 */ s32 unk1C0;
-    /* 0x1C4 */ struct ObjGroup *unk1C4;    // bone group?
+    /* 0x1C4 */ struct ObjGroup *boneGrp;    // bone group?
     /* 0x1C8 */ s32 colourNum;
     /* 0x1CC */ s32 type;     // 0 = normal joint, 5 = grabbable joint. seems to be set, but never used
     /* 0x1D0 */ struct ObjAnimator *rootAnimator;  // root animator? used by eye_joint_update_func
