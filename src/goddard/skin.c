@@ -123,7 +123,7 @@ struct ObjNet *make_net(UNUSED s32 flags, struct ObjShape *shapedata, struct Obj
     net->ctrlType = 0;
     net->unk21C = NULL;
     net->unk3C = 1;
-    net->colourNum = 0;
+    net->colourNum = COLOUR_BLACK;
     net->skinGrp = NULL;
     reset_net(net);
 

@@ -1283,7 +1283,7 @@ void d_set_shapeptrptr(struct ObjShape **shpPtrptr) {
     switch (sDynListCurObj->type) {
         case OBJ_TYPE_JOINTS:
             ((struct ObjJoint *) sDynListCurObj)->shapePtr = *shpPtrptr;
-            ((struct ObjJoint *) sDynListCurObj)->colourNum = 0;
+            ((struct ObjJoint *) sDynListCurObj)->colourNum = COLOUR_BLACK;
             break;
         case OBJ_TYPE_NETS:
             ((struct ObjNet *) sDynListCurObj)->shapePtr = *shpPtrptr;
@@ -1324,7 +1324,7 @@ void d_set_shapeptr(DynObjName name) {
     switch (sDynListCurObj->type) {
         case OBJ_TYPE_JOINTS:
             ((struct ObjJoint *) sDynListCurObj)->shapePtr = (struct ObjShape *) info->obj;
-            ((struct ObjJoint *) sDynListCurObj)->colourNum = 0;
+            ((struct ObjJoint *) sDynListCurObj)->colourNum = COLOUR_BLACK;
             break;
         case OBJ_TYPE_NETS:
             ((struct ObjNet *) sDynListCurObj)->shapePtr = (struct ObjShape *) info->obj;

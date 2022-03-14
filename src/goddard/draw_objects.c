@@ -555,9 +555,9 @@ void draw_net(struct ObjNet *self) {
  * Draws a gadget
  */
 void draw_gadget(struct ObjGadget *gdgt) {
-    s32 colour = 0;
+    s32 colour = COLOUR_BLACK;
 
-    if (gdgt->colourNum != 0) {
+    if (gdgt->colourNum != COLOUR_BLACK) {
         colour = gdgt->colourNum;
     }
 

@@ -6,6 +6,7 @@
 #include "gd_types.h"
 #include "macros.h"
 #include "objects.h"
+#include "draw_objects.h"
 #include "old_menu.h"
 #include "renderer.h"
 
@@ -23,7 +24,6 @@
 // bss
 UNUSED static char sDefSettingsMenuStr[0x100];
 static struct GdVec3f sStaticVec;
-UNUSED static struct GdVec3f unusedVec;
 static struct ObjGadget *sCurGadgetPtr;
 
 // forward declarations
@@ -80,7 +80,7 @@ struct ObjGadget *make_gadget(UNUSED s32 a0, s32 a1) {
     gdgt->rangeMax = 1.0f;
     gdgt->rangeMin = 0.0f;
     gdgt->unk20 = a1;
-    gdgt->colourNum = 0;
+    gdgt->colourNum = COLOUR_BLACK;
     gdgt->sliderPos = 1.0f;
     gdgt->size.x = 100.0f;
     gdgt->size.y = 10.0f;
