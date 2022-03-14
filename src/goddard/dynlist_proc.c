@@ -2365,7 +2365,7 @@ void d_link_with_ptr(void *ptr) {
     imin("dLinkWithPtr");
     switch (sDynListCurObj->type) {
         case OBJ_TYPE_CAMERAS:
-            ((struct ObjCamera *) dynobj)->unk30 = ptr;
+            ((struct ObjCamera *) dynobj)->obj = ptr;
             break;
         case OBJ_TYPE_GROUPS:
             link = make_link_to_obj(NULL, ptr);

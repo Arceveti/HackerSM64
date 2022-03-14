@@ -20,12 +20,6 @@
 #include "shape_helper.h"
 #include "skin.h"
 
-// structs
-struct Unk801B9E68 {
-    /* 0x00 */ s32 count;
-    /* 0x04 */ u8 filler[20];
-}; /* sizeof() = 0x18 */
-
 // data
 f32 D_801A81C0 = 0.0f;
 f32 D_801A81C4 = 0.0f;
@@ -49,7 +43,7 @@ s32 gGdObjCount;                // @ 801B9E58
 s32 gGdGroupCount;              // @ 801B9E5C
 s32 gGdPlaneCount;              // @ 801B9E60
 s32 gGdCameraCount;             // @ 801B9E64
-struct Unk801B9E68 sGdViewInfo; // @ 801B9E68
+s32 sGdViewCount;           // @ 801B9E68
 void *D_801B9E80;
 struct ObjJoint *gGdJointList;  // @ 801B9E84
 struct ObjBone *gGdBoneList;    // @ 801B9E88
@@ -517,7 +511,7 @@ struct ObjCamera *make_camera(s32 flags, struct GdObj *obj) {
     }
 
     newCam->flags = (flags | CAMERA_FLAG_UNK_10);
-    newCam->unk30 = obj;
+    newCam->obj = obj;
     gd_set_identity_mat4(&newCam->unk64);
     gd_set_identity_mat4(&newCam->unkA8);
 
@@ -535,7 +529,7 @@ struct ObjCamera *make_camera(s32 flags, struct GdObj *obj) {
     newCam->zoomLevel = 0;
     newCam->maxZoomLevel = -1;
 
-    newCam->unkA4 = 0.0f;
+    newCam->roll = 0.0f;
 
     newCam->lookAt.x = newCam->lookAt.y = newCam->lookAt.z = 0.0f;
     newCam->worldPos.x = newCam->worldPos.y = newCam->worldPos.z = 0.0f;
@@ -598,7 +592,7 @@ struct ObjView *make_view(const char *name, s32 flags, s32 projectionType, s32 u
     addto_group(gGdViewsGroup, &newView->header);
 
     newView->flags = (flags | VIEW_UPDATE | VIEW_LIGHT);
-    newView->id = sGdViewInfo.count++;
+    newView->id = sGdViewCount++;
     newView->components = parts;
 
     if (newView->components != NULL) {
@@ -608,9 +602,9 @@ struct ObjView *make_view(const char *name, s32 flags, s32 projectionType, s32 u
     newView->unk78 = 0;
     newView->projectionType = projectionType;
 
-    newView->clipping.x = 30.0f;
+    newView->clipping.x =   30.0f;
     newView->clipping.y = 5000.0f;
-    newView->clipping.z = 45.0f;
+    newView->clipping.z =   45.0f;
 
     newView->upperLeft.x = (f32) ulx;
     newView->upperLeft.y = (f32) uly;
@@ -851,13 +845,6 @@ s32 group_contains_obj(struct ObjGroup *group, struct GdObj *obj) {
     return FALSE;
 }
 
-/**
- * Unused - called by __main__
- */
-s32 make_scene(void) {
-    return 0;
-}
-
 /* @ 22CA00 for 0x88 */
 static void reset_joint_or_net(struct GdObj *obj) {
     struct GdObj *localObjPtr = obj;
@@ -954,6 +941,7 @@ s32 apply_to_obj_types_in_group(s32 types, applyproc_t func, struct ObjGroup *gr
 
         curLink = nextLink;
     }
+
     return fnAppliedCount;
 }
 
@@ -1151,7 +1139,7 @@ void transform_child_objects_recursive(struct GdObj *obj, struct GdObj *parentOb
 }
 
 /* @ 22D9E0 for 0x1BC */
-s32 func_8017F210(struct GdObj *a0, struct GdObj *a1) {
+s32 func_8017F210(struct GdObj *obj1, struct GdObj *obj2) {
     struct ListNode *link;
     struct ObjGroup *grp;
     UNUSED Mat4f *sp60;
@@ -1159,39 +1147,39 @@ s32 func_8017F210(struct GdObj *a0, struct GdObj *a1) {
     UNUSED Mat4f *sp58;
     Mat4f *sp54;
     Mat4f *sp50;
-    struct GdVec3f sp2C;
+    struct GdVec3f scale;
     s32 count = 1;
 
-    if (a1 != NULL) {
-        set_cur_dynobj(a1);
+    if (obj2 != NULL) {
+        set_cur_dynobj(obj2);
         sp60 = d_get_matrix_ptr();
         sp54 = (Mat4f *) d_get_rot_mtx_ptr();
 
-        set_cur_dynobj(a0);
+        set_cur_dynobj(obj1);
         sp5C = d_get_i_mtx_ptr();
         sp50 = (Mat4f *) d_get_rot_mtx_ptr();
 
-        d_get_scale(&sp2C);
+        d_get_scale(&scale);
         gd_mult_mat4f(sp5C, sp54, sp50);
-        gd_scale_mat4f_by_vec3f(sp50, &sp2C);
+        gd_scale_mat4f_by_vec3f(sp50, &scale);
     } else {
-        set_cur_dynobj(a0);
+        set_cur_dynobj(obj1);
         sp58 = d_get_matrix_ptr();
         sp5C = d_get_i_mtx_ptr();
         sp54 = (Mat4f *) d_get_rot_mtx_ptr();
 
-        d_get_scale(&sp2C);
+        d_get_scale(&scale);
         gd_copy_mat4f(sp5C, sp54);
-        gd_scale_mat4f_by_vec3f(sp54, &sp2C);
+        gd_scale_mat4f_by_vec3f(sp54, &scale);
     }
 
-    set_cur_dynobj(a0);
+    set_cur_dynobj(obj1);
     grp = d_get_att_objgroup();
 
     if (grp != NULL) {
         link = grp->firstMember;
         while (link != NULL) {
-            count += func_8017F210(link->obj, a0);
+            count += func_8017F210(link->obj, obj1);
             link = link->next;
         }
     }
@@ -1488,11 +1476,10 @@ void drag_picked_object(struct GdObj *inputObj) {
         return;
     }
 
-    dispMag = gd_vec3f_magnitude(&gViewUpdateCamera->unk40);
-    dispMag /= 1000.0f;
+    dispMag = gd_vec3f_magnitude(&gViewUpdateCamera->unk40) / 1000.0f;
 
-    displacement.x = ((f32)(ctrl->csrX - ctrl->dragStartX)) * dispMag;
-    displacement.y = ((f32) - (ctrl->csrY - ctrl->dragStartY)) * dispMag;
+    displacement.x = ((f32) (ctrl->csrX - ctrl->dragStartX)) * dispMag;
+    displacement.y = ((f32)-(ctrl->csrY - ctrl->dragStartY)) * dispMag;
     displacement.z = 0.0f;
 
     gd_inverse_mat4f(&gViewUpdateCamera->unkE8, &sp40);
@@ -1546,7 +1533,7 @@ void find_and_drag_picked_object(struct ObjGroup *group) {
 
 /* @ 22F180 for 0x624; orig name: func_801809B0 */
 void move_camera(struct ObjCamera *cam) {
-    struct GdObj *spEC;
+    struct GdObj *obj;
     struct GdVec3f spE0;
     struct GdVec3f spD4;
     struct GdVec3f spC8;
@@ -1563,10 +1550,10 @@ void move_camera(struct ObjCamera *cam) {
     spE0.x = spE0.y = spE0.z = 0.0f;
     spB0.x = spB0.y = spB0.z = 0.0f;
 
-    spEC = cam->unk30;
+    obj = cam->obj;
 
-    if (spEC != NULL) {
-        set_cur_dynobj(spEC);
+    if (obj != NULL) {
+        set_cur_dynobj(obj);
         d_get_world_pos(&spE0);
         d_get_matrix(&sp70);
 
@@ -1740,7 +1727,7 @@ void null_obj_lists(void) {
     gGdGroupCount = 0;
     gGdPlaneCount = 0;
     gGdCameraCount = 0;
-    sGdViewInfo.count = 0;
+    sGdViewCount = 0;
 
     gGdCameraList = NULL;
     D_801B9E50 = NULL;

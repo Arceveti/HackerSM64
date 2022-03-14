@@ -36,10 +36,6 @@ u32 __main__(void) {
     gGdCtrl.newStartPress = FALSE;
     gGdCtrl.prevFrame = &gGdCtrlPrev;
 
-    imin("main - make_scene");
-    make_scene();  // make_scene does nothing, though
-    imout();
-
     gd_init_controllers();
     print_all_memtrackers();
 

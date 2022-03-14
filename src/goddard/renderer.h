@@ -78,7 +78,7 @@ void gd_dl_mul_trans_matrix(f32 x, f32 y, f32 z);
 void gd_dl_load_trans_matrix(f32 x, f32 y, f32 z);
 void gd_dl_scale(f32 x, f32 y, f32 z);
 void gd_dl_rotate(f32 ang, s8 axis);
-void gd_dl_lookat(struct ObjCamera *cam, f32 arg1, f32 arg2, f32 arg3, f32 arg4, f32 arg5, f32 arg6, f32 arg7);
+void gd_dl_lookat(struct ObjCamera *cam, f32 xFrom, f32 yFrom, f32 zFrom, f32 xTo, f32 yTo, f32 zTo, f32 roll);
 void check_tri_display(s32 vtxcount);
 Vtx *gd_dl_make_vertex(f32 x, f32 y, f32 z, f32 alpha);
 void func_8019FEF0(void);

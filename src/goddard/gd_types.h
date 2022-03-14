@@ -441,7 +441,7 @@ struct ObjCamera {
     /* 0x024 */ struct ObjCamera* next;
     /* 0x028 */ s32 id;
     /* 0x02C */ s32 flags;   // flag of some sort
-    /* 0x030 */ struct GdObj* unk30;   // pointer to some type of object
+    /* 0x030 */ struct GdObj* obj;   // pointer to some type of object
     /* 0x034 */ struct GdVec3f lookAt;  // point that the camera faces
     /* 0x040 */ struct GdVec3f unk40;   // relative position related?
     /* 0x04C */ struct GdVec3f unk4C;
@@ -449,7 +449,7 @@ struct ObjCamera {
     /* 0x05C */ u8  filler[4];
     /* 0x060 */ f32 unk60;
     /* 0x064 */ Mat4f unk64;    //matrix4x4
-    /* 0x0A4 */ f32 unkA4;
+    /* 0x0A4 */ f32 roll;
     /* 0x0A8 */ Mat4f unkA8;    //matrix4x4
     /* 0x0E8 */ Mat4f unkE8;
     /* 0x128 */ struct GdVec3f unk128;  //possibly

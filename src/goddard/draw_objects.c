@@ -579,29 +579,28 @@ void draw_gadget(struct ObjGadget *gdgt) {
 
 /* 22803C -> 22829C */
 void draw_camera(struct ObjCamera *cam) {
-    struct GdVec3f sp44;
-    UNUSED f32 sp40 = 0.0f;
+    struct GdVec3f pos;
 
-    sp44.x = 0.0f;
-    sp44.y = 0.0f;
-    sp44.z = 0.0f;
-    if (cam->unk30 != NULL) {
-        set_cur_dynobj(cam->unk30);
-        d_get_world_pos(&sp44);
-        sp44.x += cam->lookAt.x;
-        sp44.y += cam->lookAt.y;
-        sp44.z += cam->lookAt.z;
+    pos.x = 0.0f;
+    pos.y = 0.0f;
+    pos.z = 0.0f;
+    if (cam->obj != NULL) {
+        set_cur_dynobj(cam->obj);
+        d_get_world_pos(&pos);
+        pos.x += cam->lookAt.x;
+        pos.y += cam->lookAt.y;
+        pos.z += cam->lookAt.z;
     } else {
-        sp44.x = cam->lookAt.x;
-        sp44.y = cam->lookAt.y;
-        sp44.z = cam->lookAt.z;
+        pos.x = cam->lookAt.x;
+        pos.y = cam->lookAt.y;
+        pos.z = cam->lookAt.z;
     }
 
-    if (ABS(cam->worldPos.x - sp44.x) + ABS(cam->worldPos.z - sp44.z) == 0.0f) {
+    if (ABS(cam->worldPos.x - pos.x) + ABS(cam->worldPos.z - pos.z) == 0.0f) {
         gd_printf("Draw_Camera(): Zero view distance\n");
         return;
     }
-    gd_dl_lookat(cam, cam->worldPos.x, cam->worldPos.y, cam->worldPos.z, sp44.x, sp44.y, sp44.z, cam->unkA4);
+    gd_dl_lookat(cam, cam->worldPos.x, cam->worldPos.y, cam->worldPos.z, pos.x, pos.y, pos.z, cam->roll);
 }
 
 /**

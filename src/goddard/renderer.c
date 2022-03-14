@@ -1681,12 +1681,12 @@ void gd_dl_rotate(f32 ang, s8 axis) {
 }
 
 /* 24DAE8 -> 24E1A8 */
-void gd_dl_lookat(struct ObjCamera *cam, f32 arg1, f32 arg2, f32 arg3, f32 arg4, f32 arg5, f32 arg6, f32 arg7) {
+void gd_dl_lookat(struct ObjCamera *cam, f32 xFrom, f32 yFrom, f32 zFrom, f32 xTo, f32 yTo, f32 zTo, f32 roll) {
     LookAt *lookat;
 
-    arg7 *= RAD_PER_DEG;
+    roll *= RAD_PER_DEG;
 
-    gd_mat4f_lookat(&cam->unkE8, arg1, arg2, arg3, arg4, arg5, arg6, gd_sin_d(arg7), gd_cos_d(arg7), 0.0f);
+    gd_mat4f_lookat(&cam->unkE8, xFrom, yFrom, zFrom, xTo, yTo, zTo, gd_sin_d(roll), gd_cos_d(roll), 0.0f);
 
     mat4_to_mtx(&cam->unkE8, &DL_CURRENT_MTX(sCurrentGdDl));
     gSPMatrix(next_gfx(), osVirtualToPhysical(&DL_CURRENT_MTX(sCurrentGdDl)),
