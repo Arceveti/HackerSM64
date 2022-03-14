@@ -7,6 +7,7 @@
 #include "joints.h"
 #include "macros.h"
 #include "objects.h"
+#include "draw_objects.h"
 #include "particles.h"
 #include "renderer.h"
 #include "skin.h"
