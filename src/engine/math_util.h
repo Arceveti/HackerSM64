@@ -493,12 +493,12 @@ ALWAYS_INLINE f32 absf(f32 in) {
 }
 /// Absolute value of an integer value
 ALWAYS_INLINE s32 absi(s32 in) {
-    register s32 t0 = (in >> 31);
+    s32 t0 = (in >> 31);
     return ((in ^ t0) - t0);
 }
 /// Absolute value of a short value
 ALWAYS_INLINE s32 abss(s16 in) {
-    register s32 t0 = (in >> 31);
+    s32 t0 = (in >> 31);
     return ((in ^ t0) - t0);
 }
 /// Backwards compatibility
