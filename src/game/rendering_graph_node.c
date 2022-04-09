@@ -265,6 +265,21 @@ void switch_ucode(Gfx* dlHead, s32 ucode) {
 }
 #endif
 
+#define UPPER_FIXED(x) ((int)((unsigned int)((x) * 0x10000) >> 16))
+#define LOWER_FIXED(x) ((int)((unsigned int)((x) * 0x10000) & 0xFFFF))
+
+// Fixed-point identity matrix with the inverse of world scale
+Mtx identityMatrixWorldScale = {{
+    {UPPER_FIXED(1.0f / WORLD_SCALE) << 16, 0x00000000,
+     UPPER_FIXED(1.0f / WORLD_SCALE) <<  0, 0x00000000},
+    {0x00000000,                            UPPER_FIXED(1.0f / WORLD_SCALE) << 16,
+     0x00000000,                            UPPER_FIXED(1.0f)               <<  0},
+    {LOWER_FIXED(1.0f / WORLD_SCALE) << 16, 0x00000000,
+     LOWER_FIXED(1.0f / WORLD_SCALE) <<  0, 0x00000000},
+    {0x00000000,                            LOWER_FIXED(1.0f / WORLD_SCALE) << 16,
+     0x00000000,                            LOWER_FIXED(1.0f)               <<  0}
+}};
+
 /**
  * Process a master list node. This has been modified, so now it iterates through sRenderPhases to determine the draw order.
  */
@@ -366,6 +381,8 @@ void geo_process_master_list_sub(struct GraphNodeMasterList *node) {
 #ifdef VISUAL_DEBUG
     if (gVisualHitboxView) {
         render_debug_boxes(DEBUG_UCODE_DEFAULT | DEBUG_BOX_CLEAR);
+        // Load the world scale identity matrix
+        gSPMatrix(gDisplayListHead++, &identityMatrixWorldScale, G_MTX_MODELVIEW | G_MTX_LOAD | G_MTX_NOPUSH);
     }
     if (gVisualSurfaceView) {
         // Renders twice, once as decal and once as non-decal.
@@ -504,7 +521,7 @@ void geo_process_perspective(struct GraphNodePerspective *node) {
 
         Gfx* dlHead = gDisplayListHead;
 
-        guPerspective(mtx, &perspNorm, node->fov, sAspectRatio, node->near, node->far, 1.0f);
+        guPerspective(mtx, &perspNorm, node->fov, sAspectRatio, node->near / WORLD_SCALE, node->far / WORLD_SCALE, 1.0f);
         gSPPerspNormalize(dlHead++, perspNorm);
 
         gSPMatrix(dlHead++, VIRTUAL_TO_PHYSICAL(mtx), (G_MTX_PROJECTION | G_MTX_LOAD | G_MTX_NOPUSH));
@@ -627,13 +644,11 @@ void geo_process_camera(struct GraphNodeCamera *node) {
     gCurLookAt->l[1].l.dir[2] = (s8)(127.0f *  (*cameraMatrix)[2][0]);
 #endif
 
-    // Make a copy of the view matrix and scale it based on WORLD_SCALE
+    // Make a copy of the view matrix and scale its translation based on WORLD_SCALE
     Mat4 scaledCamera;
     mtxf_copy(scaledCamera, gCameraTransform);
     for (s32 i = 0; i < 3; i++) {
-        for (s32 j = 0; j < 3; j++) {
-            scaledCamera[i][j] *= WORLD_SCALE;
-        }
+        scaledCamera[3][i] /= WORLD_SCALE;
     }
 
     // Convert the scaled matrix to fixed-point and integrate it into the projection matrix stack
