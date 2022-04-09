@@ -891,24 +891,25 @@ void mtx_rotate_xy(Mtx *mtx, s32 angle) {
 }
 
 void create_transformation_from_matrices(Mat4 dst, Mat4 a1, Mat4 a2) {
-    f32 *dstp = (f32 *)dst;
-    f32 tx = a2[3][0];
-    f32 ty = a2[3][1];
-    f32 tz = a2[3][2];
-    f32 rx, ry, rz;
-    s32 i;
+    Vec3f medium;
+    s32 i, j;
     for (i = 0; i < 3; i++) {
-        rx = a2[i][0];
-        ry = a2[i][1];
-        rz = a2[i][2];
-        dstp[ 0] = (a1[0][0] * rx + a1[0][1] * ry + a1[0][2] * rz); //   dot(a1[0], a2[i])
-        dstp[ 4] = (a1[1][0] * rx + a1[1][1] * ry + a1[1][2] * rz); //   dot(a1[1], a2[i])
-        dstp[ 8] = (a1[2][0] * rx + a1[2][1] * ry + a1[2][2] * rz); //   dot(a1[2], a2[i])
-        dstp[12] = (a1[3][0] * rx + a1[3][1] * ry + a1[3][2] * rz)  //   dot(a1[3], a2[i])
-                 - (      tx * rx +       ty * ry +       tz * rz); // - dot(a2[3], a2[i])
-        dstp++;
+        medium[i] = (a2[3][0] * a2[i][0])
+                  + (a2[3][1] * a2[i][1])
+                  + (a2[3][2] * a2[i][2]);
+        dst[i][3] = 0;
     }
-    MTXF_END(dst);
+    for (i = 0; i < 4; i++) {
+        for (j = 0; j < 3; j++) {
+            dst[i][j] = (a1[i][0] * a2[j][0]) 
+                      + (a1[i][1] * a2[j][1]) 
+                      + (a1[i][2] * a2[j][2]);
+        }
+    }
+    dst[3][0] -= medium[0];
+    dst[3][1] -= medium[1];
+    dst[3][2] -= medium[2];
+    *((u32 *) &dst[3][3]) = FLOAT_ONE;
 }
 
 /**
