@@ -1496,8 +1496,7 @@ s32 update_boss_fight_camera(struct Camera *c, Vec3f focus, Vec3f pos) {
 
     focus[1] = (sMarioCamState->pos[1] + secondFocus[1]) / 2.f + 100.f;
     if (heldState == HELD_HELD) {
-        focus[1] += 300.f * sins((gMarioStates[0].angleVel[1] > 0.f) ?  gMarioStates[0].angleVel[1]
-                                                                     : -gMarioStates[0].angleVel[1]);
+        focus[1] += 300.f * sins(abss(gMarioStates[0].angleVel[1]));   
     }
 
     // Set C-Down distance and pitch.
@@ -1615,12 +1614,7 @@ s32 update_behind_mario_camera(struct Camera *c, Vec3f focus, Vec3f pos) {
     // translates to a slower speed
     // Note: Pitch is always within +- 90 degrees or +-0x4000, and 0x4000 / 0x200 = 32
     yawSpeed = 32 - absPitch / 0x200;
-    if (yawSpeed < 1) {
-        yawSpeed = 1;
-    }
-    if (yawSpeed > 32) {
-        yawSpeed = 32;
-    }
+    yawSpeed = CLAMP(yawSpeed, 1, 32);
 
     if (sCSideButtonYaw != 0) {
         camera_approach_s16_symmetric_bool(&sCSideButtonYaw, 0, 1);
@@ -1746,11 +1740,7 @@ s32 mode_behind_mario(struct Camera *c) {
     }
     approach_camera_height(c, newPos[1], 50.f);
     waterHeight = find_water_level(c->pos[0], c->pos[1], c->pos[2]) + 100.f;
-    if (c->pos[1] <= waterHeight) {
-        gCameraMovementFlags |= CAM_MOVE_SUBMERGED;
-    } else {
-        gCameraMovementFlags &= ~CAM_MOVE_SUBMERGED;
-    }
+    COND_BIT(c->pos[1] <= waterHeight, gCameraMovementFlags, CAM_MOVE_SUBMERGED);
 
     resolve_geometry_collisions(c->pos);
     // Prevent camera getting too far away
