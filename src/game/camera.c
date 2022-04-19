@@ -1953,7 +1953,8 @@ s32 update_default_camera(struct Camera *c) {
         } else {
             nextYawVel = 0x100;
         }
-        if (gPlayer1Controller->stickX != 0.0f || gPlayer1Controller->stickY != 0.0f) {
+        if (gPlayer1Controller->stickX != 0.0f
+         || gPlayer1Controller->stickY != 0.0f) {
             nextYawVel = 0x20;
         }
     } else {
@@ -2373,7 +2374,7 @@ void exit_c_up(struct Camera *c) {
          || sModeInfo.lastMode == CAMERA_MODE_FREE_ROAM) {
             searching = TRUE;
             // Check the whole circle around Mario for an open direction to zoom out to
-            for (sector = 0; sector < 16 && searching == 1; sector++) {
+            for (sector = 0; sector < 16 && searching; sector++) {
                 vec3f_set_dist_and_angle(checkFoc, curPos, curDist, 0, curYaw + checkYaw);
 
                 // If there are no walls this way,
@@ -2406,7 +2407,7 @@ void exit_c_up(struct Camera *c) {
                 }
 
                 // Alternate left and right, checking each 1/16th (22.5 degrees) of the circle
-                if (searching == 1) {
+                if (searching) {
                     checkYaw = -checkYaw;
                     if (checkYaw < 0) {
                         checkYaw -= 0x1000;
