@@ -775,7 +775,7 @@ Gfx *geo_painting_draw(s32 callContext, struct GraphNode *node, UNUSED void *con
         return NULL;
     }
 
-    // Failsafes for nonexistent painting groups.
+    // Failsafe for nonexistent painting groups.
     if (obj->oPaintingGroup >= PAINTING_NUM_GROUPS) {
         return NULL;
     }
