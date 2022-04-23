@@ -63,9 +63,9 @@
 // #define VERTICAL_CULLING
 
 // The default drawing distance for objects.
-// Vanilla is 4000.0f.
+// Vanilla is 4000.
 // NOTE: Setting this higher has a large performance impact.
-#define DEFAULT_DRAWING_DISTANCE 4000.0f
+#define DEFAULT_DRAWING_DISTANCE 4000
 
 // Use 64x64 quarter shadow textures (Vanilla are 16x16).
 #define HD_SHADOWS

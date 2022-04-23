@@ -11,6 +11,11 @@
 // Automatically calculates the optimal collision distance for an object based on its vertices.
 #define AUTO_COLLISION_DISTANCE
 
+// The default collision distance for objects.
+// Vanilla is 1000.
+// NOTE: Setting this higher has a large performance impact.
+#define DEFAULT_COLLISION_DISTANCE 1000
+
 // Allows objects to use camera distance to determine whether to load collision if the camera is closer than Mario.
 #define LOAD_OBJECT_COLLISION_NEAR_CAMERA
 

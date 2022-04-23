@@ -175,7 +175,7 @@ struct Object *allocate_object(struct ObjectNode *objList) {
     obj->oDamageOrCoinValue = 0;
     obj->oHealth = 2048;
 
-    obj->oCollisionDistance = 1000.0f;
+    obj->oCollisionDistance = DEFAULT_COLLISION_DISTANCE;
     obj->oDrawingDistance = DEFAULT_DRAWING_DISTANCE;
 
     mtxf_identity(obj->transform);
