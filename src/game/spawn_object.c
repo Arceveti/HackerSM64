@@ -203,17 +203,10 @@ struct Object *allocate_object(struct ObjectNode *objList) {
  * Spawn an object at the origin with the behavior script at virtual address bhvScript.
  */
 struct Object *create_object(const BehaviorScript *bhvScript) {
-    s32 objListIndex;
     struct Object *obj;
     struct ObjectNode *objList;
 
-    // If the first behavior script command is "begin <object list>", then
-    // extract the object list from it
-    if ((bhvScript[0] >> 24) == 0) {
-        objListIndex = (bhvScript[0] >> 16) & 0xFFFF;
-    } else {
-        objListIndex = OBJ_LIST_DEFAULT;
-    }
+    u32 objListIndex = get_object_list_from_behavior(bhvScript);
 
     objList = &gObjectLists[objListIndex];
     obj = allocate_object(objList);

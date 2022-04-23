@@ -811,7 +811,7 @@ static BhvCommandProc BehaviorCmdTable[] = {
     /*BHV_CMD_BILLBOARD             */ bhv_cmd_billboard,
     /*BHV_CMD_HIDE                  */ bhv_cmd_hide,
     /*BHV_CMD_SET_HITBOX            */ bhv_cmd_set_hitbox,
-    /*BHV_CMD_NOP_4                 */ bhv_cmd_nop_4,
+    /*BHV_CMD_NOP_4                 */ bhv_cmd_nop_4, //! TODO: remove or repurpose this
     /*BHV_CMD_DELAY_VAR             */ bhv_cmd_delay_var,
     /*BHV_CMD_BEGIN_REPEAT_UNUSED   */ bhv_cmd_begin_repeat_unused,
     /*BHV_CMD_LOAD_ANIMATIONS       */ bhv_cmd_load_animations,

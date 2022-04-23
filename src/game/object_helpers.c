@@ -581,9 +581,9 @@ UNUSED void cur_obj_unused_init_on_floor(void) {
 u32 get_object_list_from_behavior(const BehaviorScript *behavior) {
     u32 objectList;
 
-    // If the first behavior command is "begin", then get the object list header
-    // from there
-    if ((behavior[0] >> 24) == 0) {
+    // If the first behavior script command is "begin <object list>", then
+    // extract the object list from it
+    if ((behavior[0] >> 24) == BHV_CMD_BEGIN) {
         objectList = ((behavior[0] >> 16) & 0xFFFF);
     } else {
         objectList = OBJ_LIST_DEFAULT;
