@@ -1248,10 +1248,7 @@ void geo_try_process_children(struct GraphNode *node) {
     }
 }
 
-typedef void (*GeoProcessFunc)(struct GraphNode *node);
-
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wincompatible-pointer-types"
+typedef void (*GeoProcessFunc)();
 
 // See enum 'GraphNodeTypes' in 'graph_node.h'.
 static GeoProcessFunc GeoProcessJumpTable[] = {
@@ -1278,8 +1275,6 @@ static GeoProcessFunc GeoProcessJumpTable[] = {
     /*GRAPH_NODE_TYPE_ROOT                  */ geo_try_process_children,
     /*GRAPH_NODE_TYPE_START                 */ geo_try_process_children,
 };
-
-#pragma GCC diagnostic pop
 
 /**
  * Process a generic geo node and its siblings.
