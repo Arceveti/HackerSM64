@@ -835,62 +835,63 @@ static BhvCommandProc BehaviorCmdTable[] = {
 
 // Execute the behavior script of the current object, process the object flags, and other miscellaneous code for updating objects.
 void cur_obj_update(void) {
-    u32 objFlags = o->oFlags;
+    struct Object *obj = o;
+    u32 objFlags = obj->oFlags;
     f32 distanceFromMario;
     BhvCommandProc bhvCmdProc;
     s32 bhvProcResult;
 
     // Calculate the distance from the object to Mario.
     if (objFlags & OBJ_FLAG_COMPUTE_DIST_TO_MARIO) {
-        o->oDistanceToMario = dist_between_objects(o, gMarioObject);
-        distanceFromMario = o->oDistanceToMario;
+        obj->oDistanceToMario = dist_between_objects(obj, gMarioObject);
+        distanceFromMario = obj->oDistanceToMario;
     } else {
         distanceFromMario = 0.0f;
     }
 
     // Calculate the angle from the object to Mario.
     if (objFlags & OBJ_FLAG_COMPUTE_ANGLE_TO_MARIO) {
-        o->oAngleToMario = obj_angle_to_object(o, gMarioObject);
+        obj->oAngleToMario = obj_angle_to_object(obj, gMarioObject);
     }
 
     // If the object's action has changed, reset the action timer.
-    if (o->oAction != o->oPrevAction) {
-        o->oTimer = 0;
-        o->oSubAction = 0;
-        o->oPrevAction = o->oAction;
+    if (obj->oAction != obj->oPrevAction) {
+        obj->oTimer = 0;
+        obj->oSubAction = 0;
+        obj->oPrevAction = obj->oAction;
     }
 
     // Execute the behavior script.
-    gCurBhvCommand = o->curBhvCommand;
+    gCurBhvCommand = obj->curBhvCommand;
 
     do {
         bhvCmdProc = BehaviorCmdTable[*gCurBhvCommand >> 24];
         bhvProcResult = bhvCmdProc();
     } while (bhvProcResult == BHV_PROC_CONTINUE);
 
-    o->curBhvCommand = gCurBhvCommand;
+    obj->curBhvCommand = gCurBhvCommand;
 
     // Increment the object's timer.
-    if (o->oTimer < 0x3FFFFFFF) {
-        o->oTimer++;
+    if (obj->oTimer < 0x3FFFFFFF) {
+        obj->oTimer++;
     }
 
     // If the object's action has changed, reset the action timer.
-    if (o->oAction != o->oPrevAction) {
-        o->oTimer = 0;
-        o->oSubAction = 0;
-        o->oPrevAction = o->oAction;
+    if (obj->oAction != obj->oPrevAction) {
+        obj->oTimer = 0;
+        obj->oSubAction = 0;
+        obj->oPrevAction = obj->oAction;
     }
 
     // Execute various code based on object flags.
-    objFlags = o->oFlags;
+    objFlags = obj->oFlags;
 
     if (objFlags & OBJ_FLAG_SET_FACE_ANGLE_TO_MOVE_ANGLE) {
-        vec3i_copy(&o->oFaceAngleVec, &o->oMoveAngleVec);
+        vec3i_copy(&obj->oFaceAngleVec, &obj->oMoveAngleVec);
     }
 
     if (objFlags & OBJ_FLAG_SET_FACE_YAW_TO_MOVE_YAW) {
-        o->oFaceAngleYaw = o->oMoveAngleYaw;
+        obj->oFaceAngleYaw = obj->oMoveAngleYaw;
     }
 
     if (objFlags & OBJ_FLAG_MOVE_XZ_USING_FVEL) {
@@ -902,58 +903,58 @@ void cur_obj_update(void) {
     }
 
     if (objFlags & OBJ_FLAG_TRANSFORM_RELATIVE_TO_PARENT) {
-        obj_build_transform_relative_to_parent(o);
+        obj_build_transform_relative_to_parent(obj);
     }
 
     if (objFlags & OBJ_FLAG_SET_THROW_MATRIX_FROM_TRANSFORM) {
-        obj_set_throw_matrix_from_transform(o);
+        obj_set_throw_matrix_from_transform(obj);
     }
 
     if (objFlags & OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE) {
-        obj_update_gfx_pos_and_angle(o);
+        obj_update_gfx_pos_and_angle(obj);
     }
 
 #if SILHOUETTE
-    COND_BIT((objFlags & OBJ_FLAG_SILHOUETTE        ), o->header.gfx.node.flags, GRAPH_RENDER_SILHOUETTE        );
-    COND_BIT((objFlags & OBJ_FLAG_OCCLUDE_SILHOUETTE), o->header.gfx.node.flags, GRAPH_RENDER_OCCLUDE_SILHOUETTE);
+    COND_BIT((objFlags & OBJ_FLAG_SILHOUETTE        ), obj->header.gfx.node.flags, GRAPH_RENDER_SILHOUETTE        );
+    COND_BIT((objFlags & OBJ_FLAG_OCCLUDE_SILHOUETTE), obj->header.gfx.node.flags, GRAPH_RENDER_OCCLUDE_SILHOUETTE);
 #endif
 
 #ifdef OBJECTS_REJ
     if ((objFlags & OBJ_FLAG_SILHOUETTE) || (objFlags & OBJ_FLAG_UCODE_SMALL)) {
-        o->header.gfx.ucode = GRAPH_NODE_UCODE_REJ;
+        obj->header.gfx.ucode = GRAPH_NODE_UCODE_REJ;
     } else {
-        o->header.gfx.ucode = GRAPH_NODE_UCODE_DEFAULT;
+        obj->header.gfx.ucode = GRAPH_NODE_UCODE_DEFAULT;
     }
 #endif
 
 #ifdef OBJ_OPACITY_BY_CAM_DIST
     if (objFlags & OBJ_FLAG_OPACITY_FROM_CAMERA_DIST) {
-        obj_set_opacity_from_cam_dist(o);
+        obj_set_opacity_from_cam_dist(obj);
     }
 #endif
 
 #ifdef PUPPYLIGHTS
-    puppylights_object_emit(o);
+    puppylights_object_emit(obj);
 #endif
 
     // Handle visibility of object
-    if (o->oRoom != -1) {
+    if (obj->oRoom != -1) {
         // If the object is in a room, only show it when Mario is in the room.
         cur_obj_enable_rendering_if_mario_in_room();
     } else if (
-        o->collisionData == NULL
+        obj->collisionData == NULL
         &&  (objFlags & OBJ_FLAG_COMPUTE_DIST_TO_MARIO)
         && !(objFlags & OBJ_FLAG_ACTIVE_FROM_AFAR)
     ) {
         // If the object has a render distance, check if it should be shown.
-        if (distanceFromMario > o->oDrawingDistance) {
+        if (distanceFromMario > obj->oDrawingDistance) {
             // Out of render distance, hide the object.
             cur_obj_disable_rendering();
-            o->activeFlags |= ACTIVE_FLAG_FAR_AWAY;
-        } else if (o->oHeldState == HELD_FREE) {
+            obj->activeFlags |= ACTIVE_FLAG_FAR_AWAY;
+        } else if (obj->oHeldState == HELD_FREE) {
             // In render distance (and not being held), show the object.
             cur_obj_enable_rendering();
-            o->activeFlags &= ~ACTIVE_FLAG_FAR_AWAY;
+            obj->activeFlags &= ~ACTIVE_FLAG_FAR_AWAY;
         }
     }
 }
