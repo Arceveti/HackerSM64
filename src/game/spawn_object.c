@@ -183,7 +183,7 @@ struct Object *allocate_object(struct ObjectNode *objList) {
     obj->respawnInfoType = RESPAWN_INFO_TYPE_NULL;
     obj->respawnInfo = NULL;
 
-    obj->oDistanceToMario = 19000.0f;
+    obj->oDistanceToMario = F32_MAX;
     obj->oRoom = -1;
 
     obj->header.gfx.node.flags &= ~GRAPH_RENDER_INVISIBLE;

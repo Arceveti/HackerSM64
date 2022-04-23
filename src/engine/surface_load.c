@@ -646,9 +646,9 @@ void load_object_collision_model(void) {
     TerrainData *collisionData = obj->collisionData;
     f32 marioDist = obj->oDistanceToMario;
 
-    // On an object's first frame, the distance is set to 19000.0f.
+    // On an object's first frame, the distance is set to F32_MAX.
     // If the distance hasn't been updated, update it now.
-    if (marioDist == construct_float(19000.0f)) {
+    if (marioDist == construct_float(F32_MAX)) {
         marioDist = dist_between_objects(obj, gMarioObject);
     }
 
