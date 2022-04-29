@@ -285,19 +285,22 @@ Gfx *init_skybox_display_list(s8 player, s8 background, s8 colorIndex) {
 Gfx *create_skybox_facing_camera(s8 player, s8 background, f32 fov, Vec3f pos, Vec3f focus) {
     s8 colorIndex = 1;
 
+#ifdef ENABLE_VANILLA_LEVEL_SPECIFIC_CHECKS
     // If the "Plunder in the Sunken Ship" star in JRB is not collected, make the sky darker and slightly green.
-    if (background == BACKGROUND_ABOVE_CLOUDS
+    if (background == BACKGROUND_ABOVE_CLOUDS) {
 #ifdef JRB_ACT_SPECIFIC_MIST
-        && gCurrActNum == 1) {
+        if (gCurrActNum == 1) {
 #else
-        && !(save_file_get_star_flags(gCurrSaveFileNum - 1, COURSE_NUM_TO_INDEX(COURSE_JRB)) & STAR_FLAG_ACT_1)) {
+        if (!(save_file_get_star_flags(gCurrSaveFileNum - 1, COURSE_NUM_TO_INDEX(COURSE_JRB)) & STAR_FLAG_ACT_1)) {
 #endif
-        colorIndex = 0;
+            colorIndex = 0;
+        }
     }
+#endif
 
     //! fov is always set to 90.0f. If this line is removed, then the game crashes because fov is 0 on
     //! the first frame, which causes a floating point divide by 0
-    fov = construct_float(90.0f);
+    fov = 90.0f;
     s16 yaw;
     vec3f_get_angle(pos, focus, &sSkyBoxInfo[player].pitch, &yaw);
     sSkyBoxInfo[player].yaw = yaw;

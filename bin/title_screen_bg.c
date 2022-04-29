@@ -149,7 +149,7 @@ const Gfx title_screen_bg_dl_face_easter_egg_end[] = {
 };
 #endif
 
-#ifdef ENABLE_RUMBLE
+#if defined(ENABLE_RUMBLE)
 ALIGNED8 static const Texture title_texture_rumble_pak[] = {
 #include "textures/title_screen_bg/title_screen_bg.06648.rgba16.inc.c"
 };
