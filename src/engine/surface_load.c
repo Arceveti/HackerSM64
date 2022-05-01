@@ -455,9 +455,6 @@ u32 get_area_terrain_size(TerrainData *data) {
 void load_area_terrain(s32 index, TerrainData *data, RoomData *surfaceRooms, MacroObject *macroObjects) {
     s32 terrainLoadType;
     TerrainData *vertexData = NULL;
-#if PUPPYPRINT_DEBUG
-    OSTime first = osGetTime();
-#endif
 
     // Initialize the data for this.
     gEnvironmentRegions = NULL;
@@ -496,9 +493,6 @@ void load_area_terrain(s32 index, TerrainData *data, RoomData *surfaceRooms, Mac
 
     gNumStaticSurfaceNodes = gSurfaceNodesAllocated;
     gNumStaticSurfaces = gSurfacesAllocated;
-#if PUPPYPRINT_DEBUG
-    collisionTime[perfIteration] += osGetTime() - first;
-#endif
 }
 
 /**
@@ -636,10 +630,6 @@ static f32 get_optimal_collision_distance(struct Object *obj) {
  * Transform an object's vertices, reload them, and render the object.
  */
 void load_object_collision_model(void) {
-#if PUPPYPRINT_DEBUG
-    OSTime first = osGetTime();
-#endif
-
     struct Object *obj = gCurrentObject;
     TerrainData vertexData[600];
 
@@ -700,8 +690,4 @@ void load_object_collision_model(void) {
 
     obj->oCollisionDistance = colDist;
     obj->oDrawingDistance = drawDist;
-
-#if PUPPYPRINT_DEBUG
-    collisionTime[perfIteration] += osGetTime() - first;
-#endif
 }

@@ -648,9 +648,6 @@ void thread2_crash_screen(UNUSED void *arg) {
     osSetEventMesg(OS_EVENT_FAULT,     &gCrashScreen.mesgQueue, (OSMesg) 2);
 
     while (TRUE) {
-#if PUPPYPRINT_DEBUG
-        OSTime first = osGetTime();
-#endif
         if (thread == NULL) {
             osRecvMesg(&gCrashScreen.mesgQueue, &mesg, 1);
             thread = get_crashed_thread();
@@ -681,9 +678,6 @@ void thread2_crash_screen(UNUSED void *arg) {
             read_controller_inputs(THREAD_2_CRASH_SCREEN);
             draw_crash_screen(thread);
         }
-#if PUPPYPRINT_DEBUG
-        profiler_update(faultTime, first);
-#endif
     }
 }
 
