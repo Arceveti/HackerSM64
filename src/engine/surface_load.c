@@ -555,8 +555,6 @@ void load_object_surfaces(TerrainData **data, TerrainData *vertexData, struct Ob
 
     s32 flags = (surf_has_no_cam_collision(surfaceType) | SURFACE_FLAG_DYNAMIC);
 
-    RoomData room = 0;
-
     for (i = 0; i < numSurfaces; i++) {
         struct Surface *surface = read_surface_data(vertexData, data);
 
@@ -575,7 +573,7 @@ void load_object_surfaces(TerrainData **data, TerrainData *vertexData, struct Ob
 #endif
 
             surface->flags |= flags;
-            surface->room = room;
+            surface->room = 0;
             add_surface(surface, TRUE);
         }
 
