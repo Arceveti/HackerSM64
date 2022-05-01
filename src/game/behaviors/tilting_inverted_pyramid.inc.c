@@ -45,6 +45,7 @@ void bhv_tilting_inverted_pyramid_loop(void) {
     approach_f32_symmetric_bool(&o->oTiltingPyramidNormalX, targetNormal[0], 0.01f);
     approach_f32_symmetric_bool(&o->oTiltingPyramidNormalY, targetNormal[1], 0.01f);
     approach_f32_symmetric_bool(&o->oTiltingPyramidNormalZ, targetNormal[2], 0.01f);
+    vec3f_normalize(&o->oTiltingPyramidNormalVec);
     mtxf_align_terrain_normal(*transform, &o->oTiltingPyramidNormalVec, &o->oPosVec, 0);
 
 #ifndef PLATFORM_DISPLACEMENT_2
