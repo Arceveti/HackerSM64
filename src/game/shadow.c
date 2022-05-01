@@ -28,7 +28,6 @@ static ShadowRectangle sShadowRectangles[2] = {
 };
 
 struct Shadow gCurrShadow;
-struct Shadow *s = &gCurrShadow;
 
 /**
  * Shrink a shadow when its parent object is further from the floor, given the
@@ -65,80 +64,76 @@ s32 dim_shadow_with_distance(u8 solidity, f32 distFromFloor) {
 }
 
 /**
- * Initialize a shadow. Return 0 on success, 1 on failure.
+ * Set a shadow's scale and solidity. Return true if zero solidity
  *
  * @param pos Position of the parent object (not the shadow)
  * @param shadowScale Diameter of the shadow
- * @param overwriteSolidity Flag for whether the existing shadow solidity should
- *                          be dimmed based on its distance to the floor
+ * @param solidity Base solidity of the shadow, ignored if 0
  */
-s32 init_shadow(f32 distToShadow, s16 shadowScale, s8 shadowType, u8 overwriteSolidity) {
+s32 set_shadow_scale_solidity(struct Shadow *shadow, f32 distToShadow, s16 shadowScale, s8 shadowType, Alpha solidity) {
     f32 baseScale;
 
     if (shadowType != SHADOW_SQUARE_PERMANENT) {
         // Set solidity and scale based on distance.
-        if (overwriteSolidity) {
-            s->solidity = dim_shadow_with_distance(overwriteSolidity, distToShadow);
+        if (solidity) {
+            shadow->solidity = dim_shadow_with_distance(solidity, distToShadow);
         }
 
         baseScale = scale_shadow_with_distance(shadowScale, distToShadow);
     } else {
-        s->solidity = overwriteSolidity;
+        shadow->solidity = solidity;
         baseScale = shadowScale;
     }
-    vec3f_set(s->scale, baseScale, baseScale, baseScale);
+    vec3f_set(shadow->scale, baseScale, baseScale, baseScale);
 
-    return !(s->solidity);
+    return !shadow->solidity;
 }
 
 /**
  * Linearly interpolate a shadow's solidity between zero and finalSolidity
  * depending on curr's relation to start and end.
  */
-void linearly_interpolate_solidity_positive(u8 finalSolidity, s16 curr, s16 start, s16 end) {
-    if (curr >= 0 && curr < start) {
-        s->solidity = 0;
+s32 linearly_interpolate_positive(Alpha finalSolidity, s16 curr, s16 start, s16 end) {
+    if (curr < start) {
+        return 0;
     } else if (end < curr) {
-        s->solidity = finalSolidity;
+        return finalSolidity;
     } else {
-        s->solidity = (f32) finalSolidity * (curr - start) / (end - start);
+        return (f32) finalSolidity * (curr - start) / (end - start);
     }
 }
 
 /**
  * Linearly interpolate a shadow's solidity between initialSolidity and zero
- * depending on curr's relation to start and end. Note that if curr < start,
- * the solidity will be zero.
+ * depending on curr's relation to start and end.
  */
-void linearly_interpolate_solidity_negative(u8 initialSolidity, s16 curr, s16 start, s16 end) {
-    // The curr < start case is not handled. Thus, if start != 0, this function
-    // will have the surprising behavior of hiding the shadow until start.
-    // This is not necessarily a bug, since this function is only used once,
-    // with start == 0.
-    if (curr >= start && end >= curr) {
-        s->solidity = ((f32) initialSolidity * (construct_float(1.0f) - (f32)(curr - start) / (end - start)));
+s32 linearly_interpolate_negative(Alpha initialSolidity, s16 curr, s16 start, s16 end) {
+    if (curr < start) {
+        return initialSolidity;
+    } else if (curr > end) {
+        return 0;
     } else {
-        s->solidity = 0;
+        return ((f32) initialSolidity * (1.0f - (f32)(curr - start) / (end - start)));
     }
 }
 
 /**
  * Change a shadow's solidity based on the player's current animation frame.
  */
-s32 correct_shadow_solidity_for_animations(u8 initialSolidity) {
+s32 correct_shadow_solidity_for_animations(struct Shadow *shadow, u8 initialSolidity) {
     s16 animFrame = gMarioObject->header.gfx.animInfo.animFrame;
 
     switch (gMarioObject->header.gfx.animInfo.animID) {
         case MARIO_ANIM_IDLE_ON_LEDGE:
             return SHADOW_SOLIDITY_NO_SHADOW;
         case MARIO_ANIM_FAST_LEDGE_GRAB:
-            linearly_interpolate_solidity_positive(initialSolidity, animFrame,  5, 14);
+            shadow->solidity = linearly_interpolate_positive(initialSolidity, animFrame,  5, 14); // fade in
             return SHADOW_SOILDITY_ALREADY_SET;
         case MARIO_ANIM_SLOW_LEDGE_GRAB:
-            linearly_interpolate_solidity_positive(initialSolidity, animFrame, 21, 33);
+            shadow->solidity = linearly_interpolate_positive(initialSolidity, animFrame, 21, 33); // fade in
             return SHADOW_SOILDITY_ALREADY_SET;
         case MARIO_ANIM_CLIMB_DOWN_LEDGE:
-            linearly_interpolate_solidity_negative(initialSolidity, animFrame,  0,  5);
+            shadow->solidity = linearly_interpolate_negative(initialSolidity, animFrame,  0,  5); // fade out
             return SHADOW_SOILDITY_ALREADY_SET;
         default:
             return SHADOW_SOLIDITY_NOT_YET_SET;
@@ -149,19 +144,19 @@ s32 correct_shadow_solidity_for_animations(u8 initialSolidity) {
 /**
  * Slightly change the height of a shadow in levels with lava.
  */
-void correct_lava_shadow_height(f32 *floorHeight) {
+void correct_lava_shadow_height(struct Shadow *shadow, f32 *floorHeight) {
     if (gCurrLevelNum == LEVEL_BITFS) {
-        if (*floorHeight < construct_float(-3000.0f)) {
-            *floorHeight = construct_float(-3062.0f);
-            s->isDecal = FALSE;
-        } else if (*floorHeight > construct_float(3400.0f)) {
-            *floorHeight = construct_float(3492.0f);
-            s->isDecal = FALSE;
+        if (*floorHeight < -3000) {
+            *floorHeight = -3062;
+            shadow->isDecal = FALSE;
+        } else if (*floorHeight > 3400) {
+            *floorHeight = 3492;
+            shadow->isDecal = FALSE;
         }
     } else if (gCurrLevelNum == LEVEL_LLL
                && gCurrAreaIndex == 1) {
-        *floorHeight = construct_float(5.0f);
-        s->isDecal = FALSE;
+        *floorHeight = 5;
+        shadow->isDecal = FALSE;
     }
 }
 #endif
@@ -171,9 +166,8 @@ void correct_lava_shadow_height(f32 *floorHeight) {
  * shadowType 0 uses a circle texture, the rest use a square texture.
  * Uses environment alpha for shadow solidity.
  */
-static void add_shadow_to_display_list(Gfx *displayListHead, s8 shadowType) {
+static void add_shadow_to_display_list(Gfx *displayListHead, s8 shadowType, Alpha solidity) {
     Gfx *dl_shadow = (shadowType == SHADOW_CIRCLE) ? dl_shadow_circle : dl_shadow_square;
-    Alpha solidity = s->solidity;
 
     gSPDisplayList(displayListHead++, dl_shadow);
     gDPSetEnvColor(displayListHead++, 255, 255, 255, solidity);
@@ -191,6 +185,7 @@ Gfx *create_shadow_below_xyz(Vec3f pos, s16 shadowScale, u8 shadowSolidity, s8 s
     const f32 floorLowerLimitMisc = construct_float(FLOOR_LOWER_LIMIT_MISC);
 
     struct Object *obj = gCurGraphNodeObjectNode;
+    struct Shadow *shadow = &gCurrShadow;
 
     // Check if the object exists.
     if (obj == NULL) {
@@ -208,6 +203,8 @@ Gfx *create_shadow_below_xyz(Vec3f pos, s16 shadowScale, u8 shadowSolidity, s8 s
     s8 notHeldObj = (gCurGraphNodeHeldObject == NULL);
 
     struct MarioState *m = gMarioState;
+
+    // -- Check for floors -- 
 
     // Attempt to use existing floors before finding a new one.
     if (notHeldObj && isPlayer && m->floor) {
@@ -232,8 +229,10 @@ Gfx *create_shadow_below_xyz(Vec3f pos, s16 shadowScale, u8 shadowSolidity, s8 s
         shifted = FALSE;
     }
 
+    // -- Handle water and other translucent surfaces --
+
     // The shadow is a decal by default.
-    s->isDecal = TRUE;
+    shadow->isDecal = TRUE;
 
     // Check for water under the shadow.
     struct Surface *waterFloor = NULL;
@@ -252,7 +251,7 @@ Gfx *create_shadow_below_xyz(Vec3f pos, s16 shadowScale, u8 shadowSolidity, s8 s
         floorHeight = waterLevel;
 
         // Don't use the decal layer, since water is transparent.
-        s->isDecal = FALSE;
+        shadow->isDecal = FALSE;
 
         // Check whether the water is an environment box or a water surface.
         if (waterFloor != NULL) { // Water surfaces:
@@ -264,7 +263,7 @@ Gfx *create_shadow_below_xyz(Vec3f pos, s16 shadowScale, u8 shadowSolidity, s8 s
         TerrainData type = floor->type;
         if (type == SURFACE_ICE) {
             // Ice floors are usually transparent.
-            s->isDecal = FALSE;
+            shadow->isDecal = FALSE;
 #ifdef ENABLE_VANILLA_LEVEL_SPECIFIC_CHECKS
         } else if (type == SURFACE_BURNING) {
             // Set the shadow height to the lava height in specific areas.
@@ -279,10 +278,12 @@ Gfx *create_shadow_below_xyz(Vec3f pos, s16 shadowScale, u8 shadowSolidity, s8 s
                 // Raise the shadow 5 units so the shadow doesn't clip into the flying carpet.
                 floorHeight += 5;
                 // The flying carpet is transparent.
-                s->isDecal = FALSE;
+                shadow->isDecal = FALSE;
             }
         }
     }
+
+    // -- Floor normals --
 
     f32 nx, ny, nz;
     if (isEnvBox) {
@@ -307,6 +308,8 @@ Gfx *create_shadow_below_xyz(Vec3f pos, s16 shadowScale, u8 shadowSolidity, s8 s
         }
     }
 
+    // -- Height checks --
+
     // No shadow if the floor is lower than expected possible,
     if (floorHeight < floorLowerLimitMisc) {
         return NULL;
@@ -316,30 +319,30 @@ Gfx *create_shadow_below_xyz(Vec3f pos, s16 shadowScale, u8 shadowSolidity, s8 s
     f32 distToShadow = (y - floorHeight);
 
     // No shadow if the object is below it.
-    if (distToShadow < construct_float(-80.0f)) {
+    if (distToShadow < -80) {
         return NULL;
     }
 
     // No shadow if the non-Mario object is too high.
-    if (!isPlayer && distToShadow > construct_float(1024.0f)) {
+    if (!isPlayer && distToShadow > 1024) {
         return NULL;
     }
 
-    vec3f_set(s->floorNormal, nx, ny, nz);
+    // -- Player or object specific calculations --
 
     if (isPlayer) {
         // Set the shadow solidity manually for certain Mario animations.
-        s32 solidityAction = correct_shadow_solidity_for_animations(shadowSolidity);
+        s32 solidityAction = correct_shadow_solidity_for_animations(shadow, shadowSolidity);
         switch (solidityAction) {
             case SHADOW_SOLIDITY_NO_SHADOW:
                 return NULL;
             case SHADOW_SOILDITY_ALREADY_SET:
-                if (init_shadow(distToShadow, shadowScale, shadowType, /* overwriteSolidity */ 0)) {
+                if (set_shadow_scale_solidity(shadow, distToShadow, shadowScale, shadowType, /* overwriteSolidity */ 0)) {
                     return NULL;
                 }
                 break;
             case SHADOW_SOLIDITY_NOT_YET_SET:
-                if (init_shadow(distToShadow, shadowScale, shadowType, shadowSolidity)) {
+                if (set_shadow_scale_solidity(shadow, distToShadow, shadowScale, shadowType, shadowSolidity)) {
                     return NULL;
                 }
                 break;
@@ -347,21 +350,23 @@ Gfx *create_shadow_below_xyz(Vec3f pos, s16 shadowScale, u8 shadowSolidity, s8 s
                 return NULL;
         }
     } else {
-        if (init_shadow(distToShadow, shadowScale, shadowType, shadowSolidity)) {
+        if (set_shadow_scale_solidity(shadow, distToShadow, shadowScale, shadowType, shadowSolidity)) {
             return NULL;
         }
 
         // Get the scaling modifiers for rectangular shadows (Whomp and Spindel).
         if (shadowType >= SHADOW_RECTANGLE_HARDCODED_OFFSET) {
             s8 idx = shadowType - SHADOW_RECTANGLE_HARDCODED_OFFSET;
-            s->scale[0] *= sShadowRectangles[idx].scaleX;
-            s->scale[2] *= sShadowRectangles[idx].scaleZ;
+            shadow->scale[0] *= sShadowRectangles[idx].scaleX;
+            shadow->scale[2] *= sShadowRectangles[idx].scaleZ;
             if (sShadowRectangles[idx].scaleWithDistance) {
-                scale_shadow_with_distance(s->scale[0], distToShadow);
-                scale_shadow_with_distance(s->scale[2], distToShadow);
+                scale_shadow_with_distance(shadow->scale[0], distToShadow);
+                scale_shadow_with_distance(shadow->scale[2], distToShadow);
             }
         }
     }
+
+    // -- Set up gfx --
 
     Gfx *displayList = alloc_display_list(4 * sizeof(Gfx));
 
@@ -370,10 +375,13 @@ Gfx *create_shadow_below_xyz(Vec3f pos, s16 shadowScale, u8 shadowSolidity, s8 s
     }
 
     // Generate the shadow display list with type and solidity.
-    add_shadow_to_display_list(displayList, shadowType);
+    add_shadow_to_display_list(displayList, shadowType, shadow->solidity);
 
     // Move the shadow position to the floor height.
     pos[1] = floorHeight;
+
+    // Set the floor normals in the shadow struct.
+    vec3f_set(shadow->floorNormal, nx, ny, nz);
 
     return displayList;
 }

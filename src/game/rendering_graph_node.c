@@ -947,14 +947,14 @@ void geo_process_shadow(struct GraphNodeShadow *node) {
 #ifndef DISABLE_SHADOWS
     if (gCurGraphNodeCamera != NULL && gCurGraphNodeObject != NULL) {
         Vec3f shadowPos;
-        f32 shadowScale;
+        f32 shadowScale = node->shadowScale * 0.5f;
 
         if (gCurGraphNodeHeldObject != NULL) {
             vec3f_copy(shadowPos, gMatStack[gMatStackIndex][3]);
-            shadowScale = node->shadowScale * gCurGraphNodeHeldObject->objNode->header.gfx.scale[0];
+            shadowScale *= gCurGraphNodeHeldObject->objNode->header.gfx.scale[0];
         } else {
             vec3f_copy(shadowPos, gCurGraphNodeObject->pos);
-            shadowScale = node->shadowScale * gCurGraphNodeObject->scale[0];
+            shadowScale *= gCurGraphNodeObject->scale[0];
         }
 
         s8 shifted = (gCurrAnimEnabled
@@ -985,7 +985,7 @@ void geo_process_shadow(struct GraphNodeShadow *node) {
             shadowPos[2] += (-animOffset[0] * sinAng) + (animOffset[2] * cosAng);
         }
 
-        Gfx *shadowList = create_shadow_below_xyz(shadowPos, (shadowScale * construct_float(0.5f)),
+        Gfx *shadowList = create_shadow_below_xyz(shadowPos, shadowScale,
                                                   node->shadowSolidity, node->shadowType, shifted);
 
         if (shadowList != NULL) {
