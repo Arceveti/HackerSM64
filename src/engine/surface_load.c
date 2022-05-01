@@ -666,9 +666,9 @@ void load_object_collision_model(void) {
 
     f32 drawDist = obj->oDrawingDistance;
 
-    // If the object collision is supposed to be loaded more than the
+    // If the collision distance is larger than the
     // drawing distance, extend the drawing range.
-    if (colDist > drawDist) {
+    if (drawDist < colDist) {
         drawDist = colDist;
     }
 
