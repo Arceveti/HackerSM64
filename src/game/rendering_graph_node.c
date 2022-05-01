@@ -985,17 +985,21 @@ void geo_process_shadow(struct GraphNodeShadow *node) {
             shadowPos[2] += (-animOffset[0] * sinAng) + (animOffset[2] * cosAng);
         }
 
-        Gfx *shadowList = create_shadow_below_xyz(shadowPos, shadowScale,
-                                                  node->shadowSolidity, node->shadowType, shifted);
+        Vec3f floorNormal;
+        Vec3f scaleVec;
+        s8 isDecal;
+
+        Gfx *shadowList = create_shadow_below_xyz(shadowPos, floorNormal, scaleVec, shadowScale,
+                                                  node->shadowSolidity, node->shadowType, shifted, &isDecal);
 
         if (shadowList != NULL) {
             mtxf_shadow(gMatStack[gMatStackIndex + 1],
-                gCurrShadow.floorNormal, shadowPos, gCurrShadow.scale, gCurGraphNodeObject->angle[1]);
+                floorNormal, shadowPos, scaleVec, gCurGraphNodeObject->angle[1]);
 
             inc_mat_stack();
             geo_append_display_list(
                 (void *) VIRTUAL_TO_PHYSICAL(shadowList),
-                gCurrShadow.isDecal ? LAYER_TRANSPARENT_DECAL : LAYER_TRANSPARENT
+                isDecal ? LAYER_TRANSPARENT_DECAL : LAYER_TRANSPARENT
             );
 
             gMatStackIndex--;

@@ -39,23 +39,6 @@ enum ShadowType {
     SHADOW_RECTANGLE_WHOMP            = (1 + SHADOW_RECTANGLE_HARDCODED_OFFSET),
 };
 
-/**
- * Encapsulation of information about a shadow.
- */
-struct Shadow {
-    /* Normal vector of the floor. */
-    Vec3f floorNormal;
-    /* Size of the shadow. */
-    Vec3f scale;
-    /* Initial solidity of the shadow, from 0 to 255 (just an alpha value). */
-    Alpha solidity;
-    /*
-     * Whether the shadow is a decal or not.
-     * It should not be a decal when it's on a transparent surface (water, lava, ice, flying carpet, etc.).
-     */
-    s8 isDecal;
-};
-
 enum ShadowSolidity {
     /**
      * Constant to indicate that a shadow should not be drawn.
@@ -86,12 +69,10 @@ typedef struct {
     u8 scaleWithDistance : 1;
 } ShadowRectangle;
 
-extern struct Shadow gCurrShadow;
-
 /**
  * Given the (x, y, z) location of an object, create a shadow below that object
  * with the given initial solidity and "shadowType" (described above).
  */
-Gfx *create_shadow_below_xyz(Vec3f pos, s16 shadowScale, u8 shadowSolidity, s8 shadowType, s8 shifted);
+Gfx *create_shadow_below_xyz(Vec3f pos, Vec3f floorNormal, Vec3f scaleVec, s16 shadowScale, u8 shadowSolidity, s8 shadowType, s8 shifted, s8 *isDecal);
 
 #endif // SHADOW_H
