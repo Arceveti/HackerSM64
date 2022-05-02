@@ -180,7 +180,7 @@ void apply_platform_displacement(u32 isMario, struct Object *platform) {
     Vec3s rotation;
     Mat4 displaceMatrix;
 
-    vec3s_copy(rotation, &platform->oAngleVelVec);
+    vec3i_to_vec3s(rotation, &platform->oAngleVelVec);
 
     if (isMario) {
         vec3f_copy(pos, gMarioStates[0].pos);
