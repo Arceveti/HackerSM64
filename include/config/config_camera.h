@@ -24,6 +24,9 @@
 #define FLYING_CAMERA_MODE        CAMERA_MODE_BEHIND_MARIO
 /*******************************************/
 
+// Overwrites the above values with vanilla values.
+// #define USE_VANILLA_CAMERA
+
 // Mario's eye height. Many camera functions add this to the Y position. Vanilla is 125.
 #define MARIO_EYE_HEIGHT 125
 
