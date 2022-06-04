@@ -372,12 +372,12 @@ struct PlayerCameraState {
     /*0x04*/ Vec3f pos;
     /*0x10*/ Vec3s faceAngle;
     /*0x16*/ Vec3s headRotation;
-    /*0x1C*/ s16 unused;
     /**
      * Set to nonzero when an event, such as entering a door, starting the credits, or throwing bowser,
      * has happened on this frame.
      */
-    /*0x1E*/ s16 cameraEvent;
+    /*0x1C*/ s16 cameraEvent;
+    /*0x1E*/ u8 filler[2];
     /*0x20*/ struct Object *usedObj;
 };
 
@@ -394,7 +394,7 @@ struct TransitionInfo {
     /*0x0C*/ f32 focDist;
     /*0x10*/ s32 framesLeft;
     /*0x14*/ Vec3f marioPos;
-    /*0x20*/ u8 unused; // for the structs to align, there has to be an extra unused variable here. type is unknown.
+    /*0x20*/ u8 unused; //! for the structs to align, there has to be an extra unused variable here. type is unknown.
 };
 
 /**
@@ -506,15 +506,19 @@ struct PlayerGeometry {
     /*0x00*/ struct Surface *currFloor;
     /*0x04*/ f32 currFloorHeight;
     /*0x08*/ s16 currFloorType;
+    /*0x0A*/ u8 filler1[2];
     /*0x0C*/ struct Surface *currCeil;
-    /*0x10*/ s16 currCeilType;
-    /*0x14*/ f32 currCeilHeight;
+    /*0x10*/ f32 currCeilHeight;
+    /*0x14*/ s16 currCeilType;
+    /*0x16*/ u8 filler2[2];
     /*0x18*/ struct Surface *prevFloor;
     /*0x1C*/ f32 prevFloorHeight;
     /*0x20*/ s16 prevFloorType;
+    /*0x22*/ u8 filler3[2];
     /*0x24*/ struct Surface *prevCeil;
     /*0x28*/ f32 prevCeilHeight;
     /*0x2C*/ s16 prevCeilType;
+    /*0x2E*/ u8 filler4[2];
     /*0x30*/ f32 waterHeight;
 };
 
