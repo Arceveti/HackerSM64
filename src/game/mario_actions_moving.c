@@ -69,7 +69,7 @@ void align_with_floor(struct MarioState *m) {
     if ((floor != NULL) && (m->pos[1] < (m->floorHeight + 80.0f))) {
         m->pos[1] = m->floorHeight;
 #ifdef FAST_FLOOR_ALIGN
-        if (absf(m->forwardVel) > FAST_FLOOR_ALIGN) {
+        if (absf(m->moveSpeed) > FAST_FLOOR_ALIGN) {
             Vec3f floorNormal;
             surface_normal_to_vec3f(floorNormal, floor);
             mtxf_align_terrain_normal(sFloorAlignMatrix[m->playerID], floorNormal, m->pos, m->faceAngle[1]);
