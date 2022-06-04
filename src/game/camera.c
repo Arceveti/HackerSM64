@@ -1904,7 +1904,7 @@ s32 update_default_camera(struct Camera *c) {
     // If C-Down is active, determine what distance the camera should be from Mario
     if (gCameraMovementFlags & CAM_MOVE_ZOOMED_OUT) {
         //! In Mario mode, the camera is zoomed out further than in Lakitu mode (1400 vs 1200)
-        if (set_cam_angle(0) == CAM_ANGLE_MARIO) {
+        if (set_cam_angle(CAM_ANGLE_NONE) == CAM_ANGLE_MARIO) {
             zoomDist = gCameraZoomDist + 1050;
         } else {
             zoomDist = gCameraZoomDist + 400;
@@ -2823,7 +2823,7 @@ void update_camera(struct Camera *c) {
         // Only process R_TRIG if 'fixed' is not selected in the menu
         if (cam_select_alt_mode(CAM_SELECTION_NONE) == CAM_SELECTION_MARIO) {
             if (gPlayer1Controller->buttonPressed & R_TRIG) {
-                if (set_cam_angle(0) == CAM_ANGLE_LAKITU) {
+                if (set_cam_angle(CAM_ANGLE_NONE) == CAM_ANGLE_LAKITU) {
                     set_cam_angle(CAM_ANGLE_MARIO);
                 } else {
                     set_cam_angle(CAM_ANGLE_LAKITU);
@@ -3589,7 +3589,7 @@ s32 update_camera_hud_status(struct Camera *c) {
     if (c->cutscene != CUTSCENE_NONE
         || ((gPlayer1Controller->buttonDown & R_TRIG) && cam_select_alt_mode(0) == CAM_SELECTION_FIXED)) {
         status |= CAM_STATUS_FIXED;
-    } else if (set_cam_angle(0) == CAM_ANGLE_MARIO) {
+    } else if (set_cam_angle(CAM_ANGLE_NONE) == CAM_ANGLE_MARIO) {
         status |= CAM_STATUS_MARIO;
     } else {
         status |= CAM_STATUS_LAKITU;
@@ -4652,7 +4652,7 @@ u32 get_cutscene_from_mario_status(struct Camera *c) {
  */
 void warp_camera(f32 displacementX, f32 displacementY, f32 displacementZ) {
     Vec3f displacement;
-    struct MarioState *marioStates = &gMarioStates[0];
+    struct MarioState *marioState = &gMarioStates[0];
     struct LinearTransitionPoint *start = &sModeInfo.transitionStart;
     struct LinearTransitionPoint *end = &sModeInfo.transitionEnd;
 
@@ -4664,7 +4664,7 @@ void warp_camera(f32 displacementX, f32 displacementY, f32 displacementZ) {
     vec3f_add(gLakituState.curFocus,  displacement);
     vec3f_add(gLakituState.goalPos,   displacement);
     vec3f_add(gLakituState.goalFocus, displacement);
-    marioStates->waterLevel += displacementY;
+    marioState->waterLevel += displacementY;
 
     vec3f_add(start->focus, displacement);
     vec3f_add(start->pos,   displacement);
@@ -7564,7 +7564,7 @@ void cutscene_star_spawn(struct Camera *c) {
  * Move the camera back to Mario.
  */
 void cutscene_star_spawn_back(struct Camera *c) {
-    if ((c->mode == CAMERA_MODE_BOSS_FIGHT) && (set_cam_angle(0) == CAM_ANGLE_LAKITU)) {
+    if ((c->mode == CAMERA_MODE_BOSS_FIGHT) && (set_cam_angle(CAM_ANGLE_NONE) == CAM_ANGLE_LAKITU)) {
         cutscene_event(cutscene_star_spawn_update_boss_fight, c, 0, -1);
     } else {
         cutscene_event(cutscene_star_spawn_fly_back,          c, 0,  0);
