@@ -6180,33 +6180,25 @@ s32 rotate_camera_around_walls(UNUSED struct Camera *c, Vec3f cPos, s16 *avoidYa
  * Note: Also finds the water level, but waterHeight is unused
  */
 void find_mario_floor_and_ceil(struct PlayerGeometry *pg) {
-    struct Surface *surf;
-    s32 tempCollisionFlags = gCollisionFlags;
-    gCollisionFlags |= COLLISION_FLAG_CAMERA;
+    struct MarioState *marioState = &gMarioStates[0];
 
-    if (find_floor(sMarioCamState->pos[0], sMarioCamState->pos[1] + 10.f,
-                   sMarioCamState->pos[2], &surf) != FLOOR_LOWER_LIMIT) {
-        pg->currFloorType = surf->type;
+    pg->currFloor = marioState->floor;
+    pg->currFloorHeight = marioState->floorHeight;
+    if (pg->currFloorHeight != FLOOR_LOWER_LIMIT) {
+        pg->currFloorType = marioState->floor->type;
     } else {
         pg->currFloorType = SURFACE_DEFAULT;
     }
 
-    if (find_ceil(sMarioCamState->pos[0], sMarioCamState->pos[1] - 10.f,
-                  sMarioCamState->pos[2], &surf) != CELL_HEIGHT_LIMIT) {
-        pg->currCeilType = surf->type;
+    pg->currCeil = marioState->ceil;
+    pg->currCeilHeight = marioState->ceilHeight;
+    if (pg->currCeilHeight != CELL_HEIGHT_LIMIT) {
+        pg->currCeilType = marioState->ceil->type;
     } else {
         pg->currCeilType = SURFACE_DEFAULT;
     }
 
-    gCollisionFlags &= ~COLLISION_FLAG_CAMERA;
-    pg->currFloorHeight = find_floor(sMarioCamState->pos[0],
-                                     sMarioCamState->pos[1] + 10.f,
-                                     sMarioCamState->pos[2], &pg->currFloor);
-    pg->currCeilHeight = find_ceil(sMarioCamState->pos[0],
-                                   sMarioCamState->pos[1] - 10.f,
-                                   sMarioCamState->pos[2], &pg->currCeil);
-    pg->waterHeight = find_water_level(sMarioCamState->pos[0], sMarioCamState->pos[1], sMarioCamState->pos[2]);
-    gCollisionFlags = tempCollisionFlags;
+    pg->waterHeight = marioState->waterLevel;
 }
 
 /**
