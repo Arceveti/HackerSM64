@@ -25,7 +25,7 @@
 /*******************************************/
 
 // Overwrites the above values with vanilla values & enables vanilla camera processing.
-#define USE_VANILLA_CAMERA
+// #define USE_VANILLA_CAMERA
 
 // Mario's eye height. Many camera functions add this to the Y position. Vanilla is 125.
 #define MARIO_EYE_HEIGHT 125
