@@ -3059,7 +3059,6 @@ void reset_camera(struct Camera *c) {
 }
 
 void init_camera(struct Camera *c) {
-    struct Surface *floor = NULL;
     Vec3f marioOffset;
     s32 i;
 
@@ -3188,8 +3187,7 @@ void init_camera(struct Camera *c) {
     // Set the camera pos to marioOffset (relative to Mario), added to Mario's position
     offset_rotated(c->pos, sMarioCamState->pos, marioOffset, sMarioCamState->faceAngle);
     if (c->mode != CAMERA_MODE_BEHIND_MARIO) {
-        c->pos[1] = find_floor(sMarioCamState->pos[0], sMarioCamState->pos[1] + 100.f,
-                               sMarioCamState->pos[2], &floor) + MARIO_EYE_HEIGHT;
+        c->pos[1] = sMarioGeometry.currFloorHeight;
     }
     vec3f_copy(c->focus, sMarioCamState->pos);
     vec3f_copy(gLakituState.curPos, c->pos);
