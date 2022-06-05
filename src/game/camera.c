@@ -610,37 +610,21 @@ void calc_y_to_curr_floor(f32 *posOff, f32 posMul, f32 posBound, f32 *focOff, f3
 
     *posOff = (floorHeight - sMarioCamState->pos[1]) * posMul;
 
-    if (*posOff > posBound) {
-        *posOff = posBound;
-    }
-
-    if (*posOff < -posBound) {
-        *posOff = -posBound;
-    }
+    *posOff = CLAMP(*posOff, -posBound, posBound);
 
     *focOff = (floorHeight - sMarioCamState->pos[1]) * focMul;
 
-    if (*focOff > focBound) {
-        *focOff = focBound;
-    }
-
-    if (*focOff < -focBound) {
-        *focOff = -focBound;
-    }
+    *focOff = CLAMP(*focOff, -focBound, focBound);
 }
 
 void focus_on_mario(Vec3f focus, Vec3f pos, f32 posYOff, f32 focYOff, f32 dist, s16 pitch, s16 yaw) {
     Vec3f marioPos;
 
-    marioPos[0] = sMarioCamState->pos[0];
-    marioPos[1] = sMarioCamState->pos[1] + posYOff;
-    marioPos[2] = sMarioCamState->pos[2];
+    vec3f_copy_y_off(marioPos, sMarioCamState->pos, posYOff);
 
     vec3f_set_dist_and_angle(marioPos, pos, dist, pitch + sLakituPitch, yaw);
 
-    focus[0] = sMarioCamState->pos[0];
-    focus[1] = sMarioCamState->pos[1] + focYOff;
-    focus[2] = sMarioCamState->pos[2];
+    vec3f_copy_y_off(focus, sMarioCamState->pos, focYOff);
 }
 
 /**
