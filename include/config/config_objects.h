@@ -23,6 +23,10 @@
 // Allows for retries on collecting the remaining blue coins from a blue coin switch.
 #define BLUE_COIN_SWITCH_RETRY
 
+// The radius of coin ring formations.
+#define COIN_FORMATION_HORIZONTAL_RING_RADIUS 300.0f
+#define COIN_FORMATION_VERTICAL_RING_RADIUS 200.0f
+
 // -- EXCLAMATION BOX --
 
 // Makes all cap boxes solid regardless of whether their cap switch is pressed.

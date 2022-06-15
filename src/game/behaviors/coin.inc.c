@@ -200,13 +200,13 @@ void spawn_coin_in_formation(s32 index, s32 shape) {
             }
             break;
         case COIN_FORMATION_BP_SHAPE_HORIZONTAL_RING:
-            pos[0] = sins(index << 13) * 300.0f;
-            pos[2] = coss(index << 13) * 300.0f;
+            pos[0] = sins(index << 13) * COIN_FORMATION_HORIZONTAL_RING_RADIUS;
+            pos[2] = coss(index << 13) * COIN_FORMATION_HORIZONTAL_RING_RADIUS;
             break;
         case COIN_FORMATION_BP_SHAPE_VERTICAL_RING:
             snapToGround = FALSE;
-            pos[0] = coss(index << 13) * 200.0f;
-            pos[1] = sins(index << 13) * 200.0f + 200.0f;
+            pos[0] = coss(index << 13) * COIN_FORMATION_VERTICAL_RING_RADIUS;
+            pos[1] = sins(index << 13) * COIN_FORMATION_VERTICAL_RING_RADIUS + COIN_FORMATION_VERTICAL_RING_RADIUS;
             break;
         case COIN_FORMATION_BP_SHAPE_ARROW:
             pos[0] = sCoinArrowPositions[index][0];
