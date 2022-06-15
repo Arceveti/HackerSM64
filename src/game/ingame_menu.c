@@ -809,7 +809,7 @@ void change_and_flash_dialog_text_color_lines(s8 colorMode, s8 lineNum, u8 *cust
             gDPSetEnvColor(dlHead++, 255, 255, 255, 255);
         } else {
             if (lineNum == gDialogLineNum) {
-                colorFade = (gSineTable[gDialogColorFadeTimer >> 4] * 50.0f) + 200.0f;
+                colorFade = (sins(gDialogColorFadeTimer) * 50.0f) + 200.0f;
                 gDPSetEnvColor(dlHead++, colorFade, colorFade, colorFade, 255);
             } else {
                 gDPSetEnvColor(dlHead++, 200, 200, 200, 255);
