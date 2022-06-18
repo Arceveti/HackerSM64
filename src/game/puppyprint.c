@@ -286,14 +286,14 @@ void print_ram_overview(void) {
 }
 
 const char *audioPoolNames[NUM_AUDIO_POOLS] = {
-    "gAudioInitPool",
-    "gNotesAndBuffersPool",
-    "gSeqLoadedPool.persistent.pool",
-    "gSeqLoadedPool.temporary.pool",
-    "gBankLoadedPool.persistent.pool",
-    "gBankLoadedPool.temporary.pool",
-#if defined(BETTER_REVERB) && (defined(VERSION_US) || defined(VERSION_JP))
-    "gBetterReverbPool",
+    "Audio Init Pool",
+    "Notes And Buffers Pool",
+    "Persistent Sequence Pool",
+    "Persistent Bank Pool",
+    "Temporary Sequence Pool",
+    "Temporary Bank Pool",
+#ifdef BETTER_REVERB
+    "Better Reverb Pool",
 #endif
 };
 
@@ -691,6 +691,7 @@ void prepare_blank_box(void) {
 }
 
 void finish_blank_box(void) {
+    gDPPipeSync(gDisplayListHead++);
     print_set_envcolour(255, 255, 255, 255);
     gSPDisplayList(gDisplayListHead++, dl_hud_img_end);
 }
@@ -703,6 +704,8 @@ void render_blank_box(s32 x1, s32 y1, s32 x2, s32 y2, s32 r, s32 g, s32 b, s32 a
     s32 cycleadd = 0;
 
     Gfx* dlHead = gDisplayListHead;
+
+    gDPPipeSync(dlHead++);
 
     if (((absi(x1 - x2) % 4) == 0) && (a == 255)) {
         gDPSetCycleType(dlHead++, G_CYC_FILL);
@@ -723,7 +726,6 @@ void render_blank_box(s32 x1, s32 y1, s32 x2, s32 y2, s32 r, s32 g, s32 b, s32 a
         cycleadd = 0;
     }
 
-    gDPPipeSync(dlHead++);
     gDPSetFillColor(dlHead++, (GPACK_RGBA5551(r, g, b, 1) << 16) | GPACK_RGBA5551(r, g, b, 1));
 
     gDisplayListHead = dlHead;
