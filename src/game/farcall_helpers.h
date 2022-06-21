@@ -56,6 +56,13 @@ void obj_roll_to_match_yaw_turn(s16 targetYaw, s16 maxRoll, s16 rollSpeed);
 s32 random_linear_offset(s16 base, s16 range);
 s32 random_mod_offset(s16 base, s16 step, s16 mod);
 s32 obj_random_fixed_turn(s16 delta);
+
+enum ScaleStatus {
+    OBJ_SCALE_STATUS_END        = -1,
+    OBJ_SCALE_STATUS_SCALING    =  0,
+    OBJ_SCALE_STATUS_SHOOT_FIRE =  1,
+};
+
 s32 obj_grow_then_shrink(f32 *scaleVel, f32 shootFireScale, f32 endScale);
 s32 oscillate_toward(s32 *value, f32 *vel, s32 target, f32 velCloseToZero, f32 accel, f32 slowdown);
 void obj_update_blinking(s32 *blinkTimer, s16 baseCycleLength, s16 cycleLengthRange, s16 blinkLength);

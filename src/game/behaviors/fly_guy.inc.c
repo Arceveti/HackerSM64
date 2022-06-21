@@ -144,25 +144,23 @@ static void fly_guy_act_shoot_fire(void) {
         // it becomes below 1.2 during this latter portion, shoot fire.
         scaleStatus = obj_grow_then_shrink(&o->oFlyGuyScaleVel, 1.2f, 1.1f);
 
-        if (scaleStatus != 0) {
-            if (scaleStatus < 0) {
-                // We have reached scale 1.1
-                o->oAction = FLY_GUY_ACT_IDLE;
-            } else {
-                // We have reached below scale 1.2 in the shrinking portion
-                s16 fireMovePitch = obj_turn_pitch_toward_mario(0.0f, 0);
+        if (scaleStatus == OBJ_SCALE_STATUS_END) {
+            // We have reached scale 1.1
+            o->oAction = FLY_GUY_ACT_IDLE;
+        } else if (scaleStatus == OBJ_SCALE_STATUS_SHOOT_FIRE) {
+            // We have reached below scale 1.2 in the shrinking portion
+            s16 fireMovePitch = obj_turn_pitch_toward_mario(0.0f, 0);
 
-                cur_obj_play_sound_2(SOUND_OBJ_FLAME_BLOWN);
-                clamp_s16(&fireMovePitch, 0x800, 0x3000);
+            cur_obj_play_sound_2(SOUND_OBJ_FLAME_BLOWN);
+            clamp_s16(&fireMovePitch, 0x800, 0x3000);
 
-                obj_spit_fire(
-                    /*relativePos*/ 0, 38, 20,
-                    /*scale      */ 2.5f,
-                    /*model      */ MODEL_RED_FLAME_SHADOW,
-                    /*startSpeed */ 25.0f,
-                    /*endSpeed   */ 20.0f,
-                    /*movePitch  */ fireMovePitch);
-            }
+            obj_spit_fire(
+                /*relativePos*/ 0, 38, 20,
+                /*scale      */ 2.5f,
+                /*model      */ MODEL_RED_FLAME_SHADOW,
+                /*startSpeed */ 25.0f,
+                /*endSpeed   */ 20.0f,
+                /*movePitch  */ fireMovePitch);
         }
     } else {
         //! By triggering this repeatedly, we can keep obj_grow_then_shrink
