@@ -385,7 +385,7 @@ struct VtxLink *make_vtx_link(struct VtxLink *prevNode, Vtx *data) {
     newNode->data = data;
 
     // WTF? Not sure what this is supposed to check
-    if (((uintptr_t)(newNode)) == 0x3F800000) {
+    if (((uintptr_t)(newNode)) == 0x3F800000) { // 1.0f
         fatal_printf("bad3\n");
     }
 

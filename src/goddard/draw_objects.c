@@ -319,7 +319,7 @@ void check_face_bad_vtx(struct ObjFace *face) {
             gd_printf("bad1\n");
             return;
         }
-        if ((uintptr_t) vtx->gbiVerts == 0x3F800000) {
+        if ((uintptr_t) vtx->gbiVerts == 0x3F800000) { // 1.0f
             fatal_printf("bad2 %x,%d,%d,%d\n", (u32) (uintptr_t) vtx, vtx->scaleFactor, vtx->id, vtx->header.type);
         }
     }
