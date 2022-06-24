@@ -307,7 +307,9 @@ void note_init(struct Note *note) {
 #if defined(VERSION_EU) || defined(VERSION_SH)
 #define note_disable2 note_disable
 void note_disable(struct Note *note) {
-    note->noteSubEu.needsInit = FALSE;
+    if (note->noteSubEu.needsInit) {
+        note->noteSubEu.needsInit = FALSE;
+    }
 #ifdef VERSION_EU
     else {
         note_set_vel_pan_reverb(note, 0, 0x40, 0);
