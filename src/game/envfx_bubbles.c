@@ -390,7 +390,7 @@ void envfx_bubbles_update_switch(s32 mode, Vec3s camTo, Vec3s vertex1, Vec3s ver
  * the global sGfxCursor instead.
  */
 void envfx_set_bubble_texture(s32 mode, s16 index) {
-    void **imageArr;
+    void **imageArr = NULL;
     s16 frame = (gEnvFxBuffer + index)->animFrame;
 
     switch (mode) {

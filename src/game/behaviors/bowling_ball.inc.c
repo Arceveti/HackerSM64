@@ -250,7 +250,7 @@ void bhv_free_bowling_ball_roll_loop(void) {
         cur_obj_play_sound_1(SOUND_ENV_BOWLING_BALL_ROLL);
     }
 
-    /* Always false, commented out to suppress compiler warnings. */
+    // Always false!
     // if ((collisionFlags & OBJ_COL_FLAG_GROUNDED) && !(collisionFlags & OBJ_COL_FLAGS_LANDED)) {
     //     cur_obj_play_sound_2(SOUND_GENERAL_QUIET_POUND1_LOWPRIO);
     // }

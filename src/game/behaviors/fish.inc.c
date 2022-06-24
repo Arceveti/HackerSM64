@@ -10,10 +10,10 @@
  */
 static void fish_spawner_act_spawn(void) {
     s32 i;
-    s32 schoolQuantity;
-    ModelID16 model;
+    s32 schoolQuantity = 0;
+    ModelID16 model = 0;
     f32 minDistToMario;
-    const struct Animation *const *fishAnimation;
+    const struct Animation * const *fishAnimation = NULL;
 
     switch (o->oBehParams2ndByte) {
         case FISH_SPAWNER_BP_MANY_BLUE: model = MODEL_FISH;      schoolQuantity = 20; minDistToMario = 1500.0f; fishAnimation = blue_fish_seg3_anims_0301C2B0; break;

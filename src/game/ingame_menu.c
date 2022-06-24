@@ -1397,7 +1397,7 @@ void do_cutscene_handler(void) {
 // "Dear Mario" message handler
 void print_peach_letter_message(void) {
 #if MULTILANG
-    void **dialogTable;
+    void **dialogTable = NULL;
     gInGameLanguage = eu_get_language();
     switch (gInGameLanguage) {
         default:

@@ -173,7 +173,7 @@ void bhv_unagi_loop(void) {
             break;
         case UNAGI_ACT_RETURN_TO_CAVE:
             unagi_act_2();
-            // fallthrough
+            FALL_THROUGH;
         case UNAGI_ACT_IN_CAVE:
             unagi_act_3();
             break;

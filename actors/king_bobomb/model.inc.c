@@ -12,12 +12,12 @@
 // // Unreferenced light group
 
 // // 0x05000078
-// ALIGNED8 static const Texture king_bobomb_seg5_texture_05000078[] = {
+// UNUSED ALIGNED8 static const Texture king_bobomb_seg5_texture_05000078[] = {
 // #include "actors/king_bobomb/bob-omb_buddy_left_side_unused.rgba16.inc.c"
 // };
 
 // // 0x05001078
-// ALIGNED8 static const Texture king_bobomb_seg5_texture_05001078[] = {
+// UNUSED ALIGNED8 static const Texture king_bobomb_seg5_texture_05001078[] = {
 // #include "actors/king_bobomb/bob-omb_buddy_right_side_unused.rgba16.inc.c"
 // };
 

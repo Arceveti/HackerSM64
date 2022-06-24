@@ -1653,6 +1653,7 @@ void sequence_channel_process_script(struct SequenceChannel *seqChannel) {
                         } else {
                             eu_stubbed_printf_1("SUB:ERR:BANK %d NOT CACHED.\n", cmd);
                         }
+                        // fallthrough
                         FALL_THROUGH;
 #endif
 

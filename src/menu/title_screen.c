@@ -273,6 +273,6 @@ s32 lvl_intro_update(s16 arg, UNUSED s32 unusedArg) {
         case LVL_INTRO_GAME_OVER:           return (LEVEL_FILE_SELECT + gDebugLevelSelect);
 #endif
         case LVL_INTRO_LEVEL_SELECT:        return intro_level_select();
-        default: return LEVEL_NONE;
+        default:                            return LEVEL_NONE;
     }
 }

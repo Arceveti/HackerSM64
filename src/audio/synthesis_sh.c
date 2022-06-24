@@ -33,8 +33,6 @@
     aSetBuffer(pkt, 0, 0, c + DMEM_ADDR_WET_RIGHT_CH, d);                                              \
     aSaveBuffer(pkt, VIRTUAL_TO_PHYSICAL2(gSynthesisReverb.ringBuffer.right + (off)));
 
-#define AUDIO_ALIGN(val, amnt) ALIGN((val), (1 << amnt))
-
 struct VolumeChange {
     u16 sourceLeft;
     u16 sourceRight;
@@ -211,7 +209,7 @@ u64 *synthesis_resample_and_mix_reverb(u64 *cmd, s32 bufLen, s16 reverbIndex, s1
         aMix(cmd++, 0x8000 + gSynthesisReverbs[reverbIndex].reverbGain, DMEM_ADDR_WET_LEFT_CH, DMEM_ADDR_WET_LEFT_CH, DEFAULT_LEN_2CH);
     } else {
         startPad = (item->startPos & 0x7) * 2;
-        paddedLengthA = AUDIO_ALIGN(startPad + item->lengthA, 4);
+        paddedLengthA = ALIGN(startPad + item->lengthA, 16);
 
         cmd = synthesis_load_reverb_ring_buffer(cmd, DMEM_ADDR_RESAMPLED, (item->startPos - startPad / 2), DEFAULT_LEN_1CH, reverbIndex);
         if (item->lengthB != 0) {
@@ -540,13 +538,13 @@ u64 *synthesis_process_note(s32 noteIndex, struct NoteSubEu *noteSubEu, struct N
                         v0_2 = sp84 + (temp * unk_s6) + sampleAddr;
                     } else {
                         v0_2 = dma_sample_data((uintptr_t)(sp84 + (temp * unk_s6) + sampleAddr),
-                                AUDIO_ALIGN(t0 * unk_s6 + 16, 4), flags, &synthesisState->sampleDmaIndex, audioBookSample->medium);
+                                ALIGN(t0 * unk_s6 + 16, 16), flags, &synthesisState->sampleDmaIndex, audioBookSample->medium);
                     }
 
                     a3 = ((uintptr_t)v0_2 & 0xf);
-                    aligned = AUDIO_ALIGN(t0 * unk_s6 + 16, 4);
+                    aligned = ALIGN(t0 * unk_s6 + 16, 16);
                     addr = (DMEM_ADDR_COMPRESSED_ADPCM_DATA - aligned) & 0xffff;
-                    aLoadBuffer(cmd++, VIRTUAL_TO_PHYSICAL2(v0_2 - a3), addr, AUDIO_ALIGN(t0 * unk_s6 + 16, 4));
+                    aLoadBuffer(cmd++, VIRTUAL_TO_PHYSICAL2(v0_2 - a3), addr, ALIGN(t0 * unk_s6 + 16, 16));
                 } else {
                     s0 = 0;
                     a3 = 0;
@@ -560,13 +558,13 @@ u64 *synthesis_process_note(s32 noteIndex, struct NoteSubEu *noteSubEu, struct N
                 if (nAdpcmSamplesProcessed == 0) {
                     switch (audioBookSample->codec) {
                         case CODEC_ADPCM:
-                            aligned = AUDIO_ALIGN(t0 * unk_s6 + 16, 4);
+                            aligned = ALIGN(t0 * unk_s6 + 16, 16);
                             addr = (DMEM_ADDR_COMPRESSED_ADPCM_DATA - aligned) & 0xffff;
                             aSetBuffer(cmd++, 0, addr + a3, DMEM_ADDR_UNCOMPRESSED_NOTE, s0 * 2);
                             aADPCMdec(cmd++, flags, VIRTUAL_TO_PHYSICAL2(synthesisState->synthesisBuffers->adpcmdecState));
                             break;
                         case CODEC_S8:
-                            aligned = AUDIO_ALIGN(t0 * unk_s6 + 16, 4);
+                            aligned = ALIGN(t0 * unk_s6 + 16, 16);
                             addr = (DMEM_ADDR_COMPRESSED_ADPCM_DATA - aligned) & 0xffff;
                             aSetBuffer(cmd++, 0, addr + a3, DMEM_ADDR_UNCOMPRESSED_NOTE, s0 * 2);
                             aS8Dec(cmd++, flags, VIRTUAL_TO_PHYSICAL2(synthesisState->synthesisBuffers->adpcmdecState));
@@ -574,16 +572,16 @@ u64 *synthesis_process_note(s32 noteIndex, struct NoteSubEu *noteSubEu, struct N
                     }
                     sp130 = s2 * 2;
                 } else {
-                    s5Aligned = AUDIO_ALIGN(s5 + 16, 4);
+                    s5Aligned = ALIGN(s5 + 16, 16);
                     switch (audioBookSample->codec) {
                         case CODEC_ADPCM:
-                            aligned = AUDIO_ALIGN(t0 * unk_s6 + 16, 4);
+                            aligned = ALIGN(t0 * unk_s6 + 16, 16);
                             addr = (DMEM_ADDR_COMPRESSED_ADPCM_DATA - aligned) & 0xffff;
                             aSetBuffer(cmd++, 0, addr + a3, DMEM_ADDR_UNCOMPRESSED_NOTE + s5Aligned, s0 * 2);
                             aADPCMdec(cmd++, flags, VIRTUAL_TO_PHYSICAL2(synthesisState->synthesisBuffers->adpcmdecState));
                             break;
                         case CODEC_S8:
-                            aligned = AUDIO_ALIGN(t0 * unk_s6 + 16, 4);
+                            aligned = ALIGN(t0 * unk_s6 + 16, 16);
                             addr = (DMEM_ADDR_COMPRESSED_ADPCM_DATA - aligned) & 0xffff;
                             aSetBuffer(cmd++, 0, addr + a3, DMEM_ADDR_UNCOMPRESSED_NOTE + s5Aligned, s0 * 2);
                             aS8Dec(cmd++, flags, VIRTUAL_TO_PHYSICAL2(synthesisState->synthesisBuffers->adpcmdecState));
@@ -633,7 +631,7 @@ skip:
                 case 2:
                     switch (curPart) {
                         case 0:
-                            aDownsampleHalf(cmd++, AUDIO_ALIGN(samplesLenAdjusted / 2, 3), DMEM_ADDR_UNCOMPRESSED_NOTE + sp130, DMEM_ADDR_RESAMPLED);
+                            aDownsampleHalf(cmd++, ALIGN(samplesLenAdjusted / 2, 8), DMEM_ADDR_UNCOMPRESSED_NOTE + sp130, DMEM_ADDR_RESAMPLED);
                             resampledTempLen = samplesLenAdjusted;
                             noteSamplesDmemAddrBeforeResampling = DMEM_ADDR_RESAMPLED;
                             if (noteSubEu->finished) {
@@ -641,7 +639,7 @@ skip:
                             }
                             break;
                         case 1:
-                            aDownsampleHalf(cmd++, AUDIO_ALIGN(samplesLenAdjusted / 2, 3), DMEM_ADDR_UNCOMPRESSED_NOTE + sp130, resampledTempLen + DMEM_ADDR_RESAMPLED);
+                            aDownsampleHalf(cmd++, ALIGN(samplesLenAdjusted / 2, 8), DMEM_ADDR_UNCOMPRESSED_NOTE + sp130, resampledTempLen + DMEM_ADDR_RESAMPLED);
                             break;
                     }
             }
@@ -856,7 +854,7 @@ u64 *note_apply_headset_pan_effects(u64 *cmd, struct NoteSubEu *noteSubEu, struc
 
         if (prevPanShift != 0) {
             aLoadBuffer(cmd++, VIRTUAL_TO_PHYSICAL2(note->synthesisBuffers->panSamplesBuffer),
-                        DMEM_ADDR_NOTE_PAN_TEMP, AUDIO_ALIGN(prevPanShift, 4));
+                        DMEM_ADDR_NOTE_PAN_TEMP, ALIGN(prevPanShift, 16));
             aDMEMMove(cmd++, DMEM_ADDR_TEMP, DMEM_ADDR_NOTE_PAN_TEMP + prevPanShift, bufLen + panShift - prevPanShift);
         } else {
             aDMEMMove(cmd++, DMEM_ADDR_TEMP, DMEM_ADDR_NOTE_PAN_TEMP, bufLen + panShift);
@@ -871,7 +869,7 @@ u64 *note_apply_headset_pan_effects(u64 *cmd, struct NoteSubEu *noteSubEu, struc
     if (panShift) {
         // Save excessive samples for next iteration
         aSaveBuffer(cmd++, DMEM_ADDR_NOTE_PAN_TEMP + bufLen,
-                    VIRTUAL_TO_PHYSICAL2(note->synthesisBuffers->panSamplesBuffer), AUDIO_ALIGN(panShift, 4));
+                    VIRTUAL_TO_PHYSICAL2(note->synthesisBuffers->panSamplesBuffer), ALIGN(panShift, 16));
     }
 
     aAddMixer(cmd++, DMEM_ADDR_NOTE_PAN_TEMP, dest, (bufLen + 0x3f) & 0xffc0);

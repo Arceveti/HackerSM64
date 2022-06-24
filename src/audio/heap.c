@@ -1644,6 +1644,8 @@ void func_sh_802f23ec(void) {
     struct Instrument *inst;
     struct UnkEntry *entry = NULL; //! @bug: not initialized but nevertheless used
 
+    return; // This function is extremely unstable but doesn't actually appear to be very important apparently.
+
     seqCount = gAlCtlHeader->seqCount;
     for (idx = 0; idx < seqCount; idx++) {
         bankId1 = gCtlEntries[idx].bankId1;
