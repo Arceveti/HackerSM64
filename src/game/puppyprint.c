@@ -648,7 +648,7 @@ void puppyprint_render_profiler(void) {
 void puppyprint_profiler_process(void) {
     if (fDebug && (gPlayer1Controller->buttonPressed & L_TRIG)) {
         sDebugMenu ^= TRUE;
-        if (sDebugMenu == FALSE) {
+        if (!sDebugMenu) {
             sPPDebugPage = sDebugOption;
         }
     }

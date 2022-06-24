@@ -1271,7 +1271,7 @@ s32 lvl_init_from_save_file(UNUSED s16 initOrUpdate, s32 levelNum) {
     sWarpDest.type = WARP_TYPE_NOT_WARPING;
     sDelayedWarpOp = WARP_OP_NONE;
 #ifdef CASTLE_MUSIC_FIX
-    gNeverEnteredCastle = 0;
+    gNeverEnteredCastle = FALSE;
 #else
     gNeverEnteredCastle = !save_file_exists(gCurrSaveFileNum - 1);
 #endif

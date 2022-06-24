@@ -403,7 +403,7 @@ void bowser_bits_actions(void) {
         case FALSE:
             // oBowserBitsJustJump never changes value,
             // so its always FALSE, maybe a debug define
-            if (o->oBowserBitsJustJump == FALSE) {
+            if (!o->oBowserBitsJustJump) {
                 bowser_bits_action_list();
             } else {
                 bowser_set_act_big_jump();
@@ -1039,7 +1039,7 @@ void bowser_act_jump_onto_stage(void) {
                 o->oDragStrength = 10.0f;
                 o->oSubAction++; // BOWSER_SUB_ACT_JUMP_ON_STAGE_STOP
                 // Spawn shockwave (BitS only) if is not on a platform
-                if (onDynamicFloor == FALSE) {
+                if (!onDynamicFloor) {
                     bowser_spawn_shockwave();
                 // If is on a dynamic floor in BitS, then jump
                 // because of the falling platform

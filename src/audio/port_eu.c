@@ -270,7 +270,7 @@ void func_802ad7ec(u32 arg0) {
                         seqPlayer->seqVariationEu[cmd->u.s.arg3] = cmd->u2.as_s8;
                         break;
                 }
-            } else if (seqPlayer->enabled != FALSE && cmd->u.s.arg2 < 0x10) {
+            } else if (seqPlayer->enabled && cmd->u.s.arg2 < 0x10) {
                 chan = seqPlayer->channels[cmd->u.s.arg2];
                 if (IS_SEQUENCE_CHANNEL_VALID(chan)) {
                     switch (cmd->u.s.op) {

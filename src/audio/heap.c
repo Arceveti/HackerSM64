@@ -611,7 +611,7 @@ void *alloc_bank_or_seq(struct SoundMultiPool *loadedPool, s32 arg1, s32 size, s
         pool = &loadedPool->temporary.pool;
         if (tp->entries[tp->nextSide].id != (s8)nullID) {
             table[tp->entries[tp->nextSide].id] = SOUND_LOAD_STATUS_NOT_LOADED;
-            if (isSound == TRUE) {
+            if (isSound) {
                 discard_bank(tp->entries[tp->nextSide].id);
             }
         }
@@ -1525,7 +1525,7 @@ struct UnkEntry *func_sh_802f1ec4(u32 size) {
     s32 chosenIndex = -1;
     for (i = 0; i < D_SH_8034F68C; i++) {
         unkStruct = &D_SH_8034EC88[i];
-        if (unkStruct->isFree == FALSE) {
+        if (!unkStruct->isFree) {
             itemStart = unkStruct->ramAddr;
             itemEnd = unkStruct->ramAddr + unkStruct->sample->size - 1;
             if (itemEnd < phi_s3 && itemStart < phi_s3) {
@@ -1542,7 +1542,7 @@ struct UnkEntry *func_sh_802f1ec4(u32 size) {
     }
 
     for (i = 0; i < pool->numEntries; i++) {
-        if (pool->entries[i].used == FALSE) {
+        if (!pool->entries[i].used) {
             continue;
         }
         itemStart = pool->entries[i].srcAddr;

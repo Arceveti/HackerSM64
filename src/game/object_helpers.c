@@ -555,13 +555,15 @@ void cur_obj_hide(void) {
 }
 
 void cur_obj_set_pos_relative(struct Object *other, f32 dleft, f32 dy, f32 dforward) {
-    f32 facingZ = coss(other->oMoveAngleYaw);
-    f32 facingX = sins(other->oMoveAngleYaw);
+    s32 otherYaw = other->oMoveAngleYaw;
+
+    f32 facingZ = coss(otherYaw);
+    f32 facingX = sins(otherYaw);
 
     f32 dz = (dforward * facingZ) - (dleft * facingX);
     f32 dx = (dforward * facingX) + (dleft * facingZ);
 
-    o->oMoveAngleYaw = other->oMoveAngleYaw;
+    o->oMoveAngleYaw = otherYaw;
 
     o->oPosX = other->oPosX + dx;
     o->oPosY = other->oPosY + dy;
@@ -1506,7 +1508,7 @@ void cur_obj_move_standard(s16 steepSlopeAngleDegrees) {
             negativeSpeed = TRUE;
         }
         o->oForwardVel = sqrtf(sqr(o->oVelX) + sqr(o->oVelZ));
-        if (negativeSpeed == TRUE) {
+        if (negativeSpeed) {
             o->oForwardVel = -o->oForwardVel;
         }
     }

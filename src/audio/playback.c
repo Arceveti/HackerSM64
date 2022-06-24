@@ -307,9 +307,7 @@ void note_init(struct Note *note) {
 #if defined(VERSION_EU) || defined(VERSION_SH)
 #define note_disable2 note_disable
 void note_disable(struct Note *note) {
-    if (note->noteSubEu.needsInit == TRUE) {
-        note->noteSubEu.needsInit = FALSE;
-    }
+    note->noteSubEu.needsInit = FALSE;
 #ifdef VERSION_EU
     else {
         note_set_vel_pan_reverb(note, 0, 0x40, 0);
@@ -548,7 +546,7 @@ void process_notes(void) {
                     if (note->wantedParentLayer != NO_LAYER) {
                         note_disable2(note);
                         if (note->wantedParentLayer->seqChannel != NULL) {
-                            if (note_init_for_layer(note, note->wantedParentLayer) == TRUE) {
+                            if (note_init_for_layer(note, note->wantedParentLayer)) {
                                 note_disable2(note);
                                 POP(&note->listItem);
                                 PREPEND(&note->listItem, &gNoteFreeLists.disabled);
@@ -1196,7 +1194,7 @@ struct Note *alloc_note_from_disabled(struct NotePool *pool, struct SequenceChan
 #if defined(VERSION_EU) || defined(VERSION_SH)
         note_init_for_layer(note, seqLayer);
 #else
-        if (note_init_for_layer(note, seqLayer) == TRUE) {
+        if (note_init_for_layer(note, seqLayer)) {
             audio_list_push_front(&gNoteFreeLists.disabled, &note->listItem);
             return NULL;
         }

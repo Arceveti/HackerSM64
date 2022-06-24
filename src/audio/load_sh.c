@@ -342,7 +342,7 @@ void preload_sequence(u32 seqId, s32 preloadMask) {
 s32 func_sh_802f2f38(struct AudioBankSample *sample, s32 bankId) {
     u8 *sp24;
 
-    if (sample->isPatched == TRUE && sample->medium != 0) {
+    if (sample->isPatched && sample->medium != 0) {
         sp24 = func_sh_802f1d90(sample->size, bankId, sample->sampleAddr, sample->medium);
         if (sp24 == NULL) {
             return -1;
@@ -1325,7 +1325,7 @@ void patch_sound(struct AudioBankSound *sound, struct AudioBank *memBase, struct
 
     if ((uintptr_t) sound->sample <= 0x80000000) {
         sample = sound->sample = PATCH(sound->sample, memBase);
-        if (sample->size != 0 && sample->isPatched != TRUE) {
+        if (sample->size != 0 && !sample->isPatched) {
             sample->loop = PATCH(sample->loop, memBase);
             sample->book = PATCH(sample->book, memBase);
             switch (sample->medium) {
@@ -1466,7 +1466,7 @@ s32 func_sh_802f573c(s32 audioResetStatus) {
             return FALSE;
         }
         idx >>= 0x18;
-        if (D_SH_8034EC88[idx].isFree == FALSE) {
+        if (!D_SH_8034EC88[idx].isFree) {
             sample = D_SH_8034EC88[idx].sample;
             added = (sample->sampleAddr + sample->size + sample->medium);
             if (added == D_SH_8034EC88[idx].endAndMediumIdentification) {
@@ -1478,7 +1478,7 @@ s32 func_sh_802f573c(s32 audioResetStatus) {
 
 next:
         if (D_SH_8034F68C > 0) {
-            if (D_SH_8034EC88[D_SH_8034F68C - 1].isFree == TRUE) {
+            if (D_SH_8034EC88[D_SH_8034F68C - 1].isFree) {
                 D_SH_8034F68C--;
                 goto next;
             }

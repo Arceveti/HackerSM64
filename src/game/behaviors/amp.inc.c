@@ -101,7 +101,7 @@ static void homing_amp_chase_loop(void) {
 
     // If the amp is locked on to Mario, start "chasing" him by moving
     // in a straight line at 15 units/second for 32 frames.
-    if (o->oHomingAmpLockedOn == TRUE) {
+    if (o->oHomingAmpLockedOn) {
         o->oForwardVel = 15.0f;
 
         // Move the amp's average Y (the Y value it oscillates around) to align with
@@ -189,7 +189,7 @@ static void amp_attack_cooldown_loop(void) {
 void bhv_homing_amp_loop(void) {
     switch (o->oAction) {
         case HOMING_AMP_ACT_INACTIVE:
-            if (is_point_within_radius_of_mario(o->oHomeX, o->oHomeY, o->oHomeZ, 800) == TRUE) {
+            if (is_point_within_radius_of_mario(o->oHomeX, o->oHomeY, o->oHomeZ, 800)) {
                 // Make the amp start to appear, and un-hide it.
                 o->oAction = HOMING_AMP_ACT_APPEAR;
                 cur_obj_unhide();

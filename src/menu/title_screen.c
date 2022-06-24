@@ -217,7 +217,7 @@ s32 intro_regular(void) {
 s32 intro_game_over(void) {
     s32 level = LEVEL_NONE;
 
-    if (sPlayMarioGameOver == TRUE) {
+    if (sPlayMarioGameOver) {
         play_sound(SOUND_MARIO_GAME_OVER, gGlobalSoundSource);
         sPlayMarioGameOver = FALSE;
     }

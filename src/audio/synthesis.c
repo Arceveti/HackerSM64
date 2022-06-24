@@ -947,7 +947,7 @@ u64 *synthesis_process_notes(s16 *aiBuf, s32 bufLen, u64 *cmd) {
             gAudioErrorFlags = (note->bankId << 8) + noteIndex + 0x1000000;
         } else if (((struct vNote *)note)->enabled) {
 #else
-        if (note->noteSubEu.enabled == FALSE) {
+        if (!note->noteSubEu.enabled) {
             return cmd;
         } else {
 #endif
@@ -957,9 +957,9 @@ u64 *synthesis_process_notes(s16 *aiBuf, s32 bufLen, u64 *cmd) {
 #endif
 
 #ifdef VERSION_EU
-            if (noteSubEu->needsInit == TRUE) {
+            if (noteSubEu->needsInit) {
 #else
-            if (note->needsInit == TRUE) {
+            if (note->needsInit) {
 #endif
                 flags = A_INIT;
 #ifndef VERSION_EU
@@ -1078,11 +1078,11 @@ u64 *synthesis_process_notes(s16 *aiBuf, s32 bufLen, u64 *cmd) {
 #endif
 
 #ifdef VERSION_EU
-                        if (s2 == 0 && synthesisState->restart == FALSE) {
+                        if (s2 == 0 && !synthesisState->restart) {
                             s2 = 16;
                         }
 #else
-                        if (s2 == 0 && note->restart == FALSE) {
+                        if (s2 == 0 && !note->restart) {
                             s2 = 16;
                         }
 #endif
@@ -1106,9 +1106,9 @@ u64 *synthesis_process_notes(s16 *aiBuf, s32 bufLen, u64 *cmd) {
                             t0 = (s0 + 0xf) / 16;
                             if (loopInfo->count != 0) {
                                 // Loop around and restart
-                                restart = 1;
+                                restart = TRUE;
                             } else {
-                                noteFinished = 1;
+                                noteFinished = TRUE;
                             }
                         }
 
@@ -1137,13 +1137,13 @@ u64 *synthesis_process_notes(s16 *aiBuf, s32 bufLen, u64 *cmd) {
                         }
 
 #ifdef VERSION_EU
-                        if (synthesisState->restart != FALSE) {
+                        if (synthesisState->restart) {
                             aSetLoop(cmd++, VIRTUAL_TO_PHYSICAL2(audioBookSample->loop->state));
                             flags = A_LOOP; // = 2
                             synthesisState->restart = FALSE;
                         }
 #else
-                        if (note->restart != FALSE) {
+                        if (note->restart) {
                             aSetLoop(cmd++, VIRTUAL_TO_PHYSICAL2(audioBookSample->loop->state));
                             flags = A_LOOP; // = 2
                             note->restart = FALSE;
@@ -1249,9 +1249,9 @@ u64 *synthesis_process_notes(s16 *aiBuf, s32 bufLen, u64 *cmd) {
                                     resampledTempLen = samplesLenAdjusted + 4;
                                     noteSamplesDmemAddrBeforeResampling = DMEM_ADDR_RESAMPLED + 4;
 #ifdef VERSION_EU
-                                    if (noteSubEu->finished != FALSE) {
+                                    if (noteSubEu->finished) {
 #else
-                                    if (note->finished != FALSE) {
+                                    if (note->finished) {
 #endif
                                         aClearBuffer(cmd++, DMEM_ADDR_RESAMPLED + resampledTempLen, samplesLenAdjusted + 0x10);
                                     }
@@ -1278,9 +1278,9 @@ u64 *synthesis_process_notes(s16 *aiBuf, s32 bufLen, u64 *cmd) {
                     }
 
 #ifdef VERSION_EU
-                    if (noteSubEu->finished != FALSE) {
+                    if (noteSubEu->finished) {
 #else
-                    if (note->finished != FALSE) {
+                    if (note->finished) {
 #endif
                         break;
                     }
@@ -1290,7 +1290,7 @@ u64 *synthesis_process_notes(s16 *aiBuf, s32 bufLen, u64 *cmd) {
             flags = 0;
 
 #ifdef VERSION_EU
-            if (noteSubEu->needsInit == TRUE) {
+            if (noteSubEu->needsInit) {
                 flags = A_INIT;
                 noteSubEu->needsInit = FALSE;
             }
@@ -1298,7 +1298,7 @@ u64 *synthesis_process_notes(s16 *aiBuf, s32 bufLen, u64 *cmd) {
             cmd = final_resample(cmd, synthesisState, bufLen * 2, resamplingRateFixedPoint,
                                  noteSamplesDmemAddrBeforeResampling, flags);
 #else
-            if (note->needsInit == TRUE) {
+            if (note->needsInit) {
                 flags = A_INIT;
                 note->needsInit = FALSE;
             }

@@ -189,7 +189,7 @@ void bully_spawn_coin(void) {
 }
 
 void bully_act_level_death(void) {
-    if (obj_lava_death() == TRUE) {
+    if (obj_lava_death()) {
         if (o->oBehParams2ndByte == BULLY_BP_SIZE_SMALL) {
             if (o->oBullySubtype == BULLY_STYPE_MINION) {
                 o->parentObj->oBullyKBTimerAndMinionKOCounter++;
@@ -222,7 +222,7 @@ void bhv_bully_loop(void) {
         case BULLY_ACT_PATROL:
             o->oForwardVel = 5.0f;
 
-            if (obj_return_home_if_safe(o, o->oHomeX, o->oPosY, o->oHomeZ, 800) == TRUE) {
+            if (obj_return_home_if_safe(o, o->oHomeX, o->oPosY, o->oHomeZ, 800)) {
                 o->oAction = BULLY_ACT_CHASE_MARIO;
                 cur_obj_init_animation(BULLY_ANIM_RUNNING);
             }
@@ -277,7 +277,7 @@ void bhv_big_bully_with_minions_init(void) {
 }
 
 void big_bully_spawn_star(void) {
-    if (obj_lava_death() == TRUE) {
+    if (obj_lava_death()) {
         spawn_mist_particles();
         spawn_default_star(3700.0f, 600.0f, -5500.0f);
     }
@@ -293,7 +293,7 @@ void bhv_big_bully_with_minions_loop(void) {
         case BULLY_ACT_PATROL:
             o->oForwardVel = 5.0f;
 
-            if (obj_return_home_if_safe(o, o->oHomeX, o->oPosY, o->oHomeZ, 1000) == TRUE) {
+            if (obj_return_home_if_safe(o, o->oHomeX, o->oPosY, o->oHomeZ, 1000)) {
                 o->oAction = BULLY_ACT_CHASE_MARIO;
                 cur_obj_init_animation(BULLY_ANIM_RUNNING);
             }

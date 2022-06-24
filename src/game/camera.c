@@ -5911,7 +5911,7 @@ void camera_course_processing(struct Camera *c) {
 
                 // Check if Mario is inside the bounds
                 if (is_pos_in_bounds(sMarioCamState->pos, center, bounds,
-                                                   sCameraTriggers[level][b].boundsYaw) == TRUE) {
+                                                   sCameraTriggers[level][b].boundsYaw)) {
                     //! This should be checked before calling is_pos_in_bounds. (It doesn't belong
                     //! outside the while loop because some events disable area processing)
                     if (!(sStatusFlags & CAM_FLAG_BLOCK_AREA_PROCESSING)) {

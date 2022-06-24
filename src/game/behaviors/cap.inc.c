@@ -263,7 +263,7 @@ void bhv_normal_cap_loop(void) {
         normal_cap_set_save_flags();
     }
 
-    if (cap_set_hitbox() == TRUE) {
+    if (cap_set_hitbox()) {
         save_file_clear_flags(SAVE_FLAG_CAP_ON_GROUND);
     }
 }

@@ -122,7 +122,7 @@ static void boo_approach_target_opacity_and_update_scale(void) {
 static void boo_oscillate(s32 ignoreOpacity) {
     o->oFaceAnglePitch = sins(o->oBooOscillationTimer) * 0x400;
 
-    if (o->oOpacity == 255 || ignoreOpacity == TRUE) {
+    if (ignoreOpacity || o->oOpacity == 255) {
         o->header.gfx.scale[0] = sins(o->oBooOscillationTimer) * 0.08f + o->oBooBaseScale;
         o->header.gfx.scale[1] = -sins(o->oBooOscillationTimer) * 0.08f + o->oBooBaseScale;
         o->header.gfx.scale[2] = o->header.gfx.scale[0];
@@ -135,8 +135,8 @@ static s32 boo_vanish_or_appear(void) {
     s16 relativeAngleToMario = abs_angle_diff(o->oAngleToMario, o->oMoveAngleYaw);
     s16 relativeMarioFaceAngle = abs_angle_diff(o->oMoveAngleYaw, gMarioObject->oFaceAngleYaw);
     // magic?
-    s16 relativeAngleToMarioThreshhold = 0x1568;
-    s16 relativeMarioFaceAngleThreshhold = 0x6B58;
+    s16 relativeAngleToMarioThreshhold = 0x1568; // ~30.1 degrees
+    s16 relativeMarioFaceAngleThreshhold = 0x6B58; // ~150.95 degrees
     s32 doneAppearing = FALSE;
 
     o->oVelY = 0.0f;

@@ -2258,10 +2258,10 @@ void parse_p1_controller(void) {
     gdctrl->cup    = (currInputs->button & U_CBUTTONS) != 0;
     gdctrl->cdown  = (currInputs->button & D_CBUTTONS) != 0;
     // but not these buttons??
-    gdctrl->dleft  = currInputs->button & L_JPAD;
-    gdctrl->dright = currInputs->button & R_JPAD;
-    gdctrl->dup    = currInputs->button & U_JPAD;
-    gdctrl->ddown  = currInputs->button & D_JPAD;
+    gdctrl->dleft  = (currInputs->button & L_JPAD);
+    gdctrl->dright = (currInputs->button & R_JPAD);
+    gdctrl->dup    = (currInputs->button & U_JPAD);
+    gdctrl->ddown  = (currInputs->button & D_JPAD);
 
     if (gdctrl->btnA && !gdctrl->dragging) {
         gdctrl->startedDragging = TRUE;

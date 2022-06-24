@@ -974,7 +974,7 @@ void func_8017E584(struct ObjNet *net, struct GdVec3f *a1, struct GdVec3f *a2) {
     sp7C.y -= sp1C.y;
     sp7C.z -= sp1C.z;
 
-    if (gd_normalize_vec3f(&sp7C) == FALSE) {
+    if (!gd_normalize_vec3f(&sp7C)) {
         sp7C.x = -sp70.x;
         sp7C.y = -sp70.y;
         sp7C.z = -sp70.z;
@@ -1583,7 +1583,7 @@ void move_camera(struct ObjCamera *cam) {
 
     sp2C = &cam->unk64;
     if ((cam->flags & CAMERA_FLAG_CONTROLLABLE) != 0) {
-        if (ctrl->btnB != FALSE && ctrl->prevFrame->btnB == FALSE) { // new B press
+        if (ctrl->btnB && !ctrl->prevFrame->btnB) { // new B press
             cam->zoomLevel++;
             if (cam->zoomLevel > cam->maxZoomLevel) {
                 cam->zoomLevel = 0;

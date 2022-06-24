@@ -286,7 +286,7 @@ void draw_material(struct ObjMaterial *mtl) {
             mtlType = GD_MTL_BREAK;
         }
     }
-    if (sUseSelectedColor == FALSE) {
+    if (!sUseSelectedColor) {
         gd_dl_material_lighting(mtl->gddlNumber, &mtl->Kd, mtlType);
     } else {
         gd_dl_material_lighting(mtl->gddlNumber, sSelectedColour, GD_MTL_LIGHTS);
@@ -394,7 +394,7 @@ void draw_face(struct ObjFace *face) {
     Vtx *gbiVtx;       // 18
 
     imin("draw_face");
-    if (sUseSelectedColor == FALSE && face->mtlId >= 0 && face->mtl != NULL) { // -1 == colored face
+    if (!sUseSelectedColor && face->mtlId >= 0 && face->mtl != NULL) { // -1 == colored face
         i = face->mtl->gddlNumber;
 
         if (i != 0 && i != sUpdateViewState.mtlDlNum) {
@@ -1352,7 +1352,7 @@ void update_view(struct ObjView *view) {
 
     if (view->components != NULL) {
         if (gGdCtrl.dragging) {
-            if (gd_getproperty(3, 0) != FALSE && gGdCtrl.startedDragging != FALSE) {
+            if (gd_getproperty(3, 0) && gGdCtrl.startedDragging) { //! gd_getproperty here is always TRUE
                 init_pick_buf(sPickBuffer, ARRAY_COUNT(sPickBuffer));
                 drawscene(FIND_PICKS, sUpdateViewState.view->components, NULL);
                 pickOffset = get_cur_pickbuf_offset(sPickBuffer);

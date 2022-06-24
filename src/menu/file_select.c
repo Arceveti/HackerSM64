@@ -198,10 +198,10 @@ s32 check_clicked_button(s16 x, s16 y, f32 depth) {
     s16 maxY = newY + 21.0f;
     s16 minY = newY - 21.0f;
 
-    if (sClickPos[0] < maxX && minX < sClickPos[0] && sClickPos[1] < maxY && minY < sClickPos[1]) {
-        return TRUE;
-    }
-    return FALSE;
+    return (sClickPos[0] < maxX
+         && minX < sClickPos[0]
+         && sClickPos[1] < maxY
+         && minY < sClickPos[1]);
 }
 
 /**
@@ -515,7 +515,7 @@ void check_score_menu_clicked_buttons(struct Object *scoreButton) {
             s16 buttonX = sMainMenuButtons[buttonID]->oPosX;
             s16 buttonY = sMainMenuButtons[buttonID]->oPosY;
 
-            if (check_clicked_button(buttonX, buttonY, 22.0f) == TRUE && sMainMenuTimer >= SCORE_TIMER) {
+            if (check_clicked_button(buttonX, buttonY, 22.0f) && sMainMenuTimer >= SCORE_TIMER) {
                 // If menu button clicked, select it
                 if (buttonID == MENU_BUTTON_SCORE_RETURN || buttonID == MENU_BUTTON_SCORE_COPY_FILE
                     || buttonID == MENU_BUTTON_SCORE_ERASE_FILE) {
@@ -529,7 +529,7 @@ void check_score_menu_clicked_buttons(struct Object *scoreButton) {
                 else { // Check if a save file is clicked
                     if (sMainMenuTimer >= SCORE_TIMER) {
                         // If clicked in a existing save file, select it too see it's score
-                        if (save_file_exists(buttonID - MENU_BUTTON_SCORE_MIN) == TRUE) {
+                        if (save_file_exists(buttonID - MENU_BUTTON_SCORE_MIN)) {
                             play_sound(SOUND_MENU_CAMERA_ZOOM_IN, gGlobalSoundSource);
 #if ENABLE_RUMBLE
                             queue_rumble_data(5, 80);
@@ -569,10 +569,10 @@ void check_score_menu_clicked_buttons(struct Object *scoreButton) {
 void copy_action_file_button(struct Object *copyButton, s32 copyFileButtonID) {
     switch (copyButton->oMenuButtonActionPhase) {
         case COPY_PHASE_MAIN: // Copy Menu Main Phase
-            if (sAllFilesExist == TRUE) { // Don't enable copy if all save files exists
+            if (sAllFilesExist) { // Don't enable copy if all save files exists
                 return;
             }
-            if (save_file_exists(copyFileButtonID - MENU_BUTTON_COPY_MIN) == TRUE) {
+            if (save_file_exists(copyFileButtonID - MENU_BUTTON_COPY_MIN)) {
                 // If clicked in a existing save file, ask where it wants to copy
                 play_sound(SOUND_MENU_CLICK_FILE_SELECT, gGlobalSoundSource);
 #if ENABLE_RUMBLE
@@ -598,7 +598,7 @@ void copy_action_file_button(struct Object *copyButton, s32 copyFileButtonID) {
             break;
         case COPY_PHASE_COPY_WHERE: // Copy Menu "COPY IT TO WHERE?" Phase (after a file is selected)
             sMainMenuButtons[copyFileButtonID]->oMenuButtonState = MENU_BUTTON_STATE_ZOOM_IN_OUT;
-            if (save_file_exists(copyFileButtonID - MENU_BUTTON_COPY_MIN) == FALSE) {
+            if (!save_file_exists(copyFileButtonID - MENU_BUTTON_COPY_MIN)) {
                 // If clicked in a non-existing save file, copy the file
                 play_sound(SOUND_MENU_STAR_SOUND, gGlobalSoundSource);
 #if ENABLE_RUMBLE
@@ -646,7 +646,7 @@ void check_copy_menu_clicked_buttons(struct Object *copyButton) {
             s16 buttonX = sMainMenuButtons[buttonID]->oPosX;
             s16 buttonY = sMainMenuButtons[buttonID]->oPosY;
 
-            if (check_clicked_button(buttonX, buttonY, 22.0f) == TRUE) {
+            if (check_clicked_button(buttonX, buttonY, 22.0f)) {
                 // If menu button clicked, select it
                 if (buttonID == MENU_BUTTON_COPY_RETURN || buttonID == MENU_BUTTON_COPY_CHECK_SCORE
                     || buttonID == MENU_BUTTON_COPY_ERASE_FILE) {
@@ -687,7 +687,7 @@ void check_copy_menu_clicked_buttons(struct Object *copyButton) {
 void erase_action_file_button(struct Object *eraseButton, s32 eraseFileButtonID) {
     switch (eraseButton->oMenuButtonActionPhase) {
         case ERASE_PHASE_MAIN: // Erase Menu Main Phase
-            if (save_file_exists(eraseFileButtonID - MENU_BUTTON_ERASE_MIN) == TRUE) {
+            if (save_file_exists(eraseFileButtonID - MENU_BUTTON_ERASE_MIN)) {
                 // If clicked in a existing save file, ask if it wants to delete it
                 play_sound(SOUND_MENU_CLICK_FILE_SELECT, gGlobalSoundSource);
 #if ENABLE_RUMBLE
@@ -743,7 +743,7 @@ void check_erase_menu_clicked_buttons(struct Object *eraseButton) {
             s16 buttonX = sMainMenuButtons[buttonID]->oPosX;
             s16 buttonY = sMainMenuButtons[buttonID]->oPosY;
 
-            if (check_clicked_button(buttonX, buttonY, 22.0f) == TRUE) {
+            if (check_clicked_button(buttonX, buttonY, 22.0f)) {
                 // If menu button clicked, select it
                 if (buttonID == MENU_BUTTON_ERASE_RETURN || buttonID == MENU_BUTTON_ERASE_CHECK_SCORE
                     || buttonID == MENU_BUTTON_ERASE_COPY_FILE) {
@@ -838,7 +838,7 @@ void check_sound_mode_menu_clicked_buttons(struct Object *soundModeButton) {
             s16 buttonX = sMainMenuButtons[buttonID]->oPosX;
             s16 buttonY = sMainMenuButtons[buttonID]->oPosY;
 
-            if (check_clicked_button(buttonX, buttonY, 22.0f) == TRUE) {
+            if (check_clicked_button(buttonX, buttonY, 22.0f)) {
                 // If sound mode button clicked, select it and define sound mode
                 // The check will always be true because of the group configured above (In JP & US)
                 if (buttonID == MENU_BUTTON_STEREO || buttonID == MENU_BUTTON_MONO
@@ -1286,7 +1286,7 @@ void print_generic_string_fade(s16 x, s16 y, const unsigned char *text) {
  * Updates text fade at the top of a menu.
  */
 s32 update_text_fade_out(void) {
-    if (sFadeOutText == TRUE) {
+    if (sFadeOutText) {
         sTextFadeAlpha += 50;
         if (sTextFadeAlpha == 250) {
             sFadeOutText = FALSE;
@@ -1487,7 +1487,7 @@ void copy_menu_update_message(void) {
             if (sMainMenuTimer == FADEOUT_TIMER) {
                 sFadeOutText = TRUE;
             }
-            if (update_text_fade_out() == TRUE) {
+            if (update_text_fade_out()) {
                 if (sStatusMessageID == COPY_MSG_MAIN_TEXT) {
                     sStatusMessageID = COPY_MSG_NOSAVE_EXISTS;
                 } else {
@@ -1500,7 +1500,7 @@ void copy_menu_update_message(void) {
                 && sStatusMessageID == COPY_MSG_SAVE_EXISTS) {
                 sFadeOutText = TRUE;
             }
-            if (update_text_fade_out() == TRUE) {
+            if (update_text_fade_out()) {
                 if (sStatusMessageID != COPY_MSG_COPY_WHERE) {
                     sStatusMessageID = COPY_MSG_COPY_WHERE;
                 } else {
@@ -1512,7 +1512,7 @@ void copy_menu_update_message(void) {
             if (sMainMenuTimer == FADEOUT_TIMER) {
                 sFadeOutText = TRUE;
             }
-            if (update_text_fade_out() == TRUE) {
+            if (update_text_fade_out()) {
                 if (sStatusMessageID != COPY_MSG_COPY_COMPLETE) {
                     sStatusMessageID = COPY_MSG_COPY_COMPLETE;
                 } else {
@@ -1687,7 +1687,7 @@ void erase_menu_update_message(void) {
                 && sStatusMessageID == ERASE_MSG_NOSAVE_EXISTS) {
                 sFadeOutText = TRUE;
             }
-            if (update_text_fade_out() == TRUE) {
+            if (update_text_fade_out()) {
                 if (sStatusMessageID == ERASE_MSG_MAIN_TEXT) {
                     sStatusMessageID = ERASE_MSG_NOSAVE_EXISTS;
                 } else {
@@ -1696,7 +1696,7 @@ void erase_menu_update_message(void) {
             }
             break;
         case ERASE_PHASE_PROMPT:
-            if (update_text_fade_out() == TRUE) {
+            if (update_text_fade_out()) {
                 if (sStatusMessageID != ERASE_MSG_PROMPT) {
                     sStatusMessageID = ERASE_MSG_PROMPT;
                 }
@@ -1708,7 +1708,7 @@ void erase_menu_update_message(void) {
             if (sMainMenuTimer == FADEOUT_TIMER) {
                 sFadeOutText = TRUE;
             }
-            if (update_text_fade_out() == TRUE) {
+            if (update_text_fade_out()) {
                 if (sStatusMessageID != ERASE_MSG_MARIO_ERASED) {
                     sStatusMessageID = ERASE_MSG_MARIO_ERASED;
                 } else {
@@ -1978,12 +1978,10 @@ void print_file_select_strings(void) {
         case MENU_BUTTON_SOUND_MODE:   print_sound_mode_menu_strings();     break;
     }
     // If all 4 save file exists, define true to sAllFilesExist to prevent more copies in copy menu
-    if (save_file_exists(SAVE_FILE_A) == TRUE && save_file_exists(SAVE_FILE_B) == TRUE &&
-        save_file_exists(SAVE_FILE_C) == TRUE && save_file_exists(SAVE_FILE_D) == TRUE) {
-        sAllFilesExist = TRUE;
-    } else {
-        sAllFilesExist = FALSE;
-    }
+    sAllFilesExist = (save_file_exists(SAVE_FILE_A)
+                   && save_file_exists(SAVE_FILE_B)
+                   && save_file_exists(SAVE_FILE_C)
+                   && save_file_exists(SAVE_FILE_D));
     // Timers for menu alpha text and the main menu itself
     if (sTextBaseAlpha < 250) {
         sTextBaseAlpha += 10;

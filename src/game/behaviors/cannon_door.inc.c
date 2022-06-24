@@ -1,7 +1,7 @@
 // cannon.inc.c
 
 void bhv_cannon_closed_init(void) {
-    if (save_file_is_cannon_unlocked() == TRUE) {
+    if (save_file_is_cannon_unlocked()) {
         // If the cannon is open, spawn a cannon and despawn the object.
         struct Object *cannon = spawn_object(o, MODEL_CANNON_BASE, bhvCannon);
 
@@ -43,7 +43,7 @@ void bhv_cannon_closed_loop(void) {
             o->oVelY = 0.0f;
             o->oDrawingDistance = 4000.0f;
 
-            if (save_file_is_cannon_unlocked() == TRUE) {
+            if (save_file_is_cannon_unlocked()) {
                 o->oAction = CANNON_TRAP_DOOR_ACT_CAM_ZOOM;
             }
             break;

@@ -86,7 +86,7 @@ void breakable_box_small_idle_loop(void) {
             break;
     }
 
-    if (o->oBreakableBoxSmallReleased == TRUE) {
+    if (o->oBreakableBoxSmallReleased) {
         breakable_box_small_released_loop();
     }
 }

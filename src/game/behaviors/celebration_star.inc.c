@@ -39,7 +39,7 @@ void celeb_star_act_spin_around_mario(void) {
 
 void celeb_star_act_face_camera(void) {
     if (o->oTimer < 10) {
-        if (o->oCelebStarIsBowserKey == FALSE) {
+        if (!o->oCelebStarIsBowserKey) {
             cur_obj_scale((f32) o->oTimer / 10.0f);
         } else {
             cur_obj_scale((f32) o->oTimer / 30.0f);
