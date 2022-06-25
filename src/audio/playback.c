@@ -1128,11 +1128,7 @@ void note_init_for_layer(struct Note *note, struct SequenceChannelLayer *seqLaye
     }
     sub->sound.audioBankSound = seqLayer->sound;
 
-    if (instId >= 0x80) {
-        sub->isSyntheticWave = TRUE;
-    } else {
-        sub->isSyntheticWave = FALSE;
-    }
+    sub->isSyntheticWave = (instId >= 0x80);
 
     if (sub->isSyntheticWave) {
         build_synthetic_wave(note, seqLayer, instId);

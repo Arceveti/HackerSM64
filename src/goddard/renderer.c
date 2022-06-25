@@ -2263,11 +2263,7 @@ void parse_p1_controller(void) {
     gdctrl->dup    = (currInputs->button & U_JPAD);
     gdctrl->ddown  = (currInputs->button & D_JPAD);
 
-    if (gdctrl->btnA && !gdctrl->dragging) {
-        gdctrl->startedDragging = TRUE;
-    } else {
-        gdctrl->startedDragging = FALSE;
-    }
+    gdctrl->startedDragging = (gdctrl->btnA && !gdctrl->dragging);
     // toggle if A is pressed? or is this just some seed for an rng?
     gdctrl->dragging = gdctrl->btnA;
     gdctrl->unkD8b20 = gdctrl->unkD8b40 = FALSE;

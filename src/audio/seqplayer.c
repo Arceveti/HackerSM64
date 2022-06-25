@@ -573,11 +573,7 @@ void seq_channel_layer_process_script(struct SequenceChannelLayer *layer) {
 
             case 0xc4: // layer_somethingon
             case 0xc5: // layer_somethingoff
-                if (cmd == 0xc4) {
-                    layer->continuousNotes = TRUE;
-                } else {
-                    layer->continuousNotes = FALSE;
-                }
+                layer->continuousNotes = (cmd == 0xc4);
                 seq_channel_layer_note_decay(layer);
                 break;
 
@@ -1056,11 +1052,7 @@ s32 seq_channel_layer_process_script_part2(struct SequenceChannelLayer *layer) {
 
             case 0xc4: // layer_somethingon
             case 0xc5: // layer_somethingoff
-                if (cmd == 0xc4) {
-                    layer->continuousNotes = TRUE;
-                } else {
-                    layer->continuousNotes = FALSE;
-                }
+                layer->continuousNotes = (cmd == 0xc4);
                 seq_channel_layer_note_decay(layer);
                 break;
 
