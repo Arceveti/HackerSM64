@@ -1,7 +1,7 @@
 #include <ultra64.h>
+#include <PR/os_internal_reg.h>
 #include <PR/os_system.h>
 #include <PR/os_vi.h>
-#include <PR/os_internal_reg.h>
 #include <stdio.h>
 
 #include "sm64.h"
@@ -303,8 +303,6 @@ void handle_dp_complete(void) {
     sCurrentDisplaySPTask = NULL;
 }
 
-extern void crash_screen_init(void);
-
 void check_cache_emulation() {
     // Disable interrupts to ensure that nothing evicts the variable from cache while we're using it.
     u32 saved = __osDisableInt();
@@ -319,6 +317,8 @@ void check_cache_emulation() {
     // Restore interrupts
     __osRestoreInt(saved);
 }
+
+extern void crash_screen_init(void);
 
 void thread3_main(UNUSED void *arg) {
     setup_mesg_queues();
