@@ -329,8 +329,8 @@ u8 D_80332108 = 0;
 u8 sHasStartedFadeOut = FALSE;
 u16 sSoundBanksThatLowerBackgroundMusic = 0;
 u8 sBackgroundMusicMaxTargetVolume = TARGET_VOLUME_UNSET;
-u8 D_80332120 = 0;
-u8 D_80332124 = 0;
+u8 sCurrentSecondaryMusicSeqId = SEQ_SOUND_PLAYER;
+u8 sSecondaryMusicTargetVolume = 0;
 
 #if defined(VERSION_EU) || defined(VERSION_SH)
 u8 D_EU_80300558 = 0;
@@ -1672,8 +1672,8 @@ void process_level_music_dynamics(void) {
     s16 dur1, dur2;
     u16 bit;
 
-    func_8031F96C(0);
-    func_8031F96C(2);
+    func_8031F96C(SEQ_PLAYER_LEVEL);
+    func_8031F96C(SEQ_PLAYER_SFX);
     func_80320ED8();
     if (sMusicDynamicDelay != 0) {
         sMusicDynamicDelay--;
@@ -1982,8 +1982,8 @@ void sound_init(void) {
     gSoundMode = SOUND_MODE_STEREO;
     sBackgroundMusicQueueSize = 0;
     sBackgroundMusicMaxTargetVolume = TARGET_VOLUME_UNSET;
-    D_80332120 = 0;
-    D_80332124 = 0;
+    sCurrentSecondaryMusicSeqId = SEQ_SOUND_PLAYER;
+    sSecondaryMusicTargetVolume = 0;
     sNumProcessedSoundRequests = 0;
     sSoundRequestCount = 0;
 }
@@ -2111,7 +2111,7 @@ void sound_banks_enable(UNUSED u8 player, u16 bankMask) {
         if (bankMask & 1) {
             sSoundBankDisabled[i] = FALSE;
         }
-        bankMask = bankMask >> 1;
+        bankMask >>= 1;
     }
 }
 
@@ -2320,10 +2320,10 @@ void func_80320ED8(void) {
     begin_background_music_fade(50);
 
     if (sBackgroundMusicTargetVolume != TARGET_VOLUME_UNSET
-        && (D_80332120 == SEQ_EVENT_MERRY_GO_ROUND || D_80332120 == SEQ_EVENT_PIRANHA_PLANT)) {
-        seq_player_play_sequence(SEQ_PLAYER_ENV, D_80332120, 1);
-        if (D_80332124 != 0xff) {
-            seq_player_fade_to_target_volume(SEQ_PLAYER_ENV, 1, D_80332124);
+        && (sCurrentSecondaryMusicSeqId == SEQ_EVENT_MERRY_GO_ROUND || sCurrentSecondaryMusicSeqId == SEQ_EVENT_PIRANHA_PLANT)) {
+        seq_player_play_sequence(SEQ_PLAYER_ENV, sCurrentSecondaryMusicSeqId, 1);
+        if (sSecondaryMusicTargetVolume != 0xff) {
+            seq_player_fade_to_target_volume(SEQ_PLAYER_ENV, 1, sSecondaryMusicTargetVolume);
         }
     }
 }
@@ -2344,13 +2344,13 @@ void play_secondary_music(u8 seqId, u8 bgMusicVolume, u8 volume, u16 fadeTimer) 
         if (volume < 0x80) {
             seq_player_fade_to_target_volume(SEQ_PLAYER_ENV, fadeTimer, volume);
         }
-        D_80332124 = volume;
-        D_80332120 = seqId;
+        sSecondaryMusicTargetVolume = volume;
+        sCurrentSecondaryMusicSeqId = seqId;
     } else if (volume != 0xff) {
         sBackgroundMusicTargetVolume = bgMusicVolume + TARGET_VOLUME_IS_PRESENT_FLAG;
         begin_background_music_fade(fadeTimer);
         seq_player_fade_to_target_volume(SEQ_PLAYER_ENV, fadeTimer, volume);
-        D_80332124 = volume;
+        sSecondaryMusicTargetVolume = volume;
     }
 }
 
@@ -2361,8 +2361,8 @@ void play_secondary_music(u8 seqId, u8 bgMusicVolume, u8 volume, u16 fadeTimer) 
 void func_80321080(u16 fadeTimer) {
     if (sBackgroundMusicTargetVolume != TARGET_VOLUME_UNSET) {
         sBackgroundMusicTargetVolume = TARGET_VOLUME_UNSET;
-        D_80332120 = 0;
-        D_80332124 = 0;
+        sCurrentSecondaryMusicSeqId = SEQ_SOUND_PLAYER;
+        sSecondaryMusicTargetVolume = 0;
         begin_background_music_fade(fadeTimer);
         seq_player_fade_out(SEQ_PLAYER_ENV, fadeTimer);
     }
