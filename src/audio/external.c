@@ -312,16 +312,16 @@ STATIC_ASSERT(ARRAY_COUNT(sBackgroundMusicDefaultVolume) == SEQ_COUNT,
 
 u8 sCurrentBackgroundMusicSeqId = SEQUENCE_NONE;
 u8 sMusicDynamicDelay = 0;
-u8 sSoundBankUsedListBack[SOUND_BANK_COUNT] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
-u8 sSoundBankFreeListFront[SOUND_BANK_COUNT] = { 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 };
-u8 sNumSoundsInBank[SOUND_BANK_COUNT] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 }; // only used for debugging
+u8 sSoundBankUsedListBack[SOUND_BANK_COUNT]   = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+u8 sSoundBankFreeListFront[SOUND_BANK_COUNT]  = { 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 };
+u8 sNumSoundsInBank[SOUND_BANK_COUNT]         = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 }; // only used for debugging
 u8 sMaxChannelsForSoundBank[SOUND_BANK_COUNT] = { 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 };
 
 // sBackgroundMusicMaxTargetVolume and sBackgroundMusicTargetVolume use the 0x80
 // bit to indicate that they are set, and the rest of the bits for the actual value
-#define TARGET_VOLUME_IS_PRESENT_FLAG 0x80
-#define TARGET_VOLUME_VALUE_MASK 0x7f
-#define TARGET_VOLUME_UNSET 0x00
+#define TARGET_VOLUME_IS_PRESENT_FLAG BIT(7) // 0x80
+#define TARGET_VOLUME_VALUE_MASK      BITMASK(7) // 0x7f
+#define TARGET_VOLUME_UNSET           0x00
 
 f32 gGlobalSoundSource[3] = { 0.0f, 0.0f, 0.0f };
 u8 sSoundBankDisabled[16] = { 0 };
@@ -348,7 +348,7 @@ struct UnkStruct80343D00 D_SH_80343D00;
 
 struct Sound sSoundRequests[0x100];
 // Curiously, this has size 3, despite SEQUENCE_PLAYERS == 4 on EU
-struct ChannelVolumeScaleFade D_80360928[3][CHANNELS_MAX];
+struct ChannelVolumeScaleFade sChannelVolumeScaleFadeInfo[3][CHANNELS_MAX];
 u8 sUsedChannelsForSoundBank[SOUND_BANK_COUNT];
 u8 sCurrentSound[SOUND_BANK_COUNT][MAX_CHANNELS_PER_SOUND_BANK]; // index into sSoundBanks
 
@@ -364,10 +364,6 @@ u8 sSoundMovingSpeed[SOUND_BANK_COUNT];
 u8 sBackgroundMusicTargetVolume;
 static u8 sLowerBackgroundMusicVolume;
 struct SequenceQueueItem sBackgroundMusicQueue[MAX_BACKGROUND_MUSIC_QUEUE_SIZE];
-
-#if defined(VERSION_EU) || defined(VERSION_SH)
-s32 unk_sh_8034754C;
-#endif
 
 #ifdef VERSION_EU
 OSMesgQueue OSMesgQueue0;
@@ -1550,7 +1546,7 @@ static void seq_player_play_sequence(u8 player, u8 seqId, u16 arg2) {
     }
 
     for (i = 0; i < CHANNELS_MAX; i++) {
-        D_80360928[player][i].remainingFrames = 0;
+        sChannelVolumeScaleFadeInfo[player][i].remainingFrames = 0;
     }
 
 #if defined(VERSION_EU) || defined(VERSION_SH)
@@ -1619,7 +1615,7 @@ static void fade_channel_volume_scale(u8 player, u8 channelIndex, u8 targetScale
     struct ChannelVolumeScaleFade *temp;
 
     if (gSequencePlayers[player].channels[channelIndex] != &gSequenceChannelNone) {
-        temp = &D_80360928[player][channelIndex];
+        temp = &sChannelVolumeScaleFadeInfo[player][channelIndex];
         temp->remainingFrames = fadeDuration;
         temp->velocity = ((f32)(targetScale / 127.0f)
                           - gSequencePlayers[player].channels[channelIndex]->volumeScale)
@@ -1638,22 +1634,22 @@ static void func_8031F96C(u8 player) {
     // Loop over channels
     for (i = 0; i < CHANNELS_MAX; i++) {
         if (gSequencePlayers[player].channels[i] != &gSequenceChannelNone
-            && D_80360928[player][i].remainingFrames != 0) {
-            D_80360928[player][i].current += D_80360928[player][i].velocity;
+            && sChannelVolumeScaleFadeInfo[player][i].remainingFrames != 0) {
+            sChannelVolumeScaleFadeInfo[player][i].current += sChannelVolumeScaleFadeInfo[player][i].velocity;
 #if defined(VERSION_EU) || defined(VERSION_SH)
             func_802ad728(0x01000000 | (player & 0xff) << 16 | (i & 0xff) << 8,
-                          D_80360928[player][i].current);
+                          sChannelVolumeScaleFadeInfo[player][i].current);
 #else
-            gSequencePlayers[player].channels[i]->volumeScale = D_80360928[player][i].current;
+            gSequencePlayers[player].channels[i]->volumeScale = sChannelVolumeScaleFadeInfo[player][i].current;
 #endif
-            D_80360928[player][i].remainingFrames--;
-            if (D_80360928[player][i].remainingFrames == 0) {
+            sChannelVolumeScaleFadeInfo[player][i].remainingFrames--;
+            if (sChannelVolumeScaleFadeInfo[player][i].remainingFrames == 0) {
 #if defined(VERSION_EU) || defined(VERSION_SH)
                 func_802ad728((0x01000000 | ((player & 0xFF) << 16) | ((i & 0xFF) << 8)),
-                              (FLOAT_CAST(D_80360928[player][i].target) / 127.0f));
+                              (FLOAT_CAST(sChannelVolumeScaleFadeInfo[player][i].target) / 127.0f));
 #else
                 gSequencePlayers[player].channels[i]->volumeScale =
-                    D_80360928[player][i].target / 127.0f;
+                    sChannelVolumeScaleFadeInfo[player][i].target / 127.0f;
 #endif
             }
         }
@@ -1700,7 +1696,7 @@ void process_level_music_dynamics(void) {
             }
 
             j++;
-            bit = bit >> 1;
+            bit >>= 1;
         }
 
         for (j = 0; j < condIndex; j++) {
@@ -1761,7 +1757,7 @@ void process_level_music_dynamics(void) {
             tempBits = 0;
         } else {
             tempBits      = sLevelDynamics[gCurrLevelNum][i] & 0xff00;
-            musicDynIndex = sLevelDynamics[gCurrLevelNum][i] & 0xff;
+            musicDynIndex = sLevelDynamics[gCurrLevelNum][i] & 0x00ff;
             i++;
         }
 
@@ -1965,7 +1961,7 @@ void sound_init(void) {
 
     for (j = 0; j < 3; j++) {
         for (i = 0; i < CHANNELS_MAX; i++) {
-            D_80360928[j][i].remainingFrames = 0;
+            sChannelVolumeScaleFadeInfo[j][i].remainingFrames = 0;
         }
     }
 
@@ -2086,7 +2082,7 @@ void sound_banks_disable(UNUSED u8 player, u16 bankMask) {
         if (bankMask & 1) {
             sSoundBankDisabled[i] = TRUE;
         }
-        bankMask = bankMask >> 1;
+        bankMask >>= 1;
     }
 }
 
@@ -2412,7 +2408,7 @@ void play_course_clear(s32 isKey) {
     } else {
         seq_player_play_sequence(SEQ_PLAYER_ENV, SEQ_EVENT_CUTSCENE_COLLECT_STAR, 0);
     }
-    sBackgroundMusicMaxTargetVolume = TARGET_VOLUME_IS_PRESENT_FLAG | 0;
+    sBackgroundMusicMaxTargetVolume = (TARGET_VOLUME_IS_PRESENT_FLAG | 0);
 #if defined(VERSION_EU) || defined(VERSION_SH)
     D_EU_80300558 = 2;
 #endif
@@ -2424,7 +2420,7 @@ void play_course_clear(s32 isKey) {
  */
 void play_peachs_jingle(void) {
     seq_player_play_sequence(SEQ_PLAYER_ENV, SEQ_EVENT_PEACH_MESSAGE, 0);
-    sBackgroundMusicMaxTargetVolume = TARGET_VOLUME_IS_PRESENT_FLAG | 0;
+    sBackgroundMusicMaxTargetVolume = (TARGET_VOLUME_IS_PRESENT_FLAG | 0);
 #if defined(VERSION_EU) || defined(VERSION_SH)
     D_EU_80300558 = 2;
 #endif
@@ -2440,7 +2436,7 @@ void play_peachs_jingle(void) {
  */
 void play_puzzle_jingle(void) {
     seq_player_play_sequence(SEQ_PLAYER_ENV, SEQ_EVENT_SOLVE_PUZZLE, 0);
-    sBackgroundMusicMaxTargetVolume = TARGET_VOLUME_IS_PRESENT_FLAG | 20;
+    sBackgroundMusicMaxTargetVolume = (TARGET_VOLUME_IS_PRESENT_FLAG | 20);
 #if defined(VERSION_EU) || defined(VERSION_SH)
     D_EU_80300558 = 2;
 #endif
@@ -2452,7 +2448,7 @@ void play_puzzle_jingle(void) {
  */
 void play_star_fanfare(void) {
     seq_player_play_sequence(SEQ_PLAYER_ENV, SEQ_EVENT_HIGH_SCORE, 0);
-    sBackgroundMusicMaxTargetVolume = TARGET_VOLUME_IS_PRESENT_FLAG | 20;
+    sBackgroundMusicMaxTargetVolume = (TARGET_VOLUME_IS_PRESENT_FLAG | 20);
 #if defined(VERSION_EU) || defined(VERSION_SH)
     D_EU_80300558 = 2;
 #endif
@@ -2464,7 +2460,7 @@ void play_star_fanfare(void) {
  */
 void play_power_star_jingle(void) {
     seq_player_play_sequence(SEQ_PLAYER_ENV, SEQ_EVENT_CUTSCENE_STAR_SPAWN, 0);
-    sBackgroundMusicMaxTargetVolume = TARGET_VOLUME_IS_PRESENT_FLAG | 20;
+    sBackgroundMusicMaxTargetVolume = (TARGET_VOLUME_IS_PRESENT_FLAG | 20);
 #if defined(VERSION_EU) || defined(VERSION_SH)
     D_EU_80300558 = 2;
 #endif
@@ -2476,7 +2472,7 @@ void play_power_star_jingle(void) {
  */
 void play_race_fanfare(void) {
     seq_player_play_sequence(SEQ_PLAYER_ENV, SEQ_EVENT_RACE, 0);
-    sBackgroundMusicMaxTargetVolume = TARGET_VOLUME_IS_PRESENT_FLAG | 20;
+    sBackgroundMusicMaxTargetVolume = (TARGET_VOLUME_IS_PRESENT_FLAG | 20);
 #if defined(VERSION_EU) || defined(VERSION_SH)
     D_EU_80300558 = 2;
 #endif
@@ -2488,7 +2484,7 @@ void play_race_fanfare(void) {
  */
 void play_toads_jingle(void) {
     seq_player_play_sequence(SEQ_PLAYER_ENV, SEQ_EVENT_TOAD_MESSAGE, 0);
-    sBackgroundMusicMaxTargetVolume = TARGET_VOLUME_IS_PRESENT_FLAG | 20;
+    sBackgroundMusicMaxTargetVolume = (TARGET_VOLUME_IS_PRESENT_FLAG | 20);
 #if defined(VERSION_EU) || defined(VERSION_SH)
     D_EU_80300558 = 2;
 #endif
