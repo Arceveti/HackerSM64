@@ -127,7 +127,7 @@ s16 gDialogID = DIALOG_NONE;
 s16 gLastDialogPageStrPos = 0;
 s16 gDialogTextPos = 0;
 s8 gDialogLineNum = 1;
-s8 gLastDialogResponse = 0;
+s8 gLastDialogResponse = FALSE;
 u8 gMenuHoldKeyIndex = 0;
 u8 gMenuHoldKeyTimer = 0;
 s32 gDialogResponse = DIALOG_RESPONSE_NONE;
@@ -753,7 +753,7 @@ void create_dialog_box_with_response(s16 dialog) {
     if (gDialogID == DIALOG_NONE) {
         gDialogID = dialog;
         gDialogBoxType = DIALOG_TYPE_ROTATE;
-        gLastDialogResponse = 1;
+        gLastDialogResponse = TRUE;
     }
 }
 
@@ -765,7 +765,7 @@ void reset_dialog_render_state(void) {
     gDialogBoxState = DIALOG_STATE_OPENING;
     gDialogID = DIALOG_NONE;
     gDialogTextPos = 0;
-    gLastDialogResponse = 0;
+    gLastDialogResponse = FALSE;
     gLastDialogPageStrPos = 0;
     gDialogResponse = DIALOG_RESPONSE_NONE;
 }
@@ -1241,7 +1241,7 @@ void render_dialog_entries(void) {
                 gDialogBoxState = DIALOG_STATE_OPENING;
                 gDialogID = DIALOG_NONE;
                 gDialogTextPos = 0;
-                gLastDialogResponse = 0;
+                gLastDialogResponse = FALSE;
                 gLastDialogPageStrPos = 0;
                 gDialogResponse = DIALOG_RESPONSE_NONE;
             }
@@ -1266,7 +1266,7 @@ void render_dialog_entries(void) {
     );
     handle_dialog_text_and_pages(0, dialog, lowerBound);
 
-    if (gLastDialogPageStrPos == -1 && gLastDialogResponse == 1) {
+    if (gLastDialogPageStrPos == -1 && gLastDialogResponse) {
         render_dialog_triangle_choice();
     }
     gDPSetScissor(gDisplayListHead++, G_SC_NON_INTERLACE, 2, 2, SCREEN_WIDTH - gBorderHeight / 2, SCREEN_HEIGHT - gBorderHeight / 2);
