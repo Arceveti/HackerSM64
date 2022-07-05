@@ -634,6 +634,6 @@ void update_objects(void) {
     COND_BIT((gTimeStopState & TIME_STOP_ENABLED), gTimeStopState, TIME_STOP_ACTIVE);
 
     gPrevFrameObjectCount = gObjectCounter;
-    
+
     profiler_update(PROFILER_TIME_BEHAVIOR_AFTER_MARIO);
 }

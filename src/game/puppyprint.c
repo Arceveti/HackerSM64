@@ -587,8 +587,6 @@ void puppyprint_render_standard(void) {
     // finish_blank_box();
 }
 
-
-
 void puppyprint_render_minimal(void) {
     print_basic_profiling();
 }
