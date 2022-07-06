@@ -142,7 +142,7 @@ enum MarioLoseCapEnemyType {
     LOSE_CAP_ENEMY_TYPE_UKIKI,
 };
 
-s16 mario_obj_angle_to_object(struct MarioState *m, struct Object *obj);
+s32  mario_obj_angle_to_object(struct MarioState *m, struct Object *obj);
 void mario_stop_riding_object(struct MarioState *m);
 void mario_grab_used_object(struct MarioState *m);
 void mario_drop_held_object(struct MarioState *m);
