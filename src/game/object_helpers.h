@@ -204,11 +204,13 @@ void cur_obj_set_pos_via_transform(void);
 void cur_obj_spawn_particles(struct SpawnParticlesInfo *info);
 s32 cur_obj_reflect_move_angle_off_wall(void);
 
-#define WAYPOINT_FLAGS_END -1
-#define WAYPOINT_FLAGS_NONE 0
-#define WAYPOINT_FLAGS_INITIALIZED 0x8000
-#define WAYPOINT_FLAGS_PLATFORM_ON_TRACK_PAUSE 3
-#define WAYPOINT_MASK_00FF 0x00FF
+enum WaypointPathFlags {
+    WAYPOINT_FLAGS_END = -1,
+    WAYPOINT_FLAGS_NONE = 0,
+    WAYPOINT_FLAGS_INITIALIZED = BIT(15),
+    WAYPOINT_FLAGS_INDEX_MASK = BITMASK(7),
+    WAYPOINT_INDEX_PLATFORM_ON_TRACK_PAUSE = 3,
+};
 
 enum PathStatus {
     PATH_REACHED_END = -1,
@@ -217,9 +219,9 @@ enum PathStatus {
 };
 
 enum ObjScaleAxis {
-    SCALE_AXIS_X = (1 << 0), // 0x01
-    SCALE_AXIS_Y = (1 << 1), // 0x02
-    SCALE_AXIS_Z = (1 << 2), // 0x04
+    SCALE_AXIS_X = BIT(0), // 0x01
+    SCALE_AXIS_Y = BIT(1), // 0x02
+    SCALE_AXIS_Z = BIT(2), // 0x04
 };
 
 void obj_set_hitbox(struct Object *obj, struct ObjectHitbox *hitbox);

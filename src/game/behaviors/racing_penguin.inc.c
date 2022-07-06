@@ -40,7 +40,7 @@ static void racing_penguin_act_show_init_text(void) {
 
         o->oPathedStartWaypoint = o->oPathedPrevWaypoint =
             segmented_to_virtual(ccm_seg7_trajectory_penguin_race);
-        o->oPathedPrevWaypointFlags = 0;
+        o->oPathedPrevWaypointFlags = WAYPOINT_FLAGS_NONE;
 
         o->oAction = RACING_PENGUIN_ACT_PREPARE_FOR_RACE;
         o->oVelY = 60.0f;
@@ -69,11 +69,10 @@ static void racing_penguin_act_race(void) {
 
         cur_obj_play_sound_1(SOUND_AIR_ROUGH_SLIDE);
 
-        if (targetSpeed < 100.0f || (o->oPathedPrevWaypointFlags & WAYPOINT_MASK_00FF) >= 35) {
-            if ((o->oPathedPrevWaypointFlags & WAYPOINT_MASK_00FF) >= 35) {
-                minSpeed = 60.0f;
-            }
-
+        if (targetSpeed < 100.0f) {
+            approach_f32_ptr(&o->oRacingPenguinWeightedNewTargetSpeed, -500.0f, 100.0f);
+        } else if ((o->oPathedPrevWaypointFlags & WAYPOINT_FLAGS_INDEX_MASK) >= 35) {
+            minSpeed = 60.0f;
             approach_f32_ptr(&o->oRacingPenguinWeightedNewTargetSpeed, -500.0f, 100.0f);
         } else {
             approach_f32_ptr(&o->oRacingPenguinWeightedNewTargetSpeed, 1000.0f, 30.0f);

@@ -1618,7 +1618,7 @@ void cur_obj_set_face_angle_to_move_angle(void) {
 
 // removed unused arg: define allows for any number of args
 s32 cur_obj_follow_path_new(void) {
-    if (o->oPathedPrevWaypointFlags == 0) {
+    if (o->oPathedPrevWaypointFlags == WAYPOINT_FLAGS_NONE) {
         o->oPathedPrevWaypoint = o->oPathedStartWaypoint;
         o->oPathedPrevWaypointFlags = WAYPOINT_FLAGS_INITIALIZED;
     }
@@ -1634,7 +1634,7 @@ s32 cur_obj_follow_path_new(void) {
         targetWaypoint = startWaypoint;
     }
 
-    o->oPathedPrevWaypointFlags = lastWaypoint->flags | WAYPOINT_FLAGS_INITIALIZED;
+    o->oPathedPrevWaypointFlags = (lastWaypoint->flags | WAYPOINT_FLAGS_INITIALIZED);
 
     vec3_diff(prevToNext, targetWaypoint->pos, lastWaypoint->pos);
     vec3_diff(objToNext, targetWaypoint->pos, &o->oPosVec);

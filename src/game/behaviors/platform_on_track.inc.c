@@ -228,7 +228,7 @@ static void platform_on_track_act_move_along_track(void) {
         // The ski lift should pause or stop after reaching a special waypoint
         if (o->oPlatformOnTrackPrevWaypointFlags != WAYPOINT_FLAGS_NONE && !o->oPlatformOnTrackIsNotSkiLift) {
             if (o->oPlatformOnTrackPrevWaypointFlags == WAYPOINT_FLAGS_END
-             || o->oPlatformOnTrackPrevWaypointFlags == WAYPOINT_FLAGS_PLATFORM_ON_TRACK_PAUSE) {
+             || o->oPlatformOnTrackPrevWaypointFlags == WAYPOINT_INDEX_PLATFORM_ON_TRACK_PAUSE) {
                 cur_obj_play_sound_2(SOUND_GENERAL_ELEVATOR_WOBBLE);
 
                 o->oForwardVel = 0.0f;
@@ -247,11 +247,7 @@ static void platform_on_track_act_move_along_track(void) {
                 f32 targetVel = gMarioObject->platform == o
                     ? (o->oDistanceToMario * coss(o->oAngleToMario - o->oMoveAngleYaw)) - 10.0f
                     : 10.0f;
-                if (targetVel < 10.0f) {
-                    targetVel = 10.0f;
-                } else if (targetVel > 16.0f) {
-                    targetVel = 16.0f;
-                }
+                targetVel = CLAMP(targetVel, 10.0f, 16.0f);
                 obj_forward_vel_approach(targetVel, 0.1f);
 #else
                 o->oForwardVel = 10.0f;

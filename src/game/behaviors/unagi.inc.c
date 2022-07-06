@@ -55,7 +55,7 @@ void unagi_act_1_4(s32 nextAction) {
             o->oForwardVel = 40.0f;
         }
     } else if (cur_obj_check_if_at_animation_end()) {
-        if ((o->oAction != nextAction) && (o->oPathedPrevWaypointFlags & 0xFF) >= 7) {
+        if ((o->oAction != nextAction) && (o->oPathedPrevWaypointFlags & WAYPOINT_FLAGS_INDEX_MASK) >= 7) {
             cur_obj_init_animation_with_sound(UNAGI_ANIM_STATIC_STRAIGHT);
         } else {
             cur_obj_init_animation_with_sound(UNAGI_ANIM_SWIM);
@@ -82,7 +82,7 @@ void unagi_act_1_4(s32 nextAction) {
 
 void unagi_act_2(void) {
     o->oPathedPrevWaypoint = o->oPathedStartWaypoint;
-    o->oPathedPrevWaypointFlags = 0;
+    o->oPathedPrevWaypointFlags = WAYPOINT_FLAGS_NONE;
 
     cur_obj_set_pos_to_home();
 
