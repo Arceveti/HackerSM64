@@ -146,7 +146,7 @@ void func_80192528(struct ObjNet *net) {
     D_801B9E28.z = 0.0f;
     D_801B9E34 = 0.0f;
 
-    if (net->flags & 0x1) {
+    if (net->flags & (1 << 0)) {
         net->velocity.y -= 4.0f;
     }
 
@@ -375,14 +375,9 @@ void convert_net_verts(struct ObjNet *net) {
         if (net->shapePtr->unk30) {
             convert_gd_verts_to_Vn(net->shapePtr->vtxGroup);
         }
-    }
-
-    switch (net->netType) {
-        case NET_TYPE_SCALED_VERTICES:
-            if (net->shapePtr != NULL) {
-                convert_gd_verts_to_Vtx(net->shapePtr->scaledVtxGroup);
-            }
-            break;
+        if (net->netType == NET_TYPE_SCALED_VERTICES) {
+            convert_gd_verts_to_Vtx(net->shapePtr->scaledVtxGroup);
+        }
     }
 }
 

@@ -126,6 +126,7 @@ void gd_rot_mat_about_vec(Mat4f *mtx, struct GdVec3f *vec) {
     f32 x = vec->x;
     f32 y = vec->y;
     f32 z = vec->z;
+
     if (x != 0.0f) gd_absrot_mat4(mtx, GD_X_AXIS, x);
     if (y != 0.0f) gd_absrot_mat4(mtx, GD_Y_AXIS, y);
     if (z != 0.0f) gd_absrot_mat4(mtx, GD_Z_AXIS, z);
