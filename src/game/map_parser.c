@@ -19,7 +19,7 @@ extern u32 gMapEntrySize;
 extern u8 _mapDataSegmentRomStart[];
 
 static void headless_dma(u32 devAddr, void *dramAddr, u32 size) {
-    register u32 stat = IO_READ(PI_STATUS_REG);
+    u32 stat = IO_READ(PI_STATUS_REG);
 
     while (stat & (PI_STATUS_IO_BUSY | PI_STATUS_DMA_BUSY)) {
         stat = IO_READ(PI_STATUS_REG);
