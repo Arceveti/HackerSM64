@@ -1745,7 +1745,6 @@ const BehaviorScript bhvBreakableBox[] = {
         CALL_NATIVE(bhv_breakable_box_loop),
         CALL_NATIVE(load_object_collision_model),
     END_LOOP(),
-    BREAK(),
 };
 
 const BehaviorScript bhvPushableMetalBox[] = {
