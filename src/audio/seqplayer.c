@@ -1952,7 +1952,7 @@ void sequence_channel_process_script(struct SequenceChannel *seqChannel) {
                         if ((cmd & 0xf) != 0) {
                             seqChannel->notePriority = cmd & 0xf;
                         }
-                        cmd = cmd >> 4;
+                        cmd >>= 4;
                         if (cmd != 0) {
                             seqChannel->unkSH06 = cmd;
                         }

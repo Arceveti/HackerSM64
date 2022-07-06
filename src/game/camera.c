@@ -3226,7 +3226,7 @@ void init_camera(struct Camera *c) {
 void zoom_out_if_paused_and_outside(struct GraphNodeCamera *camera) {
     s16 yaw;
     s32 areaMaskIndex = gCurrLevelArea / 32;
-    s32 areaBit = 1 << (((gCurrLevelArea & 0x10) / 4) + (((gCurrLevelArea & 0xF) - 1) & 3));
+    s32 areaBit = BIT(((gCurrLevelArea & 0x10) / 4) + (((gCurrLevelArea & 0xF) - 1) & 3));
 
     if (areaMaskIndex >= LEVEL_MAX / 2) {
         areaMaskIndex = 0;
@@ -4497,7 +4497,7 @@ s32 determine_dance_cutscene(UNUSED struct Camera *c) {
         cutsceneIndex &= 0xF;
     } else {
         // Even stars use the upper four bytes
-        cutsceneIndex = cutsceneIndex >> 4;
+        cutsceneIndex >>= 4;
     }
     cutscene = sDanceCutsceneTable[cutsceneIndex];
     return cutscene;
