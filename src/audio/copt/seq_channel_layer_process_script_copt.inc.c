@@ -66,8 +66,7 @@ struct AdsrSettings *adsr = _adsr; \
 struct Instrument **instOut = _instOut;\
     u8 _instId = instId; \
     struct Instrument *inst; \
-    UNUSED u32 pad; \
-        /* copt inlines instId here  */ \
+    /* copt inlines instId here  */ \
     if (instId >= gCtlEntries[(*seqChannel).bankId].numInstruments) { \
         _instId = gCtlEntries[(*seqChannel).bankId].numInstruments; \
         if (_instId == 0) { \
