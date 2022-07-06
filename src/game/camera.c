@@ -4506,7 +4506,7 @@ s32 determine_dance_cutscene(UNUSED struct Camera *c) {
 /**
  * @return `pullResult` or `pushResult` depending on Mario's door action
  */
-u8 open_door_cutscene(u8 pullResult, u8 pushResult) {
+u32 open_door_cutscene(u8 pullResult, u8 pushResult) {
     if (sMarioCamState->action == ACT_PULLING_DOOR) {
         return pullResult;
     }
