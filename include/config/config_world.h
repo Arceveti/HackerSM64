@@ -47,7 +47,7 @@
 #define CELL_SIZE ((LEVEL_BOUNDARY_MAX * 2) / NUM_CELLS)
 
 
-// -- Memory pool sizes --
+// -- Memory pool sizes (UNUSED) --
 
 /**
  *  If you see "SURFACE POOL FULL" or "SURFACE NODE POOL FULL" in game, you should increase
