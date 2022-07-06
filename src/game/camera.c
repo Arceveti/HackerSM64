@@ -9252,7 +9252,6 @@ void cutscene_exit_painting_start(struct Camera *c) {
     struct Surface *floor;
     f32 floorHeight;
 
-    // play_painting_eject_sound();
     vec3f_set(sCutsceneVars[2].point, 258.0f, -352.0f, 1189.0f);
     vec3f_set(sCutsceneVars[1].point,  65.0f, -155.0f,  444.0f);
 #ifdef ENABLE_VANILLA_CAM_PROCESSING

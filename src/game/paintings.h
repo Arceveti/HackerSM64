@@ -162,6 +162,4 @@ Gfx *geo_painting_draw(s32 callContext, struct GraphNode *node, UNUSED void *con
 void bhv_painting_init(void);
 void bhv_painting_loop(void);
 
-s32 get_active_painting_id(void);
-
 #endif // PAINTINGS_H
