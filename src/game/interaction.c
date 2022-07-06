@@ -987,7 +987,7 @@ u32 interact_warp_door(struct MarioState *m, UNUSED u32 interactType, struct Obj
 }
 
 u32 get_door_save_file_flag(struct Object *door) {
-    u32 saveFileFlag = 0;
+    u32 saveFileFlag = SAVE_FLAGS_NONE;
     s16 requiredNumStars = (door->oBehParams >> 24);
 
     //! Hardcoded vanilla position check
@@ -1023,9 +1023,6 @@ u32 interact_door(struct MarioState *m, UNUSED u32 interactType, struct Object *
                 enterDoorAction = ACT_PUSHING_DOOR;
             }
 
-#ifndef UNLOCK_ALL
-            u32 doorSaveFileFlag = get_door_save_file_flag(obj);
-#endif
             m->interactObj = obj;
             m->usedObj     = obj;
 
@@ -1034,7 +1031,9 @@ u32 interact_door(struct MarioState *m, UNUSED u32 interactType, struct Object *
             }
 
 #ifndef UNLOCK_ALL
-            if (doorSaveFileFlag != 0 && !(save_file_get_flags() & doorSaveFileFlag)) {
+            u32 doorSaveFileFlag = get_door_save_file_flag(obj);
+
+            if (doorSaveFileFlag != SAVE_FLAGS_NONE && !(save_file_get_flags() & doorSaveFileFlag)) {
                 enterDoorAction = ACT_UNLOCKING_STAR_DOOR;
             }
 #endif
