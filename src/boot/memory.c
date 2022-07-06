@@ -131,7 +131,7 @@ void main_pool_init(void *start, void *end) {
     sPoolListHeadL->next = NULL;
     sPoolListHeadR->prev = NULL;
     sPoolListHeadR->next = NULL;
-#if PUPPYPRINT_DEBUG
+#ifdef PUPPYPRINT_DEBUG
     mempool = sPoolFreeSpace;
 #endif
 }
@@ -336,7 +336,7 @@ void *load_segment(s32 segment, u8 *srcStart, u8 *srcEnd, u32 side, u8 *bssStart
             set_segment_base_addr(segment, addr);
         }
     }
-#if PUPPYPRINT_DEBUG
+#ifdef PUPPYPRINT_DEBUG
     ramsizeSegment[(segment + nameTable) - 2] = ((s32)srcEnd - (s32)srcStart);
 #endif
     return addr;
@@ -418,15 +418,13 @@ void *load_segment_decompress(s32 segment, u8 *srcStart, u8 *srcEnd) {
         }
     }
 #endif
-#if PUPPYPRINT_DEBUG
+#ifdef PUPPYPRINT_DEBUG
     ramsizeSegment[(segment + nameTable) - 2] = (s32)srcEnd - (s32)srcStart;
 #endif
     return dest;
 }
 
 void *load_segment_decompress_heap(u32 segment, u8 *srcStart, u8 *srcEnd) {
-    UNUSED void *dest = NULL;
-
 #ifdef UNCOMPRESSED
     dma_read(gDecompressionHeap, srcStart, srcEnd);
     set_segment_base_addr(segment, gDecompressionHeap);

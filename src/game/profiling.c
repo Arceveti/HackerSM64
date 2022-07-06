@@ -2,6 +2,9 @@
 #include <PR/os_internal_reg.h>
 #include "game_init.h"
 
+#ifdef PUPPYPRINT_DEBUG
+#include "puppyprint.h"
+#endif
 #include "profiling.h"
 #include "fasttext.h"
 
@@ -131,11 +134,6 @@ static void update_rdp_timers() {
     buffer_update(&all_profiling_data[PROFILER_TIME_PIPE], pipe, profile_buffer_index);
 }
 
-#ifdef PUPPYPRINT_DEBUG
-extern u8 sPPDebugPage;
-extern u8 fDebug;
-#endif
-
 float profiler_get_fps() {
     return (1000000.0f * PROFILING_BUFFER_SIZE) / (OS_CYCLES_TO_USEC(all_profiling_data[PROFILER_TIME_FPS].total));
 }
@@ -192,16 +190,14 @@ void profiler_print_times() {
     update_total_timer();
     update_rdp_timers();
 
-#ifndef PUPPYPRINT_DEBUG
-    static u8 show_profiler = 0;
-    if (gPlayer1Controller->buttonPressed & L_TRIG) {
-        show_profiler ^= 1;
-    }
-#endif
-
 #ifdef PUPPYPRINT_DEBUG
-    if (fDebug && sPPDebugPage == 0) {
+    if (fDebug && sPPDebugPage == PUPPYPRINT_PAGE_STANDARD) {
 #else
+    static u8 show_profiler = FALSE;
+    if (gPlayer1Controller->buttonPressed & L_TRIG) {
+        show_profiler ^= TRUE;
+    }
+
     if (show_profiler) {
 #endif
         for (int i = 0; i < PROFILER_TIME_COUNT; i++) {

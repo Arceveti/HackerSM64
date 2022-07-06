@@ -715,10 +715,8 @@ static void level_cmd_nop(void) {
 }
 
 static void level_cmd_show_dialog(void) {
-    if (sCurrAreaIndex != -1) {
-        if (CMD_GET(u8, 2) < 2) {
-            gAreas[sCurrAreaIndex].dialog[CMD_GET(u8, 2)] = CMD_GET(u8, 3);
-        }
+    if (sCurrAreaIndex != -1 && CMD_GET(u8, 2) < 2) {
+        gAreas[sCurrAreaIndex].dialog[CMD_GET(u8, 2)] = CMD_GET(u8, 3);
     }
     sCurrentCmd = CMD_NEXT;
 }
@@ -790,9 +788,9 @@ static void level_cmd_puppyvolume(void) {
     if (sPuppyVolumeStack[gPuppyVolumeCount] == NULL) {
         sCurrentCmd = CMD_NEXT;
         gPuppyError |= PUPPY_ERROR_POOL_FULL;
-#if PUPPYPRINT_DEBUG
+ #ifdef PUPPYPRINT_DEBUG
         append_puppyprint_log("Puppycamera volume allocation failed.");
-#endif
+ #endif
         return;
     }
 
@@ -816,7 +814,7 @@ static void level_cmd_puppyvolume(void) {
 
     sPuppyVolumeStack[gPuppyVolumeCount]->shape = CMD_GET(u8,  33);
     sPuppyVolumeStack[gPuppyVolumeCount]->room  = CMD_GET(s16, 34);
-    sPuppyVolumeStack[gPuppyVolumeCount]->fov  = CMD_GET(u8, 36);
+    sPuppyVolumeStack[gPuppyVolumeCount]->fov   = CMD_GET(u8,  36);
     sPuppyVolumeStack[gPuppyVolumeCount]->area  = sCurrAreaIndex;
 
     gPuppyVolumeCount++;
@@ -840,9 +838,9 @@ static void level_cmd_puppylight_node(void) {
 #ifdef PUPPYLIGHTS
     gPuppyLights[gNumLights] = mem_pool_alloc(gLightsPool, sizeof(struct PuppyLight));
     if (gPuppyLights[gNumLights] == NULL) {
-#if PUPPYPRINT_DEBUG
+ #ifdef PUPPYPRINT_DEBUG
         append_puppyprint_log("Puppylight allocation failed.");
-#endif
+ #endif
         sCurrentCmd = CMD_NEXT;
         return;
     }

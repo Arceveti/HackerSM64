@@ -300,7 +300,7 @@ void sound_init_main_pools(s32 sizeForAudioInitPool) {
     sound_alloc_pool_init(&gAudioSessionPool, (gAudioHeap + sizeForAudioInitPool), (gAudioHeapSize - sizeForAudioInitPool));
 }
 
-#if PUPPYPRINT_DEBUG
+#ifdef PUPPYPRINT_DEBUG
 void puppyprint_get_allocated_pools(s32 *audioPoolList) {
     u32 i, j;
     const struct SoundAllocPool *pools[NUM_AUDIO_POOLS] = {
@@ -1187,7 +1187,7 @@ void audio_reset_session(void) {
 #if defined(VERSION_JP) || defined(VERSION_US)
     s8 updatesPerFrame;
 #endif
-#if PUPPYPRINT_DEBUG
+#ifdef PUPPYPRINT_DEBUG
     OSTime first = osGetTime();
 #endif
     s32 j;
@@ -1403,7 +1403,7 @@ void audio_reset_session(void) {
 
     init_sample_dma_buffers(gMaxSimultaneousNotes);
 
-#if defined(VERSION_EU)
+#ifdef VERSION_EU
     build_vol_rampings_table(0, gAudioBufferParameters.samplesPerUpdate);
 #endif
 
@@ -1419,12 +1419,12 @@ void audio_reset_session(void) {
         gAudioLoadLock = AUDIO_LOCK_NOT_LOADING;
     }
 #endif
-#if PUPPYPRINT_DEBUG
-#ifdef PUPPYPRINT_DEBUG_CYCLES
+#ifdef PUPPYPRINT_DEBUG
+ #ifdef PUPPYPRINT_DEBUG_CYCLES
     append_puppyprint_log("Audio Initialised in %dc.", (s32)(osGetTime() - first));
-#else
+ #else
     append_puppyprint_log("Audio Initialised in %dus.", (s32)OS_CYCLES_TO_USEC(osGetTime() - first));
-#endif
+ #endif
 #endif
 
     sAudioIsInitialized = TRUE;

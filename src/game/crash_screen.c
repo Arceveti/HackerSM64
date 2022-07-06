@@ -19,7 +19,7 @@
 
 enum crashPages {
     PAGE_CONTEXT,
-#if PUPPYPRINT_DEBUG
+#ifdef PUPPYPRINT_DEBUG
     PAGE_LOG,
 #endif
     PAGE_STACKTRACE,
@@ -286,15 +286,15 @@ void draw_crash_context(OSThread *thread, s32 cause) {
     crash_screen_print_float_reg( 30, 220, 30, &tc->fp30.f.f_even);
 }
 
-#if PUPPYPRINT_DEBUG
+#ifdef PUPPYPRINT_DEBUG
 void draw_crash_log(void) {
     s32 i;
     osWritebackDCacheAll();
-#define LINE_HEIGHT (25 + ((LOG_BUFFER_SIZE - 1) * 10))
+ #define LINE_HEIGHT (25 + ((LOG_BUFFER_SIZE - 1) * 10))
     for (i = 0; i < LOG_BUFFER_SIZE; i++) {
         crash_screen_print(30, (LINE_HEIGHT - (i * 10)), consoleLogTable[i]);
     }
-#undef LINE_HEIGHT
+ #undef LINE_HEIGHT
 }
 #endif
 
@@ -602,7 +602,7 @@ void draw_crash_screen(OSThread *thread) {
             crash_screen_draw_rect(25, 18, 270, 1, COLOR_RGBA16_LIGHT_GRAY, FALSE);
             switch (crashPage) {
                 case PAGE_CONTEXT:    draw_crash_context(thread, cause); break;
-#if PUPPYPRINT_DEBUG
+#ifdef PUPPYPRINT_DEBUG
                 case PAGE_LOG: 		  draw_crash_log(); break;
 #endif
                 case PAGE_STACKTRACE: draw_stacktrace(thread, cause); break;

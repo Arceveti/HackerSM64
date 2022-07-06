@@ -54,23 +54,21 @@ u8 fDebug = TRUE;
 u8 fDebug = FALSE;
 #endif
 
-#if PUPPYPRINT_DEBUG
-s8 benchViewer  = FALSE;
-u8 benchOption  = 0;
-s8 logViewer    = FALSE;
-u8 sPPDebugPage = 0;
-u8 sDebugMenu   = FALSE;
+#ifdef PUPPYPRINT_DEBUG
+s8 benchViewer = FALSE;
+u8 benchOption = PUPPYPRINT_BENCH_GAME;
+s8 logViewer = FALSE;
+u8 sPPDebugPage = PUPPYPRINT_PAGE_STANDARD;
+u8 sDebugMenu = FALSE;
 u8 sDebugOption = 0;
 // Profiler values
-s8  perfIteration  = 0;
-s16 benchmarkLoop  = 0;
+s16 benchmarkLoop = 0;
 s32 benchmarkTimer = 0;
 s32 benchmarkProgramTimer = 0;
-s8  benchmarkType  = 0;
 // General
-u32     rspTime = 0;
-u32     rdpTime = 0;
-s32       benchMark[NUM_BENCH_ITERATIONS + 2];
+u32 rspTime = 0;
+u32 rdpTime = 0;
+s32 benchMark[NUM_BENCH_ITERATIONS + 2];
 // RAM
 s8  ramViewer = FALSE;
 s32 ramsizeSegment[NUM_TLB_SEGMENTS + 1] = {
@@ -143,7 +141,7 @@ void puppyprint_profiler_finished(void) {
     benchMark[NUM_BENCH_ITERATIONS    ] = 0;
     benchMark[NUM_BENCH_ITERATIONS + 1] = 0;
     benchmarkTimer = 300;
-    benchViewer    = FALSE;
+    benchViewer = FALSE;
 
     for (i = 0; i < (NUM_BENCH_ITERATIONS - 2); i++) {
         benchMark[NUM_BENCH_ITERATIONS] += benchMark[i];
@@ -300,7 +298,7 @@ void print_audio_ram_overview(void) {
     char textBytes[128];
     const s32 x = 16;
     s32 y = 16;
-    s32 i =  0;
+    s32 i = 0;
     s32 percentage = 0;
     s32 tmpY = y;
     s32 totalMemory[2] = { 0, 0 };
@@ -361,7 +359,7 @@ void print_audio_ram_overview(void) {
 
 void benchmark_custom(void) {
     if ((benchmarkLoop == 0)
-     || (benchOption != 2)) {
+     || (benchOption != PUPPYPRINT_BENCH_CUSTOM)) {
         return;
     }
 
@@ -371,7 +369,7 @@ void benchmark_custom(void) {
         // Insert your function here!
 
         if ((benchmarkLoop > 0)
-         && (benchOption == 2)) {
+         && (benchOption == PUPPYPRINT_BENCH_CUSTOM)) {
             benchmarkLoop--;
 
             benchMark[benchmarkLoop] = (osGetTime() - lastTime);
@@ -453,16 +451,16 @@ void puppyprint_render_collision(void) {
 
     sprintf(textBytes, "Static Pool Size: 0x%X#Dynamic Pool Size: 0x%X#Dynamic Pool Used: 0x%X#Surfaces Allocated: %d#Nodes Allocated: %d", gTotalStaticSurfaceData, DYNAMIC_SURFACE_POOL_SIZE,(uintptr_t)gDynamicSurfacePoolEnd - (uintptr_t)gDynamicSurfacePool,
             gSurfacesAllocated, gSurfaceNodesAllocated);
-    print_small_text(304, 60, textBytes, PRINT_TEXT_ALIGN_RIGHT, PRINT_ALL, 1);
+    print_small_text(304, 60, textBytes, PRINT_TEXT_ALIGN_RIGHT, PRINT_ALL, FONT_OUTLINE);
 
 
 #ifdef VISUAL_DEBUG
-    print_small_text(160, (SCREEN_HEIGHT - 42), "Use the dpad to toggle visual collision modes", PRINT_TEXT_ALIGN_CENTRE, PRINT_ALL, 1);
+    print_small_text(160, (SCREEN_HEIGHT - 42), "Use the dpad to toggle visual collision modes", PRINT_TEXT_ALIGN_CENTRE, PRINT_ALL, FONT_OUTLINE);
     switch (gVisualDebugViewCycle) {
-        case VISUAL_DEBUG_VIEW_NONE:                  print_small_text(160, (SCREEN_HEIGHT - 32), "Current view: None",                  PRINT_TEXT_ALIGN_CENTRE, PRINT_ALL, 1); break;
-        case VISUAL_DEBUG_VIEW_HITBOXES:              print_small_text(160, (SCREEN_HEIGHT - 32), "Current view: Hitboxes",              PRINT_TEXT_ALIGN_CENTRE, PRINT_ALL, 1); break;
-        case VISUAL_DEBUG_VIEW_SURFACES:              print_small_text(160, (SCREEN_HEIGHT - 32), "Current view: Surfaces",              PRINT_TEXT_ALIGN_CENTRE, PRINT_ALL, 1); break;
-        case VISUAL_DEBUG_VIEW_HITBOXES_AND_SURFACES: print_small_text(160, (SCREEN_HEIGHT - 32), "Current view: Hitboxes and Surfaces", PRINT_TEXT_ALIGN_CENTRE, PRINT_ALL, 1); break;
+        case VISUAL_DEBUG_VIEW_NONE:                  print_small_text(160, (SCREEN_HEIGHT - 32), "Current view: None",                  PRINT_TEXT_ALIGN_CENTRE, PRINT_ALL, FONT_OUTLINE); break;
+        case VISUAL_DEBUG_VIEW_HITBOXES:              print_small_text(160, (SCREEN_HEIGHT - 32), "Current view: Hitboxes",              PRINT_TEXT_ALIGN_CENTRE, PRINT_ALL, FONT_OUTLINE); break;
+        case VISUAL_DEBUG_VIEW_SURFACES:              print_small_text(160, (SCREEN_HEIGHT - 32), "Current view: Surfaces",              PRINT_TEXT_ALIGN_CENTRE, PRINT_ALL, FONT_OUTLINE); break;
+        case VISUAL_DEBUG_VIEW_HITBOXES_AND_SURFACES: print_small_text(160, (SCREEN_HEIGHT - 32), "Current view: Hitboxes and Surfaces", PRINT_TEXT_ALIGN_CENTRE, PRINT_ALL, FONT_OUTLINE); break;
     }
     if (gPlayer1Controller->buttonPressed & R_JPAD) gVisualDebugViewCycle++;
     if (gPlayer1Controller->buttonPressed & L_JPAD) gVisualDebugViewCycle--;
@@ -622,7 +620,7 @@ void render_page_menu(void) {
                 print_set_envcolour(0xFF, 0xFF, 0xFF, 0xFF);
             }
 
-            print_small_text((28 + (MENU_BOX_WIDTH / 2)), posY, ppPages[i].name, PRINT_TEXT_ALIGN_CENTRE, PRINT_ALL, 0);
+            print_small_text((28 + (MENU_BOX_WIDTH / 2)), posY, ppPages[i].name, PRINT_TEXT_ALIGN_CENTRE, PRINT_ALL, FONT_DEFAULT);
         }
     }
 }
@@ -654,7 +652,7 @@ void puppyprint_profiler_process(void) {
         && (gPlayer1Controller->buttonDown & L_TRIG)
         && (gPlayer1Controller->buttonDown & U_JPAD)
     ) {
-        fDebug    ^= TRUE;
+        fDebug ^= TRUE;
         sDebugMenu = FALSE;
     }
 
@@ -735,9 +733,9 @@ extern s32 text_iterate_command(const char *str, s32 i, s32 runCMD);
 extern void get_char_from_byte(u8 letter, s32 *textX, s32 *textY, s32 *spaceX, s32 *offsetY, s32 font);
 
 s32 get_text_width(const char *str, s32 font) {
-    s32 i       = 0;
+    s32 i = 0;
     s32 textPos = 0;
-    s32 wideX   = 0;
+    s32 wideX = 0;
     s32 textX, textY, offsetY, spaceX;
 
     for (i = 0; i < (signed)strlen(str); i++) {
@@ -779,8 +777,8 @@ const Gfx dl_small_text_begin[] = {
     gsSPEndDisplayList(),
 };
 
-s8 shakeToggle = 0;
-s8  waveToggle = 0;
+s8 shakeToggle = FALSE;
+s8  waveToggle = FALSE;
 
 void print_small_text(s32 x, s32 y, const char *str, s32 align, s32 amount, s32 font) {
     s32 textX = 0;
@@ -798,8 +796,8 @@ void print_small_text(s32 x, s32 y, const char *str, s32 align, s32 amount, s32 
     s32 prevxlu = 256; // Set out of bounds, so it will *always* be different at first.
     Texture *(*fontTex)[] = segmented_to_virtual(&puppyprint_font_lut);
 
-    shakeToggle = 0;
-    waveToggle  = 0;
+    shakeToggle = FALSE;
+    waveToggle = FALSE;
 
     if (amount == PRINT_ALL) {
         tx = (signed)strlen(str);
@@ -900,7 +898,9 @@ void print_small_text(s32 x, s32 y, const char *str, s32 align, s32 amount, s32 
 
 s32 text_iterate_command(const char *str, s32 i, s32 runCMD) {
     s32 len = 0;
-    while ((str[i + len] != '>') && ((i + len) < (signed)strlen(str))) len++;
+    while ((str[i + len] != '>') && ((i + len) < (signed)strlen(str))) {
+        len++;
+    }
     len++;
 
     if (runCMD) {
@@ -960,9 +960,9 @@ s32 text_iterate_command(const char *str, s32 i, s32 runCMD) {
             s32 b = (coss((gGlobalTimer * 600) - 21845) + 1) * 127;
             print_set_envcolour(r, g, b, 255);
         } else if (strncmp((str + i), "<SHAKE>", 7) == 0) { // Toggles text that shakes on the spot. Do it again to disable it.
-            shakeToggle ^= 1;
+            shakeToggle ^= TRUE;
         } else if (strncmp((str + i), "<WAVE>",  6) == 0) { // Toggles text that waves around. Do it again to disable it.
-            waveToggle  ^= 1;
+            waveToggle ^= TRUE;
         }
     }
     return len;
@@ -1095,7 +1095,7 @@ void render_multi_image(Texture *image, s32 x, s32 y, s32 width, s32 height, UNU
     }
     num = height;
     // Find the height remainder
-    s32 peakH  = height - (height % imH);
+    s32 peakH = height - (height % imH);
     s32 cycles = (width * peakH) / (imW * imH);
 
     // Pass 1
@@ -1130,11 +1130,11 @@ void render_multi_image(Texture *image, s32 x, s32 y, s32 width, s32 height, UNU
             gDPLoadTextureTile(dlHead++,
                 image, G_IM_FMT_RGBA, G_IM_SIZ_16b, width, height, posW, posH, ((posW + imW) - 1), (height - 1), 0, (G_TX_NOMIRROR | G_TX_WRAP), (G_TX_NOMIRROR | G_TX_WRAP), maskW, maskH, 0, 0);
             gSPScisTextureRectangle(dlHead++,
-                (x + posW) << 2,
-                (y + posH) << 2,
-                ((x + posW + imW) - mOne) << 2,
-                ((y + posH + imH) - mOne) << 2,
-                G_TX_RENDERTILE, 0, 0, modeSC << 10, 1 << 10);
+                ((x + posW) << 2),
+                ((y + posH) << 2),
+                (((x + posW + imW) - mOne) << 2),
+                (((y + posH + imH) - mOne) << 2),
+                G_TX_RENDERTILE, 0, 0, (modeSC << 10), (1 << 10));
         }
     }
 

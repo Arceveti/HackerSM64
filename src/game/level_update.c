@@ -1140,7 +1140,7 @@ s32 update_level(void) {
 
 s32 init_level(void) {
     s32 fadeFromColor = FALSE;
-#if PUPPYPRINT_DEBUG
+#ifdef PUPPYPRINT_DEBUG
     OSTime first = osGetTime();
 #endif
 
@@ -1221,12 +1221,12 @@ s32 init_level(void) {
     puppylights_allocate();
 #endif
 
-#if PUPPYPRINT_DEBUG
-#ifdef PUPPYPRINT_DEBUG_CYCLES
+#ifdef PUPPYPRINT_DEBUG
+ #ifdef PUPPYPRINT_DEBUG_CYCLES
     append_puppyprint_log("Level loaded in %dc", (s32)(osGetTime() - first));
-#else
+ #else
     append_puppyprint_log("Level loaded in %dus", (s32)(OS_CYCLES_TO_USEC(osGetTime() - first)));
-#endif
+ #endif
 #endif
     return TRUE;
 }

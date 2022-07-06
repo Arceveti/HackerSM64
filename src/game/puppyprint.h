@@ -25,12 +25,12 @@ enum PuppyprintTextAlign {
     PRINT_ALL               = -1,
 };
 
-#if PUPPYPRINT_DEBUG
-#ifdef BETTER_REVERB
-#define NUM_AUDIO_POOLS 7
-#else
-#define NUM_AUDIO_POOLS 6
-#endif
+#ifdef PUPPYPRINT_DEBUG
+    #ifdef BETTER_REVERB
+        #define NUM_AUDIO_POOLS 7
+    #else
+        #define NUM_AUDIO_POOLS 6
+    #endif
 #endif
 
 enum PuppyFont {
@@ -39,9 +39,24 @@ enum PuppyFont {
     FONT_NUM,
 };
 
+enum PuppyPrintPages {
+    PUPPYPRINT_PAGE_STANDARD,
+    PUPPYPRINT_PAGE_MINIMAL,
+    PUPPYPRINT_PAGE_AUDIO,
+    PUPPYPRINT_PAGE_SEGMENTS,
+    PUPPYPRINT_PAGE_COLLISION,
+    PUPPYPRINT_PAGE_LOG,
+};
+
+enum PuppyPrintBenchOptions {
+    PUPPYPRINT_BENCH_GAME,
+    PUPPYPRINT_BENCH_AUDIO,
+    PUPPYPRINT_BENCH_CUSTOM,
+};
+
+extern u8 fDebug;
 extern u8 sPPDebugPage;
 extern u8 gPuppyFont;
-extern s8 perfIteration;
 extern s16 benchmarkLoop;
 extern s32 benchmarkTimer;
 extern ColorRGBA gCurrEnv;
