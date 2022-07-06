@@ -248,7 +248,7 @@ static void klepto_act_dive_at_mario(void) {
                 && o->oDistanceToMario < 200.0f
                 && dy > 50.0f
                 && dy < 90.0f
-                && mario_lose_cap_to_enemy(1)) {
+                && mario_lose_cap_to_enemy(LOSE_CAP_ENEMY_TYPE_KLEPTO)) {
                 o->oAnimState = KLEPTO_ANIM_STATE_HOLDING_CAP;
             }
         }

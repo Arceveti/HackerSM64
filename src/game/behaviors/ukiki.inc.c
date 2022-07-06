@@ -528,7 +528,7 @@ void cage_ukiki_held_loop(void) {
 void cap_ukiki_held_loop(void) {
     switch (o->oUkikiTextState) {
         case UKIKI_TEXT_DEFAULT:
-            if (mario_lose_cap_to_enemy(2)) {
+            if (mario_lose_cap_to_enemy(LOSE_CAP_ENEMY_TYPE_UKIKI)) {
                 o->oUkikiTextState = UKIKI_TEXT_STEAL_CAP;
                 o->oUkikiHasCap |= UKIKI_CAP_ON;
             }

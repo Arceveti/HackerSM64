@@ -135,6 +135,13 @@ enum KnockbackActionStrengthIndex {
     KNOCKBACK_STRENGTH_INDEX_HARD,
 };
 
+// For mario_lose_cap_to_enemy
+enum MarioLoseCapEnemyType {
+    LOSE_CAP_ENEMY_TYPE_0,
+    LOSE_CAP_ENEMY_TYPE_KLEPTO,
+    LOSE_CAP_ENEMY_TYPE_UKIKI,
+};
+
 s16 mario_obj_angle_to_object(struct MarioState *m, struct Object *obj);
 void mario_stop_riding_object(struct MarioState *m);
 void mario_grab_used_object(struct MarioState *m);
