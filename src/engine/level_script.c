@@ -725,8 +725,8 @@ static void level_cmd_show_dialog(void) {
 
 static void level_cmd_set_music(void) {
     if (sCurrAreaIndex != -1) {
-        gAreas[sCurrAreaIndex].musicParam = CMD_GET(s16, 2);
-        gAreas[sCurrAreaIndex].musicParam2 = CMD_GET(s16, 4);
+        gAreas[sCurrAreaIndex].musicSettingsPreset = CMD_GET(s16, 2);
+        gAreas[sCurrAreaIndex].musicSeqId = CMD_GET(s16, 4); // music/seq
     }
     sCurrentCmd = CMD_NEXT;
 }

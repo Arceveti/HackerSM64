@@ -1151,8 +1151,8 @@ void audio_reset_session(struct AudioSessionSettings *preset, s32 presetId) {
         bzero(&gAiBuffers[0][0], (AIBUFFER_LEN * NUMAIBUFFERS));
         persistent_pool_clear(&gSeqLoadedPool.persistent);
         persistent_pool_clear(&gBankLoadedPool.persistent);
-        temporary_pool_clear( &gSeqLoadedPool.temporary);
-        temporary_pool_clear( &gBankLoadedPool.temporary);
+        temporary_pool_clear(&gSeqLoadedPool.temporary);
+        temporary_pool_clear(&gBankLoadedPool.temporary);
         reset_bank_and_seq_load_status();
 
         init_reverb_us(presetId);

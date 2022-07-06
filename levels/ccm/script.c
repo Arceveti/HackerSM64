@@ -93,7 +93,7 @@ const LevelScript level_ccm_entry[] = {
         TERRAIN(/*terrainData*/ ccm_seg7_area_1_collision),
         MACRO_OBJECTS(/*objList*/ ccm_seg7_area_1_macro_objs),
         SHOW_DIALOG(/*index*/ 0x00, DIALOG_048),
-        SET_BACKGROUND_MUSIC(/*settingsPreset*/ 0x0000, /*seq*/ SEQ_LEVEL_SNOW),
+        SET_BACKGROUND_MUSIC(/*settingsPreset*/ SEQ_SETTINGS_PRESET_DEFAULT, /*seq*/ SEQ_LEVEL_SNOW),
         TERRAIN_TYPE(/*terrainType*/ TERRAIN_SNOW),
     END_AREA(),
 
@@ -106,7 +106,7 @@ const LevelScript level_ccm_entry[] = {
         JUMP_LINK(script_func_local_4),
         TERRAIN(/*terrainData*/ ccm_seg7_area_2_collision),
         MACRO_OBJECTS(/*objList*/ ccm_seg7_area_2_macro_objs),
-        SET_BACKGROUND_MUSIC(/*settingsPreset*/ 0x0001, /*seq*/ SEQ_LEVEL_SLIDE),
+        SET_BACKGROUND_MUSIC(/*settingsPreset*/ SEQ_SETTINGS_PRESET_CASTLE, /*seq*/ SEQ_LEVEL_SLIDE),
         TERRAIN_TYPE(/*terrainType*/ TERRAIN_SLIDE),
     END_AREA(),
 

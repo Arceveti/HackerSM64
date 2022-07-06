@@ -33,7 +33,7 @@ const LevelScript level_bowser_1_entry[] = {
         WARP_NODE(/*id*/ WARP_NODE_DEFAULT,        /*destLevel*/ LEVEL_CASTLE,   /*destArea*/ 0x01, /*destNode*/ WARP_CASTLE_INSIDE_1_FROM_BOWSER_1_SUCCESS, /*flags*/ WARP_NO_CHECKPOINT),
         WARP_NODE(/*id*/ WARP_NODE_DEATH,          /*destLevel*/ LEVEL_BITDW,    /*destArea*/ 0x01, /*destNode*/ WARP_BITDW_FROM_BOWSER_1_DEATH,             /*flags*/ WARP_NO_CHECKPOINT),
         TERRAIN(/*terrainData*/ bowser_1_seg7_collision_level),
-        SET_BACKGROUND_MUSIC(/*settingsPreset*/ 0x0002, /*seq*/ SEQ_LEVEL_BOSS_KOOPA),
+        SET_BACKGROUND_MUSIC(/*settingsPreset*/ SEQ_SETTINGS_PRESET_BOSS, /*seq*/ SEQ_LEVEL_BOSS_KOOPA),
         TERRAIN_TYPE(/*terrainType*/ TERRAIN_STONE),
     END_AREA(),
 

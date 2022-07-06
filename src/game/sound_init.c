@@ -205,16 +205,12 @@ void play_painting_eject_sound(void) {
  */
 void play_infinite_stairs_music(void) {
 #ifdef ENABLE_VANILLA_LEVEL_SPECIFIC_CHECKS
-    u8 shouldPlay = FALSE;
-
-    /* Infinite stairs? */
-    if (gCurrLevelNum == LEVEL_CASTLE && gCurrAreaIndex == 2 && gMarioState->numStars < 70) {
-        if (gMarioState->floor != NULL && gMarioState->floor->room == 6) {
-            if (gMarioState->pos[2] < 2540.0f) {
-                shouldPlay = TRUE;
-            }
-        }
-    }
+    u8 shouldPlay = (gCurrLevelNum == LEVEL_CASTLE
+                    && gCurrAreaIndex == 2
+                    && gMarioState->numStars < 70
+                    && gMarioState->floor != NULL
+                    && gMarioState->floor->room == 6
+                    && gMarioState->pos[2] < 2540.0f);
 
     if (sPlayingInfiniteStairs ^ shouldPlay) {
         sPlayingInfiniteStairs = shouldPlay;
@@ -230,12 +226,12 @@ void play_infinite_stairs_music(void) {
 /**
  * Called from threads: thread5_game_loop
  */
-void set_background_music(u16 a, u16 seqArgs, s16 fadeTimer) {
+void set_background_music(u16 settingsPreset, u16 seqArgs, s16 fadeTimer) {
     if (gResetTimer == 0 && seqArgs != sCurrentMusic) {
         if (gCurrCreditsEntry != NULL) {
-            sound_reset(7);
+            sound_reset(SEQ_SETTINGS_PRESET_CREDITS);
         } else {
-            sound_reset(a);
+            sound_reset(settingsPreset);
         }
 
 #ifdef ENABLE_VANILLA_LEVEL_SPECIFIC_CHECKS

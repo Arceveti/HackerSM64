@@ -857,7 +857,7 @@ void audio_init() {
     gAudioFrameCount = 0;
     gAudioTaskIndex = 0;
     gCurrAiBufferIndex = 0;
-    gSoundMode = 0;
+    gSoundMode = SOUND_MODE_STEREO;
     gAudioTask = NULL;
     gAudioTasks[0].task.t.data_size = 0;
     gAudioTasks[1].task.t.data_size = 0;

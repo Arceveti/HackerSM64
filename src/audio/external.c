@@ -325,7 +325,7 @@ u8 sMaxChannelsForSoundBank[SOUND_BANK_COUNT] = { 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 }
 
 f32 gGlobalSoundSource[3] = { 0.0f, 0.0f, 0.0f };
 u8 sSoundBankDisabled[16] = { 0 };
-u8 D_80332108 = 0;
+u8 D_80332108 = 0; // higher bits = sound mode, lower bits = preset ID
 u8 sHasStartedFadeOut = FALSE;
 u16 sSoundBanksThatLowerBackgroundMusic = 0;
 u8 sBackgroundMusicMaxTargetVolume = TARGET_VOLUME_UNSET;
@@ -2495,8 +2495,8 @@ void play_toads_jingle(void) {
  * Called from threads: thread5_game_loop
  */
 void sound_reset(u8 presetId) {
-    if (presetId >= 8) {
-        presetId = 0;
+    if (presetId >= SEQ_SETTINGS_PRESET_COUNT) {
+        presetId = SEQ_SETTINGS_PRESET_DEFAULT;
     }
     sGameLoopTicked = 0;
     disable_all_sequence_players();
