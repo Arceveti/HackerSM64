@@ -56,14 +56,14 @@ static const LevelScript script_func_local_2[] = {
 };
 
 static const LevelScript script_func_local_3[] = {
-    OBJECT_WITH_ACTS(/*model*/ MODEL_NONE, /*pos*/ 3360,  1580,  2660, /*angle*/ 0, 0, 0, /*behParam*/ 0x02000000, /*beh*/ bhvHiddenStar,          /*acts*/ ALL_ACTS),
-    OBJECT_WITH_ACTS(/*model*/ MODEL_STAR, /*pos*/  890,  3400, -2040, /*angle*/ 0, 0, 0, /*behParam*/ 0x03000000, /*beh*/ bhvStar,                 /*acts*/ ALL_ACTS),
+    OBJECT_WITH_ACTS(/*model*/ MODEL_NONE, /*pos*/ 3360,  1580,  2660, /*angle*/ 0, 0, 0, /*behParam*/ 0x02000000, /*beh*/ bhvHiddenStar,        /*acts*/ ALL_ACTS),
+    OBJECT_WITH_ACTS(/*model*/ MODEL_STAR, /*pos*/  890,  3400, -2040, /*angle*/ 0, 0, 0, /*behParam*/ 0x03000000, /*beh*/ bhvStar,              /*acts*/ ALL_ACTS),
     RETURN(),
 };
 
 static const LevelScript script_func_local_4[] = {
     OBJECT_WITH_ACTS(/*model*/ MODEL_NONE, /*pos*/ -770, -1600,  3600, /*angle*/ 0, 0, 0, /*behParam*/ 0x04000000, /*beh*/ bhvHiddenRedCoinStar, /*acts*/ ALL_ACTS),
-    OBJECT_WITH_ACTS(/*model*/ MODEL_STAR, /*pos*/ 2180,  -840,  3720, /*angle*/ 0, 0, 0, /*behParam*/ 0x05000000, /*beh*/ bhvStar,                 /*acts*/ ALL_ACTS),
+    OBJECT_WITH_ACTS(/*model*/ MODEL_STAR, /*pos*/ 2180,  -840,  3720, /*angle*/ 0, 0, 0, /*behParam*/ 0x05000000, /*beh*/ bhvStar,              /*acts*/ ALL_ACTS),
     RETURN(),
 };
 
@@ -93,16 +93,16 @@ const LevelScript level_wdw_entry[] = {
     LOAD_MODEL_FROM_GEO(MODEL_WDW_ROTATING_PLATFORM,             wdw_geo_000640),
 
     AREA(/*index*/ 1, wdw_geo_000658),
-        OBJECT(/*model*/ MODEL_NONE, /*pos*/  3395, 3580,  384, /*angle*/ 0, 180, 0, /*behParam*/ 0x000A0000, /*beh*/ bhvSpinAirborneWarp),
-        OBJECT(/*model*/ MODEL_NONE, /*pos*/   818,    0, 3634, /*angle*/ 0,  45, 0, /*behParam*/ 0x000B0000, /*beh*/ bhvFadingWarp),
-        OBJECT(/*model*/ MODEL_NONE, /*pos*/ -2865, 3328, 3065, /*angle*/ 0,   0, 0, /*behParam*/ 0x000C0000, /*beh*/ bhvFadingWarp),
-        WARP_NODE(/*id*/ 0x0A, /*destLevel*/ LEVEL_WDW, /*destArea*/ 0x01, /*destNode*/ 0x0A, /*flags*/ WARP_NO_CHECKPOINT),
-        WARP_NODE(/*id*/ 0x0B, /*destLevel*/ LEVEL_WDW, /*destArea*/ 0x01, /*destNode*/ 0x0C, /*flags*/ WARP_NO_CHECKPOINT),
-        WARP_NODE(/*id*/ 0x0C, /*destLevel*/ LEVEL_WDW, /*destArea*/ 0x01, /*destNode*/ 0x0B, /*flags*/ WARP_NO_CHECKPOINT),
+        OBJECT(/*model*/ MODEL_NONE, /*pos*/  3395, 3580,  384, /*angle*/ 0, 180, 0, /*behParam*/ WARP_WDW_1_MAIN_ENTRY << 16, /*beh*/ bhvSpinAirborneWarp),
+        OBJECT(/*model*/ MODEL_NONE, /*pos*/   818,    0, 3634, /*angle*/ 0,  45, 0, /*behParam*/ WARP_WDW_1_FADING_A   << 16, /*beh*/ bhvFadingWarp),
+        OBJECT(/*model*/ MODEL_NONE, /*pos*/ -2865, 3328, 3065, /*angle*/ 0,   0, 0, /*behParam*/ WARP_WDW_1_FADING_B   << 16, /*beh*/ bhvFadingWarp),
+        WARP_NODE(/*id*/ WARP_WDW_1_MAIN_ENTRY, /*destLevel*/ LEVEL_WDW,    /*destArea*/ 0x01, /*destNode*/ WARP_WDW_1_MAIN_ENTRY,                 /*flags*/ WARP_NO_CHECKPOINT),
+        WARP_NODE(/*id*/ WARP_WDW_1_FADING_A,   /*destLevel*/ LEVEL_WDW,    /*destArea*/ 0x01, /*destNode*/ WARP_WDW_1_FADING_B,                   /*flags*/ WARP_NO_CHECKPOINT),
+        WARP_NODE(/*id*/ WARP_WDW_1_FADING_B,   /*destLevel*/ LEVEL_WDW,    /*destArea*/ 0x01, /*destNode*/ WARP_WDW_1_FADING_A,                   /*flags*/ WARP_NO_CHECKPOINT),
         JUMP_LINK(script_func_local_3),
         JUMP_LINK(script_func_local_1),
-        WARP_NODE(/*id*/ 0xF0, /*destLevel*/ LEVEL_CASTLE, /*destArea*/ 0x02, /*destNode*/ 0x32, /*flags*/ WARP_NO_CHECKPOINT),
-        WARP_NODE(/*id*/ 0xF1, /*destLevel*/ LEVEL_CASTLE, /*destArea*/ 0x02, /*destNode*/ 0x64, /*flags*/ WARP_NO_CHECKPOINT),
+        WARP_NODE(/*id*/ WARP_NODE_DEFAULT,     /*destLevel*/ LEVEL_CASTLE, /*destArea*/ 0x02, /*destNode*/ WARP_CASTLE_INSIDE_2_FROM_WDW_SUCCESS, /*flags*/ WARP_NO_CHECKPOINT),
+        WARP_NODE(/*id*/ WARP_NODE_DEATH,       /*destLevel*/ LEVEL_CASTLE, /*destArea*/ 0x02, /*destNode*/ WARP_CASTLE_INSIDE_2_FROM_WDW_DEATH,   /*flags*/ WARP_NO_CHECKPOINT),
         INSTANT_WARP(/*index*/ 1, /*destArea*/ 2, /*displace*/ 0, 0, 0),
         TERRAIN(/*terrainData*/ wdw_seg7_area_1_collision),
         MACRO_OBJECTS(/*objList*/ wdw_seg7_area_1_macro_objs),
@@ -113,8 +113,8 @@ const LevelScript level_wdw_entry[] = {
     AREA(/*index*/ 2, wdw_geo_000724),
         JUMP_LINK(script_func_local_4),
         JUMP_LINK(script_func_local_2),
-        WARP_NODE(/*id*/ 0xF0, /*destLevel*/ LEVEL_CASTLE, /*destArea*/ 0x02, /*destNode*/ 0x32, /*flags*/ WARP_NO_CHECKPOINT),
-        WARP_NODE(/*id*/ 0xF1, /*destLevel*/ LEVEL_CASTLE, /*destArea*/ 0x02, /*destNode*/ 0x64, /*flags*/ WARP_NO_CHECKPOINT),
+        WARP_NODE(/*id*/ WARP_NODE_DEFAULT,     /*destLevel*/ LEVEL_CASTLE, /*destArea*/ 0x02, /*destNode*/ WARP_CASTLE_INSIDE_2_FROM_WDW_SUCCESS, /*flags*/ WARP_NO_CHECKPOINT),
+        WARP_NODE(/*id*/ WARP_NODE_DEATH,       /*destLevel*/ LEVEL_CASTLE, /*destArea*/ 0x02, /*destNode*/ WARP_CASTLE_INSIDE_2_FROM_WDW_DEATH,   /*flags*/ WARP_NO_CHECKPOINT),
         INSTANT_WARP(/*index*/ 0, /*destArea*/ 1, /*displace*/ 0, 0, 0),
         TERRAIN(/*terrainData*/ wdw_seg7_area_2_collision),
         MACRO_OBJECTS(/*objList*/ wdw_seg7_area_2_macro_objs),
