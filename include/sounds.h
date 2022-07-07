@@ -1,16 +1,19 @@
 #ifndef SOUNDS_H
 #define SOUNDS_H
 
-#define SOUNDARGS_MASK_BANK         0xF0000000
-#define SOUNDARGS_MASK_FLAGS1       0x0F000000
-#define SOUNDARGS_MASK_SOUNDID      0x00FF0000
-#define SOUNDARGS_MASK_PRIORITY     0x0000FF00
-#define SOUNDARGS_MASK_FLAGS2       0x000000F0
-#define SOUNDARGS_MASK_STATUS       0x0000000F
+#define SOUNDARGS_SHIFT_BANK        (4 * 7) // 28
+#define SOUNDARGS_SHIFT_FLAGS1      (4 * 6) // 24
+#define SOUNDARGS_SHIFT_SOUNDID     (4 * 4) // 16
+#define SOUNDARGS_SHIFT_PRIORITY    (4 * 2) //  8
+#define SOUNDARGS_SHIFT_FLAGS2      (4 * 1) //  4
+#define SOUNDARGS_SHIFT_STATUS      (4 * 0) //  0
 
-#define SOUNDARGS_SHIFT_BANK        28
-#define SOUNDARGS_SHIFT_SOUNDID     16
-#define SOUNDARGS_SHIFT_PRIORITY     8
+#define SOUNDARGS_MASK_BANK         (0x0F << SOUNDARGS_SHIFT_BANK    ) // 0xF0000000
+#define SOUNDARGS_MASK_FLAGS1       (0x0F << SOUNDARGS_SHIFT_FLAGS1  ) // 0x0F000000
+#define SOUNDARGS_MASK_SOUNDID      (0xFF << SOUNDARGS_SHIFT_SOUNDID ) // 0x00FF0000
+#define SOUNDARGS_MASK_PRIORITY     (0xFF << SOUNDARGS_SHIFT_PRIORITY) // 0x0000FF00
+#define SOUNDARGS_MASK_FLAGS2       (0x0F << SOUNDARGS_SHIFT_FLAGS2  ) // 0x000000F0
+#define SOUNDARGS_MASK_STATUS       (0x0F << SOUNDARGS_SHIFT_STATUS  ) // 0x0000000F
 
 // Sound Magic Definition:
 // First Byte (Upper Nibble): Sound Bank (not the same as audio bank!)
@@ -101,7 +104,7 @@ enum SoundTerrain {
 };
 
 // silence
-#define NO_SOUND                    0
+#define NO_SOUND 0
 
 /**
  * The table below defines all sounds that exist in the game, and which flags
