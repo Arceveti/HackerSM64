@@ -106,17 +106,16 @@ void bhv_blue_coin_switch_loop(void) {
             // and recedes at 20 units/frame, which means it will fully recede after 5 frames.
 #ifdef BLUE_COIN_SWITCH_RETRY
             if (o->oTimer > 3) {
-#else
-            if (o->oTimer > 5) {
-                cur_obj_hide();
-#endif
                 // Set to BLUE_COIN_SWITCH_ACT_TICKING
                 o->oAction = BLUE_COIN_SWITCH_ACT_TICKING;
-#ifdef BLUE_COIN_SWITCH_RETRY
                 // ???
                 o->oVelY    = 0.0f;
                 o->oGravity = 0.0f;
 #else
+            if (o->oTimer > 5) {
+                cur_obj_hide();
+                // Set to BLUE_COIN_SWITCH_ACT_TICKING
+                o->oAction = BLUE_COIN_SWITCH_ACT_TICKING;
                 o->oPosY = gMarioObject->oPosY - 40.0f;
 #endif
 

@@ -70,11 +70,11 @@ extern s16 *gWaveSamples[4];
 
 #if defined(VERSION_EU) || defined(VERSION_SH)
 extern u8 euUnknownData_8030194c[4];
-#ifdef VERSION_EU
+ #ifdef VERSION_EU
 extern u16 gHeadsetPanQuantization[0x10];
-#else
+ #else
 extern u16 gHeadsetPanQuantization[0x40];
-#endif
+ #endif
 extern s16 euUnknownData_80301950[64];
 extern struct NoteSubEu gZeroNoteSub;
 extern struct NoteSubEu gDefaultNoteSub;
@@ -125,11 +125,11 @@ extern s32 gRefreshRate;
 extern s16 *gAiBuffers[NUMAIBUFFERS];
 extern s16 gAiBufferLengths[NUMAIBUFFERS];
 #if defined(VERSION_SH)
-#define AIBUFFER_LEN 0xb00
+    #define AIBUFFER_LEN 0xb00
 #elif defined(VERSION_EU)
-#define AIBUFFER_LEN (0xa0 * 17)
+    #define AIBUFFER_LEN (0xa0 * 17)
 #else
-#define AIBUFFER_LEN (0xa0 * 16)
+    #define AIBUFFER_LEN (0xa0 * 16)
 #endif
 
 extern u32 gAudioRandom;
@@ -183,9 +183,9 @@ extern OSMesgQueue *D_SH_80350FA8;
 #endif
 
 #if defined(VERSION_EU) || defined(VERSION_SH)
-#define AUDIO_INIT_POOL_SIZE (0x2B00 + BANK_SETS_ALLOC + EXT_AUDIO_INIT_POOL_SIZE)
+    #define AUDIO_INIT_POOL_SIZE (0x2B00 + BANK_SETS_ALLOC + EXT_AUDIO_INIT_POOL_SIZE)
 #else
-#define AUDIO_INIT_POOL_SIZE (0x2400 + BANK_SETS_ALLOC + EXT_AUDIO_INIT_POOL_SIZE)
+    #define AUDIO_INIT_POOL_SIZE (0x2400 + BANK_SETS_ALLOC + EXT_AUDIO_INIT_POOL_SIZE)
 #endif
 
 // TODO: needs validation once EU can compile. EU is very likely incorrect!

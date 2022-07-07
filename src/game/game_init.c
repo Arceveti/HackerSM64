@@ -793,7 +793,7 @@ void thread5_game_loop(UNUSED void *arg) {
         addr = level_script_execute(addr);
 #ifdef PUPPYPRINT_DEBUG
         puppyprint_profiler_process();
-#elif VISUAL_DEBUG
+#elif defined(VISUAL_DEBUG)
         debug_box_input();
 #endif
 

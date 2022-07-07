@@ -1678,13 +1678,13 @@ u32 mario_can_talk(struct MarioState *m, u32 arg) {
      || m->action == ACT_DECELERATING
      || m->action == ACT_BRAKING
      || m->action == ACT_BRAKING_STOP) {
-#else
+#else // !EASIER_DIALOG_TRIGGER
     if (m->action & ACT_FLAG_IDLE) {
         return TRUE;
     }
 
     if (m->action == ACT_WALKING) {
-#endif
+#endif // !EASIER_DIALOG_TRIGGER
         if (arg) {
             return TRUE;
         }
@@ -1703,9 +1703,9 @@ u32 mario_can_talk(struct MarioState *m, u32 arg) {
 
 #define READ_MASK (INPUT_A_PRESSED | INPUT_B_PRESSED)
 #ifdef EASIER_DIALOG_TRIGGER
-#define SIGN_RANGE DEGREES(90)
+    #define SIGN_RANGE DEGREES(90)
 #else
-#define SIGN_RANGE DEGREES(45)
+    #define SIGN_RANGE DEGREES(45)
 #endif
 
 u32 check_read_sign(struct MarioState *m, struct Object *obj) {
@@ -1718,19 +1718,19 @@ u32 check_read_sign(struct MarioState *m, struct Object *obj) {
         && (facingDYaw <=  SIGN_RANGE)
         && abs_angle_diff(mario_obj_angle_to_object(m, obj), m->faceAngle[1]) <= SIGN_RANGE
     ) {
-#ifdef DIALOG_INDICATOR
+ #ifdef DIALOG_INDICATOR
         if (obj_has_behavior(obj, bhvSignOnWall)) {
             spawn_object_relative(ORANGE_NUMBER_A, 0, 180, 32, obj, MODEL_NUMBER, bhvOrangeNumber);
         } else {
             spawn_object_relative(ORANGE_NUMBER_A, 0, 160,  8, obj, MODEL_NUMBER, bhvOrangeNumber);
         }
-#endif
+ #endif
         if (m->input & READ_MASK) {
-#else
+#else // !EASIER_DIALOG_TRIGGER
     if ((m->input & READ_MASK) && mario_can_talk(m, 0) && object_facing_mario(m, obj, SIGN_RANGE)) {
         s16 facingDYaw = (s16)(obj->oMoveAngleYaw + 0x8000) - m->faceAngle[1];
         if (facingDYaw >= -SIGN_RANGE && facingDYaw <= SIGN_RANGE) {
-#endif
+#endif // !EASIER_DIALOG_TRIGGER
             f32 targetX = obj->oPosX + 105.0f * sins(obj->oMoveAngleYaw);
             f32 targetZ = obj->oPosZ + 105.0f * coss(obj->oMoveAngleYaw);
 
@@ -1753,19 +1753,19 @@ u32 check_npc_talk(struct MarioState *m, struct Object *obj) {
         mario_can_talk(m, TRUE)
         && abs_angle_diff(mario_obj_angle_to_object(m, obj), m->faceAngle[1]) <= SIGN_RANGE
     ) {
-#ifdef DIALOG_INDICATOR
+ #ifdef DIALOG_INDICATOR
         if (obj_has_behavior(obj, bhvYoshi)) {
             spawn_object_relative(ORANGE_NUMBER_A, 0, 256, 64, obj, MODEL_NUMBER, bhvOrangeNumber);
         } else {
             spawn_object_relative(ORANGE_NUMBER_A, 0, 160,  0, obj, MODEL_NUMBER, bhvOrangeNumber);
         }
-#endif
+ #endif
         if (m->input & READ_MASK) {
-#else
+#else // !EASIER_DIALOG_TRIGGER
     if ((m->input & READ_MASK) && mario_can_talk(m, 1)) {
         s16 facingDYaw = mario_obj_angle_to_object(m, obj) - m->faceAngle[1];
         if (facingDYaw >= -SIGN_RANGE && facingDYaw <= SIGN_RANGE) {
-#endif
+#endif // !EASIER_DIALOG_TRIGGER
             obj->oInteractStatus = INT_STATUS_INTERACTED;
 
             m->interactObj = obj;

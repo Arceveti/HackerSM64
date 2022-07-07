@@ -4,17 +4,17 @@
 #include "internal.h"
 
 #ifdef VERSION_SH
-#define DEFAULT_LEN_1CH 0x180
-#define DEFAULT_LEN_2CH 0x300
+    #define DEFAULT_LEN_1CH 0x180
+    #define DEFAULT_LEN_2CH 0x300
 #else
-#define DEFAULT_LEN_1CH 0x140
-#define DEFAULT_LEN_2CH 0x280
+    #define DEFAULT_LEN_1CH 0x140
+    #define DEFAULT_LEN_2CH 0x280
 #endif
 
 #if defined(VERSION_EU) || defined(VERSION_SH)
-#define MAX_UPDATES_PER_FRAME 5
+    #define MAX_UPDATES_PER_FRAME 5
 #else
-#define MAX_UPDATES_PER_FRAME 4
+    #define MAX_UPDATES_PER_FRAME 4
 #endif
 
 #ifdef BETTER_REVERB
@@ -52,9 +52,9 @@ STATIC_ASSERT(NUM_ALLPASS % 3 == 0, "NUM_ALLPASS must be a multiple of 3!");
 #define BETTER_REVERB_SIZE 0
 
 #ifdef VERSION_EU
-#define REVERB_WINDOW_SIZE_MAX 0x1000
+    #define REVERB_WINDOW_SIZE_MAX 0x1000
 #else
-#define REVERB_WINDOW_SIZE_MAX 0x1000
+    #define REVERB_WINDOW_SIZE_MAX 0x1000
 #endif
 
 #endif
@@ -66,7 +66,7 @@ STATIC_ASSERT(NUM_ALLPASS % 3 == 0, "NUM_ALLPASS must be a multiple of 3!");
     + (4 * (16 * sizeof(s16))) \
     + (4 /* gAudioUpdatesPerFrame */ * (2 * DEFAULT_LEN_2CH)) \
 )
-#else
+#else // !(VERSION_JP || VERSION_US)
 #define REVERB_WINDOW_HEAP_SIZE \
 ( \
     ((REVERB_WINDOW_SIZE_MAX * sizeof(s16) * 2) \
@@ -74,7 +74,7 @@ STATIC_ASSERT(NUM_ALLPASS % 3 == 0, "NUM_ALLPASS must be a multiple of 3!");
     + (4 /* gAudioUpdatesPerFrame */ * (2 * DEFAULT_LEN_2CH))) \
     * 4 /* gNumSynthesisReverbs */ \
 )
-#endif
+#endif // !(VERSION_JP || VERSION_US)
 
 struct ReverbRingBufferItem {
     s16 numSamplesAfterDownsampling;
@@ -93,9 +93,9 @@ struct SynthesisReverb {
     /*0x03, 0x03, 0x03*/ u8 curFrame;
 #if defined(VERSION_EU) || defined(VERSION_SH)
     /*      0x04, 0x04*/ u8 downsampleRate;
-#ifdef VERSION_SH
+ #ifdef VERSION_SH
     /*            0x05*/ s8 unk5;
-#endif
+ #endif
     /*      0x06, 0x06*/ u16 windowSize; // same as bufSizePerChannel
 #endif
 #ifdef VERSION_SH
