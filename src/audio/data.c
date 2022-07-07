@@ -100,12 +100,12 @@ u16 gAudioCosineTable[128] = {
 // between -1 and +1 octave.
 // gPitchBendFrequencyScale[k] = (0.5 * 2^(k/127))
 #ifndef VERSION_SH
-#if defined(VERSION_EU)
+ #ifdef VERSION_EU
 f32 gPitchBendFrequencyScale[256] = {
     0.5f,
-#else
+ #else
 f32 gPitchBendFrequencyScale[255] = {
-#endif
+ #endif
     0.500000f, 0.502736f, 0.505488f, 0.508254f, 0.511036f, 0.513833f, 0.516645f, 0.519472f, 0.522315f,
     0.525174f, 0.528048f, 0.530938f, 0.533843f, 0.536765f, 0.539702f, 0.542656f, 0.545626f, 0.548612f,
     0.551614f, 0.554633f, 0.557669f, 0.560721f, 0.563789f, 0.566875f, 0.569977f, 0.573097f, 0.576233f,
@@ -416,9 +416,7 @@ f32 gPitchBendFrequencyScale[256] = {
     1.873209f, 1.883461f, 1.893768f, 1.904132f, 1.914553f, 1.925031f, 1.935567f, 1.946159f, 1.956810f,
     1.967520f, 1.978287f, 1.989114f, 2.0f
 };
-#endif
 
-#ifdef VERSION_SH
 f32 unk_sh_data_1[] = {
   0.890899f,  0.890899f,  0.89171f,   0.892521f,  0.893333f,  0.894146f,  0.89496f,   0.895774f,
   0.89659f,   0.897406f,  0.898222f,  0.89904f,   0.899858f,  0.900677f,  0.901496f,  0.902317f,
@@ -490,9 +488,9 @@ u8 unk_sh_data2[4] = { 0, 0, 0, 0 };
 struct NoteSubEu gZeroNoteSub = { 0 };
 struct NoteSubEu gDefaultNoteSub = {
     1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, { NULL },
-#ifdef VERSION_SH
+ #ifdef VERSION_SH
     0
-#endif
+ #endif
 };
 
 u16 gHeadsetPanQuantization[0x40] = {
@@ -503,7 +501,7 @@ u16 gHeadsetPanQuantization[0x40] = {
 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
 };
-#endif
+#endif // VERSION_SH
 
 #ifdef VERSION_EU
 u8 euUnknownData_8030194c[4] = { 0x40, 0x20, 0x10, 0x08 };
@@ -712,7 +710,7 @@ f32 gVolRampingRhs128[128] = {
     0.525077f, 0.524798f, 0.524522f, 0.524247f, 0.523975f, 0.523706f, 0.523439f, 0.523174f, 0.522911f,
     0.522651f, 0.522393f
 };
-#endif
+#endif // VERSION_JP || VERSION_US
 
 #ifdef VERSION_SH
 u16 unk_sh_data_3[] = {
@@ -881,16 +879,14 @@ u16 unk_sh_data_4[] = {
     0x5FFF, 0x9001,
     0x7FFF, 0x8001
 };
-#endif
-
-#ifndef VERSION_SH
+#else // !VERSION_SH
 s16 gTatumsPerBeat = TATUMS_PER_BEAT;
 s32 gAudioHeapSize = DOUBLE_SIZE_ON_64_BIT(AUDIO_HEAP_SIZE);
 s32 gAudioInitPoolSize = DOUBLE_SIZE_ON_64_BIT(AUDIO_INIT_POOL_SIZE);
 volatile s32 gAudioLoadLock = AUDIO_LOCK_UNINITIALIZED;
-#endif
+#endif // !VERSION_SH
 
-#if defined(VERSION_EU)
+#ifdef VERSION_EU
 u8 bufferDelete2[12] = { 0 };
 u8 D_EU_80302010 = 0;
 u8 D_EU_80302014 = 0;

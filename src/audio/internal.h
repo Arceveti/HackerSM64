@@ -81,21 +81,21 @@ enum Codecs {
 
 #ifdef VERSION_EU
 /*#ifdef PUPPYPRINT_DEBUG
-#define eu_stubbed_printf_0(msg) append_puppyprint_log(msg)
-#define eu_stubbed_printf_1(msg, a) append_puppyprint_log(msg, a)
-#define eu_stubbed_printf_2(msg, a, b) append_puppyprint_log(msg, a, b)
-#define eu_stubbed_printf_3(msg, a, b, c) append_puppyprint_log(msg, a, b, c)
+    #define eu_stubbed_printf_0(msg) append_puppyprint_log(msg)
+    #define eu_stubbed_printf_1(msg, a) append_puppyprint_log(msg, a)
+    #define eu_stubbed_printf_2(msg, a, b) append_puppyprint_log(msg, a, b)
+    #define eu_stubbed_printf_3(msg, a, b, c) append_puppyprint_log(msg, a, b, c)
 #else*/
-#define eu_stubbed_printf_0(msg) stubbed_printf(msg)
-#define eu_stubbed_printf_1(msg, a) stubbed_printf(msg, a)
-#define eu_stubbed_printf_2(msg, a, b) stubbed_printf(msg, a, b)
-#define eu_stubbed_printf_3(msg, a, b, c) stubbed_printf(msg, a, b, c)
+    #define eu_stubbed_printf_0(msg) stubbed_printf(msg)
+    #define eu_stubbed_printf_1(msg, a) stubbed_printf(msg, a)
+    #define eu_stubbed_printf_2(msg, a, b) stubbed_printf(msg, a, b)
+    #define eu_stubbed_printf_3(msg, a, b, c) stubbed_printf(msg, a, b, c)
 //#endif
 #else
-#define eu_stubbed_printf_0(msg)
-#define eu_stubbed_printf_1(msg, a)
-#define eu_stubbed_printf_2(msg, a, b)
-#define eu_stubbed_printf_3(msg, a, b, c)
+    #define eu_stubbed_printf_0(msg)
+    #define eu_stubbed_printf_1(msg, a)
+    #define eu_stubbed_printf_2(msg, a, b)
+    #define eu_stubbed_printf_3(msg, a, b, c)
 #endif
 
 struct NotePool;
@@ -273,8 +273,7 @@ struct SequencePlayer {
 #if defined(VERSION_JP) || defined(VERSION_US)
     /*0x008, ?????*/ u8 loadingBankNumInstruments;
     /*0x009, ?????*/ u8 loadingBankNumDrums;
-#endif
-#if defined(VERSION_EU) || defined(VERSION_SH)
+#else // VERSION_EU || VERSION_SH
     /*     , 0x007, 0x007*/ s8 seqVariationEu[1];
 #endif
     /*0x00A, 0x008*/ u16 tempo; // beats per minute in JP, tatums per minute in US/EU
@@ -551,10 +550,10 @@ struct NoteSynthesisState {
     /*0x01*/ u8 sampleDmaIndex;
     /*0x02*/ u8 prevHeadsetPanRight;
     /*0x03*/ u8 prevHeadsetPanLeft;
-#ifdef VERSION_SH
+ #ifdef VERSION_SH
     /*      0x04*/ u8 reverbVol;
     /*      0x05*/ u8 unk5;
-#endif
+ #endif
     /*0x04, 0x06*/ u16 samplePosFrac;
     /*0x08*/ s32 samplePosInt;
     /*0x0C*/ struct NoteSynthesisBuffers *synthesisBuffers;
@@ -566,10 +565,10 @@ struct NotePlaybackState {
     /*0x04, 0x00, 0x00*/ u8 priority;
     /*      0x01, 0x01*/ u8 waveId;
     /*      0x02, 0x02*/ u8 sampleCountIndex;
-#ifdef VERSION_SH
+ #ifdef VERSION_SH
     /*            0x03*/ u8 bankId;
     /*            0x04*/ u8 unkSH34;
-#endif
+ #endif
     /*0x08, 0x04, 0x06*/ s16 adsrVolScale;
     /*0x18, 0x08, 0x08*/ f32 portamentoFreqScale;
     /*0x1C, 0x0C, 0x0C*/ f32 vibratoFreqScale;
@@ -594,11 +593,11 @@ struct NoteSubEu {
     /*0x01*/ u8 bookOffset            : 3;
     /*0x01*/ u8 isSyntheticWave       : 1;
     /*0x01*/ u8 hasTwoAdpcmParts      : 1;
-#ifdef VERSION_EU
+ #ifdef VERSION_EU
     /*0x02*/ u8 bankId;
-#else
+ #else
     /*0x02*/ u8 synthesisVolume; // UQ4.4, although 0 <= x < 1 is rounded up to 1
-#endif
+ #endif
     /*0x03*/ u8 headsetPanRight;
     /*0x04*/ u8 headsetPanLeft;
     /*0x05*/ u8 reverbVol;       // UQ0.7  (EU Q1.7)
@@ -609,9 +608,9 @@ struct NoteSubEu {
         s16 *samples;
         struct AudioBankSound *audioBankSound;
     } sound;
-#ifdef VERSION_SH
+ #ifdef VERSION_SH
     /*0x10*/ s16 *filter;
-#endif
+ #endif
 };
 struct Note {
     /* U/J,  EU,  SH  */
@@ -622,17 +621,17 @@ struct Note {
     // when needed... This breaks alignment on non-N64 platforms, which we hack
     // around by skipping the padding in that case.
     // TODO: use macros or something instead.
-#ifdef TARGET_N64
+ #ifdef TARGET_N64
     u8 pad0[12];
-#endif
+ #endif
 
     /*0x04, 0x30, 0x30*/ u8 priority;
     /*      0x31, 0x31*/ u8 waveId;
     /*      0x32, 0x32*/ u8 sampleCountIndex;
-#ifdef VERSION_SH
+ #ifdef VERSION_SH
     /*            0x33*/ u8 bankId;
     /*            0x34*/ u8 unkSH34;
-#endif
+ #endif
     /*0x08, 0x34, 0x36*/ s16 adsrVolScale;
     /*0x18, 0x38,     */ f32 portamentoFreqScale;
     /*0x1C, 0x3C,     */ f32 vibratoFreqScale;
@@ -717,9 +716,9 @@ struct NoteSynthesisBuffers {
     s16 panResampleState[0x10];
     s16 panSamplesBuffer[0x20];
     s16 dummyResampleState[0x10];
-#if defined(VERSION_JP) || defined(VERSION_US)
+ #if defined(VERSION_JP) || defined(VERSION_US)
     s16 samples[0x40];
-#endif
+ #endif
 #endif
 };
 

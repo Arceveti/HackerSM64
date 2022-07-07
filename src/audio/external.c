@@ -341,8 +341,7 @@ u8 sBackgroundMusicQueueSize = 0;
 // bss
 #if defined(VERSION_JP) || defined(VERSION_US)
 s16 *gCurrAiBuffer;
-#endif
-#ifdef VERSION_SH
+#elif defined(VERSION_SH)
 struct UnkStruct80343D00 D_SH_80343D00;
 #endif
 
@@ -406,7 +405,7 @@ void func_80320ED8(void);
 #if defined(VERSION_EU) || defined(VERSION_SH)
 void audio_reset_session_eu(s32 presetId) {
     OSMesg mesg;
-#ifdef VERSION_SH
+ #ifdef VERSION_SH
     osRecvMesg(D_SH_80350FA8, &mesg, OS_MESG_NOBLOCK);
     osSendMesg(D_SH_80350F88, (OSMesg) presetId, OS_MESG_NOBLOCK);
     osRecvMesg(D_SH_80350FA8, &mesg, OS_MESG_BLOCK);
@@ -414,18 +413,16 @@ void audio_reset_session_eu(s32 presetId) {
         osRecvMesg(D_SH_80350FA8, &mesg, OS_MESG_BLOCK);
     }
 
-#else
+ #else // !VERSION_SH
     osRecvMesg(OSMesgQueues[3], &mesg, OS_MESG_NOBLOCK);
     osSendMesg(OSMesgQueues[2], (OSMesg) presetId, OS_MESG_NOBLOCK);
     osRecvMesg(OSMesgQueues[3], &mesg, OS_MESG_BLOCK);
     if ((s32) mesg != presetId) {
         osRecvMesg(OSMesgQueues[3], &mesg, OS_MESG_BLOCK);
     }
-#endif
+ #endif // !VERSION_SH
 }
-#endif
-
-#if defined(VERSION_JP) || defined(VERSION_US)
+#else // !(VERSION_EU || VERSION_SH)
 /**
  * Called from threads: thread3_main, thread5_game_loop
  */
@@ -457,7 +454,7 @@ static void func_8031D690(s32 player, FadeT fadeInTime) {
     seqPlayer->fadeVolume = 0.0f;
     seqPlayer->fadeVelocity = 0.0f;
 }
-#endif
+#endif // !(VERSION_EU || VERSION_SH)
 
 /**
  * Called from threads: thread5_game_loop
@@ -556,11 +553,11 @@ static void seq_player_fade_to_target_volume(s32 player, FadeT fadeDuration, u8 
 }
 
 #if defined(VERSION_EU) || defined(VERSION_SH)
-#ifdef VERSION_EU
+ #ifdef VERSION_EU
 extern void func_802ad7a0(void);
-#else
+ #else // VERSION_SH
 extern void func_sh_802F64C8(void);
-#endif
+ #endif // VERSION_SH
 
 /**
  * Called from threads: thread5_game_loop
@@ -570,11 +567,11 @@ void maybe_tick_game_sound(void) {
         update_game_sound();
         sGameLoopTicked = 0;
     }
-#ifdef VERSION_EU
+ #ifdef VERSION_EU
     func_802ad7a0();
-#else
+ #else // VERSION_SH
     func_sh_802F64C8(); // moved in SH
-#endif
+ #endif // VERSION_SH
 }
 
 void func_eu_802e9bec(s32 player, s32 channel, s32 arg2) {
@@ -1147,7 +1144,7 @@ static u32 get_sound_reverb(UNUSED u8 bank, UNUSED u8 soundIndex, u8 channelInde
     // reverb = reverb adjustment + level reverb + a volume-dependent value
     // The volume-dependent value is 0 when volume is at maximum, and raises to
     // LOW_VOLUME_REVERB when the volume is 0
-    reverb = (u8)(u8) gSequencePlayers[SEQ_PLAYER_SFX].channels[channelIndex]->soundScriptIO[5]
+    reverb = (u8) gSequencePlayers[SEQ_PLAYER_SFX].channels[channelIndex]->soundScriptIO[5]
                   + sLevelAreaReverbs[level][area]
                   + ((1.0f - gSequencePlayers[SEQ_PLAYER_SFX].channels[channelIndex]->volume)
                         * LOW_VOLUME_REVERB);
@@ -1581,21 +1578,21 @@ static void seq_player_play_sequence(u8 player, u8 seqId, u16 arg2) {
  */
 void seq_player_fade_out(u8 player, u16 fadeDuration) {
 #if defined(VERSION_EU) || defined(VERSION_SH)
-#ifdef VERSION_EU
+ #ifdef VERSION_EU
     u32 fd = fadeDuration;
-#else
+ #else
     s32 fd = fadeDuration; // will also match if we change function signature func_802ad74c to use s32 as arg1
-#endif
+ #endif
     if (!player) {
         sCurrentBackgroundMusicSeqId = SEQUENCE_NONE;
     }
     func_802ad74c(0x83000000 | (player & 0xff) << 16, fd);
-#else
+#else // !(VERSION_EU || VERSION_SH)
     if (player == SEQ_PLAYER_LEVEL) {
         sCurrentBackgroundMusicSeqId = SEQUENCE_NONE;
     }
     seq_player_fade_to_zero_volume(player, fadeDuration);
-#endif
+#endif // !(VERSION_EU || VERSION_SH)
 }
 
 /**

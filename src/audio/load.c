@@ -73,22 +73,14 @@ u32 sDmaBufSize;
 s32 gMaxAudioCmds;
 s32 gMaxSimultaneousNotes;
 
-#ifdef VERSION_EU
-s16 gTempoInternalToExternal;
-#else
+#ifndef VERSION_EU
 s32 gSamplesPerFrameTarget;
 s32 gMinAiBufferLength;
+#endif
 
 s16 gTempoInternalToExternal;
-
 s8 gAudioUpdatesPerFrame;
-#endif
-
 s8 gSoundMode;
-
-#ifdef VERSION_EU
-s8 gAudioUpdatesPerFrame;
-#endif
 
 extern u64 gAudioGlobalsStartMarker;
 extern u64 gAudioGlobalsEndMarker;
@@ -254,26 +246,21 @@ void *dma_sample_data(uintptr_t devAddr, u32 size, s32 arg2, u8 *dmaIndexRef) {
     dma->sizeUnused = transfer;
 #ifdef VERSION_US
     osInvalDCache(dma->buffer, transfer);
-#endif
+#endif // VERSION_US
 #ifdef VERSION_EU
     osPiStartDma(&gCurrAudioFrameDmaIoMesgBufs[gCurrAudioFrameDmaCount++], OS_MESG_PRI_NORMAL,
                      OS_READ, dmaDevAddr, dma->buffer, transfer, &gCurrAudioFrameDmaQueue);
-#else
+#else // !VERSION_EU
     gCurrAudioFrameDmaCount++;
     osPiStartDma(&gCurrAudioFrameDmaIoMesgBufs[gCurrAudioFrameDmaCount - 1], OS_MESG_PRI_NORMAL,
                  OS_READ, dmaDevAddr, dma->buffer, transfer, &gCurrAudioFrameDmaQueue);
-#endif
+#endif // !VERSION_EU
     *dmaIndexRef = dmaIndex;
     return dma->buffer + (devAddr - dmaDevAddr);
 }
 
 void init_sample_dma_buffers(UNUSED s32 arg0) {
     s32 i;
-#ifdef VERSION_EU
-#define j i
-#else
-    s32 j;
-#endif
 
     sDmaBufSize = DMA_BUF_SIZE_0;
 
@@ -284,11 +271,7 @@ void init_sample_dma_buffers(UNUSED s32 arg0) {
 #endif
         sSampleDmas[gSampleDmaNumListItems].buffer = soundAlloc(&gNotesAndBuffersPool, sDmaBufSize);
         if (sSampleDmas[gSampleDmaNumListItems].buffer == NULL) {
-#ifdef VERSION_EU
             break;
-#else
-            goto out1;
-#endif
         }
         sSampleDmas[gSampleDmaNumListItems].bufSize = sDmaBufSize;
         sSampleDmas[gSampleDmaNumListItems].source = 0;
@@ -297,17 +280,14 @@ void init_sample_dma_buffers(UNUSED s32 arg0) {
         sSampleDmas[gSampleDmaNumListItems].ttl = 0;
         gSampleDmaNumListItems++;
     }
-#if defined(VERSION_JP) || defined(VERSION_US)
-out1:
-#endif
 
     for (i = 0; (u32) i < gSampleDmaNumListItems; i++) {
         sSampleDmaReuseQueue1[i] = (u8) i;
         sSampleDmas[i].reuseIndex = (u8) i;
     }
 
-    for (j = gSampleDmaNumListItems; j < 0x100; j++) {
-        sSampleDmaReuseQueue1[j] = 0;
+    for (i = gSampleDmaNumListItems; i < 0x100; i++) {
+        sSampleDmaReuseQueue1[i] = 0;
     }
 
     sSampleDmaReuseQueueTail1 = 0;
@@ -319,11 +299,7 @@ out1:
     for (i = 0; i < gMaxSimultaneousNotes; i++) {
         sSampleDmas[gSampleDmaNumListItems].buffer = soundAlloc(&gNotesAndBuffersPool, sDmaBufSize);
         if (sSampleDmas[gSampleDmaNumListItems].buffer == NULL) {
-#ifdef VERSION_EU
             break;
-#else
-            goto out2;
-#endif
         }
         sSampleDmas[gSampleDmaNumListItems].bufSize = sDmaBufSize;
         sSampleDmas[gSampleDmaNumListItems].source = 0;
@@ -332,9 +308,6 @@ out1:
         sSampleDmas[gSampleDmaNumListItems].ttl = 0;
         gSampleDmaNumListItems++;
     }
-#if defined(VERSION_JP) || defined(VERSION_US)
-out2:
-#endif
 
     for (i = sSampleDmaListSize1; (u32) i < gSampleDmaNumListItems; i++) {
         sSampleDmaReuseQueue2[i - sSampleDmaListSize1] = (u8) i;
@@ -343,15 +316,12 @@ out2:
 
     // This probably meant to touch the range size1..size2 as well... but it
     // doesn't matter, since these values are never read anyway.
-    for (j = gSampleDmaNumListItems; j < 0x100; j++) {
-        sSampleDmaReuseQueue2[j] = sSampleDmaListSize1;
+    for (i = gSampleDmaNumListItems; i < 0x100; i++) {
+        sSampleDmaReuseQueue2[i] = sSampleDmaListSize1;
     }
 
     sSampleDmaReuseQueueTail2 = 0;
     sSampleDmaReuseQueueHead2 = gSampleDmaNumListItems - sSampleDmaListSize1;
-#ifdef VERSION_EU
-#undef j
-#endif
 }
 
 #if defined(VERSION_JP) || defined(VERSION_US)
@@ -387,7 +357,7 @@ void patch_sound(UNUSED struct AudioBankSound *sound, UNUSED u8 *memBase, UNUSED
             sample->loop = PATCH(sample->loop, memBase);
             sample->book = PATCH(sample->book, memBase);
         }
-#endif
+#endif // VERSION_EU
     }
 
 #undef PATCH
@@ -395,7 +365,7 @@ void patch_sound(UNUSED struct AudioBankSound *sound, UNUSED u8 *memBase, UNUSED
 
 #ifdef VERSION_EU
 #define PATCH_SOUND patch_sound
-#else
+#else // !VERSION_EU
 // copt inline of the above
 #define PATCH_SOUND(_sound, mem, offset)                                                  \
 {                                                                                         \
@@ -419,7 +389,7 @@ void patch_sound(UNUSED struct AudioBankSound *sound, UNUSED u8 *memBase, UNUSED
         }                                                                                 \
     }                                                                                     \
 }
-#endif
+#endif // !VERSION_EU
 
 // on US/JP this inlines patch_sound, using some -sopt compiler flag
 void patch_audio_bank(struct AudioBank *mem, u8 *offset, u32 numInstruments, u32 numDrums) {
@@ -456,11 +426,7 @@ void patch_audio_bank(struct AudioBank *mem, u8 *offset, u32 numInstruments, u32
         }
     }
 
-#if defined(VERSION_JP) || defined(VERSION_US)
-    if (numInstruments >= 1) {
-#else
     if (numInstruments > 0) {
-#endif
         itInstrs = mem->instruments;
         end = numInstruments + itInstrs;
 
@@ -537,16 +503,15 @@ struct AudioBank *bank_load_async(s32 bankId, s32 arg1, struct SequencePlayer *s
     gCtlEntries[bankId].instruments = ret->instruments;
     gCtlEntries[bankId].drums = 0;
     seqPlayer->bankDmaCurrMemAddr = (u8 *) ret;
-    seqPlayer->bankDmaCurrDevAddr = (uintptr_t)(ctlData + 0x10);
-    seqPlayer->bankDmaRemaining = alloc;
 #else
     seqPlayer->loadingBankNumInstruments = numInstruments;
     seqPlayer->loadingBankNumDrums = numDrums;
     seqPlayer->bankDmaCurrMemAddr = (u8 *) ret;
     seqPlayer->loadingBank = ret;
+#endif
     seqPlayer->bankDmaCurrDevAddr = (uintptr_t)(ctlData + 0x10);
     seqPlayer->bankDmaRemaining = alloc;
-#endif
+
     OSMesgQueue *mesgQueue = &seqPlayer->bankDmaMesgQueue;
     osCreateMesgQueue(mesgQueue, &seqPlayer->bankDmaMesg, 1);
 #if defined(VERSION_JP) || defined(VERSION_US)
@@ -625,17 +590,16 @@ u32 get_missing_bank(u32 seqId, s32 *nonNullCount, s32 *nullCount) {
     offset = ((u16 *) gAlBankSets)[seqId];
     for (i = gAlBankSets[offset++], ret = 0; i != 0; i--) {
         bankId = gAlBankSets[offset++];
+
+        if (IS_BANK_LOAD_COMPLETE(bankId)) {
+            temp = get_bank_or_seq(&gBankLoadedPool, 2, bankId);
 #else
     offset = ((u16 *) gAlBankSets)[seqId] + 1;
     for (i = gAlBankSets[offset - 1], ret = 0; i != 0; i--) {
         offset++;
         bankId = gAlBankSets[offset - 1];
-#endif
 
         if (IS_BANK_LOAD_COMPLETE(bankId)) {
-#ifdef VERSION_EU
-            temp = get_bank_or_seq(&gBankLoadedPool, 2, bankId);
-#else
             temp = get_bank_or_seq(&gBankLoadedPool, 2, gAlBankSets[offset - 1]);
 #endif
         } else {
@@ -662,17 +626,16 @@ struct AudioBank *load_banks_immediate(s32 seqId, u8 *outDefaultBank) {
 #ifdef VERSION_EU
     for (i = gAlBankSets[offset++]; i != 0; i--) {
         bankId = gAlBankSets[offset++];
+
+        if (IS_BANK_LOAD_COMPLETE(bankId)) {
+            ret = get_bank_or_seq(&gBankLoadedPool, 2, bankId);
 #else
     offset++;
     for (i = gAlBankSets[offset - 1]; i != 0; i--) {
         offset++;
         bankId = gAlBankSets[offset - 1];
-#endif
 
         if (IS_BANK_LOAD_COMPLETE(bankId)) {
-#ifdef VERSION_EU
-            ret = get_bank_or_seq(&gBankLoadedPool, 2, bankId);
-#else
             ret = get_bank_or_seq(&gBankLoadedPool, 2, gAlBankSets[offset - 1]);
 #endif
         } else {
@@ -793,7 +756,7 @@ void load_sequence_internal(u32 player, u32 seqId, s32 loadAsync) {
 
 // (void) must be omitted from parameters to fix stack with -framepointer
 void audio_init() {
-#if defined(VERSION_JP) || defined(VERSION_US) || defined(VERSION_EU)
+#ifndef VERSION_SH
     u8 buf[0x10];
 #endif
     s32 i, /*j,*/ k;
@@ -808,7 +771,7 @@ void audio_init() {
         ((u64 *) gAudioHeap)[i] = 0;
     }
 
-#ifdef TARGET_N64
+ #ifdef TARGET_N64
     // It seems boot.s doesn't clear the .bss area for audio, so do it here.
     i = 0;
     s32 lim3 = ((uintptr_t) &gAudioGlobalsEndMarker - (uintptr_t) &gAudioGlobalsStartMarker) / 8;
@@ -817,27 +780,27 @@ void audio_init() {
         ptr64[i] = 0;
         i++;
     }
-#endif
+ #endif
 
-#else
+#else // !(VERSION_JP || VERSION_US)
     for (i = 0; i < gAudioHeapSize / 8; i++) {
         ((u64 *) gAudioHeap)[i] = 0;
     }
 
-#ifdef TARGET_N64
+ #ifdef TARGET_N64
     // It seems boot.s doesn't clear the .bss area for audio, so do it here.
     s32 lim3 = ((uintptr_t) &gAudioGlobalsEndMarker - (uintptr_t) &gAudioGlobalsStartMarker) / 8;
     u64 *ptr64 = &gAudioGlobalsStartMarker;
     for (k = lim3; k >= 0; k--) {
         *ptr64++ = 0;
     }
-#endif
+ #endif
 
     //D_EU_802298D0 = 20.03042f;
     D_EU_802298D0 = 16.713f;
     gRefreshRate = 60;
     port_eu_init();
-#endif
+#endif // !(VERSION_JP || VERSION_US)
 
 #ifdef TARGET_N64
     eu_stubbed_printf_3(

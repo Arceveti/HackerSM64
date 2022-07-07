@@ -17,11 +17,11 @@ void sequence_channel_process_sound(struct SequenceChannel *seqChannel, s32 reca
         if (seqChannel->seqPlayer->muted && (seqChannel->muteBehavior & MUTE_BEHAVIOR_SOFTEN) != 0) {
             channelVolume = seqChannel->seqPlayer->muteVolumeScale * channelVolume;
         }
-#ifdef VERSION_SH
+ #ifdef VERSION_SH
         seqChannel->appliedVolume = channelVolume * channelVolume;
-#else
+ #else
         seqChannel->appliedVolume = channelVolume;
-#endif
+ #endif
     }
 
     if (seqChannel->changes.as_bitfields.pan) {
@@ -51,7 +51,7 @@ void sequence_channel_process_sound(struct SequenceChannel *seqChannel, s32 reca
     }
     seqChannel->changes.as_u8 = 0;
 }
-#else
+#else // !(VERSION_EU || VERSION_SH)
 static void sequence_channel_process_sound(struct SequenceChannel *seqChannel) {
     s32 i;
 
@@ -72,7 +72,7 @@ static void sequence_channel_process_sound(struct SequenceChannel *seqChannel) {
         }
     }
 }
-#endif
+#endif // !(VERSION_EU || VERSION_SH)
 
 void sequence_player_process_sound(struct SequencePlayer *seqPlayer) {
     s32 i;
@@ -81,7 +81,7 @@ void sequence_player_process_sound(struct SequencePlayer *seqPlayer) {
         seqPlayer->fadeVolume += seqPlayer->fadeVelocity;
 #if defined(VERSION_EU) || defined(VERSION_SH)
         seqPlayer->recalculateVolume = TRUE;
-#endif
+#endif // (VERSION_EU || VERSION_SH)
         seqPlayer->fadeVolume = CLAMP(seqPlayer->fadeVolume, 0, 1);
 
         if (--seqPlayer->fadeRemainingFrames == 0) {
@@ -90,7 +90,7 @@ void sequence_player_process_sound(struct SequencePlayer *seqPlayer) {
                 sequence_player_disable(seqPlayer);
                 return;
             }
-#else
+#else // !(VERSION_EU || VERSION_SH)
             switch (seqPlayer->state) {
                 case SEQUENCE_PLAYER_STATE_FADE_OUT:
                     sequence_player_disable(seqPlayer);
@@ -104,7 +104,7 @@ void sequence_player_process_sound(struct SequencePlayer *seqPlayer) {
                 case SEQUENCE_PLAYER_STATE_4:
                     break;
             }
-#endif
+#endif // !(VERSION_EU || VERSION_SH)
         }
     }
 
@@ -336,17 +336,17 @@ void adsr_init(struct AdsrState *adsr, struct AdsrEnvelope *envelope, UNUSED s16
 #if defined(VERSION_EU) || defined(VERSION_SH)
     adsr->delay = 0;
     adsr->envelope = envelope;
-#ifdef VERSION_SH
+ #ifdef VERSION_SH
     adsr->sustain = 0.0f;
-#endif
+ #endif // VERSION_SH
     adsr->current = 0.0f;
-#else
+#else // !(VERSION_EU || VERSION_SH)
     adsr->initial = 0;
     adsr->delay = 0;
     adsr->velocity = 0;
     adsr->envelope = envelope;
     adsr->volOut = volOut;
-#endif
+#endif // !(VERSION_EU || VERSION_SH)
 }
 
 #if defined(VERSION_EU) || defined(VERSION_SH)

@@ -383,35 +383,33 @@ void *load_segment_decompress(s32 segment, u8 *srcStart, u8 *srcEnd) {
 #else
     void *dest = NULL;
 
-#ifdef GZIP
+ #ifdef GZIP
     u32 compSize = (srcEnd - 4 - srcStart);
-#else
-    u32 compSize = ALIGN16(srcEnd - srcStart);
-#endif
     u8 *compressed = main_pool_alloc(compSize, MEMORY_POOL_RIGHT);
-#ifdef GZIP
     // Decompressed size from end of gzip
     u32 *size = (u32 *) (compressed + compSize);
-#else
+ #else
+    u32 compSize = ALIGN16(srcEnd - srcStart);
+    u8 *compressed = main_pool_alloc(compSize, MEMORY_POOL_RIGHT);
     // Decompressed size from header (This works for non-mio0 because they also have the size in same place)
     u32 *size = (u32 *) (compressed + 4);
-#endif
+ #endif
     if (compressed != NULL) {
         dma_read(compressed, srcStart, srcEnd);
         dest = main_pool_alloc(*size, MEMORY_POOL_LEFT);
         if (dest != NULL) {
             osSyncPrintf("start decompress\n");
-#ifdef GZIP
+ #ifdef GZIP
             expand_gzip(compressed, dest, compSize, (u32)size);
-#elif RNC1
+ #elif RNC1
             Propack_UnpackM1(compressed, dest);
-#elif RNC2
+ #elif RNC2
             Propack_UnpackM2(compressed, dest);
-#elif YAY0
+ #elif YAY0
             slidstart(compressed, dest);
-#elif MIO0
+ #elif MIO0
             decompress(compressed, dest);
-#endif
+ #endif
             osSyncPrintf("end decompress\n");
             set_segment_base_addr(segment, dest);
             main_pool_free(compressed);
@@ -429,29 +427,28 @@ void *load_segment_decompress_heap(u32 segment, u8 *srcStart, u8 *srcEnd) {
     dma_read(gDecompressionHeap, srcStart, srcEnd);
     set_segment_base_addr(segment, gDecompressionHeap);
 #else
-#ifdef GZIP
+ #ifdef GZIP
     u32 compSize = (srcEnd - 4 - srcStart);
-#else
-    u32 compSize = ALIGN16(srcEnd - srcStart);
-#endif
     u8 *compressed = main_pool_alloc(compSize, MEMORY_POOL_RIGHT);
-#ifdef GZIP
     // Decompressed size from end of gzip
     u32 *size = (u32 *) (compressed + compSize);
-#endif
+ #else
+    u32 compSize = ALIGN16(srcEnd - srcStart);
+    u8 *compressed = main_pool_alloc(compSize, MEMORY_POOL_RIGHT);
+ #endif
     if (compressed != NULL) {
         dma_read(compressed, srcStart, srcEnd);
-#ifdef GZIP
+ #ifdef GZIP
         expand_gzip(compressed, gDecompressionHeap, compSize, (u32)size);
-#elif RNC1
+ #elif RNC1
         Propack_UnpackM1(compressed, gDecompressionHeap);
-#elif RNC2
+ #elif RNC2
         Propack_UnpackM2(compressed, gDecompressionHeap);
-#elif YAY0
+ #elif YAY0
         slidstart(compressed, gDecompressionHeap);
-#elif MIO0
+ #elif MIO0
         decompress(compressed, gDecompressionHeap);
-#endif
+ #endif
         set_segment_base_addr(segment, gDecompressionHeap);
         main_pool_free(compressed);
     }
