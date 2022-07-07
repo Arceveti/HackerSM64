@@ -1576,22 +1576,20 @@ void sequence_channel_process_script(struct SequenceChannel *seqChannel) {
                             break;
                         state->pc += temp;
                         break;
-#endif
 
-#if defined(VERSION_EU) || defined(VERSION_SH)
                     case 0xf1: // chan_reservenotes
-#else
+#else // !(VERSION_EU || VERSION_SH)
                     case 0xf2: // chan_reservenotes
-#endif
+#endif // !(VERSION_EU || VERSION_SH)
                         note_pool_clear(&seqChannel->notePool);
                         note_pool_fill(&seqChannel->notePool, m64_read_u8(state));
                         break;
 
 #if defined(VERSION_EU) || defined(VERSION_SH)
                     case 0xf0: // chan_unreservenotes
-#else
+#else // !(VERSION_EU || VERSION_SH)
                     case 0xf1: // chan_unreservenotes
-#endif
+#endif // !(VERSION_EU || VERSION_SH)
                         note_pool_clear(&seqChannel->notePool);
                         break;
 
@@ -1606,10 +1604,10 @@ void sequence_channel_process_script(struct SequenceChannel *seqChannel) {
                             seqData = (*seqChannel->dynTable)[value];
                             sp38 = (u16)((seqData[0] << 8) + seqData[1]);
                             seqChannel->dynTable = (void *) (seqPlayer->seqData + sp38);
-#else
+#else // !(VERSION_EU || VERSION_SH)
                             sp5A = (u16)((((*seqChannel->dynTable)[value])[0] << 8) + (((*seqChannel->dynTable)[value])[1]));
                             seqChannel->dynTable = (void *) (seqPlayer->seqData + sp5A);
-#endif
+#endif // !(VERSION_EU || VERSION_SH)
                         }
                         break;
 
@@ -1624,11 +1622,11 @@ void sequence_channel_process_script(struct SequenceChannel *seqChannel) {
                         loBits = *(sp38 + gAlBankSets);
                         cmd = gAlBankSets[(s32)sp38 + loBits - cmd];
 
-#ifdef VERSION_SH
+ #ifdef VERSION_SH
                         if (get_bank_or_seq(1, 2, cmd) != NULL)
-#else
+ #else // !VERSION_SH
                         if (get_bank_or_seq(&gBankLoadedPool, 2, cmd) != NULL)
-#endif
+ #endif // !VERSION_SH
                         {
                             seqChannel->bankId = cmd;
                         } else {
@@ -1636,7 +1634,7 @@ void sequence_channel_process_script(struct SequenceChannel *seqChannel) {
                         }
                         // fallthrough
                         FALL_THROUGH;
-#endif
+#endif // (VERSION_EU || VERSION_SH)
 
                     case 0xc1: // chan_setinstr ("set program"?)
                         set_instrument(seqChannel, m64_read_u8(state));
@@ -1654,14 +1652,14 @@ void sequence_channel_process_script(struct SequenceChannel *seqChannel) {
                         sequence_channel_set_volume(seqChannel, m64_read_u8(state));
 #if defined(VERSION_EU) || defined(VERSION_SH)
                         seqChannel->changes.as_bitfields.volume = TRUE;
-#endif
+#endif // (VERSION_EU || VERSION_SH)
                         break;
 
                     case 0xe0: // chan_setvolscale
                         seqChannel->volumeScale = FLOAT_CAST(m64_read_u8(state)) / 128.0f;
 #if defined(VERSION_EU) || defined(VERSION_SH)
                         seqChannel->changes.as_bitfields.volume = TRUE;
-#endif
+#endif // (VERSION_EU || VERSION_SH)
                         break;
 
                     case 0xde: // chan_freqscale; pitch bend using raw frequency multiplier N/2^15 (N is u16)
@@ -1669,7 +1667,7 @@ void sequence_channel_process_script(struct SequenceChannel *seqChannel) {
                         seqChannel->freqScale = FLOAT_CAST(sp5A) / 32768.0f;
 #if defined(VERSION_EU) || defined(VERSION_SH)
                         seqChannel->changes.as_bitfields.freqScale = TRUE;
-#endif
+#endif // (VERSION_EU || VERSION_SH)
                         break;
 
                     case 0xd3: // chan_pitchbend; pitch bend by <= 1 octave in either direction (-127..127)
@@ -1682,7 +1680,7 @@ void sequence_channel_process_script(struct SequenceChannel *seqChannel) {
                         seqChannel->freqScale = gPitchBendFrequencyScale[cmd];
 #if defined(VERSION_EU) || defined(VERSION_SH)
                         seqChannel->changes.as_bitfields.freqScale = TRUE;
-#endif
+#endif // (VERSION_EU || VERSION_SH)
                         break;
 
 #ifdef VERSION_SH
@@ -1691,24 +1689,24 @@ void sequence_channel_process_script(struct SequenceChannel *seqChannel) {
                         seqChannel->freqScale = unk_sh_data_1[cmd];
                         seqChannel->changes.as_bitfields.freqScale = TRUE;
                         break;
-#endif
+#endif // VERSION_SH
 
                     case 0xdd: // chan_setpan
 #if defined(VERSION_EU) || defined(VERSION_SH)
                         seqChannel->newPan = m64_read_u8(state);
                         seqChannel->changes.as_bitfields.pan = TRUE;
-#else
+#else // !(VERSION_EU || VERSION_SH)
                         seqChannel->pan = FLOAT_CAST(m64_read_u8(state)) / 128.0f;
-#endif
+#endif // !(VERSION_EU || VERSION_SH)
                         break;
 
                     case 0xdc: // chan_setpanmix; set proportion of pan to come from channel (0..128)
 #if defined(VERSION_EU) || defined(VERSION_SH)
                         seqChannel->panChannelWeight = m64_read_u8(state);
                         seqChannel->changes.as_bitfields.pan = TRUE;
-#else
+#else // !(VERSION_EU || VERSION_SH)
                         seqChannel->panChannelWeight = FLOAT_CAST(m64_read_u8(state)) / 128.0f;
-#endif
+#endif // !(VERSION_EU || VERSION_SH)
                         break;
 
                     case 0xdb: // chan_transpose; set transposition in semitones
@@ -1738,14 +1736,14 @@ void sequence_channel_process_script(struct SequenceChannel *seqChannel) {
                         break;
 
                     case 0xe2: // chan_setvibratoextentlinear
-                        seqChannel->vibratoExtentStart = m64_read_u8(state) * 8;
-                        seqChannel->vibratoExtentTarget = m64_read_u8(state) * 8;
+                        seqChannel->vibratoExtentStart       = m64_read_u8(state) *  8;
+                        seqChannel->vibratoExtentTarget      = m64_read_u8(state) *  8;
                         seqChannel->vibratoExtentChangeDelay = m64_read_u8(state) * 16;
                         break;
 
                     case 0xe1: // chan_setvibratoratelinear
-                        seqChannel->vibratoRateStart = m64_read_u8(state) * 32;
-                        seqChannel->vibratoRateTarget = m64_read_u8(state) * 32;
+                        seqChannel->vibratoRateStart       = m64_read_u8(state) * 32;
+                        seqChannel->vibratoRateTarget      = m64_read_u8(state) * 32;
                         seqChannel->vibratoRateChangeDelay = m64_read_u8(state) * 16;
                         break;
 
@@ -1823,13 +1821,13 @@ void sequence_channel_process_script(struct SequenceChannel *seqChannel) {
                     case 0xcd:
                         sequence_channel_disable(seqPlayer->channels[m64_read_u8(state)]);
                         break;
-#endif
+#endif // VERSION_SH
 
                     case 0xca: // chan_setmutebhv
                         seqChannel->muteBehavior = m64_read_u8(state);
 #ifdef VERSION_SH
                         seqChannel->changes.as_bitfields.volume = TRUE;
-#endif
+#endif // VERSION_SH
                         break;
 
                     case 0xcb: // chan_readseq
@@ -1848,7 +1846,7 @@ void sequence_channel_process_script(struct SequenceChannel *seqChannel) {
                         seqData[0] = (seqChannel->unkC8 >> 8) & 0xffff;
                         seqData[1] = (seqChannel->unkC8) & 0xffff;
                         break;
-#endif
+#endif // VERSION_SH
 
                     case 0xd0: // chan_stereoheadseteffects
                         seqChannel->stereoHeadsetEffects = m64_read_u8(state);
@@ -1876,9 +1874,8 @@ void sequence_channel_process_script(struct SequenceChannel *seqChannel) {
                             if (state->depth >= 4) {
                                 eu_stubbed_printf_0("Audio:Track: CTBLCALL Macro Level Over Error!\n");
                             }
-#endif
+
                             seqData = (*seqChannel->dynTable)[value];
-#if defined(VERSION_EU) || defined(VERSION_SH)
                             state->stack[state->depth++] = state->pc;
                             sp38 = (u16)((seqData[0] << 8) + seqData[1]);
                             state->pc = seqPlayer->seqData + sp38;
@@ -1887,6 +1884,7 @@ void sequence_channel_process_script(struct SequenceChannel *seqChannel) {
                                 eu_stubbed_printf_3("Err :Sub %x ,address %x:Undefined SubTrack Function %x", seqChannel, state->pc, sp38);
                             }
 #else
+                            seqData = (*seqChannel->dynTable)[value];
                             state->depth++, state->stack[state->depth - 1] = state->pc;
                             sp5A = ((seqData[0] << 8) + seqData[1]);
                             state->pc = seqPlayer->seqData + sp5A;
@@ -1936,7 +1934,7 @@ void sequence_channel_process_script(struct SequenceChannel *seqChannel) {
                         break;
 
                     case 0xe9: // chan_setnotepriority
-#ifdef VERSION_SH
+ #ifdef VERSION_SH
                         cmd = m64_read_u8(state);
                         if ((cmd & 0xf) != 0) {
                             seqChannel->notePriority = cmd & 0xf;
@@ -1945,11 +1943,11 @@ void sequence_channel_process_script(struct SequenceChannel *seqChannel) {
                         if (cmd != 0) {
                             seqChannel->unkSH06 = cmd;
                         }
-#else
+ #else // VERSION_EU
                         seqChannel->notePriority = m64_read_u8(state);
-#endif
+ #endif // VERSION_EU
                         break;
-#endif
+#endif // (VERSION_EU || VERSION_SH)
 #ifdef VERSION_SH
                     case 0xed:
                         seqChannel->synthesisVolume = m64_read_u8(state);
@@ -2001,7 +1999,7 @@ void sequence_channel_process_script(struct SequenceChannel *seqChannel) {
                     case 0xb6:
                         value = (*seqChannel->dynTable)[0][value];
                         break;
-#endif
+#endif // VERSION_SH
                 }
             } else {
 #ifdef VERSION_SH
@@ -2036,7 +2034,7 @@ void sequence_channel_process_script(struct SequenceChannel *seqChannel) {
                             break;
                     }
                 } else {
-#endif
+#endif // VERSION_SH
                 loBits = cmd & 0xf;
 
                 switch (cmd & 0xf0) {
@@ -2050,18 +2048,18 @@ void sequence_channel_process_script(struct SequenceChannel *seqChannel) {
                         if (func_sh_802f47c8(seqChannel->bankId, (u8)value, &seqChannel->soundScriptIO[loBits]) == -1) {
                         }
                         break;
-#else
+#else // !VERSION_SH
                     case 0x00: // chan_testlayerfinished
                         if (seqChannel->layers[loBits] != NULL) {
                             value = seqChannel->layers[loBits]->finished;
                         }
-#ifdef VERSION_EU
+ #ifdef VERSION_EU
                         else {
                             value = -1;
                         }
-#endif
+ #endif
                         break;
-#endif
+#endif // !VERSION_SH
 
                     // sh: 0x70
                     case 0x70: // chan_iowriteval; write data back to audio lib
@@ -2085,12 +2083,12 @@ void sequence_channel_process_script(struct SequenceChannel *seqChannel) {
                         break;
 
 #ifndef VERSION_SH
-#ifdef VERSION_EU
+ #ifdef VERSION_EU
                     // sh: 0x00
                     case 0x60: // chan_delayshort
                         seqChannel->delay = loBits;
                         goto out;
-#endif
+ #endif // VERSION_EU
 
                     case 0x90: // chan_setlayer
                         sp5A = m64_read_s16(state);
@@ -2111,12 +2109,12 @@ void sequence_channel_process_script(struct SequenceChannel *seqChannel) {
                         }
                         break;
 
-#ifndef VERSION_EU
+ #ifndef VERSION_EU
                     case 0x60: // chan_setnotepriority (arg must be >= 2)
                         seqChannel->notePriority = loBits;
                         break;
-#endif
-#endif
+ #endif // !VERSION_EU
+#endif // !VERSION_SH
 
 #ifdef VERSION_SH
                     case 0x20:
