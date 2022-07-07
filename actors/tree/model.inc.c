@@ -68,7 +68,7 @@ const Gfx tree_seg3_dl_bubbly[] = {
     gsDPSetCombineMode(G_CC_DECALRGBA, G_CC_DECALRGBA),
     gsSPBranchList(tree_seg3_sub_dl_bubbly),
 };
-//! These shouldn't need to be separate. However, silhouette moment.
+//! These shouldn't need to be separate. However, silhouette only works with certain render modes.
 const Gfx tree_seg3_dl_bubbly_transparent[] = {
     gsDPPipeSync(),
     gsDPSetCombineMode(G_CC_DECALFADEA, G_CC_DECALFADEA),
@@ -115,7 +115,7 @@ const Gfx tree_seg3_dl_spiky[] = {
     gsDPSetCombineMode(G_CC_DECALRGBA, G_CC_DECALRGBA),
     gsSPBranchList(tree_seg3_sub_dl_spiky),
 };
-//! These shouldn't need to be separate. However, silhouette moment.
+//! These shouldn't need to be separate. However, silhouette only works with certain render modes.
 const Gfx tree_seg3_dl_spiky_transparent[] = {
     gsDPPipeSync(),
     gsDPSetCombineMode(G_CC_DECALFADEA, G_CC_DECALFADEA),
@@ -154,7 +154,7 @@ const Gfx tree_seg3_dl_snowy_pine[] = {
     gsDPSetCombineMode(G_CC_DECALRGBA, G_CC_DECALRGBA),
     gsSPBranchList(tree_seg3_sub_dl_snowy_pine),
 };
-//! These shouldn't need to be separate. However, silhouette moment.
+//! These shouldn't need to be separate. However, silhouette only works with certain render modes.
 const Gfx tree_seg3_dl_snowy_pine_transparent[] = {
     gsDPPipeSync(),
     gsDPSetCombineMode(G_CC_DECALFADEA, G_CC_DECALFADEA),
@@ -201,7 +201,7 @@ const Gfx tree_seg3_dl_palm[] = {
     gsDPSetCombineMode(G_CC_DECALRGBA, G_CC_DECALRGBA),
     gsSPBranchList(tree_seg3_sub_dl_palm),
 };
-//! These shouldn't need to be separate. However, silhouette moment.
+//! These shouldn't need to be separate. However, silhouette only works with certain render modes.
 const Gfx tree_seg3_dl_palm_transparent[] = {
     gsDPPipeSync(),
     gsDPSetCombineMode(G_CC_DECALFADEA, G_CC_DECALFADEA),
