@@ -479,7 +479,7 @@ Gfx *geo_mario_hand_foot_scaler(s32 callContext, struct GraphNode *node, UNUSED 
         scaleNode->scale = 1.0f;
         if (asGenerated->parameter == (bodyState->punchState >> PUNCH_STATE_TIMER_SIZE)) {
             if (sMarioAttackAnimCounter != gAreaUpdateCounter && (bodyState->punchState & PUNCH_STATE_TIMER_MASK) > 0) {
-                bodyState->punchState -= 1;
+                bodyState->punchState--;
                 sMarioAttackAnimCounter = gAreaUpdateCounter;
             }
             scaleNode->scale =
