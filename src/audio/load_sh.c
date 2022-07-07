@@ -1432,8 +1432,7 @@ void func_sh_802f5310(s32 bankId, struct AudioBank *mem, struct PatchStruct *pat
     D_SH_8034F688 = 0;
     if (D_SH_8034F68C != 0 && sp4C == 0) {
         temp_s0 = D_SH_8034EC88[D_SH_8034F68C - 1].sample;
-        temp = (temp_s0->size >> 12);
-        temp += 1;
+        temp = (temp_s0->size >> 12) + 1;
         count = (uintptr_t) temp_s0->sampleAddr;
         func_sh_802f4cb4(
             count,
@@ -1474,26 +1473,25 @@ s32 func_sh_802f573c(s32 audioResetStatus) {
             D_SH_8034EC88[idx].isFree = TRUE;
         }
 
-next:
-        if (D_SH_8034F68C > 0) {
+        while (D_SH_8034F68C > 0) {
             if (D_SH_8034EC88[D_SH_8034F68C - 1].isFree) {
                 D_SH_8034F68C--;
-                goto next;
+                continue;
             }
             sample = D_SH_8034EC88[D_SH_8034F68C - 1].sample;
             sampleAddr = sample->sampleAddr;
             size = sample->size;
-            unk = size >> 0xC;
-            unk += 1;
+            unk = (size >> 0xC) + 1;
             added = ((sampleAddr + size) + sample->medium);
             if (added != D_SH_8034EC88[D_SH_8034F68C - 1].endAndMediumIdentification) {
                 D_SH_8034EC88[D_SH_8034F68C - 1].isFree = TRUE;
                 D_SH_8034F68C--;
-                goto next;
+                continue;
             }
             size = sample->size;
             func_sh_802f4cb4((uintptr_t) sampleAddr, D_SH_8034EC88[D_SH_8034F68C - 1].ramAddr, size, sample->medium,
                              unk, &gUnkQueue2, D_SH_8034EC88[D_SH_8034F68C - 1].encodedInfo);
+            break;   
         }
     }
     return TRUE;

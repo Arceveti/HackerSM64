@@ -2046,12 +2046,11 @@ void sequence_channel_process_script(struct SequenceChannel *seqChannel) {
                     case chan_testlayerfinished: // chan_testlayerfinished
                         if (seqChannel->layers[loBits] != NULL) {
                             value = seqChannel->layers[loBits]->finished;
-                        }
  #ifdef VERSION_EU
-                        else {
+                        } else {
                             value = -1;
-                        }
  #endif
+                        }
                         break;
 #endif // !VERSION_SH
 

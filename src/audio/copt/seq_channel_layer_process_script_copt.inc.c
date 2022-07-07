@@ -15,7 +15,7 @@
 #if COPT
 #define M64_READ_U8(state, dst) \
     dst = m64_read_u8(state);
-#else
+#else // !COPT
 #define M64_READ_U8(state, dst) \
 {                               \
     u8 * _ptr_pc;               \
@@ -25,13 +25,13 @@
     _pc = *_ptr_pc;             \
     dst = _pc;                  \
 }
-#endif
+#endif // !COPT
 
 #if COPT
 #define M64_READ_S16(state, dst) \
     dst = m64_read_s16(state);
-#else
-#define M64_READ_S16(state, dst)    \
+#else // !COPT
+#define M64_READ_S16(state, dst)   \
 {                                   \
     s16 _ret;                       \
     _ret = *(*state).pc << 8;       \
@@ -40,11 +40,11 @@
     ((*state).pc)++;                \
     dst = _ret;                     \
 }
-#endif
+#endif // !COPT
 #if COPT
 #define M64_READ_COMPRESSED_U16(state, dst) \
     dst = m64_read_compressed_u16(state);
-#else
+#else // !COPT
 #define M64_READ_COMPRESSED_U16(state, dst) \
 {                                           \
     u16 ret = *(state->pc++);               \
@@ -54,12 +54,12 @@
     }                                       \
     dst = ret;                              \
 }
-#endif
+#endif // !COPT
 
 #if COPT
 #define GET_INSTRUMENT(seqChannel, instId, _instOut, _adsr, dst, l) \
     dst = get_instrument(seqChannel, instId, _instOut, _adsr);
-#else
+#else // !COPT
 #define GET_INSTRUMENT(seqChannel, instId, _instOut, _adsr, dst, l) \
 { \
 struct AdsrSettings *adsr = _adsr; \
@@ -102,7 +102,7 @@ struct Instrument **instOut = _instOut;\
     *instOut = NULL; \
     ret ## l: ; \
 }
-#endif
+#endif // !COPT
 
 void seq_channel_layer_process_script(struct SequenceChannelLayer *layer) {
     struct M64ScriptState *state;
@@ -295,22 +295,21 @@ void seq_channel_layer_process_script(struct SequenceChannelLayer *layer) {
                     vel = *((*state).pc++);
                     layer->noteDuration = *((*state).pc++);
                     layer->playPercentage = sp3A;
-                    goto l1090;
+                    break;
 
                 case 0x40: // layer_note1 (play percentage, velocity)
                     M64_READ_COMPRESSED_U16(state, sp3A);
                     vel = *((*state).pc++);
                     layer->noteDuration = 0;
                     layer->playPercentage = sp3A;
-                    goto l1090;
+                    break;
 
                 case 0x80: // layer_note2 (velocity, duration; uses last play percentage)
                     sp3A = layer->playPercentage;
                     vel = *((*state).pc++);
                     layer->noteDuration = *((*state).pc++);
-                    goto l1090;
+                    break;
             }
-l1090:
             cmdSemitone = cmd - (cmd & 0xc0);
             layer->velocitySquare = vel * vel;
         } else {
@@ -318,17 +317,16 @@ l1090:
                 case 0x00: // play note, type 0 (play percentage)
                     M64_READ_COMPRESSED_U16(state, sp3A);
                     layer->playPercentage = sp3A;
-                    goto l1138;
+                    break;
 
                 case 0x40: // play note, type 1 (uses default play percentage)
                     sp3A = layer->shortNoteDefaultPlayPercentage;
-                    goto l1138;
+                    break;
 
                 case 0x80: // play note, type 2 (uses last play percentage)
                     sp3A = layer->playPercentage;
-                    goto l1138;
+                    break;
             }
-l1138:
 
             cmdSemitone = cmd - (cmd & 0xc0);
         }
@@ -402,15 +400,14 @@ l1138:
                             case PORTAMENTO_MODE_5:
                                 sp24 = temp_f2;
                                 freqScale = temp_f12;
-                                goto l13cc;
+                                break;
 
                             case PORTAMENTO_MODE_2:
                             case PORTAMENTO_MODE_4:
                                 freqScale = temp_f2;
                                 sp24 = temp_f12;
-                                goto l13cc;
+                                break;
                         }
-l13cc:
                         portamento->extent = sp24 / freqScale - 1.0f;
                         if (PORTAMENTO_IS_SPECIAL((*layer).portamento)) {
                             portamento->speed = 32512.0f * FLOAT_CAST((*seqPlayer).tempo)

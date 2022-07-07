@@ -530,7 +530,8 @@ u64 *synthesis_process_note(s32 noteIndex, struct NoteSubEu *noteSubEu, struct N
                         sp88 = 0x10;
                         sp84 = 0;
                         break;
-                    case CODEC_SKIP: goto skip;
+                    case CODEC_SKIP:
+                        goto skip;
                 }
                 if (t0 != 0) {
                     temp = (synthesisState->samplePosInt + sp88 - s2) / 16;
