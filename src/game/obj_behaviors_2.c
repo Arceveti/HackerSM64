@@ -46,7 +46,6 @@
 #include "seq_ids.h"
 #include "spawn_sound.h"
 #include "puppylights.h"
-#include "farcall_helpers.h"
 
 //! TODO: remove static
 

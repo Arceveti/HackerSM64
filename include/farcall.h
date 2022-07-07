@@ -41,10 +41,6 @@ If you have code in a groupX_geo.c file, you must load it in level scripts by do
 
 LOAD_RAW_WITH_CODE(SEGMENT_GROUPA_GEO, _group3_geoSegmentRomStart,  _group3_geoSegmentRomEnd, _group3_geoSegmentNoloadStart, _group3_geoSegmentNoloadEnd),
 
-For convenience, included is a new header: src/game/obj_behaviors_2_nonstatic.h. In addition to effectively removing
-  the static keyword from object_behaviors_2.c, this header defines prototypes for all functions in that file. This
-  allows you to reference those functions elsewhere, which is convenient for segmented behavior callbacks.
-
 Notes:
  - As of right now, Fast64 will not retain LOAD_RAW_WITH_CODE commands in the level script.
      This means that you will have to readd those on each export, but this may change in a future Fast64 version.
