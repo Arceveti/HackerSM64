@@ -48,6 +48,9 @@ struct Controller {
 #endif
 };
 
+// -- String --
+typedef u8 String[];
+
 // -- Booleans --
 typedef u8  Bool8;
 typedef u16 Bool16;
