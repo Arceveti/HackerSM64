@@ -18,12 +18,12 @@ enum PortamentoModes {
 };
 
 enum SeqChannelCommands {
-#if !defined(VERSION_EU) && !defined(VERSION_SH)
     chan_end = 0xff,
-    chan_hang = 0xf3,
-#endif
     chan_delay1 = 0xfe,
     chan_delay = 0xfd,
+#if !defined(VERSION_EU) && !defined(VERSION_SH)
+    chan_hang = 0xf3,
+#endif
 #ifdef VERSION_SH
     chan_unk_0xb0_threshold = 0xb0,
 #else
