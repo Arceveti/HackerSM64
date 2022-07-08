@@ -375,8 +375,7 @@ u64 *synthesis_save_reverb_ring_buffer(u64 *cmd, u16 addr, u16 destOffset, s32 l
 }
 
 void synthesis_load_note_subs_eu(s32 updateIndex) {
-    struct NoteSubEu *src;
-    struct NoteSubEu *dest;
+    struct NoteSubEu *src, *dest;
     s32 i;
 
     for (i = 0; i < gMaxSimultaneousNotes; i++) {
@@ -412,14 +411,23 @@ u64 *synthesis_execute(u64 *cmdBuf, s32 *writtenCmds, s16 *aiBuf, s32 bufLen) {
             // self-assignment has no affect when added here, could possibly simplify a macro definition
             chunkLen = bufLen;
             leftVolRamp = gLeftVolRampings[nextVolRampTable];
-            rightVolRamp = gRightVolRampings[nextVolRampTable & 0xFFFFFFFF];
+            rightVolRamp = gRightVolRampings[nextVolRampTable];
         } else {
             if (bufLen / i >= gAudioBufferParameters.samplesPerUpdateMax) {
-                chunkLen = gAudioBufferParameters.samplesPerUpdateMax; nextVolRampTable = 2; leftVolRamp = gLeftVolRampings[2]; rightVolRamp = gRightVolRampings[2];
+                chunkLen = gAudioBufferParameters.samplesPerUpdateMax;
+                nextVolRampTable = 2;
+                leftVolRamp = gLeftVolRampings[2];
+                rightVolRamp = gRightVolRampings[2];
             } else if (bufLen / i <= gAudioBufferParameters.samplesPerUpdateMin) {
-                chunkLen = gAudioBufferParameters.samplesPerUpdateMin; nextVolRampTable = 0; leftVolRamp = gLeftVolRampings[0]; rightVolRamp = gRightVolRampings[0];
+                chunkLen = gAudioBufferParameters.samplesPerUpdateMin;
+                nextVolRampTable = 0;
+                leftVolRamp = gLeftVolRampings[0];
+                rightVolRamp = gRightVolRampings[0];
             } else {
-                chunkLen = gAudioBufferParameters.samplesPerUpdate; nextVolRampTable = 1; leftVolRamp = gLeftVolRampings[1]; rightVolRamp = gRightVolRampings[1];
+                chunkLen = gAudioBufferParameters.samplesPerUpdate;
+                nextVolRampTable = 1;
+                leftVolRamp = gLeftVolRampings[1];
+                rightVolRamp = gRightVolRampings[1];
             }
         }
         gCurrentLeftVolRamping = leftVolRamp;
@@ -976,8 +984,7 @@ u64 *synthesis_process_notes(s16 *aiBuf, s32 bufLen, u64 *cmd) {
                         samplesLenAdjusted = samplesLenFixedPoint >> 0x10;
                     } else if ((samplesLenFixedPoint >> 0x10) & 1) {
                         samplesLenAdjusted = ((samplesLenFixedPoint >> 0x10) & ~1) + (curPart * 2);
-                    }
-                    else {
+                    } else {
                         samplesLenAdjusted = (samplesLenFixedPoint >> 0x10);
                     }
 

@@ -294,7 +294,7 @@ void func_802ad7ec(u32 arg0) {
                             chan->reverbVol = cmd->u2.as_s8;
                             break;
                         case 6:
-                            if (cmd->u.s.arg3 < 8) {
+                            if (cmd->u.s.arg3 < SOUND_SCRIPT_IO_SIZE) {
                                 chan->soundScriptIO[cmd->u.s.arg3] = cmd->u2.as_s8;
                             }
                             break;

@@ -1134,9 +1134,9 @@ static u32 get_sound_reverb(UNUSED u8 bank, UNUSED u8 soundIndex, u8 channelInde
         level = 0;
         area = 0;
     } else {
-        level = (gCurrLevelNum > LEVEL_MAX ? LEVEL_MAX : gCurrLevelNum);
+        level = ((gCurrLevelNum > LEVEL_MAX) ? LEVEL_MAX : gCurrLevelNum);
         area = gCurrAreaIndex - 1;
-        if (area > 2) {
+        if (area > 2) { //! is this necessary?
             area = 2;
         }
     }
@@ -1144,7 +1144,7 @@ static u32 get_sound_reverb(UNUSED u8 bank, UNUSED u8 soundIndex, u8 channelInde
     // reverb = reverb adjustment + level reverb + a volume-dependent value
     // The volume-dependent value is 0 when volume is at maximum, and raises to
     // LOW_VOLUME_REVERB when the volume is 0
-    reverb = (u8) gSequencePlayers[SEQ_PLAYER_SFX].channels[channelIndex]->soundScriptIO[5]
+    reverb = (u8) gSequencePlayers[SEQ_PLAYER_SFX].channels[channelIndex]->soundScriptIO[SOUND_SCRIPT_IO_REVERB_ADJUSTMENT]
                   + sLevelAreaReverbs[level][area]
                   + ((1.0f - gSequencePlayers[SEQ_PLAYER_SFX].channels[channelIndex]->volume)
                         * LOW_VOLUME_REVERB);
@@ -1213,8 +1213,8 @@ static void update_game_sound(void) {
                     sSoundBanks[bank][soundIndex].soundStatus = SOUND_STATUS_PLAYING;
 
                     // Begin playing the sound
-                    gSequencePlayers[SEQ_PLAYER_SFX].channels[channelIndex]->soundScriptIO[4] = soundId;
-                    gSequencePlayers[SEQ_PLAYER_SFX].channels[channelIndex]->soundScriptIO[0] = 1;
+                    gSequencePlayers[SEQ_PLAYER_SFX].channels[channelIndex]->soundScriptIO[SOUND_SCRIPT_IO_SOUND_ID] = soundId;
+                    gSequencePlayers[SEQ_PLAYER_SFX].channels[channelIndex]->soundScriptIO[SOUND_SCRIPT_IO_ENABLED] = 1;
 
                     switch (bank) {
                         case SOUND_BANK_MOVING:
@@ -1357,7 +1357,7 @@ static void update_game_sound(void) {
                 } else if (soundStatus == SOUND_STATUS_STOPPED
                            && !gSequencePlayers[SEQ_PLAYER_SFX].channels[channelIndex]->layers[0]->finished) {
                     update_background_music_after_sound(bank, soundIndex);
-                    gSequencePlayers[SEQ_PLAYER_SFX].channels[channelIndex]->soundScriptIO[0] = 0;
+                    gSequencePlayers[SEQ_PLAYER_SFX].channels[channelIndex]->soundScriptIO[SOUND_SCRIPT_IO_ENABLED] = 0;
                     delete_sound_from_bank(bank, soundIndex);
                 }
                 // If sound has finished playing, then delete it

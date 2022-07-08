@@ -30,7 +30,7 @@ struct SPTask *create_next_audio_frame_task(void) {
     OSTask_t *task;
     s32 flags;
     s16 *currAiBuffer;
-    s32 oldDmaCount;
+    // s32 oldDmaCount;
     s32 sp38;
     s32 sp34;
     s32 writtenCmdsCopy;
@@ -56,9 +56,9 @@ struct SPTask *create_next_audio_frame_task(void) {
         }
     }
 
-    oldDmaCount = gCurrAudioFrameDmaCount;
-    if (oldDmaCount > AUDIO_FRAME_DMA_QUEUE_SIZE) {
-    }
+    // oldDmaCount = gCurrAudioFrameDmaCount;
+    // if (oldDmaCount > AUDIO_FRAME_DMA_QUEUE_SIZE) {
+    // }
     gCurrAudioFrameDmaCount = 0;
 
     decrease_sample_dma_ttls();
@@ -332,16 +332,13 @@ void func_802ad7ec(u32 arg0) {
         if (cmd->u.s.op == 0xf8) {
             D_SH_8031509C = 1;
             break;
-        }
-        else if ((cmd->u.s.op & 0xf0) == 0xf0) {
+        } else if ((cmd->u.s.op & 0xf0) == 0xf0) {
             eu_process_audio_cmd(cmd);
-        }
-        else if (cmd->u.s.arg1 < SEQUENCE_PLAYERS) {
+        } else if (cmd->u.s.arg1 < SEQUENCE_PLAYERS) {
             seqPlayer = &gSequencePlayers[cmd->u.s.arg1];
             if ((cmd->u.s.op & 0x80) != 0) {
                 eu_process_audio_cmd(cmd);
-            }
-            else if ((cmd->u.s.op & 0x40) != 0) {
+            } else if ((cmd->u.s.op & 0x40) != 0) {
                 switch (cmd->u.s.op) {
                     case 0x41:
                         if (seqPlayer->fadeVolumeScale != cmd->u2.as_f32) {
@@ -366,8 +363,7 @@ void func_802ad7ec(u32 arg0) {
                         seqPlayer->seqVariationEu[cmd->u.s.arg3] = cmd->u2.as_s8;
                         break;
                 }
-            }
-            else if (seqPlayer->enabled && cmd->u.s.arg2 < 0x10) {
+            } else if (seqPlayer->enabled && cmd->u.s.arg2 < 0x10) {
                 chan = seqPlayer->channels[cmd->u.s.arg2];
                 if (IS_SEQUENCE_CHANNEL_VALID(chan)) {
                     switch (cmd->u.s.op) {
@@ -401,7 +397,7 @@ void func_802ad7ec(u32 arg0) {
                             }
                             break;
                         case 6:
-                            if (cmd->u.s.arg3 < 8) {
+                            if (cmd->u.s.arg3 < SOUND_SCRIPT_IO_SIZE) {
                                 chan->soundScriptIO[cmd->u.s.arg3] = cmd->u2.as_s8;
                             }
                             break;
@@ -419,7 +415,7 @@ void func_802ad7ec(u32 arg0) {
     }
 }
 
-u32 func_sh_802f6878(s32 *arg0) {
+UNUSED u32 func_sh_802f6878(s32 *arg0) {
     u32 sp1C;
 
     if (osRecvMesg(&gUnkQueue1, (OSMesg *) &sp1C, 0) == -1) {
@@ -427,7 +423,7 @@ u32 func_sh_802f6878(s32 *arg0) {
         return 0U;
     }
     *arg0 = (s32) (sp1C & 0xFFFFFF);
-    return sp1C >> 0x18;
+    return (sp1C >> 0x18);
 }
 
 UNUSED u8 *func_sh_802f68e0(u32 index, u32 *a1) {
@@ -445,14 +441,11 @@ UNUSED s32 func_sh_802f6900(void) {
     return sp18 == gAudioResetPresetIdToLoad;
 }
 
-// TODO: (Scrub C)
 void func_sh_802f6958(OSMesg mesg) {
-    s32 a;
     OSMesg recvMesg;
 
-    do {
-        a = -1;
-    } while (osRecvMesg(D_SH_80350FA8, &recvMesg, OS_MESG_NOBLOCK) != a);
+    while (osRecvMesg(D_SH_80350FA8, &recvMesg, OS_MESG_NOBLOCK) != -1) {
+    }
     func_sh_802f6540();
     osSendMesg(D_SH_80350F88, mesg, OS_MESG_NOBLOCK);
 }
@@ -554,4 +547,4 @@ char shindouDebugPrint198[] = "Macro Level Over Error!\n";
 char shindouDebugPrint199[] = "Group:Undefine upper C0h command (%x)\n";
 char shindouDebugPrint200[] = "Group:Undefined Command\n";
 
-#endif
+#endif // VERSION_SH

@@ -78,7 +78,7 @@ void sequence_channel_init(struct SequenceChannel *seqChannel) {
     seqChannel->freqScale = 1.0f;
 #endif
 
-    for (i = 0; i < 8; i++) {
+    for (i = 0; i < SOUND_SCRIPT_IO_SIZE; i++) {
         seqChannel->soundScriptIO[i] = -1;
     }
 

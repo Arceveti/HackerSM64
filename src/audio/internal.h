@@ -417,6 +417,18 @@ struct NoteAttributes {
 #endif
 }; // size = 0x10
 
+enum SoundScriptIOIndex {
+    SOUND_SCRIPT_IO_ENABLED,
+    SOUND_SCRIPT_IO_1,
+    SOUND_SCRIPT_IO_2,
+    SOUND_SCRIPT_IO_3,
+    SOUND_SCRIPT_IO_SOUND_ID,
+    SOUND_SCRIPT_IO_REVERB_ADJUSTMENT,
+    SOUND_SCRIPT_IO_6,
+    SOUND_SCRIPT_IO_7,
+    SOUND_SCRIPT_IO_SIZE,
+};
+
 // Also known as a SubTrack, according to debug strings.
 // Confusingly, a SubTrack is a container of Tracks.
 struct SequenceChannel {
@@ -486,14 +498,14 @@ struct SequenceChannel {
     /*0x40, 0x44*/ struct SequencePlayer *seqPlayer;
     /*0x44, 0x48*/ struct SequenceChannelLayer *layers[LAYERS_MAX];
 #ifndef VERSION_SH
-    /*0x54, 0x58      */ s8 soundScriptIO[8]; // bridge between sound script and audio lib. For player 2,
+    /*0x54, 0x58      */ s8 soundScriptIO[SOUND_SCRIPT_IO_SIZE]; // bridge between sound script and audio lib. For player 2,
     // [0] contains enabled, [4] contains sound ID, [5] contains reverb adjustment
 #endif
     /*0x5C, 0x60*/ struct M64ScriptState scriptState;
     /*0x78, 0x7C*/ struct AdsrSettings adsr;
     /*0x80, 0x84*/ struct NotePool notePool;
 #ifdef VERSION_SH
-    /*            0xC0*/ s8 soundScriptIO[8]; // bridge between sound script and audio lib. For player 2,
+    /*            0xC0*/ s8 soundScriptIO[SOUND_SCRIPT_IO_SIZE]; // bridge between sound script and audio lib. For player 2,
     // [0] contains enabled, [4] contains sound ID, [5] contains reverb adjustment
     /*            0xC8*/ u16 unkC8;
     /*            0xCC*/ s16 *filter;

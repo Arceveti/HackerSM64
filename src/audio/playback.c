@@ -1124,7 +1124,7 @@ void note_init_for_layer(struct Note *note, struct SequenceChannelLayer *seqLaye
     sub->bankId = seqLayer->seqChannel->bankId;
 #endif
     sub->stereoHeadsetEffects = seqLayer->seqChannel->stereoHeadsetEffects;
-    sub->reverbIndex = seqLayer->seqChannel->reverbIndex & 3;
+    sub->reverbIndex = (seqLayer->seqChannel->reverbIndex & 0x3);
 }
 #else
 s32 note_init_for_layer(struct Note *note, struct SequenceChannelLayer *seqLayer) {
