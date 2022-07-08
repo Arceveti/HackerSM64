@@ -3,6 +3,7 @@
 
 #include "debug_utils.h"
 #include "draw_objects.h"
+#include "dynlists/dynlist_macros.h"
 #include "dynlist_proc.h"
 #include "gd_main.h"
 #include "gd_math.h"
@@ -158,170 +159,170 @@ void reset_dynlist(void) {
  *          Normally the dynlist specifically sets an object for return.
  */
 struct GdObj *proc_dynlist(struct DynList *dylist) {
-    if (dylist++->cmd != 0xD1D4) {
+    if (dylist++->cmd != DYNLIST_CMD_BEGIN) {
         fatal_printf("proc_dynlist() not a valid dyn list");
     }
 
-    while (dylist->cmd != 58) {
+    while (dylist->cmd != DYNLIST_CMD_END) {
         switch (dylist->cmd) {
-            case 43:
+            case DYNLIST_CMD_SET_NAME_SUFFIX:
                 d_set_name_suffix(Dyn1AsStr(dylist));
                 break;
-            case 15:
+            case DYNLIST_CMD_MAKE_DYN_OBJ:
                 d_makeobj(Dyn2AsInt(dylist), Dyn1AsName(dylist));
                 break;
-            case 46:
+            case DYNLIST_CMD_MAKE_NET_WITH_SUB_GROUP:
                 d_add_net_with_subgroup(Dyn2AsInt(dylist), Dyn1AsName(dylist));
                 break;
-            case 48:
+            case DYNLIST_CMD_END_NET_WITH_SUB_GROUP:
                 d_end_net_with_subgroup(Dyn1AsName(dylist));
                 break;
-            case 47:
+            case DYNLIST_CMD_MAKE_ATTACHED_JOINT:
                 d_attach_joint_to_net(Dyn2AsInt(dylist), Dyn1AsName(dylist));
                 break;
-            case 16:
+            case DYNLIST_CMD_START_GROUP:
                 d_start_group(Dyn1AsName(dylist));
                 break;
-            case 17:
+            case DYNLIST_CMD_END_GROUP:
                 d_end_group(Dyn1AsName(dylist));
                 break;
-            case 18:
+            case DYNLIST_CMD_ADD_TO_GROUP:
                 d_addto_group(Dyn1AsName(dylist));
                 break;
-            case 30:
+            case DYNLIST_CMD_USE_OBJ:
                 d_use_obj(Dyn1AsName(dylist));
                 break;
-            case 28:
+            case DYNLIST_CMD_LINK_WITH:
                 d_link_with(Dyn1AsName(dylist));
                 break;
-            case 50:
+            case DYNLIST_CMD_MAKE_VAL_PTR:
                 d_add_valptr(Dyn1AsName(dylist), (u32) DynVecY(dylist), Dyn2AsInt(dylist),
                              (size_t) DynVecX(dylist));
                 break;
-            case 29:
+            case DYNLIST_CMD_LINK_WITH_PTR:
                 d_link_with_ptr(Dyn1AsPtr(dylist));
                 break;
-            case 12:
+            case DYNLIST_CMD_CALL_LIST:
                 proc_dynlist(Dyn1AsPtr(dylist));
                 break;
-            case 0:
+            case DYNLIST_CMD_USE_INTEGER_NAMES:
                 d_use_integer_names(Dyn2AsInt(dylist));
                 break;
-            case 1:
+            case DYNLIST_CMD_SET_INITIAL_POSITION:
                 d_set_init_pos(DynVecX(dylist), DynVecY(dylist), DynVecZ(dylist));
                 break;
-            case 2:
+            case DYNLIST_CMD_SET_RELATIVE_POSITION:
                 d_set_rel_pos(DynVecX(dylist), DynVecY(dylist), DynVecZ(dylist));
                 break;
-            case 3:
+            case DYNLIST_CMD_SET_WORLD_POSITION:
                 d_set_world_pos(DynVecX(dylist), DynVecY(dylist), DynVecZ(dylist));
                 break;
-            case 4:
+            case DYNLIST_CMD_SET_NORMAL:
                 d_set_normal(DynVecX(dylist), DynVecY(dylist), DynVecZ(dylist));
                 break;
-            case 5:
+            case DYNLIST_CMD_SET_SCALE:
                 d_set_scale(DynVecX(dylist), DynVecY(dylist), DynVecZ(dylist));
                 break;
-            case 49:
+            case DYNLIST_CMD_MAKE_VERTEX:
                 d_make_vertex(DynVec(dylist));
                 break;
-            case 6:
+            case DYNLIST_CMD_SET_ROTATION:
                 d_set_rotation(DynVecX(dylist), DynVecY(dylist), DynVecZ(dylist));
                 break;
-            case 27:
+            case DYNLIST_CMD_SET_CENTER_OF_GRAVITY:
                 d_center_of_gravity(DynVecX(dylist), DynVecY(dylist), DynVecZ(dylist));
                 break;
-            case 26:
+            case DYNLIST_CMD_SET_SHAPE_OFFSET:
                 d_set_shape_offset(DynVecX(dylist), DynVecY(dylist), DynVecZ(dylist));
                 break;
-            case 44:
+            case DYNLIST_CMD_SET_PARAM_F:
                 d_set_parm_f(Dyn2AsInt(dylist), DynVecX(dylist));
                 break;
-            case 45:
+            case DYNLIST_CMD_SET_PARAM_PTR:
                 d_set_parm_ptr(Dyn2AsInt(dylist), Dyn1AsPtr(dylist));
                 break;
-            case 8:
+            case DYNLIST_CMD_SET_FLAG:
                 d_set_flags(Dyn2AsInt(dylist));
                 break;
-            case 9:
+            case DYNLIST_CMD_CLEAR_FLAG:
                 d_clear_flags(Dyn2AsInt(dylist));
                 break;
-            case 7:
+            case DYNLIST_CMD_SET_DRAW_FLAG:
                 d_set_obj_draw_flag(Dyn2AsInt(dylist));
                 break;
-            case 39:
+            case DYNLIST_CMD_ATTACH:
                 d_attach(Dyn1AsName(dylist));
                 break;
-            case 40:
+            case DYNLIST_CMD_ATTACH_TO:
                 d_attachto_dynid(Dyn2AsInt(dylist), Dyn1AsName(dylist));
                 break;
-            case 41:
+            case DYNLIST_CMD_SET_ATTACH_OFFSET:
                 d_set_att_offset(DynVec(dylist));
                 break;
-            case 21:
+            case DYNLIST_CMD_SET_NODE_GROUP:
                 d_set_nodegroup(Dyn1AsName(dylist));
                 break;
-            case 20:
+            case DYNLIST_CMD_SET_MATERIAL_GROUP:
                 d_set_matgroup(Dyn1AsName(dylist));
                 break;
-            case 22:
+            case DYNLIST_CMD_SET_SKIN_SHAPE:
                 d_set_skinshape(Dyn1AsName(dylist));
                 break;
-            case 23:
+            case DYNLIST_CMD_SET_PLANE_GROUP:
                 d_set_planegroup(Dyn1AsName(dylist));
                 break;
-            case 24:
+            case DYNLIST_CMD_SET_SHAPE_PTR_PTR:
                 d_set_shapeptrptr(Dyn1AsPtr(dylist));
                 break;
-            case 25:
+            case DYNLIST_CMD_SET_SHAPE_PTR:
                 d_set_shapeptr(Dyn1AsName(dylist));
                 break;
-            case 19:
+            case DYNLIST_CMD_SET_TYPE:
                 d_set_type(Dyn2AsInt(dylist));
                 break;
-            case 13:
+            case DYNLIST_CMD_SET_COLOR_NUM:
                 d_set_colour_num(Dyn2AsInt(dylist));
                 break;
-            case 10:
+            case DYNLIST_CMD_SET_FRICTION:
                 d_friction(DynVecX(dylist), DynVecY(dylist), DynVecZ(dylist));
                 break;
-            case 11:
+            case DYNLIST_CMD_SET_SPRING:
                 d_set_spring(DynVecX(dylist));
                 break;
-            case 33:
+            case DYNLIST_CMD_SET_AMBIENT:
                 d_set_ambient(DynVecX(dylist), DynVecY(dylist), DynVecZ(dylist));
                 break;
-            case 34:
+            case DYNLIST_CMD_SET_DIFFUSE:
                 d_set_diffuse(DynVecX(dylist), DynVecY(dylist), DynVecZ(dylist));
                 break;
-            case 31:
+            case DYNLIST_CMD_SET_CONTROL_TYPE:
                 d_set_control_type(Dyn2AsInt(dylist));
                 break;
-            case 32:
+            case DYNLIST_CMD_SET_SKIN_WEIGHT:
                 d_set_skin_weight(Dyn2AsInt(dylist), DynVecX(dylist));
                 break;
-            case 35:
+            case DYNLIST_CMD_SET_ID:
                 d_set_id(Dyn2AsInt(dylist));
                 break;
-            case 36:
+            case DYNLIST_CMD_SET_MATERIAL:
                 d_set_material(Dyn1AsPtr(dylist), Dyn2AsInt(dylist));
                 break;
-            case 37:
+            case DYNLIST_CMD_MAP_MATERIALS:
                 d_map_materials(Dyn1AsName(dylist));
                 break;
-            case 38:
+            case DYNLIST_CMD_MAP_VERTICES:
                 d_map_vertices(Dyn1AsName(dylist));
                 break;
-            case 53:
+            case DYNLIST_CMD_SET_TEXTURE_ST:
                 d_set_texture_st(DynVecX(dylist), DynVecY(dylist));
                 break;
-            case 52:
+            case DYNLIST_CMD_USE_TEXTURE:
                 d_use_texture(Dyn2AsPtr(dylist));
                 break;
-            case 54:
+            case DYNLIST_CMD_MAKE_NET_FROM_SHAPE:
                 d_make_netfromshapeid(Dyn1AsName(dylist));
                 break;
-            case 55:
+            case DYNLIST_CMD_MAKE_NET_FROM_SHAPE_PTR:
                 d_make_netfromshape_ptrptr(Dyn1AsPtr(dylist));
                 break;
             default:
