@@ -214,11 +214,7 @@ void discard_sequence(s32 seqId) {
 
     for (i = 0; i < SEQUENCE_PLAYERS; i++) {
         if (gSequencePlayers[i].enabled && gSequencePlayers[i].seqId == seqId) {
-#if defined(VERSION_EU) || defined(VERSION_SH)
             sequence_player_disable(&gSequencePlayers[i]);
-#else
-            sequence_player_disable(gSequencePlayers + i);
-#endif
         }
     }
 }

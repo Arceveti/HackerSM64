@@ -191,10 +191,10 @@ void eu_process_audio_cmd(struct EuAudioCmd *cmd) {
                 for (i = 0; i < gMaxSimultaneousNotes; i++) {
                     note = &gNotes[i];
                     sub = &note->noteSubEu;
-                    if (note->noteSubEu.enabled && note->unkSH34 == 0) {
-                        if ((note->parentLayer->seqChannel->muteBehavior & 8) != 0) {
-                            sub->finished = TRUE;
-                        }
+                    if (note->noteSubEu.enabled
+                     && (note->unkSH34 == 0)
+                     && (note->parentLayer->seqChannel->muteBehavior & MUTE_BEHAVIOR_3)) {
+                        sub->finished = TRUE;
                     }
                 }
             }

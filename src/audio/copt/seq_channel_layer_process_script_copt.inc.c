@@ -272,11 +272,11 @@ void seq_channel_layer_process_script(struct SequenceChannelLayer *layer) {
             default:
                 switch (cmd & 0xf0) {
                     case layer_setshortnotevelocityfromtable: // layer_setshortnotevelocityfromtable
-                        sp3A = seqPlayer->shortNoteVelocityTable[cmd & 0xf];
+                        sp3A = seqPlayer->shortNoteVelocityTable[cmd & 0x0f];
                         (*layer).velocitySquare = (f32)(sp3A * sp3A);
                         break;
                     case layer_setshortnotedurationfromtable: // layer_setshortnotedurationfromtable
-                        (*layer).noteDuration = seqPlayer->shortNoteDurationTable[cmd & 0xf];
+                        (*layer).noteDuration = seqPlayer->shortNoteDurationTable[cmd & 0x0f];
                         break;
                 }
         }
@@ -333,7 +333,7 @@ void seq_channel_layer_process_script(struct SequenceChannelLayer *layer) {
 
         layer->delay = sp3A;
         layer->duration = layer->noteDuration * sp3A / 256;
-        if ((seqPlayer->muted && (seqChannel->muteBehavior & MUTE_BEHAVIOR_STOP_NOTES) != 0)
+        if ((seqPlayer->muted && (seqChannel->muteBehavior & MUTE_BEHAVIOR_STOP_NOTES))
             || seqChannel->stopSomething2
             || !seqChannel->hasInstrument
         ) {

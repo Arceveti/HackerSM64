@@ -6,28 +6,34 @@
 #include "types.h"
 
 #if defined(VERSION_EU) || defined(VERSION_SH)
-#define SEQUENCE_PLAYERS 4
-#define SEQUENCE_CHANNELS 48
-#define SEQUENCE_LAYERS 64
+    #define SEQUENCE_PLAYERS   4
+    #define SEQUENCE_CHANNELS 48
+    #define SEQUENCE_LAYERS   64
 #else
-#define SEQUENCE_PLAYERS 3
-#define SEQUENCE_CHANNELS 32
-#ifdef VERSION_JP
-#define SEQUENCE_LAYERS 48
-#else
-#define SEQUENCE_LAYERS 52
-#endif
+    #define SEQUENCE_PLAYERS   3
+    #define SEQUENCE_CHANNELS 32
+ #ifdef VERSION_JP
+    #define SEQUENCE_LAYERS 48
+ #else
+    #define SEQUENCE_LAYERS 52
+ #endif
 #endif
 
-#define LAYERS_MAX       4
+#define LAYERS_MAX        4
 #define CHANNELS_MAX     16
 
 #define NO_LAYER ((struct SequenceChannelLayer *)(-1))
 
 enum MuteBehaviors {
-    MUTE_BEHAVIOR_STOP_SCRIPT = (1 << 7), // 0x80 // stop processing sequence/channel scripts
-    MUTE_BEHAVIOR_STOP_NOTES  = (1 << 6), // 0x40 // prevent further notes from playing
+    MUTE_BEHAVIOR_NONE        = 0x0,
+    MUTE_BEHAVIOR_0           = (1 << 0), // 0x01 // 
+    MUTE_BEHAVIOR_1           = (1 << 1), // 0x02 // 
+    MUTE_BEHAVIOR_2           = (1 << 2), // 0x04 // 
+    MUTE_BEHAVIOR_3           = (1 << 3), // 0x08 // 
+    MUTE_BEHAVIOR_4           = (1 << 4), // 0x10 // 
     MUTE_BEHAVIOR_SOFTEN      = (1 << 5), // 0x20 // lower volume, by default to half
+    MUTE_BEHAVIOR_STOP_NOTES  = (1 << 6), // 0x40 // prevent further notes from playing
+    MUTE_BEHAVIOR_STOP_SCRIPT = (1 << 7), // 0x80 // stop processing sequence/channel scripts
 };
 
 enum SequencePlayerStates {

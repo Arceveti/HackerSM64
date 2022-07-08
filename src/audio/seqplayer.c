@@ -200,7 +200,7 @@ void sequence_player_init_channels(struct SequencePlayer *seqPlayer, u16 channel
     s32 i;
 
     for (i = 0; i < CHANNELS_MAX; i++) {
-        if (channelBits & 1) {
+        if (channelBits & 0x1) {
             seqChannel = seqPlayer->channels[i];
             if (IS_SEQUENCE_CHANNEL_VALID(seqChannel) && seqChannel->seqPlayer == seqPlayer) {
                 sequence_channel_disable(seqChannel);
@@ -230,7 +230,7 @@ void sequence_player_disable_channels(struct SequencePlayer *seqPlayer, u16 chan
 
     eu_stubbed_printf_0("SUBTRACK DIM\n");
     for (i = 0; i < CHANNELS_MAX; i++) {
-        if (channelBits & 1) {
+        if (channelBits & 0x1) {
             seqChannel = seqPlayer->channels[i];
             if (IS_SEQUENCE_CHANNEL_VALID(seqChannel)) {
                 if (seqChannel->seqPlayer == seqPlayer) {
@@ -291,7 +291,7 @@ void sequence_player_disable(struct SequencePlayer *seqPlayer) {
 
     if (IS_SEQ_LOAD_COMPLETE(seqPlayer->seqId)
 #ifdef VERSION_SH
-        && gSeqLoadStatus[seqPlayer->seqId] != 5
+        && gSeqLoadStatus[seqPlayer->seqId] != SOUND_LOAD_STATUS_5
 #endif
     ) {
         gSeqLoadStatus[seqPlayer->seqId] = SOUND_LOAD_STATUS_DISCARDABLE;
@@ -299,11 +299,11 @@ void sequence_player_disable(struct SequencePlayer *seqPlayer) {
 
     if (IS_BANK_LOAD_COMPLETE(seqPlayer->defaultBank[0])
 #ifdef VERSION_SH
-        && gBankLoadStatus[seqPlayer->defaultBank[0]] != 5
+        && gBankLoadStatus[seqPlayer->defaultBank[0]] != SOUND_LOAD_STATUS_5
 #endif
     ) {
 #ifdef VERSION_SH
-        gBankLoadStatus[seqPlayer->defaultBank[0]] = 4;
+        gBankLoadStatus[seqPlayer->defaultBank[0]] = SOUND_LOAD_STATUS_4;
 #else
         gBankLoadStatus[seqPlayer->defaultBank[0]] = SOUND_LOAD_STATUS_DISCARDABLE;
 #endif
@@ -645,11 +645,11 @@ void seq_channel_layer_process_script(struct SequenceChannelLayer *layer) {
             default:
                 switch (cmd & 0xf0) {
                     case layer_setshortnotevelocityfromtable: // layer_setshortnotevelocityfromtable
-                        sp3A = seqPlayer->shortNoteVelocityTable[cmd & 0xf];
+                        sp3A = seqPlayer->shortNoteVelocityTable[cmd & 0x0f];
                         layer->velocitySquare = (f32)(sp3A * sp3A);
                         break;
                     case layer_setshortnotedurationfromtable: // layer_setshortnotedurationfromtable
-                        layer->noteDuration = seqPlayer->shortNoteDurationTable[cmd & 0xf];
+                        layer->noteDuration = seqPlayer->shortNoteDurationTable[cmd & 0x0f];
                         break;
                     default:
                         eu_stubbed_printf_1("Audio:Track:NOTE:UNDEFINED NOTE COM. %x\n", cmd);
@@ -716,7 +716,7 @@ void seq_channel_layer_process_script(struct SequenceChannelLayer *layer) {
 
         layer->delay = sp3A;
         layer->duration = layer->noteDuration * sp3A >> 8;
-        if ((seqPlayer->muted && (seqChannel->muteBehavior & MUTE_BEHAVIOR_STOP_NOTES) != 0)
+        if ((seqPlayer->muted && (seqChannel->muteBehavior & MUTE_BEHAVIOR_STOP_NOTES))
             || seqChannel->stopSomething2
  #if defined(VERSION_JP) || defined(VERSION_US)
             || !seqChannel->hasInstrument
@@ -1117,11 +1117,11 @@ s32 seq_channel_layer_process_script_part2(struct SequenceChannelLayer *layer) {
             default:
                 switch (cmd & 0xf0) {
                     case layer_setshortnotevelocityfromtable: // layer_setshortnotevelocityfromtable
-                        sp3A = seqPlayer->shortNoteVelocityTable[cmd & 0xf];
+                        sp3A = seqPlayer->shortNoteVelocityTable[cmd & 0x0f];
                         layer->velocitySquare = (f32) (sp3A * sp3A) / (f32) (127 * 127);
                         break;
                     case layer_setshortnotedurationfromtable: // layer_setshortnotedurationfromtable
-                        layer->noteDuration = seqPlayer->shortNoteDurationTable[cmd & 0xf];
+                        layer->noteDuration = seqPlayer->shortNoteDurationTable[cmd & 0x0f];
                         break;
                     default:
                         eu_stubbed_printf_1("Audio:Track:NOTE:UNDEFINED NOTE COM. %x\n", cmd);
@@ -1323,7 +1323,7 @@ s32 seq_channel_layer_process_script_part3(struct SequenceChannelLayer *layer, s
 
     layer->delay = sp3A;
     layer->duration = layer->noteDuration * sp3A >> 8;
-    if ((seqPlayer->muted && (seqChannel->muteBehavior & 0x50) != 0)
+    if ((seqPlayer->muted && (seqChannel->muteBehavior & (MUTE_BEHAVIOR_0 | MUTE_BEHAVIOR_2)))
         || seqChannel->stopSomething2) {
         layer->stopSomething = TRUE;
         return -1;
@@ -1331,7 +1331,7 @@ s32 seq_channel_layer_process_script_part3(struct SequenceChannelLayer *layer, s
 
     return cmd;
 }
-#endif
+#endif // VERSION_SH
 
 u32 get_instrument(struct SequenceChannel *seqChannel, u8 instId, struct Instrument **instOut, struct AdsrSettings *adsr) {
     struct Instrument *inst;
@@ -1442,7 +1442,7 @@ void sequence_channel_process_script(struct SequenceChannel *seqChannel) {
     }
 
     seqPlayer = seqChannel->seqPlayer;
-    if (seqPlayer->muted && (seqChannel->muteBehavior & MUTE_BEHAVIOR_STOP_SCRIPT) != 0) {
+    if (seqPlayer->muted && (seqChannel->muteBehavior & MUTE_BEHAVIOR_STOP_SCRIPT)) {
         return;
     }
 
@@ -1921,8 +1921,8 @@ void sequence_channel_process_script(struct SequenceChannel *seqChannel) {
                     case chan_setnotepriority: // chan_setnotepriority
  #ifdef VERSION_SH
                         cmd = m64_read_u8(state);
-                        if ((cmd & 0xf) != 0) {
-                            seqChannel->notePriority = cmd & 0xf;
+                        if ((cmd & 0x0f) != 0) {
+                            seqChannel->notePriority = (cmd & 0x0f);
                         }
                         cmd >>= 4;
                         if (cmd != 0) {
@@ -1959,7 +1959,7 @@ void sequence_channel_process_script(struct SequenceChannel *seqChannel) {
                             if (cmd == 0) {
                                 seqChannel->filter = NULL;
                             } else {
-                                loBits = (cmd >> 4) & 0xf;
+                                loBits = ((cmd >> 4) & 0xf);
                                 cmd &= 0xf;
                                 fill_filter(seqChannel->filter, loBits, cmd);
                             }
@@ -1989,7 +1989,7 @@ void sequence_channel_process_script(struct SequenceChannel *seqChannel) {
             } else {
 #ifdef VERSION_SH
                 if (cmd >= 0x80) {
-                    loBits = cmd & 7;
+                    loBits = (cmd & 0x07);
                     switch (cmd & 0xf8) {
                         case chan_unk_0x80_read_finished:
                             if (seqChannel->layers[loBits] != NULL) {
@@ -2020,7 +2020,7 @@ void sequence_channel_process_script(struct SequenceChannel *seqChannel) {
                     }
                 } else {
 #endif // VERSION_SH
-                loBits = cmd & 0xf;
+                loBits = (cmd & 0x0f);
 
                 switch (cmd & 0xf0) {
 #ifdef VERSION_SH
@@ -2225,16 +2225,16 @@ void sequence_player_process_sequence(struct SequencePlayer *seqPlayer) {
 
     // Remove possible SOUND_LOAD_STATUS_DISCARDABLE marks.
 #ifdef VERSION_SH
-    if (gSeqLoadStatus[seqPlayer->seqId] != 5)
+    if (gSeqLoadStatus[seqPlayer->seqId] != SOUND_LOAD_STATUS_5)
 #endif
         gSeqLoadStatus[seqPlayer->seqId] = SOUND_LOAD_STATUS_COMPLETE;
 
 #ifdef VERSION_SH
-    if (gBankLoadStatus[seqPlayer->defaultBank[0]] != 5)
+    if (gBankLoadStatus[seqPlayer->defaultBank[0]] != SOUND_LOAD_STATUS_5)
 #endif
         gBankLoadStatus[seqPlayer->defaultBank[0]] = SOUND_LOAD_STATUS_COMPLETE;
 
-    if (seqPlayer->muted && (seqPlayer->muteBehavior & MUTE_BEHAVIOR_STOP_SCRIPT) != 0) {
+    if (seqPlayer->muted && (seqPlayer->muteBehavior & MUTE_BEHAVIOR_STOP_SCRIPT)) {
         return;
     }
 
@@ -2544,7 +2544,8 @@ void sequence_player_process_sequence(struct SequencePlayer *seqPlayer) {
                         break;
                 }
             } else {
-                loBits = (cmd & 0xf);
+                loBits = (cmd & 0x0f);
+
                 switch (cmd & 0xf0) {
                     case seq_testchdisabled: // seq_testchdisabled
 #if defined(VERSION_EU) || defined(VERSION_SH)
@@ -2623,6 +2624,7 @@ void process_sequences(UNUSED s32 iterationsRemaining) {
     s32 i;
     for (i = 0; i < SEQUENCE_PLAYERS; i++) {
         if (gSequencePlayers[i].enabled) {
+            //! functionally equivalent ifdef, but compiles differently
 #if defined(VERSION_EU) || defined(VERSION_SH)
             sequence_player_process_sequence(&gSequencePlayers[i]);
             sequence_player_process_sound(&gSequencePlayers[i]);
@@ -2666,7 +2668,7 @@ void init_sequence_player(u32 player) {
 #endif
     seqPlayer->transposition = 0;
 #ifndef VERSION_SH
-    seqPlayer->muteBehavior = MUTE_BEHAVIOR_STOP_SCRIPT | MUTE_BEHAVIOR_STOP_NOTES | MUTE_BEHAVIOR_SOFTEN;
+    seqPlayer->muteBehavior = (MUTE_BEHAVIOR_STOP_SCRIPT | MUTE_BEHAVIOR_STOP_NOTES | MUTE_BEHAVIOR_SOFTEN);
 #endif
     seqPlayer->noteAllocPolicy = 0;
     seqPlayer->shortNoteVelocityTable = gDefaultShortNoteVelocityTable;
@@ -2715,7 +2717,7 @@ void init_sequence_players(void) {
         gSequencePlayers[i].seqVariation = -1;
 #endif
 #ifdef VERSION_SH
-        gSequencePlayers[i].muteBehavior = MUTE_BEHAVIOR_STOP_SCRIPT | MUTE_BEHAVIOR_STOP_NOTES | MUTE_BEHAVIOR_SOFTEN;
+        gSequencePlayers[i].muteBehavior = (MUTE_BEHAVIOR_STOP_SCRIPT | MUTE_BEHAVIOR_STOP_NOTES | MUTE_BEHAVIOR_SOFTEN);
         gSequencePlayers[i].enabled = FALSE;
         gSequencePlayers[i].muted = FALSE;
 #endif

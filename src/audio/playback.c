@@ -494,9 +494,9 @@ void process_notes(void) {
                 reverbInfo.reverbVol = playbackState->parentLayer->seqChannel->reverbVol;
                 reverbInfo.synthesisVolume = playbackState->parentLayer->seqChannel->synthesisVolume;
                 reverbInfo.filter = playbackState->parentLayer->seqChannel->filter;
-                bookOffset = playbackState->parentLayer->seqChannel->bookOffset & 0x7;
+                bookOffset = (playbackState->parentLayer->seqChannel->bookOffset & 0x7);
                 if (playbackState->parentLayer->seqChannel->seqPlayer->muted
-                    && (playbackState->parentLayer->seqChannel->muteBehavior & 8)) {
+                    && (playbackState->parentLayer->seqChannel->muteBehavior & MUTE_BEHAVIOR_3)) {
                     reverbInfo.freqScale = 0.0f;
                     reverbInfo.velocity = 0.0f;
                 }
@@ -518,7 +518,7 @@ void process_notes(void) {
                 velocity = playbackState->parentLayer->noteVelocity;
                 pan = playbackState->parentLayer->notePan;
                 reverbVol = playbackState->parentLayer->seqChannel->reverbVol;
-                bookOffset = playbackState->parentLayer->seqChannel->bookOffset & 0x7;
+                bookOffset = (playbackState->parentLayer->seqChannel->bookOffset & 0x7);
             }
 
             frequency *= playbackState->vibratoFreqScale * playbackState->portamentoFreqScale;
@@ -718,7 +718,7 @@ void seq_channel_layer_decay_release_internal(struct SequenceChannelLayer *seqLa
             attributes->reverbVol = seqLayer->seqChannel->reverbVol;
             attributes->synthesisVolume = seqLayer->seqChannel->synthesisVolume;
             attributes->filter = seqLayer->seqChannel->filter;
-            if (seqLayer->seqChannel->seqPlayer->muted && (seqLayer->seqChannel->muteBehavior & 8) != 0) {
+            if (seqLayer->seqChannel->seqPlayer->muted && (seqLayer->seqChannel->muteBehavior & MUTE_BEHAVIOR_3)) {
                 note->noteSubEu.finished = TRUE;
             }
             note->priority = seqLayer->seqChannel->unkSH06;
