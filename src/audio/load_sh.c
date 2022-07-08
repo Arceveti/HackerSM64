@@ -315,7 +315,7 @@ struct AudioBank *load_banks_immediate(s32 seqId, s32 *outDefaultBank) {
     s32 i;
     void *ret = NULL;
 
-    offset = ((u16 *)gAlBankSets)[canonicalize_index(0, seqId)];
+    offset = ((u16 *)gAlBankSets)[canonicalize_index(SOUND_POOL_SEQ, seqId)];
     bank = 0xFF;
     for (i = gAlBankSets[offset++]; i > 0; i--) {
         bank = gAlBankSets[offset++];
@@ -328,7 +328,7 @@ struct AudioBank *load_banks_immediate(s32 seqId, s32 *outDefaultBank) {
 void preload_sequence(u32 seqId, s32 preloadMask) {
     s32 temp;
 
-    seqId = canonicalize_index(0, seqId);
+    seqId = canonicalize_index(SOUND_POOL_SEQ, seqId);
     if (preloadMask & PRELOAD_BANKS) {
         load_banks_immediate(seqId, &temp);
     }
@@ -383,7 +383,7 @@ s32 func_sh_802f3024(s32 bankId, s32 instId, s32 arg2) {
 }
 
 void func_sh_802f30f4(s32 arg0, s32 arg1, s32 arg2, OSMesgQueue *arg3) {
-    if (func_802f3f08(2, canonicalize_index(2, arg0), arg1, arg2, arg3) == 0) {
+    if (func_802f3f08(SOUND_POOL_UNK, canonicalize_index(SOUND_POOL_UNK, arg0), arg1, arg2, arg3) == 0) {
         osSendMesg(arg3, 0, 0);
     }
 }
@@ -392,11 +392,11 @@ void func_sh_802f3158(s32 seqId, s32 numChunks, s32 arg2, OSMesgQueue *retQueue)
     s32 val;
     s32 v;
 
-    val = ((u16 *) gAlBankSets)[canonicalize_index(0, seqId)];
+    val = ((u16 *) gAlBankSets)[canonicalize_index(SOUND_POOL_SEQ, seqId)];
     v = gAlBankSets[val++];
 
     while (v > 0) {
-        func_802f3f08(1, canonicalize_index(1, gAlBankSets[val++]), numChunks, arg2, retQueue);
+        func_802f3f08(SOUND_POOL_BANK, canonicalize_index(SOUND_POOL_BANK, gAlBankSets[val++]), numChunks, arg2, retQueue);
         v--;
     }
 }
@@ -404,7 +404,7 @@ void func_sh_802f3158(s32 seqId, s32 numChunks, s32 arg2, OSMesgQueue *retQueue)
 u8 *func_sh_802f3220(u32 seqId, u32 *a1) {
     s32 val;
 
-    val = ((u16 *) gAlBankSets)[canonicalize_index(0, seqId)];
+    val = ((u16 *) gAlBankSets)[canonicalize_index(SOUND_POOL_SEQ, seqId)];
     *a1 = gAlBankSets[val++];
     if (*a1 == 0) {
         return NULL;
@@ -416,13 +416,13 @@ void func_sh_802f3288(s32 idx) {
     s32 bankId;
     s32 s2;
 
-    idx = ((u16*)gAlBankSets)[canonicalize_index(0, idx)];
+    idx = ((u16*)gAlBankSets)[canonicalize_index(SOUND_POOL_SEQ, idx)];
     s2 = gAlBankSets[idx++];
     while (s2 > 0) {
         s2--;
-        bankId = canonicalize_index(1, gAlBankSets[idx++]);
+        bankId = canonicalize_index(SOUND_POOL_BANK, gAlBankSets[idx++]);
 
-        if (unk_pool1_lookup(1, bankId) == NULL) {
+        if (unk_pool1_lookup(SOUND_POOL_BANK, bankId) == NULL) {
             func_sh_802f3368(bankId);
             if (gBankLoadStatus[bankId] != SOUND_LOAD_STATUS_5) {
                 gBankLoadStatus[bankId] = SOUND_LOAD_STATUS_NOT_LOADED;
@@ -471,7 +471,7 @@ void load_sequence_internal(s32 player, s32 seqId, UNUSED s32 loadAsync) {
 
     seqPlayer = &gSequencePlayers[player];
 
-    seqId = canonicalize_index(0, seqId);
+    seqId = canonicalize_index(SOUND_POOL_SEQ, seqId);
     sequence_player_disable(seqPlayer);
 
     s0 = ((u16 *) gAlBankSets)[seqId];
@@ -497,9 +497,9 @@ void load_sequence_internal(s32 player, s32 seqId, UNUSED s32 loadAsync) {
 }
 
 void *func_sh_802f3564(s32 seqId) {
-    s32 seqId2 = canonicalize_index(0, seqId);
+    s32 seqId2 = canonicalize_index(SOUND_POOL_SEQ, seqId);
     s32 temp;
-    return func_sh_802f3764(0, seqId2, &temp);
+    return func_sh_802f3764(SOUND_POOL_SEQ, seqId2, &temp);
 }
 
 extern u8 gUnkLoadStatus[0x40];
@@ -510,9 +510,9 @@ void *func_sh_802f3598(s32 idx, s32 *medium) {
     s32 temp;
     s32 sp28;
 
-    f = get_audio_file_header(2);
-    idx = canonicalize_index(2, idx);
-    ret = get_bank_or_seq_wrapper(2, idx);
+    f = get_audio_file_header(SOUND_POOL_UNK);
+    idx = canonicalize_index(SOUND_POOL_UNK, idx);
+    ret = get_bank_or_seq_wrapper(SOUND_POOL_UNK, idx);
     if (ret != NULL) {
         if (gUnkLoadStatus[idx] != SOUND_LOAD_STATUS_5) {
             gUnkLoadStatus[idx] = SOUND_LOAD_STATUS_COMPLETE;
@@ -527,7 +527,7 @@ void *func_sh_802f3598(s32 idx, s32 *medium) {
         *medium = f->seqArray[idx].medium;
         return f->seqArray[idx].offset;
     } else {
-        ret = func_sh_802f3764(2, idx, &sp28);
+        ret = func_sh_802f3764(SOUND_POOL_UNK, idx, &sp28);
         if (ret != 0) {
             *medium = 0;
             return ret;
@@ -546,7 +546,7 @@ void *func_sh_802f3688(s32 bankId) {
     s32 sp38;
     struct PatchStruct patchInfo;
 
-    bankId = canonicalize_index(1, bankId);
+    bankId = canonicalize_index(SOUND_POOL_BANK, bankId);
     bankId1 = gCtlEntries[bankId].bankId1;
     bankId2 = gCtlEntries[bankId].bankId2;
 
@@ -565,7 +565,7 @@ void *func_sh_802f3688(s32 bankId) {
         patchInfo.baseAddr2 = NULL;
     }
 
-    ret = func_sh_802f3764(1, bankId, &sp38);
+    ret = func_sh_802f3764(SOUND_POOL_BANK, bankId, &sp38);
 
     if (ret != NULL && sp38 == 1) {
         func_sh_802f5310(bankId, ret, &patchInfo, 0);
@@ -637,19 +637,19 @@ void *func_sh_802f3764(s32 poolIdx, s32 idx, s32 *arg2) {
     }
 
     switch (poolIdx) {
-        case 0:
+        case SOUND_POOL_SEQ:
             if (gSeqLoadStatus[idx] != SOUND_LOAD_STATUS_5) {
                 gSeqLoadStatus[idx] = loadStatus;
             }
             break;
 
-        case 1:
+        case SOUND_POOL_BANK:
             if (gBankLoadStatus[idx] != SOUND_LOAD_STATUS_5) {
                 gBankLoadStatus[idx] = loadStatus;
             }
             break;
 
-        case 2:
+        case SOUND_POOL_UNK:
             if (gUnkLoadStatus[idx] != SOUND_LOAD_STATUS_5) {
                 gUnkLoadStatus[idx] = loadStatus;
             }
@@ -685,13 +685,13 @@ ALSeqFile *get_audio_file_header(s32 poolIdx) {
         default:
             ret = NULL;
             break;
-        case 0:
+        case SOUND_POOL_SEQ:
             ret = gSeqFileHeader;
             break;
-        case 1:
+        case SOUND_POOL_BANK:
             ret = gAlCtlHeader;
             break;
-        case 2:
+        case SOUND_POOL_UNK:
             ret = gAlTbl;
             break;
     }
@@ -820,7 +820,7 @@ s32 func_sh_802f3dd0(OSIoMesg *m, s32 pri, s32 direction, uintptr_t devAddr, voi
     return 0;
 }
 
-void *func_sh_802f3ee8(s32 poolIdx, s32 idx) {
+UNUSED void *func_sh_802f3ee8(s32 poolIdx, s32 idx) {
     s32 temp;
     return func_sh_802f3764(poolIdx, idx, &temp);
 }
@@ -829,17 +829,17 @@ void *func_802f3f08(s32 poolIdx, s32 idx, s32 numChunks, s32 arg3, OSMesgQueue *
     s32 loadStatus;
 
     switch (poolIdx) {
-        case 0: // sequence
+        case SOUND_POOL_SEQ: // sequence
             if (gSeqLoadStatus[idx] == SOUND_LOAD_STATUS_IN_PROGRESS) {
                 return 0;
             }
             break;
-        case 1: // bank
+        case SOUND_POOL_BANK: // bank
             if (gBankLoadStatus[idx] == SOUND_LOAD_STATUS_IN_PROGRESS) {
                 return 0;
             }
             break;
-        case 2: // unknown
+        case SOUND_POOL_UNK: // unknown
             if (gUnkLoadStatus[idx] == SOUND_LOAD_STATUS_IN_PROGRESS) {
                 return 0;
             }
@@ -894,19 +894,19 @@ void *func_802f3f08(s32 poolIdx, s32 idx, s32 numChunks, s32 arg3, OSMesgQueue *
     }
 
     switch (poolIdx) {
-        case 0: // sequence
+        case SOUND_POOL_SEQ: // sequence
             if (gSeqLoadStatus[idx] != SOUND_LOAD_STATUS_5) {
                 gSeqLoadStatus[idx] = loadStatus;
             }
             break;
 
-        case 1: // bank
+        case SOUND_POOL_BANK: // bank
             if (gBankLoadStatus[idx] != SOUND_LOAD_STATUS_5) {
                 gBankLoadStatus[idx] = loadStatus;
             }
             break;
 
-        case 2: // unknown
+        case SOUND_POOL_UNK: // unknown
             if (gUnkLoadStatus[idx] != SOUND_LOAD_STATUS_5) {
                 gUnkLoadStatus[idx] = loadStatus;
             }

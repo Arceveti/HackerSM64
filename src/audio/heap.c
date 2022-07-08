@@ -400,17 +400,17 @@ void *alloc_bank_or_seq(struct SoundMultiPool *loadedPool, s32 arg1, s32 size, s
 
 #ifdef VERSION_SH
     switch (poolIdx) {
-        case 0:
+        case SOUND_POOL_SEQ:
             loadedPool = &gSeqLoadedPool;
             table = gSeqLoadStatus;
             break;
 
-        case 1:
+        case SOUND_POOL_BANK:
             loadedPool = &gBankLoadedPool;
             table = gBankLoadStatus;
             break;
 
-        case 2:
+        case SOUND_POOL_UNK:
             loadedPool = &gUnusedLoadedPool;
             table = gUnkLoadStatus;
             break;
@@ -474,7 +474,7 @@ void *alloc_bank_or_seq(struct SoundMultiPool *loadedPool, s32 arg1, s32 size, s
 #else // !(VERSION_JP || VERSION_US)
 
  #ifdef VERSION_SH
-        if (poolIdx == 1) {
+        if (poolIdx == SOUND_POOL_BANK) {
             if (firstVal == SOUND_LOAD_STATUS_4) {
                 for (i = 0; i < gMaxSimultaneousNotes; i++) {
                     if (gNotes[i].bankId == tp->entries[0].id && gNotes[i].noteSubEu.enabled) {
@@ -530,7 +530,7 @@ void *alloc_bank_or_seq(struct SoundMultiPool *loadedPool, s32 arg1, s32 size, s
                     return NULL;
                 }
  #else // !VERSION_EU == VERSION_SH
-                if (poolIdx == 0) {
+                if (poolIdx == SOUND_POOL_SEQ) {
                     if (firstVal == SOUND_LOAD_STATUS_COMPLETE) {
                         for (i = 0; i < SEQUENCE_PLAYERS; i++) {
                             if (gSequencePlayers[i].enabled && gSequencePlayers[i].seqId == tp->entries[0].id) {
@@ -553,7 +553,7 @@ void *alloc_bank_or_seq(struct SoundMultiPool *loadedPool, s32 arg1, s32 size, s
                             goto out;
                         }
                     }
-                } else if (poolIdx == 1) {
+                } else if (poolIdx == SOUND_POOL_BANK) {
                     if (firstVal == SOUND_LOAD_STATUS_COMPLETE) {
                         for (i = 0; i < gMaxSimultaneousNotes; i++) {
                             if (gNotes[i].bankId == tp->entries[0].id && gNotes[i].noteSubEu.enabled) {
@@ -749,13 +749,13 @@ void *get_bank_or_seq_inner(s32 poolIdx, s32 arg1, s32 bankId) {
     struct PersistentPool* persistent;
 
     switch (poolIdx) {
-        case 0:
+        case SOUND_POOL_SEQ:
             loadedPool = &gSeqLoadedPool;
             break;
-        case 1:
+        case SOUND_POOL_BANK:
             loadedPool = &gBankLoadedPool;
             break;
-        case 2:
+        case SOUND_POOL_UNK:
             loadedPool = &gUnusedLoadedPool;
             break;
     }
@@ -1433,15 +1433,15 @@ void *unk_pool1_lookup(s32 poolIdx, s32 id) {
     return NULL;
 }
 
-void *unk_pool1_alloc(s32 poolIndex, s32 arg1, u32 size) {
+void *unk_pool1_alloc(s32 poolIdx, s32 id, u32 size) {
     s32 pos = gUnkPool1.pool.numAllocatedEntries;
     void *ret = sound_alloc_uninitialized(&gUnkPool1.pool, size);
     gUnkPool1.entries[pos].ptr = ret;
     if (ret == NULL) {
         return NULL;
     }
-    gUnkPool1.entries[pos].poolIndex = poolIndex;
-    gUnkPool1.entries[pos].id = arg1;
+    gUnkPool1.entries[pos].poolIndex = poolIdx;
+    gUnkPool1.entries[pos].id = id;
     gUnkPool1.entries[pos].size = size;
 
     return ret;
@@ -1576,7 +1576,7 @@ void func_sh_802f2158(struct UnkEntry *entry) {
         bankId1 = gCtlEntries[idx].bankId1;
         bankId2 = gCtlEntries[idx].bankId2;
         if ((bankId1 != 0xff && entry->bankId == bankId1) || (bankId2 != 0xff && entry->bankId == bankId2) || entry->bankId == 0) {
-            if (get_bank_or_seq(1, 2, idx) != NULL) {
+            if (get_bank_or_seq(SOUND_POOL_BANK, 2, idx) != NULL) {
                 if (IS_BANK_LOAD_COMPLETE(idx)) {
                     for (instId = 0; instId < gCtlEntries[idx].numInstruments; instId++) {
                         inst = get_instrument_inner(idx, instId);
@@ -1642,7 +1642,7 @@ void func_sh_802f23ec(void) {
         bankId1 = gCtlEntries[idx].bankId1;
         bankId2 = gCtlEntries[idx].bankId2;
         if ((bankId1 != 0xffu && entry->bankId == bankId1) || (bankId2 != 0xff && entry->bankId == bankId2) || entry->bankId == 0) {
-            if (get_bank_or_seq(1, 3, idx) != NULL) {
+            if (get_bank_or_seq(SOUND_POOL_BANK, 3, idx) != NULL) {
                 if (IS_BANK_LOAD_COMPLETE(idx)) {
                     for (i = 0; i < gUnkPool2.numEntries; i++) {
                         entry = &gUnkPool2.entries[i];

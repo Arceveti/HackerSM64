@@ -1608,7 +1608,7 @@ void sequence_channel_process_script(struct SequenceChannel *seqChannel) {
                         cmd = gAlBankSets[(s32)sp38 + loBits - cmd];
 
  #ifdef VERSION_SH
-                        if (get_bank_or_seq(1, 2, cmd) != NULL)
+                        if (get_bank_or_seq(SOUND_POOL_BANK, 2, cmd) != NULL)
  #else // !VERSION_SH
                         if (get_bank_or_seq(&gBankLoadedPool, 2, cmd) != NULL)
  #endif // !VERSION_SH
@@ -1766,7 +1766,7 @@ void sequence_channel_process_script(struct SequenceChannel *seqChannel) {
                         cmd = gAlBankSets[sp5A + loBits - cmd];
 #endif
 #ifdef VERSION_SH
-                        if (get_bank_or_seq(1, 2, cmd) != NULL)
+                        if (get_bank_or_seq(SOUND_POOL_BANK, 2, cmd) != NULL)
 #else
                         if (get_bank_or_seq(&gBankLoadedPool, 2, cmd) != NULL)
 #endif
