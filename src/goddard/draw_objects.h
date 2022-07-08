@@ -7,17 +7,17 @@
 #include "macros.h"
 
 enum GdColours {
-    COLOUR_BLACK,
-    COLOUR_WHITE,
-    COLOUR_RED,
-    COLOUR_GREEN,
-    COLOUR_BLUE,
-    COLOUR_GRAY,
-    COLOUR_DARK_GRAY,
-    COLOUR_DARK_BLUE,
-    COLOUR_YELLOW,
-    COLOUR_PINK,
-    COLOUR_BLACK2, // same as COLOUR_BLACK
+    /*0x0*/ COLOUR_BLACK,
+    /*0x1*/ COLOUR_WHITE,
+    /*0x2*/ COLOUR_RED,
+    /*0x3*/ COLOUR_GREEN,
+    /*0x4*/ COLOUR_BLUE,
+    /*0x5*/ COLOUR_GRAY,
+    /*0x6*/ COLOUR_DARK_GRAY,
+    /*0x7*/ COLOUR_DARK_BLUE,
+    /*0x8*/ COLOUR_YELLOW,
+    /*0x9*/ COLOUR_PINK,
+    /*0xA*/ COLOUR_BLACK2, // same as COLOUR_BLACK
 };
 
 // data

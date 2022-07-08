@@ -164,7 +164,7 @@ void eye_joint_update_func(struct ObjJoint *self) {
 }
 
 /* 23D62C -> 23D748; not called */
-void func_8018EE5C(struct ObjJoint *j1, struct ObjJoint *j2, struct ObjJoint *j3) {
+UNUSED void func_8018EE5C(struct ObjJoint *j1, struct ObjJoint *j2, struct ObjJoint *j3) {
     struct GdVec3f vec;
     struct ObjJoint *curj;
 
@@ -502,7 +502,7 @@ struct ObjBone *make_bone(s32 flags, struct ObjJoint *j1, struct ObjJoint *j2, U
 }
 
 /* 23E6F8 -> 23E758; not called */
-void func_8018FF28(struct ObjJoint *dst, struct ObjJoint *src) {
+UNUSED void func_8018FF28(struct ObjJoint *dst, struct ObjJoint *src) {
     if (src->flags & JOINT_FLAG_1) {
         dst->unk84.x -= src->unk84.x;
         dst->unk84.y -= src->unk84.y;
@@ -741,7 +741,7 @@ void func_801909B4(void) {
 }
 
 /* 23F1F0 -> 23F324; not called */
-void func_80190A20(void) {
+UNUSED void func_80190A20(void) {
     struct ObjJoint *j; // sp3c
     struct GdVec3f vec; // sp2C
     struct ObjGroup *grp;
@@ -825,7 +825,7 @@ void func_80190B54(struct ObjJoint *j0, struct ObjJoint *j1, struct GdVec3f *j2)
 }
 
 /* 23F638 -> 23F70C; not called */
-void func_80190E68(struct GdObj *obj, f32 x, f32 y, f32 z) {
+UNUSED void func_80190E68(struct GdObj *obj, f32 x, f32 y, f32 z) {
     struct ObjJoint *j = NULL;
     struct GdVec3f vec;
 
@@ -932,7 +932,7 @@ void func_801913F0(struct ObjJoint *j) {
 }
 
 /* 23FCDC -> 23FDD4; not called */
-void func_8019150C(Mat4f *mtx, struct GdVec3f *vec) {
+UNUSED void func_8019150C(Mat4f *mtx, struct GdVec3f *vec) {
     struct GdVec3f translation;
 
     translation.x = (*mtx)[3][0] / 10.0f;
@@ -991,7 +991,7 @@ void func_80191824(struct ObjJoint *j) {
 }
 
 /* 2400C4 -> 2401EC; not called */
-void func_801918F4(struct ObjJoint *j) {
+UNUSED void func_801918F4(struct ObjJoint *j) {
     j->velocity.x = j->unk3C.x;
     j->velocity.y = j->unk3C.y;
     j->velocity.z = j->unk3C.z;
@@ -1014,7 +1014,7 @@ void func_801918F4(struct ObjJoint *j) {
 }
 
 /* 2401EC -> 2403C8; not called */
-void func_80191A1C(struct ObjBone *b) {
+UNUSED void func_80191A1C(struct ObjBone *b) {
     f32 sp3C;
     f32 sp38 = 0.0f;
     struct GdObj *argjoint;

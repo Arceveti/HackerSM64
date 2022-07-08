@@ -5,6 +5,7 @@
 #include "dynlist_proc.h"
 #include "dynlists/dynlist_macros.h"
 #include "dynlists/dynlists.h"
+#include "gd_macros.h"
 #include "gd_main.h"
 #include "gd_math.h"
 #include "gd_types.h"
@@ -443,7 +444,7 @@ s32 getint(s32 *intPtr) {
 }
 
 /* @ 246838 for 0x14 */
-void Unknown80198068(UNUSED f32 a0) {
+UNUSED void Unknown80198068(UNUSED f32 a0) {
     printf("max=%f\n", a0);
 }
 
@@ -524,7 +525,7 @@ void scale_verts_in_shape(struct ObjShape *shape, f32 x, f32 y, f32 z) {
 
 /* @ 246BA4 for 0x70; not called */
 // Guessing on the type of a0
-void translate_verts_in_shape(struct ObjShape *shape, f32 x, f32 y, f32 z) {
+UNUSED void translate_verts_in_shape(struct ObjShape *shape, f32 x, f32 y, f32 z) {
     sVertexTranslateOffset.x = x;
     sVertexTranslateOffset.y = y;
     sVertexTranslateOffset.z = z;
@@ -538,7 +539,7 @@ void Unknown80198444(struct ObjVertex *vtx) {
 
     add_obj_pos_to_bounding_box(&vtx->header);
 
-    distance = vtx->pos.x * vtx->pos.x + vtx->pos.y * vtx->pos.y + vtx->pos.z * vtx->pos.z;
+    distance = SQ(vtx->pos.x) + SQ(vtx->pos.y) + SQ(vtx->pos.z);
 
     if (distance != 0.0f) {
         distance = gd_sqrt_d(distance); // sqrtd?

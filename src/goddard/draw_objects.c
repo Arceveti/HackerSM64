@@ -98,7 +98,7 @@ void setup_lights(void) {
 /**
  * @note Not called
  */
-void Unknown801781DC(struct ObjZone *zone) {
+UNUSED void Unknown801781DC(struct ObjZone *zone) {
     struct GdVec3f lightPos; // 3c
     struct ObjUnk200000 *unk;
     f32 sp34;
@@ -308,7 +308,7 @@ void create_mtl_gddl_if_empty(struct ObjMaterial *mtl) {
  * unconverted vertex data, or old vertex structures (like `BetaVtx`)
  * @note Not called
  */
-void check_face_bad_vtx(struct ObjFace *face) {
+UNUSED void check_face_bad_vtx(struct ObjFace *face) {
     s32 i;
     struct ObjVertex *vtx;
 
@@ -373,7 +373,7 @@ struct GdColour *gd_get_colour(s32 idx) {
  * Uncalled function that would render a triangle
  * @note Not called
  */
-void Unknown80178ECC(f32 v0X, f32 v0Y, f32 v0Z, f32 v1X, f32 v1Y, f32 v1Z) {
+UNUSED void Unknown80178ECC(f32 v0X, f32 v0Y, f32 v0Z, f32 v1X, f32 v1Y, f32 v1Z) {
     f32 difY = v1Y - v0Y;
     f32 difX = v1X - v0X;
     f32 difZ = v1Z - v0Z;
@@ -457,7 +457,7 @@ void draw_rect_stroke(s32 color, f32 ulx, f32 uly, f32 lrx, f32 lry) {
  * Uncalled function that calls other orphan stub functions.
  * @note Not called
  */
-void Unknown801792F0(struct GdObj *obj) {
+UNUSED void Unknown801792F0(struct GdObj *obj) {
     char objId[32];
     struct GdVec3f objPos;
 
@@ -609,7 +609,7 @@ void draw_camera(struct ObjCamera *cam) {
  * for the GdObj.drawFlags
  * @note Not called
  */
-void Unknown80179ACC(struct GdObj *obj) {
+UNUSED void Unknown80179ACC(struct GdObj *obj) {
     switch (obj->type) {
         case OBJ_TYPE_NETS:
             if (((struct ObjNet *) obj)->unk1C8 != NULL) {
@@ -626,7 +626,7 @@ void Unknown80179ACC(struct GdObj *obj) {
  * Forms uncalled recursive loop with Unknown80179ACC()
  * @note Not called
  */
-void func_80179B64(struct ObjGroup *group) {
+UNUSED void func_80179B64(struct ObjGroup *group) {
     apply_to_obj_types_in_group(OBJ_TYPE_LABELS | OBJ_TYPE_GADGETS | OBJ_TYPE_CAMERAS | OBJ_TYPE_NETS
                                     | OBJ_TYPE_JOINTS | OBJ_TYPE_BONES,
                                 (applyproc_t) Unknown80179ACC, group);
@@ -1227,7 +1227,7 @@ void map_vertices(struct ObjGroup *facegrp, struct ObjGroup *vtxgrp) {
  * @return void
  * @note Not Called
  */
-void unpick_obj(struct GdObj *obj) {
+UNUSED void unpick_obj(struct GdObj *obj) {
     struct GdObj *why = obj;
     if (why->drawFlags & OBJ_IS_GRABBABLE) {
         why->drawFlags &= ~(OBJ_PICKED | OBJ_HIGHLIGHTED);

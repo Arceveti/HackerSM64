@@ -195,7 +195,7 @@ void collision_something_801926A4(struct ObjNet *net) {
 }
 
 /* 2412A0 -> 24142C; not called */
-void func_80192AD0(struct ObjNet *net) {
+UNUSED void func_80192AD0(struct ObjNet *net) {
     struct ObjGroup *grp = net->unk1C8;
     struct ObjNet *sp18;
 
@@ -469,7 +469,7 @@ void func_80193848(struct ObjGroup *group) {
 }
 
 /* 24208C -> 2422E0; not called; orig name: func_801938BC */
-void gd_print_net(struct ObjNet *net) {
+UNUSED void gd_print_net(struct ObjNet *net) {
     gd_printf("Flags:%x\n", net->flags);
     gd_print_vec("World:", &net->worldPos);
     gd_print_vec("Force:", &net->unusedForce);

@@ -34,7 +34,7 @@ struct GdVec3f D_801B9E08;
 struct ObjGroup *sCurrentMoveGrp; // @ 801B9E14
 struct GdVec3f D_801B9E18;
 struct GdVec3f D_801B9E28;
-f32 D_801B9E34;
+f32 D_801B9E34; // always zero
 s32 sParticleId = 0;
 struct ObjCamera *gGdCameraList; // @ 801B9E4C
 void *D_801B9E50;
@@ -871,7 +871,7 @@ void menu_cb_reset_positions(void) {
 /**
  * Unused (not called) - does nothing useful
  */
-struct GdObj *func_8017E2F0(struct GdObj *obj, enum ObjTypeFlag type) {
+UNUSED struct GdObj *func_8017E2F0(struct GdObj *obj, enum ObjTypeFlag type) {
     enum ObjTypeFlag curObjType;
     struct ListNode *node;
 
@@ -951,7 +951,7 @@ void func_8017E584(struct ObjNet *net, struct GdVec3f *a1, struct GdVec3f *a2) {
     struct GdVec3f sp88;
     struct GdVec3f sp7C;
     struct GdVec3f sp70;
-    f32 sp2C;
+    f32 mag;
     struct GdVec3f sp1C;
 
     sp70.x = a2->x;
@@ -981,18 +981,18 @@ void func_8017E584(struct ObjNet *net, struct GdVec3f *a1, struct GdVec3f *a2) {
     }
 
     gd_cross_vec3f(&sp70, a1, &sp94);
-    sp2C = (f32) gd_sqrt_d(SQ(sp94.x) + SQ(sp94.z));
+    mag = (f32) gd_sqrt_d(SQ(sp94.x) + SQ(sp94.z));
 
-    if (sp2C > 1000.0f) {
-        sp2C = 1000.0f;
+    if (mag > 1000.0f) {
+        mag = 1000.0f;
     }
 
-    sp2C /= 1000.0f;
-    sp2C = 1.0f - sp2C;
+    mag /= 1000.0f;
+    mag = 1.0f - mag;
 
-    sp88.x = a2->x * sp2C;
-    sp88.y = a2->y * sp2C;
-    sp88.z = a2->z * sp2C;
+    sp88.x = a2->x * mag;
+    sp88.y = a2->y * mag;
+    sp88.z = a2->z * mag;
 
     net->collDisp.x += sp88.x;
     net->collDisp.y += sp88.y;

@@ -115,7 +115,7 @@ struct MemTracker *start_memtracker(const char *name) {
 }
 
 /* @ 23ABE0 -> 23AC28; not called; orig name: Unknown8018C410 */
-void print_most_recent_memtracker_name(void) {
+UNUSED void print_most_recent_memtracker_name(void) {
     gd_printf("%s\n", sActiveMemTrackers[sNumActiveMemTrackers - 1]->name);
 }
 
@@ -306,7 +306,7 @@ void split_timer_ptr(struct GdTimer *timer) {
 }
 
 /* 23B42C -> 23B49C; not called; orig name: Unknown8018CC5C */
-void split_all_timers(void) {
+UNUSED void split_all_timers(void) {
     s32 i;
     struct GdTimer *timer;
 
@@ -710,7 +710,7 @@ void gd_strcpy(char *dst, const char *src) {
 }
 
 /* 23C4AC -> 23C52C; not called; orig name: Unknown8018DCDC */
-void ascii_to_uppercase(char *str) {
+UNUSED void ascii_to_uppercase(char *str) {
     char c;
 
     while ((c = *str)) {

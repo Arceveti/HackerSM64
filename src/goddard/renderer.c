@@ -932,7 +932,7 @@ void branch_cur_dl_to_num(s32 dlNum) {
 /**
  * Unused (not called)
  */
-Gfx *get_dl_gfx(s32 num) {
+UNUSED Gfx *get_dl_gfx(s32 num) {
     return sGdDLArray[num]->gfx;
 }
 
@@ -1056,7 +1056,7 @@ void gdm_setup(void) {
 }
 
 /* 24AC2C -> 24AC80; not called; orig name: Unknown8019C45C */
-void print_gdm_stats(void) {
+UNUSED void print_gdm_stats(void) {
     stop_memtracker("total");
     gd_printf("\ngdm stats:\n");
     print_all_memtrackers();
@@ -1066,7 +1066,7 @@ void print_gdm_stats(void) {
 
 /* 24AC80 -> 24AD14; orig name: func_8019C4B0 */
 struct ObjView *make_view_withgrp(char *name, struct ObjGroup *grp) {
-    struct ObjView *view = make_view(name, (VIEW_DRAW | VIEW_ALLOC_ZBUF | VIEW_MOVEMENT), 1, 0, 0, 320, 240, grp);
+    struct ObjView *view = make_view(name, (VIEW_DRAW | VIEW_ALLOC_ZBUF | VIEW_MOVEMENT), 1, 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, grp);
     UNUSED struct ObjGroup *viewgrp = make_group(2, grp, view);
 
     view->lights = gGdLightGroup;
@@ -1242,7 +1242,7 @@ Gfx *gdm_gettestdl(s32 id) {
 }
 
 /* 24B418 -> 24B4CC; not called */
-void gdm_getpos(s32 id, struct GdVec3f *dst) {
+UNUSED void gdm_getpos(s32 id, struct GdVec3f *dst) {
     struct GdObj *dobj; // 1c
     switch (id) {
         case 5:
@@ -1391,13 +1391,13 @@ struct GdDisplayList *new_gd_dl(s32 id, s32 gfxs, s32 verts, s32 mtxs, s32 light
 }
 
 /* 24BA48 -> 24BABC; not called */
-void gd_rsp_init(void) {
+UNUSED void gd_rsp_init(void) {
     gSPDisplayList(next_gfx(), osVirtualToPhysical(&gd_dl_rsp_init));
     gDPPipeSync(next_gfx());
 }
 
 /* 24BABC -> 24BB30; not called */
-void gd_rdp_init(void) {
+UNUSED void gd_rdp_init(void) {
     gSPDisplayList(next_gfx(), osVirtualToPhysical(&gd_dl_rdp_init));
     gDPPipeSync(next_gfx());
 }
@@ -2699,7 +2699,7 @@ s32 gd_gentexture(void *texture, s32 fmt, s32 size, UNUSED u32 arg3, UNUSED u32 
 /**
  * Unused (not called)
  */
-void *load_texture_from_file(const char *file, s32 fmt, s32 size, u32 arg3, u32 arg4) {
+UNUSED void *load_texture_from_file(const char *file, s32 fmt, s32 size, u32 arg3, u32 arg4) {
     struct GdFile *txFile; // 3c
     void *texture;         // 38
     u32 txSize;            // 34
@@ -2853,7 +2853,7 @@ void update_cursor(void) {
 }
 
 /* 253728 -> 2538E0 */
-void Unknown801A4F58(void) {
+UNUSED void Unknown801A4F58(void) {
     s16 *cbufOff; // a0
     s16 *cbufOn;  // a1
     u16 *zbuf;    // a2
@@ -2867,19 +2867,19 @@ void Unknown801A4F58(void) {
     cbufOn = sScreenView->colourBufs[gGdFrameBufNum];
     zbuf = sScreenView->zbuf;
 
-    for (i = 0; i < (320 * 240); i++) { // L801A4FCC
+    for (i = 0; i < (SCREEN_WIDTH * SCREEN_HEIGHT); i++) { // L801A4FCC
         colour = cbufOff[i];
         if (colour) {
-            r = (s16)((colour >> 11) & 0x1F);
-            g = (s16)((colour >>  6) & 0x1F);
-            b = (s16)((colour >>  1) & 0x1F);
-            if (--r < 0) {
+            r = (s16)((colour >> 11) & 0x1F) - 1;
+            g = (s16)((colour >>  6) & 0x1F) - 1;
+            b = (s16)((colour >>  1) & 0x1F) - 1;
+            if (r < 0) {
                 r = 0;
             }
-            if (--g < 0) {
+            if (g < 0) {
                 g = 0;
             }
-            if (--b < 0) {
+            if (b < 0) {
                 b = 0;
             }
 
@@ -3023,7 +3023,7 @@ void gd_init(void) {
 
     sScreenView =
         make_view("screenview2", (VIEW_2_COL_BUF | VIEW_UNK_1000 | VIEW_COLOUR_BUF | VIEW_Z_BUF), 0, 0,
-                  0, 320, 240, NULL);
+                  0, SCREEN_WIDTH, SCREEN_HEIGHT, NULL);
     sScreenView->colour.r = 0.0f;
     sScreenView->colour.g = 0.0f;
     sScreenView->colour.b = 0.0f;
@@ -3144,8 +3144,8 @@ UNUSED void Unknown801A5C80(struct ObjGroup *parentGroup) {
     d_end_group("debugg");
 
     debugGroup = (struct ObjGroup *) d_use_obj("debugg");
-    make_view("debugview", (VIEW_2_COL_BUF | VIEW_ALLOC_ZBUF | VIEW_1_CYCLE | VIEW_DRAW), 2, 0, 0, 320,
-              240, debugGroup);
+    make_view("debugview", (VIEW_2_COL_BUF | VIEW_ALLOC_ZBUF | VIEW_1_CYCLE | VIEW_DRAW), 2, 0, 0, SCREEN_WIDTH,
+              SCREEN_HEIGHT, debugGroup);
 
     if (parentGroup != NULL) {
         addto_group(parentGroup, &debugGroup->header);
@@ -3206,7 +3206,7 @@ UNUSED void Unknown801A5D90(struct ObjGroup *arg0) {
             memview = make_view("memview",
                                 (VIEW_2_COL_BUF | VIEW_ALLOC_ZBUF | VIEW_UNK_2000 | VIEW_UNK_4000
                                  | VIEW_1_CYCLE | VIEW_DRAW),
-                                2, 0, 10, 320, 200, labelgrp);
+                                2, 0, 10, SCREEN_WIDTH, (SCREEN_HEIGHT - 40), labelgrp);
             memview->colour.r = 0.0f;
             memview->colour.g = 0.0f;
             memview->colour.b = 0.0f;
@@ -3229,7 +3229,7 @@ UNUSED void Unknown801A5FF8(struct ObjGroup *arg0) {
     d_set_world_pos(5.0f, 0.0f, 0.0f);
     d_set_scale(100.0f, 20.0f, 0.0f);
     d_set_type(6);
-    d_set_colour_num(2);
+    d_set_colour_num(COLOUR_RED);
     label = (struct ObjLabel *) d_makeobj(D_LABEL, AsDynName(0));
     d_set_rel_pos(5.0f, 18.0f, 0.0f);
     d_set_parm_ptr(PARM_PTR_CHAR, "ITEM 1");
@@ -3240,7 +3240,7 @@ UNUSED void Unknown801A5FF8(struct ObjGroup *arg0) {
     d_set_world_pos(5.0f, 25.0f, 0.0f);
     d_set_scale(100.0f, 20.0f, 0.0f);
     d_set_type(6);
-    d_set_colour_num(4);
+    d_set_colour_num(COLOUR_BLUE);
     label = (struct ObjLabel *) d_makeobj(D_LABEL, AsDynName(0));
     d_set_rel_pos(5.0f, 18.0f, 0.0f);
     d_set_parm_ptr(PARM_PTR_CHAR, "ITEM 2");
@@ -3251,7 +3251,7 @@ UNUSED void Unknown801A5FF8(struct ObjGroup *arg0) {
     d_set_world_pos(5.0f, 50.0f, 0.0f);
     d_set_scale(100.0f, 20.0f, 0.0f);
     d_set_type(6);
-    d_set_colour_num(3);
+    d_set_colour_num(COLOUR_GREEN);
     label = (struct ObjLabel *) d_makeobj(D_LABEL, AsDynName(0));
     d_set_rel_pos(5.0f, 18.0f, 0.0f);
     d_set_parm_ptr(PARM_PTR_CHAR, "ITEM 3");
@@ -3336,7 +3336,7 @@ void view_proc_print_timers(struct ObjView *self) {
 }
 
 /* 254FE4 -> 255600; not called; orig name: Unknown801A6814 */
-void make_timer_gadgets(void) {
+UNUSED void make_timer_gadgets(void) {
     struct ObjLabel *timerLabel;
     struct ObjGroup *timerg;
     struct ObjView *timersview;
@@ -3444,7 +3444,7 @@ void make_timer_gadgets(void) {
     timerg = (struct ObjGroup *) d_use_obj("timerg");
     timersview = make_view(
         "timersview", (VIEW_2_COL_BUF | VIEW_ALLOC_ZBUF | VIEW_1_CYCLE | VIEW_MOVEMENT | VIEW_DRAW), 2,
-        0, 10, 320, 270, timerg);
+        0, 10, SCREEN_WIDTH, (SCREEN_HEIGHT + 30), timerg);
     timersview->colour.r = 0.0f;
     timersview->colour.g = 0.0f;
     timersview->colour.b = 0.0f;
@@ -3557,7 +3557,7 @@ struct GdObj *load_dynlist(struct DynList *dynlist) {
 /**
  * Unused (not called)
  */
-void func_801A71CC(struct ObjNet *net) {
+UNUSED void func_801A71CC(struct ObjNet *net) {
     s32 i; // spB4
     s32 j; // spB0
     f32 spAC;

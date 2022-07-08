@@ -359,7 +359,7 @@ void d_set_name_suffix(char *str) {
  *
  * @note Not called
  */
-void d_append_to_name_suffix(char *str) {
+UNUSED void d_append_to_name_suffix(char *str) {
     char buf[0xff + 1];
 
     if (str != NULL) {
@@ -429,7 +429,7 @@ static struct DynObjInfo *get_dynobj_info(DynObjName name) {
  *
  * @note Not called
  */
-void reset_dynamic_objs(void) {
+UNUSED void reset_dynamic_objs(void) {
     if (sLoadedDynObjs == 0) {
         return;
     }
@@ -476,7 +476,7 @@ void d_end_net_with_subgroup(DynObjName name) {
  * by `d_attach_joint_to_net()`.
  *
  * @param arg0 Not used
- * @param name   Name for created `ObjJoint`
+ * @param name Name for created `ObjJoint`
  */
 void d_attach_joint_to_net(UNUSED s32 arg0, DynObjName name) {
     UNUSED struct DynObjInfo *curInfo = sDynListCurInfo;
@@ -1542,7 +1542,7 @@ void d_get_velocity(struct GdVec3f *dst) {
  *
  * @note Not called
  */
-void d_set_torque(const struct GdVec3f *src) {
+UNUSED void d_set_torque(const struct GdVec3f *src) {
     struct GdObj *dynobj = sDynListCurObj;
 
     if (sDynListCurObj == NULL) {
@@ -1878,7 +1878,7 @@ void d_set_att_offset(const struct GdVec3f *off) {
  *
  * @note Not called
  */
-void d_set_att_to_offset(UNUSED u32 a) {
+UNUSED void d_set_att_to_offset(UNUSED u32 a) {
     struct GdObj *dynobj; // sp3c
 
     if (sDynListCurObj == NULL) {
@@ -1915,7 +1915,7 @@ void d_set_att_to_offset(UNUSED u32 a) {
  *
  * @note Not called
  */
-void d_get_att_offset(struct GdVec3f *dst) {
+UNUSED void d_get_att_offset(struct GdVec3f *dst) {
     if (sDynListCurObj == NULL) {
         fatal_printf("proc_dynlist(): No current object");
     }
@@ -2048,7 +2048,7 @@ void d_set_normal(f32 x, f32 y, f32 z) {
  *
  * @note Not called.
  */
-struct GdVec3f *d_get_world_pos_ptr(void) {
+UNUSED struct GdVec3f *d_get_world_pos_ptr(void) {
     if (sDynListCurObj == NULL) {
         fatal_printf("proc_dynlist(): No current object");
     }
