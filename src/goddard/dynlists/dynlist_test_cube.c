@@ -10,12 +10,12 @@ struct DynList dynlist_test_cube[] = {
     BeginList(),
 
     StartGroup("ico1vg"),
-        MakeVertex(-2.0, 0.0, -2.0),
-        MakeVertex(-2.0, 0.0, 2.0),
-        MakeVertex(2.0, 0.0, 2.0),
-        MakeVertex(2.0, 0.0, -2.0),
-        MakeVertex(0.0, 3.0, 0.0),
-        MakeVertex(0.0, -3.0, 0.0),
+        MakeVertex(-2.0,  0.0, -2.0),
+        MakeVertex(-2.0,  0.0,  2.0),
+        MakeVertex( 2.0,  0.0,  2.0),
+        MakeVertex( 2.0,  0.0, -2.0),
+        MakeVertex( 0.0,  3.0,  0.0),
+        MakeVertex( 0.0, -3.0,  0.0),
     EndGroup("ico1vg"),
 
     StartGroup("ico1pg"),
