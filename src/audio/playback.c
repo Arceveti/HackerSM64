@@ -382,15 +382,15 @@ void process_notes(void) {
             if (note != playbackState->parentLayer->note && playbackState->unkSH34 == 0) {
                 playbackState->adsr.action |= ADSR_ACTION_RELEASE;
                 playbackState->adsr.fadeOutVel = gAudioBufferParameters.updatesPerFrameInv;
-                playbackState->priority = 1;
+                playbackState->priority = NOTE_PRIORITY_STOPPING;
                 playbackState->unkSH34 = 2;
                 goto d;
             } else if (!playbackState->parentLayer->enabled && playbackState->unkSH34 == 0 &&
-                       playbackState->priority >= 1) {
+                       playbackState->priority >= NOTE_PRIORITY_STOPPING) {
                 // do nothing
             } else if (playbackState->parentLayer->seqChannel->seqPlayer == NULL) {
                 sequence_channel_disable(playbackState->parentLayer->seqChannel);
-                playbackState->priority = 1;
+                playbackState->priority = NOTE_PRIORITY_STOPPING;
                 playbackState->unkSH34 = 1;
                 continue;
             } else if (playbackState->parentLayer->seqChannel->seqPlayer->muted &&
@@ -404,9 +404,9 @@ void process_notes(void) {
             seq_channel_layer_note_release(playbackState->parentLayer);
             audio_list_remove(&note->listItem);
             audio_list_push_front(&note->listItem.pool->decaying, &note->listItem);
-            playbackState->priority = 1;
+            playbackState->priority = NOTE_PRIORITY_STOPPING;
             playbackState->unkSH34 = 2;
-        } else if (playbackState->unkSH34 == 0 && playbackState->priority >= 1) {
+        } else if (playbackState->unkSH34 == 0 && playbackState->priority >= NOTE_PRIORITY_STOPPING) {
             continue;
         }
  #else // !VERSION_SH
