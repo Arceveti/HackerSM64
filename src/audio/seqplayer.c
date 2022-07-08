@@ -492,7 +492,7 @@ void seq_channel_layer_process_script(struct SequenceChannelLayer *layer) {
         }
 
         switch (cmd) {
-            case 0xff: // layer_end; function return or end of script
+            case layer_end: // layer_end; function return or end of script
                 if (state->depth == 0) {
                     // N.B. this function call is *not* inlined even though it's
                     // within the same file, unlike in the rest of this function.
@@ -502,7 +502,7 @@ void seq_channel_layer_process_script(struct SequenceChannelLayer *layer) {
                 state->pc = state->stack[--state->depth];
                 break;
 
-            case 0xfc: // layer_call
+            case layer_call: // layer_call
                 if (0 && state->depth >= 4) {
                     eu_stubbed_printf_0("Macro Level Over Error!\n");
                 }
@@ -511,7 +511,7 @@ void seq_channel_layer_process_script(struct SequenceChannelLayer *layer) {
                 state->pc = seqPlayer->seqData + sp3A;
                 break;
 
-            case 0xf8: // layer_loop; loop start, N iterations (or 256 if N = 0)
+            case layer_loop: // layer_loop; loop start, N iterations (or 256 if N = 0)
                 if (0 && state->depth >= 4) {
                     eu_stubbed_printf_0("Macro Level Over Error!\n");
                 }
@@ -519,7 +519,7 @@ void seq_channel_layer_process_script(struct SequenceChannelLayer *layer) {
                 state->stack[state->depth++] = state->pc;
                 break;
 
-            case 0xf7: // layer_loopend
+            case layer_loopend: // layer_loopend
                 if (--state->remLoopIters[state->depth - 1] != 0) {
                     state->pc = state->stack[state->depth - 1];
                 } else {
@@ -527,21 +527,21 @@ void seq_channel_layer_process_script(struct SequenceChannelLayer *layer) {
                 }
                 break;
 
-            case 0xfb: // layer_jump
+            case layer_jump: // layer_jump
                 sp3A = m64_read_s16(state);
                 state->pc = seqPlayer->seqData + sp3A;
                 break;
 
  #if defined(VERSION_EU) || defined(VERSION_SH)
-            case 0xf4:
+            case 0xf4: //! needs enum
                 state->pc += (s8)m64_read_u8(state);
                 break;
  #endif
 
-            case 0xc1: // layer_setshortnotevelocity
-            case 0xca: // layer_setpan
+            case layer_setshortnotevelocity: // layer_setshortnotevelocity
+            case layer_setpan: // layer_setpan
                 temp_a0_5 = *(state->pc++);
-                if (cmd == 0xc1) {
+                if (cmd == layer_setshortnotevelocity) {
                     layer->velocitySquare = (f32)(temp_a0_5 * temp_a0_5);
                 } else {
  #if defined(VERSION_EU) || defined(VERSION_SH)
@@ -552,28 +552,28 @@ void seq_channel_layer_process_script(struct SequenceChannelLayer *layer) {
                 }
                 break;
 
-            case 0xc2: // layer_transpose; set transposition in semitones
-            case 0xc9: // layer_setshortnoteduration
+            case layer_transpose: // layer_transpose; set transposition in semitones
+            case layer_setshortnoteduration: // layer_setshortnoteduration
                 temp_a0_5 = *(state->pc++);
-                if (cmd == 0xc9) {
+                if (cmd == layer_setshortnoteduration) {
                     layer->noteDuration = temp_a0_5;
                 } else {
                     layer->transposition = temp_a0_5;
                 }
                 break;
 
-            case 0xc4: // layer_somethingon
-            case 0xc5: // layer_somethingoff
-                layer->continuousNotes = (cmd == 0xc4);
+            case layer_somethingon: // layer_somethingon
+            case layer_somethingoff: // layer_somethingoff
+                layer->continuousNotes = (cmd == layer_somethingon);
                 seq_channel_layer_note_decay(layer);
                 break;
 
-            case 0xc3: // layer_setshortnotedefaultplaypercentage
+            case layer_setshortnotedefaultplaypercentage: // layer_setshortnotedefaultplaypercentage
                 sp3A = m64_read_compressed_u16(state);
                 layer->shortNoteDefaultPlayPercentage = sp3A;
                 break;
 
-            case 0xc6: // layer_setinstr
+            case layer_setinstr: // layer_setinstr
                 cmd = m64_read_u8(state);
  #if defined(VERSION_JP) || defined(VERSION_US)
                 if (cmd < 127) {
@@ -581,14 +581,14 @@ void seq_channel_layer_process_script(struct SequenceChannelLayer *layer) {
                 }
  #else // !(VERSION_JP || VERSION_US)
                 if (cmd >= 0x7f) {
-                    if (cmd == 0x7f) {
+                    if (cmd == 0x7f) { //! needs enum
                         layer->instOrWave = 0;
                     } else {
                         layer->instOrWave = cmd;
                         layer->instrument = NULL;
                     }
 
-                    if (cmd == 0xff) {
+                    if (cmd == layer_end) {
                         layer->adsr.releaseRate = 0;
                     }
                     break;
@@ -603,7 +603,7 @@ void seq_channel_layer_process_script(struct SequenceChannelLayer *layer) {
  #endif // !(VERSION_JP || VERSION_US)
                 break;
 
-            case 0xc7: // layer_portamento
+            case layer_portamento: // layer_portamento
                 layer->portamento.mode = m64_read_u8(state);
 
                 // cmd is reused for the portamento's semitone
@@ -626,29 +626,29 @@ void seq_channel_layer_process_script(struct SequenceChannelLayer *layer) {
                 layer->portamentoTime = sp3A;
                 break;
 
-            case 0xc8: // layer_disableportamento
+            case layer_disableportamento: // layer_disableportamento
                 layer->portamento.mode = 0;
                 break;
 
  #if defined(VERSION_EU) || defined(VERSION_SH)
-            case 0xcb:
+            case 0xcb: //! needs enum
                 sp3A = m64_read_s16(state);
                 layer->adsr.envelope = (struct AdsrEnvelope *) (seqPlayer->seqData + sp3A);
                 layer->adsr.releaseRate = m64_read_u8(state);
                 break;
 
-            case 0xcc:
+            case 0xcc: //! needs enum
                 layer->ignoreDrumPan = TRUE;
                 break;
  #endif // (VERSION_EU || VERSION_SH)
 
             default:
                 switch (cmd & 0xf0) {
-                    case 0xd0: // layer_setshortnotevelocityfromtable
+                    case layer_setshortnotevelocityfromtable: // layer_setshortnotevelocityfromtable
                         sp3A = seqPlayer->shortNoteVelocityTable[cmd & 0xf];
                         layer->velocitySquare = (f32)(sp3A * sp3A);
                         break;
-                    case 0xe0: // layer_setshortnotedurationfromtable
+                    case layer_setshortnotedurationfromtable: // layer_setshortnotedurationfromtable
                         layer->noteDuration = seqPlayer->shortNoteDurationTable[cmd & 0xf];
                         break;
                     default:
@@ -658,7 +658,7 @@ void seq_channel_layer_process_script(struct SequenceChannelLayer *layer) {
         }
     }
 
-    if (cmd == 0xc0) { // layer_delay
+    if (cmd == layer_delay) { // layer_delay
         layer->delay = m64_read_compressed_u16(state);
         layer->stopSomething = TRUE;
     } else {
@@ -666,21 +666,21 @@ void seq_channel_layer_process_script(struct SequenceChannelLayer *layer) {
 
         if (seqChannel->largeNotes) {
             switch (cmd & 0xc0) {
-                case 0x00: // layer_note0 (play percentage, velocity, duration)
+                case layer_note0: // layer_note0 (play percentage, velocity, duration)
                     sp3A = m64_read_compressed_u16(state);
                     vel = *(state->pc++);
                     layer->noteDuration = *(state->pc++);
                     layer->playPercentage = sp3A;
                     break;
 
-                case 0x40: // layer_note1 (play percentage, velocity)
+                case layer_note1: // layer_note1 (play percentage, velocity)
                     sp3A = m64_read_compressed_u16(state);
                     vel = *(state->pc++);
                     layer->noteDuration = 0;
                     layer->playPercentage = sp3A;
                     break;
 
-                case 0x80: // layer_note2 (velocity, duration; uses last play percentage)
+                case layer_note2: // layer_note2 (velocity, duration; uses last play percentage)
                     sp3A = layer->playPercentage;
                     vel = *(state->pc++);
                     layer->noteDuration = *(state->pc++);
@@ -696,16 +696,16 @@ void seq_channel_layer_process_script(struct SequenceChannelLayer *layer) {
  #endif
         } else {
             switch (cmd & 0xc0) {
-                case 0x00: // play note, type 0 (play percentage)
+                case layer_notetype0: // play note, type 0 (play percentage)
                     sp3A = m64_read_compressed_u16(state);
                     layer->playPercentage = sp3A;
                     break;
 
-                case 0x40: // play note, type 1 (uses default play percentage)
+                case layer_notetype1: // play note, type 1 (uses default play percentage)
                     sp3A = layer->shortNoteDefaultPlayPercentage;
                     break;
 
-                case 0x80: // play note, type 2 (uses last play percentage)
+                case layer_notetype2: // play note, type 2 (uses last play percentage)
                     sp3A = layer->playPercentage;
                     break;
             }
@@ -885,26 +885,18 @@ void seq_channel_layer_process_script(struct SequenceChannelLayer *layer) {
         return;
     }
 
-    cmd = FALSE;
-    if (!layer->continuousNotes) {
-        cmd = TRUE;
-    } else if (layer->note == NULL || layer->status == SOUND_LOAD_STATUS_NOT_LOADED) {
-        cmd = TRUE;
-    } else if (!sameSound) {
-        seq_channel_layer_note_decay(layer);
-        cmd = TRUE;
-    }
+    if (
+        !layer->continuousNotes
+     || (layer->note == NULL)
+     || (layer->status == SOUND_LOAD_STATUS_NOT_LOADED)
+     || !sameSound
 #if defined(VERSION_EU) || defined(VERSION_SH)
-    else if (layer != layer->note->parentLayer) {
-        cmd = TRUE;
-    }
+     || (layer != layer->note->parentLayer)
 #endif
-    else if (layer->sound == NULL) {
-        init_synthetic_wave(layer->note, layer);
-    }
-
-    if (cmd) {
+    ) {
         layer->note = alloc_note(layer);
+    } else if (layer->sound == NULL) {
+        init_synthetic_wave(layer->note, layer);
     }
 
     if (layer->note != NULL && layer->note->parentLayer == layer) {
@@ -976,7 +968,7 @@ s32 seq_channel_layer_process_script_part2(struct SequenceChannelLayer *layer) {
         }
 
         switch (cmd) {
-            case 0xff: // layer_end; function return or end of script
+            case layer_end: // layer_end; function return or end of script
                 if (state->depth == 0) {
                     // N.B. this function call is *not* inlined even though it's
                     // within the same file, unlike in the rest of this function.
@@ -986,7 +978,7 @@ s32 seq_channel_layer_process_script_part2(struct SequenceChannelLayer *layer) {
                 state->pc = state->stack[--state->depth];
                 break;
 
-            case 0xfc: // layer_call
+            case layer_call: // layer_call
                 if (0 && state->depth >= 4) {
                     eu_stubbed_printf_0("Macro Level Over Error!\n");
                 }
@@ -995,7 +987,7 @@ s32 seq_channel_layer_process_script_part2(struct SequenceChannelLayer *layer) {
                 state->pc = seqPlayer->seqData + sp3A;
                 break;
 
-            case 0xf8: // layer_loop; loop start, N iterations (or 256 if N = 0)
+            case layer_loop: // layer_loop; loop start, N iterations (or 256 if N = 0)
                 if (0 && state->depth >= 4) {
                     eu_stubbed_printf_0("Macro Level Over Error!\n");
                 }
@@ -1003,7 +995,7 @@ s32 seq_channel_layer_process_script_part2(struct SequenceChannelLayer *layer) {
                 state->stack[state->depth++] = state->pc;
                 break;
 
-            case 0xf7: // layer_loopend
+            case layer_loopend: // layer_loopend
                 if (--state->remLoopIters[state->depth - 1] != 0) {
                     state->pc = state->stack[state->depth - 1];
                 } else {
@@ -1011,57 +1003,57 @@ s32 seq_channel_layer_process_script_part2(struct SequenceChannelLayer *layer) {
                 }
                 break;
 
-            case 0xfb: // layer_jump
+            case layer_jump: // layer_jump
                 sp3A = m64_read_s16(state);
                 state->pc = seqPlayer->seqData + sp3A;
                 break;
 
-            case 0xf4:
+            case 0xf4: //! needs enum
                 state->pc += (s8)m64_read_u8(state);
                 break;
 
-            case 0xc1: // layer_setshortnotevelocity
-            case 0xca: // layer_setpan
+            case layer_setshortnotevelocity: // layer_setshortnotevelocity
+            case layer_setpan: // layer_setpan
                 temp_a0_5 = *(state->pc++);
-                if (cmd == 0xc1) {
+                if (cmd == layer_setshortnotevelocity) {
                     layer->velocitySquare = (f32) (temp_a0_5 * temp_a0_5) / (f32) (127 * 127);
                 } else {
                     layer->pan = temp_a0_5;
                 }
                 break;
 
-            case 0xc2: // layer_transpose; set transposition in semitones
-            case 0xc9: // layer_setshortnoteduration
+            case layer_transpose: // layer_transpose; set transposition in semitones
+            case layer_setshortnoteduration: // layer_setshortnoteduration
                 temp_a0_5 = *(state->pc++);
-                if (cmd == 0xc9) {
+                if (cmd == layer_setshortnoteduration) {
                     layer->noteDuration = temp_a0_5;
                 } else {
                     layer->transposition = temp_a0_5;
                 }
                 break;
 
-            case 0xc4: // layer_somethingon
-            case 0xc5: // layer_somethingoff
-                layer->continuousNotes = (cmd == 0xc4);
+            case layer_somethingon: // layer_somethingon
+            case layer_somethingoff: // layer_somethingoff
+                layer->continuousNotes = (cmd == layer_somethingon);
                 seq_channel_layer_note_decay(layer);
                 break;
 
-            case 0xc3: // layer_setshortnotedefaultplaypercentage
+            case layer_setshortnotedefaultplaypercentage: // layer_setshortnotedefaultplaypercentage
                 sp3A = m64_read_compressed_u16(state);
                 layer->shortNoteDefaultPlayPercentage = sp3A;
                 break;
 
-            case 0xc6: // layer_setinstr
+            case layer_setinstr: // layer_setinstr
                 cmd = m64_read_u8(state);
                 if (cmd >= 0x7f) {
-                    if (cmd == 0x7f) {
+                    if (cmd == 0x7f) { //! needs enum
                         layer->instOrWave = 0;
                     } else {
                         layer->instOrWave = cmd;
                         layer->instrument = NULL;
                     }
 
-                    if (cmd == 0xff) {
+                    if (cmd == layer_end) {
                         layer->adsr.releaseRate = 0;
                     }
                     break;
@@ -1075,7 +1067,7 @@ s32 seq_channel_layer_process_script_part2(struct SequenceChannelLayer *layer) {
                 }
                 break;
 
-            case 0xc7: // layer_portamento
+            case layer_portamento: // layer_portamento
                 layer->portamento.mode = m64_read_u8(state);
 
                 // cmd is reused for the portamento's semitone
@@ -1098,21 +1090,21 @@ s32 seq_channel_layer_process_script_part2(struct SequenceChannelLayer *layer) {
                 layer->portamentoTime = sp3A;
                 break;
 
-            case 0xc8: // layer_disableportamento
+            case layer_disableportamento: // layer_disableportamento
                 layer->portamento.mode = 0;
                 break;
 
-            case 0xcb:
+            case 0xcb: //! needs enum
                 sp3A = m64_read_s16(state);
                 layer->adsr.envelope = (struct AdsrEnvelope *) (seqPlayer->seqData + sp3A);
                 layer->adsr.releaseRate = m64_read_u8(state);
                 break;
 
-            case 0xcc:
+            case 0xcc: //! needs enum
                 layer->ignoreDrumPan = TRUE;
                 break;
 
-            case 0xcd:
+            case 0xcd: //! needs enum
                 layer->reverbBits.asByte = m64_read_u8(state);
                 break;
 
@@ -1124,11 +1116,11 @@ s32 seq_channel_layer_process_script_part2(struct SequenceChannelLayer *layer) {
 
             default:
                 switch (cmd & 0xf0) {
-                    case 0xd0: // layer_setshortnotevelocityfromtable
+                    case layer_setshortnotevelocityfromtable: // layer_setshortnotevelocityfromtable
                         sp3A = seqPlayer->shortNoteVelocityTable[cmd & 0xf];
                         layer->velocitySquare = (f32) (sp3A * sp3A) / (f32) (127 * 127);
                         break;
-                    case 0xe0: // layer_setshortnotedurationfromtable
+                    case layer_setshortnotedurationfromtable: // layer_setshortnotedurationfromtable
                         layer->noteDuration = seqPlayer->shortNoteDurationTable[cmd & 0xf];
                         break;
                     default:
@@ -1283,21 +1275,21 @@ s32 seq_channel_layer_process_script_part3(struct SequenceChannelLayer *layer, s
 
     if (seqChannel->largeNotes) {
         switch (cmd & 0xc0) {
-            case 0x00: // layer_note0 (play percentage, velocity, duration)
+            case layer_note0: // layer_note0 (play percentage, velocity, duration)
                 sp3A = m64_read_compressed_u16(state);
                 vel = *(state->pc++);
                 layer->noteDuration = *(state->pc++);
                 layer->playPercentage = sp3A;
                 break;
 
-            case 0x40: // layer_note1 (play percentage, velocity)
+            case layer_note1: // layer_note1 (play percentage, velocity)
                 sp3A = m64_read_compressed_u16(state);
                 vel = *(state->pc++);
                 layer->noteDuration = 0;
                 layer->playPercentage = sp3A;
                 break;
 
-            case 0x80: // layer_note2 (velocity, duration; uses last play percentage)
+            case layer_note2: // layer_note2 (velocity, duration; uses last play percentage)
                 sp3A = layer->playPercentage;
                 vel = *(state->pc++);
                 layer->noteDuration = *(state->pc++);
@@ -1311,22 +1303,22 @@ s32 seq_channel_layer_process_script_part3(struct SequenceChannelLayer *layer, s
         cmd -= (cmd & 0xc0);
     } else {
         switch (cmd & 0xc0) {
-            case 0x00: // play note, type 0 (play percentage)
+            case layer_notetype0: // play note, type 0 (play percentage)
                 sp3A = m64_read_compressed_u16(state);
                 layer->playPercentage = sp3A;
                 break;
 
-            case 0x40: // play note, type 1 (uses default play percentage)
+            case layer_notetype1: // play note, type 1 (uses default play percentage)
                 sp3A = layer->shortNoteDefaultPlayPercentage;
                 break;
 
-            case 0x80: // play note, type 2 (uses last play percentage)
+            case layer_notetype2: // play note, type 2 (uses last play percentage)
                 sp3A = layer->playPercentage;
                 break;
         }
 
         // the remaining bits are used for the semitone
-        cmd -= cmd & 0xc0;
+        cmd -= (cmd & 0xc0);
     }
 
     layer->delay = sp3A;
@@ -1556,12 +1548,11 @@ void sequence_channel_process_script(struct SequenceChannel *seqChannel) {
                     case chan_bltz: // chan_bltz
                     case chan_bgez: // chan_bgez
                         sp5A = m64_read_s16(state);
-                        if (cmd == 0xfa && value != 0)
+                        if ((cmd == chan_beqz && value != 0)
+                         || (cmd == chan_bltz && value >= 0)
+                         || (cmd == chan_bgez && value <  0)) {
                             break;
-                        if (cmd == 0xf9 && value >= 0)
-                            break;
-                        if (cmd == 0xf5 && value < 0)
-                            break;
+                        }
                         state->pc = seqPlayer->seqData + sp5A;
                         break;
 
@@ -1570,10 +1561,10 @@ void sequence_channel_process_script(struct SequenceChannel *seqChannel) {
                     case chan_beqz_rel: // chan_beqz_rel
                     case chan_bltz_rel: // chan_bltz_rel
                         temp = m64_read_u8(state);
-                        if (cmd == 0xf3 && value != 0)
+                        if ((cmd == chan_beqz_rel && value != 0)
+                         || (cmd == chan_bltz_rel && value >= 0)) {
                             break;
-                        if (cmd == 0xf2 && value >= 0)
-                            break;
+                        }
                         state->pc += temp;
                         break;
 #endif // !(VERSION_EU || VERSION_SH)
@@ -1802,9 +1793,9 @@ void sequence_channel_process_script(struct SequenceChannel *seqChannel) {
                     case chan_bitand: // chan_bitand
                     case chan_setval: // chan_setval
                         temp = m64_read_u8(state);
-                        if (cmd == 0xc8) {
+                        if (cmd == chan_subtract) {
                             value -= temp;
-                        } else if (cmd == 0xcc) {
+                        } else if (cmd == chan_setval) {
                             value = temp;
                         } else {
                             value &= temp;
@@ -2266,7 +2257,7 @@ void sequence_player_process_sequence(struct SequencePlayer *seqPlayer) {
 #endif
         for (;;) {
             cmd = m64_read_u8(state);
-            if (cmd == 0xff) { // seq_end
+            if (cmd == seq_end) { // seq_end
                 if (state->depth == 0) {
                     sequence_player_disable(seqPlayer);
                     break;
@@ -2278,22 +2269,22 @@ void sequence_player_process_sequence(struct SequencePlayer *seqPlayer) {
 #endif
             }
 
-            if (cmd == 0xfd) { // seq_delay
+            if (cmd == seq_delay) { // seq_delay
                 seqPlayer->delay = m64_read_compressed_u16(state);
                 break;
             }
 
-            if (cmd == 0xfe) { // seq_delay1
+            if (cmd == seq_delay1) { // seq_delay1
                 seqPlayer->delay = 1;
                 break;
             }
 
             if (cmd >= 0xc0) {
                 switch (cmd) {
-                    case 0xff: // seq_end
+                    case seq_end: // seq_end
                         break;
 
-                    case 0xfc: // seq_call
+                    case seq_call: // seq_call
                         u16v = m64_read_s16(state);
                         if (0 && state->depth >= 4) {
                             eu_stubbed_printf_0("Macro Level Over Error!\n");
@@ -2306,7 +2297,7 @@ void sequence_player_process_sequence(struct SequencePlayer *seqPlayer) {
                         state->pc = seqPlayer->seqData + u16v;
                         break;
 
-                    case 0xf8: // seq_loop; loop start, N iterations (or 256 if N = 0)
+                    case seq_loop: // seq_loop; loop start, N iterations (or 256 if N = 0)
                         if (0 && state->depth >= 4) {
                             eu_stubbed_printf_0("Macro Level Over Error!\n");
                         }
@@ -2318,7 +2309,7 @@ void sequence_player_process_sequence(struct SequencePlayer *seqPlayer) {
 #endif
                         break;
 
-                    case 0xf7: // seq_loopend
+                    case seq_loopend: // seq_loopend
                         state->remLoopIters[state->depth - 1]--;
                         if (state->remLoopIters[state->depth - 1] != 0) {
                             state->pc = state->stack[state->depth - 1];
@@ -2327,72 +2318,56 @@ void sequence_player_process_sequence(struct SequencePlayer *seqPlayer) {
                         }
                         break;
 
-                    case 0xfb: // seq_jump
-                    case 0xfa: // seq_beqz; jump if == 0
-                    case 0xf9: // seq_bltz; jump if < 0
-                    case 0xf5: // seq_bgez; jump if >= 0
+                    case seq_jump: // seq_jump
+                    case seq_beqz: // seq_beqz; jump if == 0
+                    case seq_bltz: // seq_bltz; jump if < 0
+                    case seq_bgez: // seq_bgez; jump if >= 0
                         u16v = m64_read_s16(state);
-                        if (cmd == 0xfa && value != 0) {
-                            break;
-                        }
-                        if (cmd == 0xf9 && value >= 0) {
-                            break;
-                        }
-                        if (cmd == 0xf5 && value < 0) {
+                        if ((cmd == seq_beqz && value != 0)
+                         || (cmd == seq_bltz && value >= 0)
+                         || (cmd == seq_bgez && value <  0)) {
                             break;
                         }
                         state->pc = seqPlayer->seqData + u16v;
                         break;
 
 #if defined(VERSION_EU) || defined(VERSION_SH)
-                    case 0xf4:
-                    case 0xf3:
-                    case 0xf2:
+                    case seq_unk_f4:
+                    case seq_unk_f3:
+                    case seq_unk_f2:
                         temp = m64_read_u8(state);
-                        if (cmd == 0xf3 && value != 0) {
-                            break;
-                        }
-                        if (cmd == 0xf2 && value >= 0) {
+                        if ((cmd == seq_unk_f3 && value != 0)
+                         || (cmd == seq_unk_f2 && value >= 0)) {
                             break;
                         }
                         state->pc += (s8) temp;
                         break;
 #endif
 
-#if defined(VERSION_EU) || defined(VERSION_SH)
-                    case 0xf1: // seq_reservenotes
-#else
-                    case 0xf2: // seq_reservenotes
-#endif
+                    case seq_reservenotes: // seq_reservenotes
                         note_pool_clear(&seqPlayer->notePool);
                         note_pool_fill(&seqPlayer->notePool, m64_read_u8(state));
                         break;
 
-#if defined(VERSION_EU) || defined(VERSION_SH)
-                    case 0xf0: // seq_unreservenotes
-#else
-                    case 0xf1: // seq_unreservenotes
-#endif
+                    case seq_unreservenotes: // seq_unreservenotes
                         note_pool_clear(&seqPlayer->notePool);
                         break;
 
-                    case 0xdf: // seq_transpose; set transposition in semitones
+                    case seq_transpose: // seq_transpose; set transposition in semitones
                         seqPlayer->transposition = 0;
                         // fallthrough
 
-                    case 0xde: // seq_transposerel; add transposition
+                    case seq_transposerel: // seq_transposerel; add transposition
                         seqPlayer->transposition += (s8) m64_read_u8(state);
                         break;
 
-                    case 0xdd: // seq_settempo (bpm)
-#ifndef VERSION_SH
-                    case 0xdc: // seq_addtempo (bpm)
-#endif
+                    case seq_settempo: // seq_settempo (bpm)
 #ifdef VERSION_SH
                         seqPlayer->tempo = m64_read_u8(state) * TEMPO_SCALE;
 #else
+                    case seq_addtempo: // seq_addtempo (bpm)
                         temp = m64_read_u8(state);
-                        if (cmd == 0xdd) {
+                        if (cmd == seq_settempo) {
                             seqPlayer->tempo = temp * TEMPO_SCALE;
                         } else {
                             seqPlayer->tempo += (s8) temp * TEMPO_SCALE;
@@ -2411,13 +2386,13 @@ void sequence_player_process_sequence(struct SequencePlayer *seqPlayer) {
                         break;
 
 #ifdef VERSION_SH
-                    case 0xdc: // seq_addtempo (bpm)
+                    case seq_addtempo: // seq_addtempo (bpm)
                         seqPlayer->tempoAdd = (s8) m64_read_u8(state) * TEMPO_SCALE;
                         break;
 #endif
 
 #if defined(VERSION_EU) || defined(VERSION_SH)
-                    case 0xda:
+                    case seq_unk_da:
                         cmd = m64_read_u8(state);
                         u16v = m64_read_s16(state);
                         switch (cmd) {
@@ -2437,7 +2412,7 @@ void sequence_player_process_sequence(struct SequencePlayer *seqPlayer) {
                         }
                         break;
 
-                    case 0xdb:
+                    case seq_unk_db:
                         temp32 = m64_read_u8(state);
                         switch (seqPlayer->state) {
                             case SEQUENCE_PLAYER_STATE_2:
@@ -2455,8 +2430,12 @@ void sequence_player_process_sequence(struct SequencePlayer *seqPlayer) {
                                 }
                         }
                         break;
-#else
-                    case 0xdb: // seq_setvol
+                    case seq_unk_d9:
+                        temp = m64_read_u8(state);
+                        seqPlayer->fadeVolumeScale = (s8) temp / 127.0f;
+                        break;
+#else // !(VERSION_EU || VERSION_SH)
+                    case seq_setvol: // seq_setvol
                         cmd = m64_read_u8(state);
                         seqPlayer->volumeDefault = FLOAT_CAST(cmd) / 127.0f;
                         if (seqPlayer->volumeDefault >= 1.0f)
@@ -2481,7 +2460,7 @@ void sequence_player_process_sequence(struct SequencePlayer *seqPlayer) {
                         }
                         break;
 
-                    case 0xda: // seq_changevol
+                    case seq_changevol: // seq_changevol
                         temp = m64_read_u8(state);
                         seqPlayer->fadeVolume += (f32)(s8) temp / 127.0f;
                         
@@ -2491,58 +2470,51 @@ void sequence_player_process_sequence(struct SequencePlayer *seqPlayer) {
                         else if (seqPlayer->volumeDefault < 0.0f)
                             seqPlayer->volumeDefault = 0.0f;
                         break;
-#endif
+#endif // !(VERSION_EU || VERSION_SH)
 
-#if defined(VERSION_EU) || defined(VERSION_SH)
-                    case 0xd9:
-                        temp = m64_read_u8(state);
-                        seqPlayer->fadeVolumeScale = (s8) temp / 127.0f;
-                        break;
-#endif
-
-                    case 0xd7: // seq_initchannels
+                    case seq_initchannels: // seq_initchannels
                         u16v = m64_read_s16(state);
                         sequence_player_init_channels(seqPlayer, u16v);
                         break;
 
-                    case 0xd6: // seq_disablechannels
+                    case seq_disablechannels: // seq_disablechannels
                         u16v = m64_read_s16(state);
                         sequence_player_disable_channels(seqPlayer, u16v);
                         break;
 
-                    case 0xd5: // seq_setmutescale
+                    case seq_setmutescale: // seq_setmutescale
                         temp = m64_read_u8(state);
                         seqPlayer->muteVolumeScale = (f32)(s8) temp / 127.0f;
                         break;
 
-                    case 0xd4: // seq_mute
+                    case seq_mute: // seq_mute
                         seqPlayer->muted = TRUE;
                         break;
 
-                    case 0xd3: // seq_setmutebhv
+                    case seq_setmutebhv: // seq_setmutebhv
                         seqPlayer->muteBehavior = m64_read_u8(state);
                         break;
 
-                    case 0xd2: // seq_setshortnotevelocitytable
-                    case 0xd1: // seq_setshortnotedurationtable
+                    case seq_setshortnotevelocitytable: // seq_setshortnotevelocitytable
+                    case seq_setshortnotedurationtable: // seq_setshortnotedurationtable
                         u16v = m64_read_s16(state);
                         seqData = seqPlayer->seqData + u16v;
-                        if (cmd == 0xd2) {
+                        if (cmd == seq_setshortnotevelocitytable) {
                             seqPlayer->shortNoteVelocityTable = seqData;
                         } else {
                             seqPlayer->shortNoteDurationTable = seqData;
                         }
                         break;
 
-                    case 0xd0: // seq_setnoteallocationpolicy
+                    case seq_setnoteallocationpolicy: // seq_setnoteallocationpolicy
                         seqPlayer->noteAllocPolicy = m64_read_u8(state);
                         break;
 
-                    case 0xcc: // seq_setval
+                    case seq_setval: // seq_setval
                         value = m64_read_u8(state);
                         break;
 
-                    case 0xc9: // seq_bitand
+                    case seq_bitand: // seq_bitand
 #if defined(VERSION_EU) || defined(VERSION_SH)
                         value &= m64_read_u8(state);
 #else
@@ -2550,19 +2522,19 @@ void sequence_player_process_sequence(struct SequencePlayer *seqPlayer) {
 #endif
                         break;
 
-                    case 0xc8: // seq_subtract
+                    case seq_subtract: // seq_subtract
                         value = value - m64_read_u8(state);
                         break;
 
 #ifdef VERSION_SH
-                    case 0xc7:
+                    case seq_unk_c7:
                         cmd = m64_read_u8(state);
                         u16v = m64_read_s16(state);
                         seqData = seqPlayer->seqData + u16v;
                         *seqData = (u8)value + cmd;
                         break;
 
-                    case 0xc6:
+                    case seq_unk_c6:
                         seqPlayer->unkSh = TRUE;
                         return;
 #endif
@@ -2572,9 +2544,9 @@ void sequence_player_process_sequence(struct SequencePlayer *seqPlayer) {
                         break;
                 }
             } else {
-                loBits = cmd & 0xf;
+                loBits = (cmd & 0xf);
                 switch (cmd & 0xf0) {
-                    case 0x00: // seq_testchdisabled
+                    case seq_testchdisabled: // seq_testchdisabled
 #if defined(VERSION_EU) || defined(VERSION_SH)
                         value = seqPlayer->channels[loBits]->finished;
 #else
@@ -2583,45 +2555,45 @@ void sequence_player_process_sequence(struct SequencePlayer *seqPlayer) {
                         }
 #endif
                         break;
-                    case 0x10:
+                    case seq_unk_1X:
                         break;
-                    case 0x20:
+                    case seq_unk_2X:
                         break;
-                    case 0x40:
+                    case seq_unk_4X:
                         break;
-                    case 0x50: // seq_subvariation
+                    case seq_subvariation: // seq_subvariation
 #if defined(VERSION_EU) || defined(VERSION_SH)
                         value -= seqPlayer->seqVariationEu[0];
 #else
                         value -= seqPlayer->seqVariation;
 #endif
                         break;
-                    case 0x60:
+                    case seq_unk_6X:
                         break;
-                    case 0x70: // seq_setvariation
+                    case seq_setvariation: // seq_setvariation
 #if defined(VERSION_EU) || defined(VERSION_SH)
                         seqPlayer->seqVariationEu[0] = value;
 #else
                         seqPlayer->seqVariation = value;
 #endif
                         break;
-                    case 0x80: // seq_getvariation
+                    case seq_getvariation: // seq_getvariation
 #if defined(VERSION_EU) || defined(VERSION_SH)
                         value = seqPlayer->seqVariationEu[0];
 #else
                         value = seqPlayer->seqVariation;
 #endif
                         break;
-                    case 0x90: // seq_startchannel
+                    case seq_startchannel: // seq_startchannel
                         u16v = m64_read_s16(state);
                         sequence_channel_enable(seqPlayer, loBits, seqPlayer->seqData + u16v);
                         break;
-                    case 0xa0:
+                    case seq_unk_aX:
                         break;
 #if !defined(VERSION_EU) && !defined(VERSION_SH)
-                    case 0xd8: // (this makes no sense)
+                    case seq_unk_d8: // (this makes no sense)
                         break;
-                    case 0xd9:
+                    case seq_unk_d9:
                         break;
 #endif
 

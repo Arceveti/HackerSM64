@@ -17,7 +17,39 @@ enum PortamentoModes {
     PORTAMENTO_MODE_5
 };
 
-enum SeqChannelCommands {
+enum SeqChannelLayerCommands {
+    layer_end = 0xff, // function return or end of script
+    layer_call = 0xfc,
+    layer_loop = 0xf8, // loop start, N iterations (or 256 if N = 0)
+    layer_loopend = 0xf7,
+    layer_jump = 0xfb,
+    layer_setshortnotevelocity = 0xc1,
+    layer_setpan = 0xca,
+    layer_transpose = 0xc2, // set transposition in semitones
+    layer_setshortnoteduration = 0xc9,
+    layer_somethingon = 0xc4,
+    layer_somethingoff = 0xc5,
+    layer_setshortnotedefaultplaypercentage = 0xc3,
+    layer_setinstr = 0xc6,
+    layer_portamento = 0xc7,
+    layer_disableportamento = 0xc8,
+    // cmd & 0xf0
+        layer_setshortnotevelocityfromtable = 0xd0,
+        layer_setshortnotedurationfromtable = 0xe0,
+    layer_delay = 0xc0,
+    // cmd & 0xc0
+        // largenotes true
+        layer_note0 = 0x00, // (play percentage, velocity, duration)
+        layer_note1 = 0x40, // (play percentage, velocity)
+        layer_note2 = 0x80, // (velocity, duration; uses last play percentage)
+        // largenotes false
+        layer_notetype0 = layer_note0, // play note, type 0 (play percentage)
+        layer_notetype1 = layer_note1, // play note, type 1 (use default play percentage)
+        layer_notetype2 = layer_note2, // play note, type 2 (use last play percentage)
+
+};
+
+enum SeqChannelScriptCommands {
     chan_end = 0xff,
     chan_delay1 = 0xfe,
     chan_delay = 0xfd,
@@ -154,6 +186,71 @@ enum SeqChannelCommands {
 #endif
     chan_iowriteval2 = 0x30, // write data back to audio lib for another channel
     chan_ioreadval2 = 0x40, // read data from audio lib from another channel
+};
+
+enum SeqChannelProcessCommands {
+	seq_end = 0xff,
+	seq_delay = 0xfd,
+	seq_delay1 = 0xfe,
+	seq_call = 0xfc,
+	seq_loop = 0xf8, // loop start, N iterations (or 256 if N = 0)
+	seq_loopend = 0xf7,
+	seq_jump = 0xfb,
+	seq_beqz = 0xfa, // jump if == 0
+	seq_bltz = 0xf9, // jump if <  0
+	seq_bgez = 0xf5, // jump if >= 0
+	seq_unk_f4 = 0xf4,
+	seq_unk_f3 = 0xf3,
+	seq_unk_f2 = 0xf2,
+#if defined(VERSION_EU) || defined(VERSION_SH)
+    seq_reservenotes = 0xf1,
+    seq_unreservenotes = 0xf0,
+#else
+    seq_reservenotes = 0xf2,
+    seq_unreservenotes = 0xf1,
+#endif
+	seq_transpose = 0xdf, // set transposition in semitones
+	seq_transposerel = 0xde, // add transposition
+	seq_settempo = 0xdd, // bpm
+    seq_addtempo = 0xdc, // bpm
+#if defined(VERSION_EU) || defined(VERSION_SH)
+	seq_unk_da = 0xda,
+	seq_unk_db = 0xdb,
+	seq_unk_d9 = 0xd9,
+#else
+	seq_setvol = 0xdb,
+	seq_changevol = 0xda,
+#endif
+	seq_initchannels = 0xd7,
+	seq_disablechannels = 0xd6,
+	seq_setmutescale = 0xd5,
+	seq_mute = 0xd4,
+	seq_setmutebhv = 0xd3,
+	seq_setshortnotevelocitytable = 0xd2,
+	seq_setshortnotedurationtable = 0xd1,
+	seq_setnoteallocationpolicy = 0xd0,
+	seq_setval = 0xcc,
+	seq_bitand = 0xc9,
+	seq_subtract = 0xc8,
+#ifdef VERSION_SH
+	seq_unk_c7 = 0xc7,
+	seq_unk_c6 = 0xc6,
+#endif
+	// cmd & 0xf0
+	seq_testchdisabled = 0x00,
+	seq_unk_1X = 0x10,
+	seq_unk_2X = 0x20,
+	seq_unk_4X = 0x40,
+	seq_subvariation = 0x50,
+	seq_unk_6X = 0x60,
+	seq_setvariation = 0x70,
+	seq_getvariation = 0x80,
+	seq_startchannel = 0x90,
+	seq_unk_aX = 0xa0,
+#if !defined(VERSION_EU) && !defined(VERSION_SH)
+	seq_unk_d8 = 0xd8, // this makes no sense
+	seq_unk_d9 = 0xd9,
+#endif
 };
 
 void seq_channel_layer_disable(struct SequenceChannelLayer *seqPlayer);

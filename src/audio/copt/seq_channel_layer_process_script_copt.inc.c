@@ -169,7 +169,7 @@ void seq_channel_layer_process_script(struct SequenceChannelLayer *layer) {
         }
 
         switch (cmd) {
-            case 0xff: // layer_end; function return or end of script
+            case layer_end: // layer_end; function return or end of script
                 if (state->depth == 0) {
                     // N.B. this function call is *not* inlined even though it's
                     // within the same file, unlike in the rest of this function.
@@ -179,18 +179,18 @@ void seq_channel_layer_process_script(struct SequenceChannelLayer *layer) {
                 state->depth--, state->pc = state->stack[state->depth];
                 break;
 
-            case 0xfc: // layer_call
+            case layer_call: // layer_call
                 M64_READ_S16(state, sp3A);
                 state->depth++, state->stack[state->depth - 1] = state->pc;
                 state->pc = seqPlayer->seqData + sp3A;
                 break;
 
-            case 0xf8: // layer_loop; loop start, N iterations (or 256 if N = 0)
+            case layer_loop: // layer_loop; loop start, N iterations (or 256 if N = 0)
                 M64_READ_U8(state, state->remLoopIters[state->depth]);
                 state->depth++, state->stack[state->depth - 1] = state->pc;
                 break;
 
-            case 0xf7: // layer_loopend
+            case layer_loopend: // layer_loopend
                 if (--state->remLoopIters[state->depth - 1] != 0) {
                     state->pc = state->stack[state->depth - 1];
                 } else {
@@ -198,43 +198,43 @@ void seq_channel_layer_process_script(struct SequenceChannelLayer *layer) {
                 }
                 break;
 
-            case 0xfb: // layer_jump
+            case layer_jump: // layer_jump
                 M64_READ_S16(state, sp3A);
                 state->pc = seqPlayer->seqData + sp3A;
                 break;
 
-            case 0xc1: // layer_setshortnotevelocity
-            case 0xca: // layer_setpan
+            case layer_setshortnotevelocity: // layer_setshortnotevelocity
+            case layer_setpan: // layer_setpan
                 temp_a0_5 = *(state->pc++);
-                if (cmd == 0xc1) {
+                if (cmd == layer_setshortnotevelocity) {
                     layer->velocitySquare = (f32)(temp_a0_5 * temp_a0_5);
                 } else {
                     layer->pan = (f32) temp_a0_5 / 128.0f;
                 }
                 break;
 
-            case 0xc2: // layer_transpose; set transposition in semitones
-            case 0xc9: // layer_setshortnoteduration
+            case layer_transpose: // layer_transpose; set transposition in semitones
+            case layer_setshortnoteduration: // layer_setshortnoteduration
                 temp_a0_5 = *(state->pc++);
-                if (cmd == 0xc9) {
+                if (cmd == layer_setshortnoteduration) {
                     layer->noteDuration = temp_a0_5;
                 } else {
                     layer->transposition = temp_a0_5;
                 }
                 break;
 
-            case 0xc4: // layer_somethingon
-            case 0xc5: // layer_somethingoff
-                layer->continuousNotes = (cmd == 0xc4);
+            case layer_somethingon: // layer_somethingon
+            case layer_somethingoff: // layer_somethingoff
+                layer->continuousNotes = (cmd == layer_somethingon);
                 seq_channel_layer_note_decay(layer);
                 break;
 
-            case 0xc3: // layer_setshortnotedefaultplaypercentage
+            case layer_setshortnotedefaultplaypercentage: // layer_setshortnotedefaultplaypercentage
                 M64_READ_COMPRESSED_U16(state, sp3A);
                 layer->shortNoteDefaultPlayPercentage = sp3A;
                 break;
 
-            case 0xc6: // layer_setinstr
+            case layer_setinstr: // layer_setinstr
                 M64_READ_U8(state, cmdSemitone);
 
                 if (cmdSemitone < 127) {
@@ -242,7 +242,7 @@ void seq_channel_layer_process_script(struct SequenceChannelLayer *layer) {
                 }
                 break;
 
-            case 0xc7: // layer_portamento
+            case layer_portamento: // layer_portamento
                 M64_READ_U8(state, (*layer).portamento.mode);
                 M64_READ_U8(state, cmdSemitone);
 
@@ -265,24 +265,24 @@ void seq_channel_layer_process_script(struct SequenceChannelLayer *layer) {
                 layer->portamentoTime = sp3A;
                 break;
 
-            case 0xc8: // layer_disableportamento
+            case layer_disableportamento: // layer_disableportamento
                 layer->portamento.mode = 0;
                 break;
 
             default:
                 switch (cmd & 0xf0) {
-                    case 0xd0: // layer_setshortnotevelocityfromtable
+                    case layer_setshortnotevelocityfromtable: // layer_setshortnotevelocityfromtable
                         sp3A = seqPlayer->shortNoteVelocityTable[cmd & 0xf];
                         (*layer).velocitySquare = (f32)(sp3A * sp3A);
                         break;
-                    case 0xe0: // layer_setshortnotedurationfromtable
+                    case layer_setshortnotedurationfromtable: // layer_setshortnotedurationfromtable
                         (*layer).noteDuration = seqPlayer->shortNoteDurationTable[cmd & 0xf];
                         break;
                 }
         }
     }
 
-    if (cmd == 0xc0) { // layer_delay
+    if (cmd == layer_delay) { // layer_delay
         M64_READ_COMPRESSED_U16(state, layer->delay);
         layer->stopSomething = TRUE;
     } else {
@@ -290,21 +290,21 @@ void seq_channel_layer_process_script(struct SequenceChannelLayer *layer) {
 
         if (seqChannel->largeNotes) {
             switch (cmd & 0xc0) {
-                case 0x00: // layer_note0 (play percentage, velocity, duration)
+                case layer_note0: // layer_note0 (play percentage, velocity, duration)
                     M64_READ_COMPRESSED_U16(state, sp3A);
                     vel = *((*state).pc++);
                     layer->noteDuration = *((*state).pc++);
                     layer->playPercentage = sp3A;
                     break;
 
-                case 0x40: // layer_note1 (play percentage, velocity)
+                case layer_note1: // layer_note1 (play percentage, velocity)
                     M64_READ_COMPRESSED_U16(state, sp3A);
                     vel = *((*state).pc++);
                     layer->noteDuration = 0;
                     layer->playPercentage = sp3A;
                     break;
 
-                case 0x80: // layer_note2 (velocity, duration; uses last play percentage)
+                case layer_note2: // layer_note2 (velocity, duration; uses last play percentage)
                     sp3A = layer->playPercentage;
                     vel = *((*state).pc++);
                     layer->noteDuration = *((*state).pc++);
@@ -314,16 +314,16 @@ void seq_channel_layer_process_script(struct SequenceChannelLayer *layer) {
             layer->velocitySquare = vel * vel;
         } else {
             switch (cmd & 0xc0) {
-                case 0x00: // play note, type 0 (play percentage)
+                case layer_notetype0: // play note, type 0 (play percentage)
                     M64_READ_COMPRESSED_U16(state, sp3A);
                     layer->playPercentage = sp3A;
                     break;
 
-                case 0x40: // play note, type 1 (uses default play percentage)
+                case layer_notetype1: // play note, type 1 (uses default play percentage)
                     sp3A = layer->shortNoteDefaultPlayPercentage;
                     break;
 
-                case 0x80: // play note, type 2 (uses last play percentage)
+                case layer_notetype2: // play note, type 2 (uses last play percentage)
                     sp3A = layer->playPercentage;
                     break;
             }
