@@ -1397,10 +1397,7 @@ void func_sh_802f5310(s32 bankId, struct AudioBank *mem, struct PatchStruct *pat
                     }
                     break;
             }
-            switch ((uintptr_t) addr) {
-                case 0:
-                    break;
-                default:
+            if (addr != NULL) {
                 switch (arg3) {
                     case 0:
                         if (temp_s0->medium == 1) {
@@ -1417,7 +1414,7 @@ void func_sh_802f5310(s32 bankId, struct AudioBank *mem, struct PatchStruct *pat
                     case 1:
                         D_SH_8034EC88[D_SH_8034F68C].sample = temp_s0;
                         D_SH_8034EC88[D_SH_8034F68C].ramAddr = addr;
-                        D_SH_8034EC88[D_SH_8034F68C].encodedInfo = (D_SH_8034F68C << 24) | 0xffffff;
+                        D_SH_8034EC88[D_SH_8034F68C].encodedInfo = ((D_SH_8034F68C << 24) | 0xffffff);
                         D_SH_8034EC88[D_SH_8034F68C].isFree = FALSE;
                         D_SH_8034EC88[D_SH_8034F68C].endAndMediumIdentification = temp_s0->sampleAddr + temp_s0->size + temp_s0->medium;
                         D_SH_8034F68C++;

@@ -1753,8 +1753,8 @@ void process_level_music_dynamics(void) {
             // The area matches. Break out of the loop.
             tempBits = 0;
         } else {
-            tempBits      = sLevelDynamics[gCurrLevelNum][i] & 0xff00;
-            musicDynIndex = sLevelDynamics[gCurrLevelNum][i] & 0x00ff;
+            tempBits      = (sLevelDynamics[gCurrLevelNum][i] & 0xff00);
+            musicDynIndex = (sLevelDynamics[gCurrLevelNum][i] & 0x00ff);
             i++;
         }
 
@@ -1775,14 +1775,12 @@ void process_level_music_dynamics(void) {
             conditionBits = tempBits;
             tempBits = 0;
             if (sMusicDynamics[musicDynIndex].bits1 & conditionBits) {
-                fade_channel_volume_scale(SEQ_PLAYER_LEVEL, i, sMusicDynamics[musicDynIndex].volScale1,
-                                          dur1);
+                fade_channel_volume_scale(SEQ_PLAYER_LEVEL, i, sMusicDynamics[musicDynIndex].volScale1, dur1);
             }
             if (sMusicDynamics[musicDynIndex].bits2 & conditionBits) {
-                fade_channel_volume_scale(SEQ_PLAYER_LEVEL, i, sMusicDynamics[musicDynIndex].volScale2,
-                                          dur2);
+                fade_channel_volume_scale(SEQ_PLAYER_LEVEL, i, sMusicDynamics[musicDynIndex].volScale2, dur2);
             }
-            tempBits = conditionBits << 1;
+            tempBits = (conditionBits << 1);
         }
 
         sCurrentMusicDynamic = musicDynIndex;
@@ -1793,14 +1791,14 @@ UNUSED void unused_8031FED0(u8 player, u32 bits, s8 arg2) {
     u8 i;
 
     if (arg2 < 0) {
-        arg2 = -arg2;
+        arg2 = -arg2; // abs
     }
 
     for (i = 0; i < CHANNELS_MAX; i++) {
         if (gSequencePlayers[player].channels[i] != &gSequenceChannelNone) {
-            if ((bits & 0x3) == 0) {
+            if ((bits & ((1 << 1) | (1 << 0))) == 0) {
                 gSequencePlayers[player].channels[i]->volumeScale = 1.0f;
-            } else if ((bits & 0x1) != 0) {
+            } else if ((bits & (1 << 0)) != 0) {
                 gSequencePlayers[player].channels[i]->volumeScale = ((f32) arg2 / 127.0f);
             } else {
                 gSequencePlayers[player].channels[i]->volumeScale = (1.0f - ((f32) arg2 / 127.0f));

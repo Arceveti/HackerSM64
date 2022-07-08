@@ -14,9 +14,9 @@ void note_set_resampling_rate(struct Note *note, f32 resamplingRateInput);
 #if defined(VERSION_EU) || defined(VERSION_SH)
  #ifdef VERSION_SH
 void note_set_vel_pan_reverb(struct Note *note, struct ReverbInfo *reverbInfo) {
- #else // !VERSION_SH
+ #else // !VERSION_SH == VERSION_EU
 void note_set_vel_pan_reverb(struct Note *note, f32 velocity, u8 pan, u8 reverbVol) {
- #endif // !VERSION_SH
+ #endif // !VERSION_SH == VERSION_EU
     struct NoteSubEu *sub = &note->noteSubEu;
     f32 volRight, volLeft;
     u8 strongRight;
@@ -24,38 +24,37 @@ void note_set_vel_pan_reverb(struct Note *note, f32 velocity, u8 pan, u8 reverbV
     s32 smallPanIndex;
  #ifdef VERSION_EU
     u16 unkMask = ~0x80;
- #else // !VERSION_EU
+ #else // !VERSION_EU == VERSION_EU
     f32 velocity;
     u8 pan;
     u8 reverbVol;
     struct ReverbBitsData reverbBits;
- #endif // !VERSION_EU
+ #endif // !VERSION_EU == VERSION_EU
 
  #ifdef VERSION_SH
     note_set_resampling_rate(note, reverbInfo->freqScale);
     velocity = reverbInfo->velocity;
-    pan = reverbInfo->pan;
+    pan = reverbInfo->pan & 0x7f;
     reverbVol = reverbInfo->reverbVol;
     reverbBits = reverbInfo->reverbBits.s;
-    pan &= 0x7f;
- #else // !VERSION_SH
+ #else // !VERSION_SH == VERSION_EU
     pan &= unkMask;
- #endif // !VERSION_SH
+ #endif // !VERSION_SH == VERSION_EU
 
     if (note->noteSubEu.stereoHeadsetEffects && gSoundMode == SOUND_MODE_HEADSET) {
  #ifdef VERSION_SH
-        smallPanIndex = pan >> 1;
- #else // !VERSION_SH
-        smallPanIndex = pan >> 3;
- #endif // !VERSION_SH
+        smallPanIndex = (pan >> 1);
+ #else // !VERSION_SH == VERSION_EU
+        smallPanIndex = (pan >> 3);
+ #endif // !VERSION_SH == VERSION_EU
         if (smallPanIndex >= ARRAY_COUNT(gHeadsetPanQuantization)) {
             smallPanIndex = ARRAY_COUNT(gHeadsetPanQuantization) - 1;
         }
 
-        sub->headsetPanLeft = gHeadsetPanQuantization[smallPanIndex];
+        sub->headsetPanLeft  = gHeadsetPanQuantization[smallPanIndex];
         sub->headsetPanRight = gHeadsetPanQuantization[ARRAY_COUNT(gHeadsetPanQuantization) - 1 - smallPanIndex];
         sub->stereoStrongRight = FALSE;
-        sub->stereoStrongLeft = FALSE;
+        sub->stereoStrongLeft  = FALSE;
         sub->usesHeadsetPanEffects = TRUE;
 
         volLeft = gHeadsetPanVolume[pan];
@@ -63,7 +62,7 @@ void note_set_vel_pan_reverb(struct Note *note, f32 velocity, u8 pan, u8 reverbV
     } else if (sub->stereoHeadsetEffects && gSoundMode == SOUND_MODE_STEREO) {
         strongLeft = FALSE;
         strongRight = FALSE;
-        sub->headsetPanLeft = 0;
+        sub->headsetPanLeft  = 0;
         sub->headsetPanRight = 0;
 
         sub->usesHeadsetPanEffects = FALSE;
@@ -77,26 +76,26 @@ void note_set_vel_pan_reverb(struct Note *note, f32 velocity, u8 pan, u8 reverbV
         }
 
         sub->stereoStrongRight = strongRight;
-        sub->stereoStrongLeft = strongLeft;
+        sub->stereoStrongLeft  = strongLeft;
 
  #ifdef VERSION_SH
         switch (reverbBits.stereoHeadsetEffects) {
             case 0:
                 sub->stereoStrongRight = reverbBits.strongRight;
-                sub->stereoStrongLeft = reverbBits.strongLeft;
+                sub->stereoStrongLeft  = reverbBits.strongLeft;
                 break;
 
             case 1:
                 break;
 
             case 2:
-                sub->stereoStrongRight = reverbBits.strongRight | strongRight;
-                sub->stereoStrongLeft = reverbBits.strongLeft | strongLeft;
+                sub->stereoStrongRight = (reverbBits.strongRight | strongRight);
+                sub->stereoStrongLeft  = (reverbBits.strongLeft  | strongLeft);
                 break;
 
             case 3:
-                sub->stereoStrongRight = reverbBits.strongRight ^ strongRight;
-                sub->stereoStrongLeft = reverbBits.strongLeft ^ strongLeft;
+                sub->stereoStrongRight = (reverbBits.strongRight ^ strongRight);
+                sub->stereoStrongLeft  = (reverbBits.strongLeft  ^ strongLeft);
                 break;
         }
  #endif // VERSION_SH
@@ -116,7 +115,7 @@ void note_set_vel_pan_reverb(struct Note *note, f32 velocity, u8 pan, u8 reverbV
         velocity = 1.0f;
     }
 
-    sub->targetVolLeft =  ((s32) (velocity * volLeft * 4095.999f));
+    sub->targetVolLeft =  ((s32) (velocity * volLeft  * 4095.999f));
     sub->targetVolRight = ((s32) (velocity * volRight * 4095.999f));
     sub->synthesisVolume = reverbInfo->synthesisVolume;
     sub->filter = reverbInfo->filter;
@@ -130,14 +129,14 @@ void note_set_vel_pan_reverb(struct Note *note, f32 velocity, u8 pan, u8 reverbV
         velocity = 32767.0f;
     }
 
-    sub->targetVolLeft =  ((s32) (velocity * volLeft) & 0xffff) >> 5;
-    sub->targetVolRight = ((s32) (velocity * volRight) & 0xffff) >> 5;
+    sub->targetVolLeft  = (((s32) (velocity *  volLeft) & 0xffff) >> 5);
+    sub->targetVolRight = (((s32) (velocity * volRight) & 0xffff) >> 5);
  #endif // !VERSION_SH
 
     //! @bug for the change to UQ0.7, the if statement should also have been changed accordingly
     if (sub->reverbVol != reverbVol) {
  #ifdef VERSION_SH
-        sub->reverbVol = reverbVol >> 1;
+        sub->reverbVol = (reverbVol >> 1);
  #else // !VERSION_SH
         sub->reverbVol = reverbVol;
  #endif // !VERSION_SH
@@ -478,23 +477,23 @@ void process_notes(void) {
             attributes = &playbackState->attributes;
  #ifdef VERSION_SH
             if (playbackState->unkSH34 == 1 || playbackState->unkSH34 == 2) {
-                reverbInfo.freqScale = attributes->freqScale;
-                reverbInfo.velocity = attributes->velocity;
-                reverbInfo.pan = attributes->pan;
-                reverbInfo.reverbVol = attributes->reverbVol;
-                reverbInfo.reverbBits = attributes->reverbBits;
+                reverbInfo.freqScale       = attributes->freqScale;
+                reverbInfo.velocity        = attributes->velocity;
+                reverbInfo.pan             = attributes->pan;
+                reverbInfo.reverbVol       = attributes->reverbVol;
+                reverbInfo.reverbBits      = attributes->reverbBits;
                 reverbInfo.synthesisVolume = attributes->synthesisVolume;
-                reverbInfo.filter = attributes->filter;
-                bookOffset = noteSubEu->bookOffset;
+                reverbInfo.filter          = attributes->filter;
+                bookOffset                 = noteSubEu->bookOffset;
             } else {
-                reverbInfo.freqScale = playbackState->parentLayer->noteFreqScale;
-                reverbInfo.velocity = playbackState->parentLayer->noteVelocity;
-                reverbInfo.pan = playbackState->parentLayer->notePan;
-                reverbInfo.reverbBits = playbackState->parentLayer->reverbBits;
-                reverbInfo.reverbVol = playbackState->parentLayer->seqChannel->reverbVol;
-                reverbInfo.synthesisVolume = playbackState->parentLayer->seqChannel->synthesisVolume;
-                reverbInfo.filter = playbackState->parentLayer->seqChannel->filter;
-                bookOffset = (playbackState->parentLayer->seqChannel->bookOffset & 0x7);
+                reverbInfo.freqScale       =  playbackState->parentLayer->noteFreqScale;
+                reverbInfo.velocity        =  playbackState->parentLayer->noteVelocity;
+                reverbInfo.pan             =  playbackState->parentLayer->notePan;
+                reverbInfo.reverbBits      =  playbackState->parentLayer->reverbBits;
+                reverbInfo.reverbVol       =  playbackState->parentLayer->seqChannel->reverbVol;
+                reverbInfo.synthesisVolume =  playbackState->parentLayer->seqChannel->synthesisVolume;
+                reverbInfo.filter          =  playbackState->parentLayer->seqChannel->filter;
+                bookOffset                 = (playbackState->parentLayer->seqChannel->bookOffset & 0x7);
                 if (playbackState->parentLayer->seqChannel->seqPlayer->muted
                     && (playbackState->parentLayer->seqChannel->muteBehavior & MUTE_BEHAVIOR_3)) {
                     reverbInfo.freqScale = 0.0f;
@@ -509,15 +508,15 @@ void process_notes(void) {
  #else // !VERSION_SH
             if (playbackState->priority == NOTE_PRIORITY_STOPPING) {
                 frequency = attributes->freqScale;
-                velocity = attributes->velocity;
-                pan = attributes->pan;
-                reverbVol = attributes->reverbVol;
+                velocity   = attributes->velocity;
+                pan        = attributes->pan;
+                reverbVol  = attributes->reverbVol;
                 bookOffset = noteSubEu->bookOffset;
             } else {
-                frequency = playbackState->parentLayer->noteFreqScale;
-                velocity = playbackState->parentLayer->noteVelocity;
-                pan = playbackState->parentLayer->notePan;
-                reverbVol = playbackState->parentLayer->seqChannel->reverbVol;
+                frequency  =  playbackState->parentLayer->noteFreqScale;
+                velocity   =  playbackState->parentLayer->noteVelocity;
+                pan        =  playbackState->parentLayer->notePan;
+                reverbVol  =  playbackState->parentLayer->seqChannel->reverbVol;
                 bookOffset = (playbackState->parentLayer->seqChannel->bookOffset & 0x7);
             }
 
@@ -572,13 +571,13 @@ void process_notes(void) {
             attributes = &note->attributes;
             if (note->priority == NOTE_PRIORITY_STOPPING) {
                 frequency = attributes->freqScale;
-                velocity = attributes->velocity;
-                pan = attributes->pan;
+                velocity  = attributes->velocity;
+                pan       = attributes->pan;
                 reverbVol = attributes->reverbVol;
             } else {
                 frequency = note->parentLayer->noteFreqScale;
-                velocity = note->parentLayer->noteVelocity;
-                pan = note->parentLayer->notePan;
+                velocity  = note->parentLayer->noteVelocity;
+                pan       = note->parentLayer->notePan;
                 reverbVol = note->parentLayer->seqChannel->reverbVol;
             }
 
@@ -710,14 +709,14 @@ void seq_channel_layer_decay_release_internal(struct SequenceChannelLayer *seqLa
 #endif
     if (note->adsr.state != ADSR_STATE_DECAY) {
         attributes->freqScale = seqLayer->noteFreqScale;
-        attributes->velocity = seqLayer->noteVelocity;
-        attributes->pan = seqLayer->notePan;
+        attributes->velocity  = seqLayer->noteVelocity;
+        attributes->pan       = seqLayer->notePan;
 #ifdef VERSION_SH
         attributes->reverbBits = seqLayer->reverbBits;
         if (seqLayer->seqChannel != NULL) {
-            attributes->reverbVol = seqLayer->seqChannel->reverbVol;
+            attributes->reverbVol       = seqLayer->seqChannel->reverbVol;
             attributes->synthesisVolume = seqLayer->seqChannel->synthesisVolume;
-            attributes->filter = seqLayer->seqChannel->filter;
+            attributes->filter          = seqLayer->seqChannel->filter;
             if (seqLayer->seqChannel->seqPlayer->muted && (seqLayer->seqChannel->muteBehavior & MUTE_BEHAVIOR_3)) {
                 note->noteSubEu.finished = TRUE;
             }
@@ -860,7 +859,7 @@ void build_synthetic_wave(struct Note *note, struct SequenceChannelLayer *seqLay
     // Repeat sample
     for (offset = note->sampleCount; offset < 0x40; offset += note->sampleCount) {
         lim = note->sampleCount;
-        if (offset < 0 || offset > 0) {
+        if (offset < 0 || offset > 0) { //! does the same thing either way
             for (j = 0; j < lim; j++) {
                 note->synthesisBuffers->samples[offset + j] = note->synthesisBuffers->samples[j];
             }
@@ -912,10 +911,10 @@ void init_note_lists(struct NotePool *pool) {
     init_note_list(&pool->decaying);
     init_note_list(&pool->releasing);
     init_note_list(&pool->active);
-    pool->disabled.pool = pool;
-    pool->decaying.pool = pool;
+    pool->disabled.pool  = pool;
+    pool->decaying.pool  = pool;
     pool->releasing.pool = pool;
-    pool->active.pool = pool;
+    pool->active.pool    = pool;
 }
 
 void init_note_free_list(void) {
@@ -936,24 +935,24 @@ void note_pool_clear(struct NotePool *pool) {
     struct AudioListItem *dest;
     UNUSED s32 j; // unused in EU
 
-    for (i = 0; i < 4; i++) {
+    for (i = 0; i < NOTE_POOL_COUNT; i++) {
         switch (i) {
-            case 0:
+            case NOTE_POOL_DISABLED:
                 source = &pool->disabled;
                 dest = &gNoteFreeLists.disabled;
                 break;
 
-            case 1:
+            case NOTE_POOL_DECAYING:
                 source = &pool->decaying;
                 dest = &gNoteFreeLists.decaying;
                 break;
 
-            case 2:
+            case NOTE_POOL_RELEASING:
                 source = &pool->releasing;
                 dest = &gNoteFreeLists.releasing;
                 break;
 
-            case 3:
+            case NOTE_POOL_ACTIVE:
                 source = &pool->active;
                 dest = &gNoteFreeLists.active;
                 break;
@@ -996,28 +995,28 @@ void note_pool_fill(struct NotePool *pool, s32 count) {
     note_pool_clear(pool);
 
     for (i = 0, j = 0; j < count; i++) {
-        if (i == 4) {
+        if (i == NOTE_POOL_COUNT) {
             eu_stubbed_printf_1("Alloc Error:Dim voice-Alloc %d", count);
             return;
         }
 
         switch (i) {
-            case 0:
+            case NOTE_POOL_DISABLED:
                 source = &gNoteFreeLists.disabled;
                 dest = &pool->disabled;
                 break;
 
-            case 1:
+            case NOTE_POOL_DECAYING:
                 source = &gNoteFreeLists.decaying;
                 dest = &pool->decaying;
                 break;
 
-            case 2:
+            case NOTE_POOL_RELEASING:
                 source = &gNoteFreeLists.releasing;
                 dest = &pool->releasing;
                 break;
 
-            case 3:
+            case NOTE_POOL_ACTIVE:
                 source = &gNoteFreeLists.active;
                 dest = &pool->active;
                 break;
@@ -1268,8 +1267,8 @@ struct Note *alloc_note(struct SequenceChannelLayer *seqLayer) {
 
     if (policy & NOTE_ALLOC_CHANNEL) {
         if (!(ret = alloc_note_from_disabled(&seqLayer->seqChannel->notePool, seqLayer))
-            && !(ret = alloc_note_from_decaying(&seqLayer->seqChannel->notePool, seqLayer))
-            && !(ret = alloc_note_from_active(&seqLayer->seqChannel->notePool, seqLayer))) {
+         && !(ret = alloc_note_from_decaying(&seqLayer->seqChannel->notePool, seqLayer))
+         && !(ret = alloc_note_from_active(&seqLayer->seqChannel->notePool, seqLayer))) {
 #ifdef VERSION_SH
             goto null_return;
 #else
@@ -1283,11 +1282,11 @@ struct Note *alloc_note(struct SequenceChannelLayer *seqLayer) {
 
     if (policy & NOTE_ALLOC_SEQ) {
         if (!(ret = alloc_note_from_disabled(&seqLayer->seqChannel->notePool, seqLayer))
-            && !(ret = alloc_note_from_disabled(&seqLayer->seqChannel->seqPlayer->notePool, seqLayer))
-            && !(ret = alloc_note_from_decaying(&seqLayer->seqChannel->notePool, seqLayer))
-            && !(ret = alloc_note_from_decaying(&seqLayer->seqChannel->seqPlayer->notePool, seqLayer))
-            && !(ret = alloc_note_from_active(&seqLayer->seqChannel->notePool, seqLayer))
-            && !(ret = alloc_note_from_active(&seqLayer->seqChannel->seqPlayer->notePool, seqLayer))) {
+         && !(ret = alloc_note_from_disabled(&seqLayer->seqChannel->seqPlayer->notePool, seqLayer))
+         && !(ret = alloc_note_from_decaying(&seqLayer->seqChannel->notePool, seqLayer))
+         && !(ret = alloc_note_from_decaying(&seqLayer->seqChannel->seqPlayer->notePool, seqLayer))
+         && !(ret = alloc_note_from_active(&seqLayer->seqChannel->notePool, seqLayer))
+         && !(ret = alloc_note_from_active(&seqLayer->seqChannel->seqPlayer->notePool, seqLayer))) {
 #ifdef VERSION_SH
             goto null_return;
 #else
@@ -1301,8 +1300,8 @@ struct Note *alloc_note(struct SequenceChannelLayer *seqLayer) {
 
     if (policy & NOTE_ALLOC_GLOBAL_FREELIST) {
         if (!(ret = alloc_note_from_disabled(&gNoteFreeLists, seqLayer))
-            && !(ret = alloc_note_from_decaying(&gNoteFreeLists, seqLayer))
-            && !(ret = alloc_note_from_active(&gNoteFreeLists, seqLayer))) {
+         && !(ret = alloc_note_from_decaying(&gNoteFreeLists, seqLayer))
+         && !(ret = alloc_note_from_active(&gNoteFreeLists, seqLayer))) {
 #ifdef VERSION_SH
             goto null_return;
 #else
@@ -1315,14 +1314,14 @@ struct Note *alloc_note(struct SequenceChannelLayer *seqLayer) {
     }
 
     if (!(ret = alloc_note_from_disabled(&seqLayer->seqChannel->notePool, seqLayer))
-        && !(ret = alloc_note_from_disabled(&seqLayer->seqChannel->seqPlayer->notePool, seqLayer))
-        && !(ret = alloc_note_from_disabled(&gNoteFreeLists, seqLayer))
-        && !(ret = alloc_note_from_decaying(&seqLayer->seqChannel->notePool, seqLayer))
-        && !(ret = alloc_note_from_decaying(&seqLayer->seqChannel->seqPlayer->notePool, seqLayer))
-        && !(ret = alloc_note_from_decaying(&gNoteFreeLists, seqLayer))
-        && !(ret = alloc_note_from_active(&seqLayer->seqChannel->notePool, seqLayer))
-        && !(ret = alloc_note_from_active(&seqLayer->seqChannel->seqPlayer->notePool, seqLayer))
-        && !(ret = alloc_note_from_active(&gNoteFreeLists, seqLayer))) {
+     && !(ret = alloc_note_from_disabled(&seqLayer->seqChannel->seqPlayer->notePool, seqLayer))
+     && !(ret = alloc_note_from_disabled(&gNoteFreeLists, seqLayer))
+     && !(ret = alloc_note_from_decaying(&seqLayer->seqChannel->notePool, seqLayer))
+     && !(ret = alloc_note_from_decaying(&seqLayer->seqChannel->seqPlayer->notePool, seqLayer))
+     && !(ret = alloc_note_from_decaying(&gNoteFreeLists, seqLayer))
+     && !(ret = alloc_note_from_active(&seqLayer->seqChannel->notePool, seqLayer))
+     && !(ret = alloc_note_from_active(&seqLayer->seqChannel->seqPlayer->notePool, seqLayer))
+     && !(ret = alloc_note_from_active(&gNoteFreeLists, seqLayer))) {
 #ifdef VERSION_SH
         goto null_return;
 #else

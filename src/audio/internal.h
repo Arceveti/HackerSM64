@@ -123,6 +123,14 @@ struct AudioListItem {
     struct NotePool *pool;
 }; // size = 0x10
 
+enum NotePools {
+    NOTE_POOL_DISABLED,
+    NOTE_POOL_DECAYING,
+    NOTE_POOL_RELEASING,
+    NOTE_POOL_ACTIVE,
+    NOTE_POOL_COUNT,
+};
+
 struct NotePool {
     struct AudioListItem disabled;
     struct AudioListItem decaying;

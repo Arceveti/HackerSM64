@@ -1108,7 +1108,7 @@ s32 seq_channel_layer_process_script_part2(struct SequenceChannelLayer *layer) {
                 layer->reverbBits.asByte = m64_read_u8(state);
                 break;
 
-            case 0xce:
+            case 0xce: //! needs enum
                 cmd = m64_read_u8(state) + 0x80;
                 layer->freqScaleMultiplier = unk_sh_data_1[cmd];
                 // missing break :)
