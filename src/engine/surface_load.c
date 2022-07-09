@@ -655,7 +655,7 @@ void load_object_collision_model(void) {
     }
 
 #ifdef LOAD_OBJECT_COLLISION_NEAR_CAMERA
-    f32 camDist = absf(obj->header.gfx.cameraToObject[2]);
+    f32 camDist = vec3_mag(obj->header.gfx.cameraToObject);
     marioDist = MIN(marioDist, camDist);
 #endif
 
