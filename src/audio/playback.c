@@ -885,6 +885,7 @@ void init_synthetic_wave(struct Note *note, struct SequenceChannelLayer *seqLaye
     sampleCountIndex = note->sampleCountIndex;
     waveSampleCountIndex = build_synthetic_wave(note, seqLayer, waveId);
  #if defined(VERSION_EU) || defined(VERSION_SH)
+    //! euUnknownData_8030194c[waveSampleCountIndex] == (0x40 >> waveSampleCountIndex);
     note->synthesisState.samplePosInt = note->synthesisState.samplePosInt * euUnknownData_8030194c[waveSampleCountIndex] / euUnknownData_8030194c[sampleCountIndex];
  #else // Not a real change. Just temporary so I can remove this variable.
     note->synthesisState.samplePosInt = note->synthesisState.samplePosInt * gDefaultShortNoteVelocityTable[waveSampleCountIndex] / gDefaultShortNoteVelocityTable[sampleCountIndex];

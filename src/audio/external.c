@@ -162,23 +162,23 @@ s16 sDynBbh[] = {
 };
 s16 sDynDdd[] = {
     SEQ_LEVEL_WATER,
-    DYN2(MARIO_X_LT, -800, MARIO_IS_IN_AREA, AREA_DDD_WHIRLPOOL & 0xf, 0),
-    DYN3(MARIO_Y_GE, -2000, MARIO_X_LT, 470, MARIO_IS_IN_AREA, AREA_DDD_WHIRLPOOL & 0xf, 0),
-    DYN2(MARIO_Y_GE, 100, MARIO_IS_IN_AREA, AREA_DDD_SUB & 0xf, 2),
+    DYN2(MARIO_X_LT,  -800, MARIO_IS_IN_AREA, (AREA_DDD_WHIRLPOOL & 0xf), 0),
+    DYN3(MARIO_Y_GE, -2000, MARIO_X_LT, 470, MARIO_IS_IN_AREA, (AREA_DDD_WHIRLPOOL & 0xf), 0),
+    DYN2(MARIO_Y_GE,   100, MARIO_IS_IN_AREA, (AREA_DDD_SUB & 0xf), 2),
     1,
 };
 s16 sDynJrb[] = {
     SEQ_LEVEL_WATER,
     DYN2(MARIO_Y_GE, 945, MARIO_X_LT, -5260, 0),
-    DYN1(MARIO_IS_IN_AREA, AREA_JRB_SHIP & 0xf, 0),
+    DYN1(MARIO_IS_IN_AREA, (AREA_JRB_SHIP & 0xf), 0),
     DYN1(MARIO_Y_GE, 1000, 0),
     DYN2(MARIO_Y_GE, -3100, MARIO_Z_LT, -900, 2),
     1,
     5, // bogus entry, ignored (was JRB originally intended to have spooky music?)
 };
 s16 sDynWdw[] = {
-    SEQ_LEVEL_UNDERGROUND, DYN2(MARIO_Y_LT, -670, MARIO_IS_IN_AREA, AREA_WDW_MAIN & 0xf, 4),
-    DYN1(MARIO_IS_IN_AREA, AREA_WDW_TOWN & 0xf, 4), 3,
+    SEQ_LEVEL_UNDERGROUND, DYN2(MARIO_Y_LT, -670, MARIO_IS_IN_AREA, (AREA_WDW_MAIN & 0xf), 4),
+    DYN1(MARIO_IS_IN_AREA, (AREA_WDW_TOWN & 0xf), 4), 3,
 };
 s16 sDynHmc[] = {
     SEQ_LEVEL_UNDERGROUND, DYN2(MARIO_X_GE, 0, MARIO_Y_LT, -203, 4),
@@ -223,8 +223,8 @@ struct MusicDynamic sMusicDynamics[8] = {
     { 0x0e43, 127, 200, 0x0000, 0, 200 }, // SEQ_LEVEL_WATER
     { 0x02ff, 127, 100, 0x0100, 0, 100 }, // SEQ_LEVEL_UNDERGROUND
     { 0x03f7, 127, 100, 0x0008, 0, 100 }, // SEQ_LEVEL_UNDERGROUND
-    { 0x0070, 127, 10, 0x0000, 0, 100 },  // SEQ_LEVEL_SPOOKY
-    { 0x0000, 127, 100, 0x0070, 0, 10 },  // SEQ_LEVEL_SPOOKY
+    { 0x0070, 127,  10, 0x0000, 0, 100 }, // SEQ_LEVEL_SPOOKY
+    { 0x0000, 127, 100, 0x0070, 0,  10 }, // SEQ_LEVEL_SPOOKY
     { 0xffff, 127, 100, 0x0000, 0, 100 }, // any (unused)
 };
 
@@ -254,11 +254,11 @@ u16 sLevelAcousticReaches[LEVEL_COUNT] = {
 #define LOW_VOLUME_REVERB 40.0f
 
 #ifdef VERSION_JP
-#define VOLUME_RANGE_UNK1 0.8f
-#define VOLUME_RANGE_UNK2 1.0f
+    #define VOLUME_RANGE_UNK1 0.8f
+    #define VOLUME_RANGE_UNK2 1.0f
 #else
-#define VOLUME_RANGE_UNK1 0.9f
-#define VOLUME_RANGE_UNK2 0.8f
+    #define VOLUME_RANGE_UNK1 0.9f
+    #define VOLUME_RANGE_UNK2 0.8f
 #endif
 
 // sBackgroundMusicDefaultVolume represents the default volume for background music sequences using the level player (deprecated).
@@ -384,8 +384,6 @@ extern OSMesgQueue *D_SH_80350F88;
 extern OSMesgQueue *D_SH_80350FA8;
 #endif
 
-typedef s32 FadeT;
-
 // some sort of main thread -> sound thread dispatchers
 extern void func_802ad728(u32 bits, f32 arg);
 extern void func_802ad74c(u32 bits, u32 arg);
@@ -426,7 +424,7 @@ void audio_reset_session_eu(s32 presetId) {
 /**
  * Called from threads: thread3_main, thread5_game_loop
  */
-static void seq_player_fade_to_zero_volume(s32 player, FadeT fadeDuration) {
+static void seq_player_fade_to_zero_volume(s32 player, s32 fadeDuration) {
     struct SequencePlayer *seqPlayer = &gSequencePlayers[player];
 
     // fadeDuration is never 0 in practice
@@ -442,7 +440,7 @@ static void seq_player_fade_to_zero_volume(s32 player, FadeT fadeDuration) {
 /**
  * Called from threads: thread4_sound, thread5_game_loop
  */
-static void func_8031D690(s32 player, FadeT fadeInTime) {
+static void func_8031D690(s32 player, s32 fadeInTime) {
     struct SequencePlayer *seqPlayer = &gSequencePlayers[player];
 
     if (fadeInTime == 0 || seqPlayer->state == SEQUENCE_PLAYER_STATE_FADE_OUT) {
@@ -459,7 +457,7 @@ static void func_8031D690(s32 player, FadeT fadeInTime) {
 /**
  * Called from threads: thread5_game_loop
  */
-static void seq_player_fade_to_percentage_of_volume(s32 player, FadeT fadeDuration, u8 percentage) {
+static void seq_player_fade_to_percentage_of_volume(s32 player, s32 fadeDuration, u8 percentage) {
     struct SequencePlayer *seqPlayer = &gSequencePlayers[player];
     f32 targetVolume;
 
@@ -494,7 +492,7 @@ static void seq_player_fade_to_percentage_of_volume(s32 player, FadeT fadeDurati
 /**
  * Called from threads: thread3_main, thread4_sound, thread5_game_loop
  */
-static void seq_player_fade_to_normal_volume(s32 player, FadeT fadeDuration) {
+static void seq_player_fade_to_normal_volume(s32 player, s32 fadeDuration) {
     struct SequencePlayer *seqPlayer = &gSequencePlayers[player];
 
 #if defined(VERSION_EU) || defined(VERSION_SH)
@@ -525,7 +523,7 @@ static void seq_player_fade_to_normal_volume(s32 player, FadeT fadeDuration) {
 /**
  * Called from threads: thread3_main, thread4_sound, thread5_game_loop
  */
-static void seq_player_fade_to_target_volume(s32 player, FadeT fadeDuration, u8 targetVolume) {
+static void seq_player_fade_to_target_volume(s32 player, s32 fadeDuration, u8 targetVolume) {
     struct SequencePlayer *seqPlayer = &gSequencePlayers[player];
 
 #if defined(VERSION_JP) || defined(VERSION_US)
@@ -698,9 +696,9 @@ void play_sound(s32 soundBits, f32 *pos) {
  * Called from threads: thread4_sound, thread5_game_loop (EU only)
  */
 static void process_sound_request(u32 bits, f32 *pos) {
-    s32 counter = 0;
+    s32 counter = FALSE;
 
-    s32 bank = (bits & SOUNDARGS_MASK_BANK) >> SOUNDARGS_SHIFT_BANK;
+    s32 bank = ((bits & SOUNDARGS_MASK_BANK) >> SOUNDARGS_SHIFT_BANK);
 
     if (sSoundBankDisabled[bank]) {
         return;
@@ -742,10 +740,10 @@ static void process_sound_request(u32 bits, f32 *pos) {
         } else {
             soundIndex = sSoundBanks[bank][soundIndex].next;
         }
-        counter++;
+        counter = TRUE;
     }
 
-    if (counter == 0) {
+    if (!counter) {
         sSoundMovingSpeed[bank] = 32;
     }
 
@@ -816,7 +814,7 @@ static void delete_sound_from_bank(u8 bank, u8 soundIndex) {
  */
 static void update_background_music_after_sound(u8 bank, u8 soundIndex) {
     if (sSoundBanks[bank][soundIndex].soundBits & SOUND_LOWER_BACKGROUND_MUSIC) {
-        sSoundBanksThatLowerBackgroundMusic &= (1 << bank) ^ 0xffff;
+        sSoundBanksThatLowerBackgroundMusic &= ((1 << bank) ^ 0xffff);
         begin_background_music_fade(50);
     }
 }
@@ -827,8 +825,7 @@ static void update_background_music_after_sound(u8 bank, u8 soundIndex) {
 static void select_current_sounds(u8 bank) {
     u32 isDiscreteAndStatus;
     u8 latestSoundIndex;
-    u8 i;
-    u8 j;
+    u8 i, j;
     u8 soundIndex;
     u32 liveSoundPriorities[16] = { 0x10000000, 0x10000000, 0x10000000, 0x10000000,
                                     0x10000000, 0x10000000, 0x10000000, 0x10000000,
@@ -885,8 +882,8 @@ static void select_current_sounds(u8 bank) {
                     + sqr(*sSoundBanks[bank][soundIndex].y)
                     + sqr(*sSoundBanks[bank][soundIndex].z));
 
-            requestedPriority = (sSoundBanks[bank][soundIndex].soundBits & SOUNDARGS_MASK_PRIORITY)
-                                >> SOUNDARGS_SHIFT_PRIORITY;
+            requestedPriority = ((sSoundBanks[bank][soundIndex].soundBits & SOUNDARGS_MASK_PRIORITY)
+                                >> SOUNDARGS_SHIFT_PRIORITY);
 
             // Recompute priority, possibly based on the sound's source position relative to the camera.
             // (Note that the sound's priority is the opposite of requestedPriority; lower is more important)
@@ -1204,7 +1201,7 @@ static void update_game_sound(void) {
 
                 if (soundStatus == SOUND_STATUS_WAITING) {
                     if (sSoundBanks[bank][soundIndex].soundBits & SOUND_LOWER_BACKGROUND_MUSIC) {
-                        sSoundBanksThatLowerBackgroundMusic |= 1 << bank;
+                        sSoundBanksThatLowerBackgroundMusic |= (1 << bank);
                         begin_background_music_fade(50);
                     }
 
@@ -1531,12 +1528,12 @@ static void update_game_sound(void) {
 /**
  * Called from threads: thread4_sound, thread5_game_loop
  */
-static void seq_player_play_sequence(u8 player, u8 seqId, u16 arg2) {
+static void seq_player_play_sequence(u8 player, u8 seqId, u16 fadeInTime) {
     u8 targetVolume;
     u8 i;
 
     if (player == SEQ_PLAYER_LEVEL) {
-        sCurrentBackgroundMusicSeqId = seqId & SEQ_BASE_ID;
+        sCurrentBackgroundMusicSeqId = (seqId & SEQ_BASE_ID);
         sBackgroundMusicForDynamics = SEQUENCE_NONE;
         sCurrentMusicDynamic = 0xff;
         sMusicDynamicDelay = 2;
@@ -1547,8 +1544,8 @@ static void seq_player_play_sequence(u8 player, u8 seqId, u16 arg2) {
     }
 
 #if defined(VERSION_EU) || defined(VERSION_SH)
-    func_802ad770(0x46000000 | ((u8)(u32) player) << 16, seqId & SEQ_VARIATION);
-    func_802ad74c(0x82000000 | ((u8)(u32) player) << 16 | ((u8)(seqId & SEQ_BASE_ID)) << 8, arg2);
+    func_802ad770((0x46000000 | ((u8)(u32) player) << 16), (seqId & SEQ_VARIATION));
+    func_802ad74c((0x82000000 | ((u8)(u32) player) << 16 | ((u8)(seqId & SEQ_BASE_ID)) << 8), fadeInTime);
 
     if (player == SEQ_PLAYER_LEVEL) {
         targetVolume = begin_background_music_fade(0);
@@ -1568,7 +1565,7 @@ static void seq_player_play_sequence(u8 player, u8 seqId, u16 arg2) {
             gSequencePlayers[SEQ_PLAYER_LEVEL].fadeVolume = (f32) targetVolume / 127.0f;
         }
     } else {
-        func_8031D690(player, arg2);
+        func_8031D690(player, fadeInTime);
     }
 #endif
 }
@@ -1586,7 +1583,7 @@ void seq_player_fade_out(u8 player, u16 fadeDuration) {
     if (!player) {
         sCurrentBackgroundMusicSeqId = SEQUENCE_NONE;
     }
-    func_802ad74c(0x83000000 | (player & 0xff) << 16, fd);
+    func_802ad74c((0x83000000 | (player & 0xff) << 16), fd);
 #else // !(VERSION_EU || VERSION_SH)
     if (player == SEQ_PLAYER_LEVEL) {
         sCurrentBackgroundMusicSeqId = SEQUENCE_NONE;
@@ -1634,7 +1631,7 @@ static void func_8031F96C(u8 player) {
             && sChannelVolumeScaleFadeInfo[player][i].remainingFrames != 0) {
             sChannelVolumeScaleFadeInfo[player][i].current += sChannelVolumeScaleFadeInfo[player][i].velocity;
 #if defined(VERSION_EU) || defined(VERSION_SH)
-            func_802ad728(0x01000000 | (player & 0xff) << 16 | (i & 0xff) << 8,
+            func_802ad728((0x01000000 | (player & 0xff) << 16 | (i & 0xff) << 8),
                           sChannelVolumeScaleFadeInfo[player][i].current);
 #else
             gSequencePlayers[player].channels[i]->volumeScale = sChannelVolumeScaleFadeInfo[player][i].current;
@@ -1678,8 +1675,8 @@ void process_level_music_dynamics(void) {
         return;
     }
 
-    u32 conditionBits = sLevelDynamics[gCurrLevelNum][1] & 0xFF00;
-    u8  musicDynIndex = (u8) sLevelDynamics[gCurrLevelNum][1] & 0xFF;
+    u32 conditionBits = (sLevelDynamics[gCurrLevelNum][1] & 0xFF00);
+    u8 musicDynIndex = ((u8) sLevelDynamics[gCurrLevelNum][1] & 0x00FF);
     i = 2;
     while (conditionBits & 0xff00) {
         j = 0;
@@ -1791,7 +1788,7 @@ UNUSED void unused_8031FED0(u8 player, u32 bits, s8 arg2) {
     u8 i;
 
     if (arg2 < 0) {
-        arg2 = -arg2; // abs
+        arg2 = -arg2; // abs s8
     }
 
     for (i = 0; i < CHANNELS_MAX; i++) {
@@ -1980,7 +1977,7 @@ void sound_init(void) {
 }
 
 // (unused)
-void get_currently_playing_sound(u8 bank, u8 *numPlayingSounds, u8 *numSoundsInBank, u8 *soundId) {
+UNUSED void get_currently_playing_sound(u8 bank, u8 *numPlayingSounds, u8 *numSoundsInBank, u8 *soundId) {
     u8 i;
     u8 count = 0;
 
@@ -2004,7 +2001,7 @@ void get_currently_playing_sound(u8 bank, u8 *numPlayingSounds, u8 *numSoundsInB
  * Called from threads: thread5_game_loop
  */
 void stop_sound(u32 soundBits, f32 *pos) {
-    u8 bank = (soundBits & SOUNDARGS_MASK_BANK) >> SOUNDARGS_SHIFT_BANK;
+    u8 bank = ((soundBits & SOUNDARGS_MASK_BANK) >> SOUNDARGS_SHIFT_BANK);
     u8 soundIndex = sSoundBanks[bank][0].next;
 
     while (soundIndex != 0xff) {
@@ -2157,8 +2154,8 @@ void play_dialog_sound(u8 dialogID) {
  * Called from threads: thread5_game_loop
  */
 void play_music(u8 player, u16 seqArgs, u16 fadeTimer) {
-    u8 seqId = seqArgs & 0xff;
-    u8 priority = seqArgs >> 8;
+    u8 seqId = (seqArgs & 0xff);
+    u8 priority = (seqArgs >> 8);
     u8 i;
     u8 foundIndex = 0;
 
@@ -2197,7 +2194,7 @@ void play_music(u8 player, u16 seqArgs, u16 fadeTimer) {
     for (i = 0; i < sBackgroundMusicQueueSize; i++) {
         if (sBackgroundMusicQueue[i].priority <= priority) {
             foundIndex = i;
-            i = sBackgroundMusicQueueSize; // break
+            break;
         }
     }
 
@@ -2246,7 +2243,7 @@ void stop_background_music(u16 seqId) {
                 }
             }
             foundIndex = i;
-            i = sBackgroundMusicQueueSize; // "break;"
+            break;
         }
     }
 
@@ -2331,7 +2328,7 @@ void play_secondary_music(u8 seqId, u8 bgMusicVolume, u8 volume, u16 fadeTimer) 
     if (sBackgroundMusicTargetVolume == TARGET_VOLUME_UNSET) {
         sBackgroundMusicTargetVolume = bgMusicVolume + TARGET_VOLUME_IS_PRESENT_FLAG;
         begin_background_music_fade(fadeTimer);
-        seq_player_play_sequence(SEQ_PLAYER_ENV, seqId, fadeTimer >> 1);
+        seq_player_play_sequence(SEQ_PLAYER_ENV, seqId, (fadeTimer >> 1));
         if (volume < 0x80) {
             seq_player_fade_to_target_volume(SEQ_PLAYER_ENV, fadeTimer, volume);
         }

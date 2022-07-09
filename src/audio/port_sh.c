@@ -20,7 +20,7 @@ extern u8 D_SH_8031509C;
 extern OSMesgQueue *D_SH_80350F68;
 
 void func_8031D690(s32 playerIndex, s32 numFrames);
-void seq_player_fade_to_zero_volume(s32 arg0, s32 numFrames);
+void seq_player_fade_to_zero_volume(s32 player, s32 numFrames);
 void func_802ad7ec(u32 arg0);
 
 struct SPTask *create_next_audio_frame_task(void) {
@@ -222,28 +222,28 @@ void eu_process_audio_cmd(struct EuAudioCmd *cmd) {
     }
 }
 
-void seq_player_fade_to_zero_volume(s32 arg0, s32 fadeOutTime) {
-    struct SequencePlayer *player;
+void seq_player_fade_to_zero_volume(s32 player, s32 fadeOutTime) {
+    struct SequencePlayer *seqPlayer = &gSequencePlayers[player];
 
     if (fadeOutTime == 0) {
         fadeOutTime = 1;
     }
-    player = &gSequencePlayers[arg0];
-    player->state = 2;
-    player->fadeRemainingFrames = fadeOutTime;
-    player->fadeVelocity = -(player->fadeVolume / (f32) fadeOutTime);
+
+    seqPlayer->state = 2;
+    seqPlayer->fadeRemainingFrames = fadeOutTime;
+    seqPlayer->fadeVelocity = -(seqPlayer->fadeVolume / (f32) fadeOutTime);
 }
 
-void func_8031D690(s32 playerIndex, s32 fadeInTime) {
-    struct SequencePlayer *player;
+void func_8031D690(s32 player, s32 fadeInTime) {
+    struct SequencePlayer *seqPlayer;
 
     if (fadeInTime != 0) {
-        player = &gSequencePlayers[playerIndex];
-        player->state = 1;
-        player->fadeTimerUnkEu = fadeInTime;
-        player->fadeRemainingFrames = fadeInTime;
-        player->fadeVolume = 0.0f;
-        player->fadeVelocity = 0.0f;
+        seqPlayer = &gSequencePlayers[player];
+        seqPlayer->state = 1;
+        seqPlayer->fadeTimerUnkEu = fadeInTime;
+        seqPlayer->fadeRemainingFrames = fadeInTime;
+        seqPlayer->fadeVolume = 0.0f;
+        seqPlayer->fadeVelocity = 0.0f;
     }
 }
 
@@ -280,7 +280,7 @@ void func_802ad74c(u32 arg0, u32 arg1) {
 }
 
 void func_802ad770(u32 arg0, s8 arg1) {
-    s32 sp1C = arg1 << 24;
+    s32 sp1C = (arg1 << 24);
     func_802ad6f0(arg0, &sp1C);
 }
 
@@ -317,10 +317,10 @@ void func_802ad7ec(u32 arg0) {
     static u8 D_SH_8031509C = 0;
 
     if (D_SH_8031509C == 0) {
-        D_SH_80315098 = (arg0 >> 8) & 0xff;
+        D_SH_80315098 = ((arg0 >> 8) & 0xff);
     }
 
-    end = arg0 & 0xff;
+    end = (arg0 & 0xff);
 
     for (;;) {
         if (D_SH_80315098 == end) {

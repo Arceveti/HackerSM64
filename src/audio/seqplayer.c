@@ -6,6 +6,7 @@
 #include "heap.h"
 #include "load.h"
 #include "seqplayer.h"
+#include "engine/math_util.h"
 
 #ifdef VERSION_SH
 void seq_channel_layer_process_script_part1(struct SequenceChannelLayer *layer);
@@ -542,7 +543,7 @@ void seq_channel_layer_process_script(struct SequenceChannelLayer *layer) {
             case layer_setpan: // layer_setpan
                 temp_a0_5 = *(state->pc++);
                 if (cmd == layer_setshortnotevelocity) {
-                    layer->velocitySquare = (f32)(temp_a0_5 * temp_a0_5);
+                    layer->velocitySquare = (f32)sqr(temp_a0_5);
                 } else {
  #if defined(VERSION_EU) || defined(VERSION_SH)
                     layer->pan = temp_a0_5;
@@ -646,7 +647,7 @@ void seq_channel_layer_process_script(struct SequenceChannelLayer *layer) {
                 switch (cmd & 0xf0) {
                     case layer_setshortnotevelocityfromtable: // layer_setshortnotevelocityfromtable
                         sp3A = seqPlayer->shortNoteVelocityTable[cmd & 0x0f];
-                        layer->velocitySquare = (f32)(sp3A * sp3A);
+                        layer->velocitySquare = (f32)sqr(sp3A);
                         break;
                     case layer_setshortnotedurationfromtable: // layer_setshortnotedurationfromtable
                         layer->noteDuration = seqPlayer->shortNoteDurationTable[cmd & 0x0f];
@@ -690,9 +691,9 @@ void seq_channel_layer_process_script(struct SequenceChannelLayer *layer) {
             // the remaining bits are used for the semitone
             cmd -= (cmd & 0xc0);
  #if defined(VERSION_EU) || defined(VERSION_SH)
-            layer->velocitySquare = (f32) vel * (f32) vel;
+            layer->velocitySquare = sqr((f32) vel);
  #else
-            layer->velocitySquare = vel * vel;
+            layer->velocitySquare = sqr(vel);
  #endif
         } else {
             switch (cmd & 0xc0) {
@@ -757,19 +758,19 @@ void seq_channel_layer_process_script(struct SequenceChannelLayer *layer) {
                 } else {
                     layer->adsr.envelope = drum->envelope;
                     layer->adsr.releaseRate = drum->releaseRate;
-#if defined(VERSION_EU) || defined(VERSION_SH)
+ #if defined(VERSION_EU) || defined(VERSION_SH)
                     if (!layer->ignoreDrumPan) {
                         layer->pan = drum->pan;
                     }
-#else
+ #else
                     layer->pan = FLOAT_CAST(drum->pan) / 128.0f;
-#endif
+ #endif
                     layer->sound = &drum->sound;
                     layer->freqScale = layer->sound->tuning;
                 }
-#ifndef VERSION_EU
+ #ifndef VERSION_EU
             skip:;
-#endif
+ #endif
             } else { // instrument
                 // cmd is reused for the instrument semitone
                 cmd += seqPlayer->transposition + seqChannel->transposition + layer->transposition;
@@ -777,18 +778,18 @@ void seq_channel_layer_process_script(struct SequenceChannelLayer *layer) {
                 if (cmd >= 0x80) {
                     layer->stopSomething = TRUE;
                 } else {
-#if defined(VERSION_EU) || defined(VERSION_SH)
+ #if defined(VERSION_EU) || defined(VERSION_SH)
                     if (layer->instOrWave == 0xffu) {
                         instrument = seqChannel->instrument;
                     } else {
                         instrument = layer->instrument;
                     }
-#else
+ #else
                     instrument = layer->instrument;
                     if (instrument == NULL) {
                         instrument = seqChannel->instrument;
                     }
-#endif
+ #endif
 
                     if (layer->portamento.mode != 0) {
                         if (layer->portamentoTargetNote < cmd) {
@@ -798,13 +799,13 @@ void seq_channel_layer_process_script(struct SequenceChannelLayer *layer) {
                         }
 
                         if (instrument != NULL) {
-#if defined(VERSION_EU)
+ #if defined(VERSION_EU)
                             sound = instrument_get_audio_bank_sound(instrument, vel);
-#else
+ #else
                             sound = (u8) vel <  instrument->normalRangeLo ? &instrument->lowNotesSound
                                   : (u8) vel <= instrument->normalRangeHi ?
                                         &instrument->normalNotesSound : &instrument->highNotesSound;
-#endif
+ #endif
                             sameSound = (sound == layer->sound);
                             layer->sound = sound;
                             tuning = sound->tuning;
@@ -821,29 +822,29 @@ void seq_channel_layer_process_script(struct SequenceChannelLayer *layer) {
                             case PORTAMENTO_MODE_1:
                             case PORTAMENTO_MODE_3:
                             case PORTAMENTO_MODE_5:
-#if defined(VERSION_JP) || defined(VERSION_US)
+ #if defined(VERSION_JP) || defined(VERSION_US)
                                 sp24 = temp_f2;
-#endif
+ #endif
                                 freqScale = temp_f12;
                                 break;
 
                             case PORTAMENTO_MODE_2:
                             case PORTAMENTO_MODE_4:
-#if defined(VERSION_EU) || defined(VERSION_SH)
+ #if defined(VERSION_EU) || defined(VERSION_SH)
                             default:
-#endif
+ #endif
                                 freqScale = temp_f2;
-#if defined(VERSION_JP) || defined(VERSION_US)
+ #if defined(VERSION_JP) || defined(VERSION_US)
                                 sp24 = temp_f12;
-#endif
+ #endif
                                 break;
                         }
 
-#if defined(VERSION_EU) || defined(VERSION_SH)
+ #if defined(VERSION_EU) || defined(VERSION_SH)
                         portamento->extent = temp_f2 / freqScale - 1.0f;
-#else
+ #else
                         portamento->extent = sp24 / freqScale - 1.0f;
-#endif
+ #endif
 
                         if (PORTAMENTO_IS_SPECIAL(layer->portamento)) {
                             portamento->speed = 32512.0f * FLOAT_CAST(seqPlayer->tempo)
@@ -858,13 +859,13 @@ void seq_channel_layer_process_script(struct SequenceChannelLayer *layer) {
                             layer->portamentoTargetNote = cmd;
                         }
                     } else if (instrument != NULL) {
-#if defined(VERSION_EU)
+ #ifdef VERSION_EU
                         sound = instrument_get_audio_bank_sound(instrument, cmd);
-#else
+ #else
                         sound = cmd < instrument->normalRangeLo ?
                                          &instrument->lowNotesSound : cmd <= instrument->normalRangeHi ?
                                          &instrument->normalNotesSound : &instrument->highNotesSound;
-#endif
+ #endif
                         sameSound = (sound == layer->sound);
                         layer->sound = sound;
                         layer->freqScale = gNoteFrequencies[cmd] * sound->tuning;
@@ -890,9 +891,9 @@ void seq_channel_layer_process_script(struct SequenceChannelLayer *layer) {
      || (layer->note == NULL)
      || (layer->status == SOUND_LOAD_STATUS_NOT_LOADED)
      || !sameSound
-#if defined(VERSION_EU) || defined(VERSION_SH)
+ #if defined(VERSION_EU) || defined(VERSION_SH)
      || (layer != layer->note->parentLayer)
-#endif
+ #endif
     ) {
         layer->note = alloc_note(layer);
     } else if (layer->sound == NULL) {
@@ -904,10 +905,10 @@ void seq_channel_layer_process_script(struct SequenceChannelLayer *layer) {
     }
 }
 
-#else
+#else // (VERSION_JP || VERSION_US)
 // US/JP version with macros to simulate inlining by copt. Edit if you dare.
 #include "copt/seq_channel_layer_process_script_copt.inc.c"
-#endif
+#endif // (VERSION_JP || VERSION_US)
 
 #ifdef VERSION_SH
 void seq_channel_layer_process_script_part1(struct SequenceChannelLayer *layer) {
@@ -1016,7 +1017,7 @@ s32 seq_channel_layer_process_script_part2(struct SequenceChannelLayer *layer) {
             case layer_setpan: // layer_setpan
                 temp_a0_5 = *(state->pc++);
                 if (cmd == layer_setshortnotevelocity) {
-                    layer->velocitySquare = (f32) (temp_a0_5 * temp_a0_5) / (f32) (127 * 127);
+                    layer->velocitySquare = (f32) sqr(temp_a0_5) / (f32) sqr(127);
                 } else {
                     layer->pan = temp_a0_5;
                 }
@@ -1118,7 +1119,7 @@ s32 seq_channel_layer_process_script_part2(struct SequenceChannelLayer *layer) {
                 switch (cmd & 0xf0) {
                     case layer_setshortnotevelocityfromtable: // layer_setshortnotevelocityfromtable
                         sp3A = seqPlayer->shortNoteVelocityTable[cmd & 0x0f];
-                        layer->velocitySquare = (f32) (sp3A * sp3A) / (f32) (127 * 127);
+                        layer->velocitySquare = (f32) sqr(sp3A) / (f32) sqr(127);
                         break;
                     case layer_setshortnotedurationfromtable: // layer_setshortnotedurationfromtable
                         layer->noteDuration = seqPlayer->shortNoteDurationTable[cmd & 0x0f];
@@ -1298,7 +1299,7 @@ s32 seq_channel_layer_process_script_part3(struct SequenceChannelLayer *layer, s
         if (vel >= 0x80 || vel < 0) {
             vel = 0x7f;
         }
-        layer->velocitySquare = ((f32) vel * (f32) vel) / (f32) (0x7f * 0x7f);
+        layer->velocitySquare = sqr((f32) vel) / (f32) sqr(0x7f);
         // the remaining bits are used for the semitone
         cmd -= (cmd & 0xc0);
     } else {
@@ -1322,7 +1323,7 @@ s32 seq_channel_layer_process_script_part3(struct SequenceChannelLayer *layer, s
     }
 
     layer->delay = sp3A;
-    layer->duration = layer->noteDuration * sp3A >> 8;
+    layer->duration = ((layer->noteDuration * sp3A) >> 8);
     if ((seqPlayer->muted && (seqChannel->muteBehavior & (MUTE_BEHAVIOR_0 | MUTE_BEHAVIOR_2)))
         || seqChannel->stopSomething2) {
         layer->stopSomething = TRUE;
@@ -1344,8 +1345,7 @@ u32 get_instrument(struct SequenceChannel *seqChannel, u8 instId, struct Instrum
     adsr->envelope = inst->envelope;
     adsr->releaseRate = inst->releaseRate;
     *instOut = inst;
-    instId++;
-    return instId;
+    return instId + 1;
 #else // !(VERSION_EU || VERSION_SH)
 
     if (instId >= gCtlEntries[seqChannel->bankId].numInstruments) {
@@ -1378,8 +1378,7 @@ u32 get_instrument(struct SequenceChannel *seqChannel, u8 instId, struct Instrum
         adsr->envelope = inst->envelope;
         adsr->releaseRate = inst->releaseRate;
         *instOut = inst;
-        instId++;
-        return instId;
+        return instId + 1;
     }
 
     gAudioErrorFlags = instId + 0x20000;
@@ -1396,15 +1395,9 @@ void set_instrument(struct SequenceChannel *seqChannel, u8 instId) {
         seqChannel->instOrWave = 0;
         seqChannel->instrument = (struct Instrument *) 1;
     } else {
-#if defined(VERSION_EU) || defined(VERSION_SH)
-        if ((seqChannel->instOrWave =
-            get_instrument(seqChannel, instId, &seqChannel->instrument, &seqChannel->adsr)) == 0)
-#else
         seqChannel->instOrWave =
             get_instrument(seqChannel, instId, &seqChannel->instrument, &seqChannel->adsr);
-        if (seqChannel->instOrWave == 0)
-#endif
-        {
+        if (seqChannel->instOrWave == 0) {
             seqChannel->hasInstrument = FALSE;
             return;
         }

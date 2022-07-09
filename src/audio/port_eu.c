@@ -22,15 +22,13 @@
 #define SAMPLES_TO_OVERPRODUCE 0x10
 #define EXTRA_BUFFERED_AI_SAMPLES_TARGET 0x40
 
-typedef s32 FadeT;
-
 extern volatile u8 gAudioResetStatus;
 extern u8 gAudioResetPresetIdToLoad;
 extern OSMesgQueue *OSMesgQueues[];
 extern struct EuAudioCmd sAudioCmd[0x100];
 
-void func_8031D690(s32 player, FadeT fadeInTime);
-void seq_player_fade_to_zero_volume(s32 player, FadeT fadeOutTime);
+void func_8031D690(s32 player, s32 fadeInTime);
+void seq_player_fade_to_zero_volume(s32 player, s32 fadeOutTime);
 void decrease_sample_dma_ttls(void);
 s32 audio_shut_down_and_reset_step(void);
 void func_802ad7ec(u32 arg0);
@@ -180,23 +178,28 @@ extern OSMesg OSMesg1;
 extern OSMesg OSMesg2;
 extern OSMesg OSMesg3;
 
-void seq_player_fade_to_zero_volume(s32 player, FadeT fadeOutTime) {
+void seq_player_fade_to_zero_volume(s32 player, s32 fadeOutTime) {
+    struct SequencePlayer *seqPlayer = &gSequencePlayers[player];
+
     if (fadeOutTime == 0) {
         fadeOutTime = 1;
     }
-    gSequencePlayers[player].fadeVelocity = -(gSequencePlayers[player].fadeVolume / fadeOutTime);
-    gSequencePlayers[player].state = 2;
-    gSequencePlayers[player].fadeRemainingFrames = fadeOutTime;
 
+    seqPlayer->fadeVelocity = -(gSequencePlayers[player].fadeVolume / fadeOutTime);
+    seqPlayer->state = 2;
+    seqPlayer->fadeRemainingFrames = fadeOutTime;
 }
 
-void func_8031D690(s32 player, FadeT fadeInTime) {
+void func_8031D690(s32 player, s32 fadeInTime) {
+    struct SequencePlayer *seqPlayer;
+
     if (fadeInTime != 0) {
-        gSequencePlayers[player].state = 1;
-        gSequencePlayers[player].fadeTimerUnkEu = fadeInTime;
-        gSequencePlayers[player].fadeRemainingFrames = fadeInTime;
-        gSequencePlayers[player].fadeVolume = 0.0f;
-        gSequencePlayers[player].fadeVelocity = 0.0f;
+        seqPlayer = &gSequencePlayers[player];
+        seqPlayer->state = 1;
+        seqPlayer->fadeTimerUnkEu = fadeInTime;
+        seqPlayer->fadeRemainingFrames = fadeInTime;
+        seqPlayer->fadeVolume = 0.0f;
+        seqPlayer->fadeVelocity = 0.0f;
     }
 }
 
@@ -240,8 +243,8 @@ void func_802ad7ec(u32 arg0) {
     struct EuAudioCmd *cmd;
     struct SequencePlayer *seqPlayer;
     struct SequenceChannel *chan;
-    u8 end = arg0 & 0xff;
-    u8 i = (arg0 >> 8) & 0xff;
+    u8 end = (arg0 & 0xff);
+    u8 i = ((arg0 >> 8) & 0xff);
 
     for (;;) {
         if (i == end) break;
@@ -313,4 +316,4 @@ void port_eu_init(void) {
     port_eu_init_queues();
 }
 
-#endif
+#endif // VERSION_EU

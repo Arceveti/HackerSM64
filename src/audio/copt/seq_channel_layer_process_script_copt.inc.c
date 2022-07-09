@@ -10,6 +10,7 @@
 #include "audio/seqplayer.h"
 #include "audio/external.h"
 #include "audio/effects.h"
+#include "engine/math_util.h"
 
 #define COPT 0
 #if COPT
@@ -31,12 +32,12 @@
 #define M64_READ_S16(state, dst) \
     dst = m64_read_s16(state);
 #else // !COPT
-#define M64_READ_S16(state, dst)   \
+#define M64_READ_S16(state, dst)    \
 {                                   \
     s16 _ret;                       \
-    _ret = *(*state).pc << 8;       \
+    _ret = (*(*state).pc << 8);     \
     ((*state).pc)++;                \
-    _ret = *(*state).pc | _ret;     \
+    _ret = (*(*state).pc | _ret);   \
     ((*state).pc)++;                \
     dst = _ret;                     \
 }
@@ -49,8 +50,8 @@
 {                                           \
     u16 ret = *(state->pc++);               \
     if (ret & 0x80) {                       \
-        ret = (ret << 8) & 0x7f00;          \
-        ret = *(state->pc++) | ret;         \
+        ret = ((ret << 8) & 0x7f00);        \
+        ret = (*(state->pc++) | ret);       \
     }                                       \
     dst = ret;                              \
 }
@@ -207,7 +208,7 @@ void seq_channel_layer_process_script(struct SequenceChannelLayer *layer) {
             case layer_setpan: // layer_setpan
                 temp_a0_5 = *(state->pc++);
                 if (cmd == layer_setshortnotevelocity) {
-                    layer->velocitySquare = (f32)(temp_a0_5 * temp_a0_5);
+                    layer->velocitySquare = (f32)sqr(temp_a0_5);
                 } else {
                     layer->pan = (f32) temp_a0_5 / 128.0f;
                 }
@@ -273,7 +274,7 @@ void seq_channel_layer_process_script(struct SequenceChannelLayer *layer) {
                 switch (cmd & 0xf0) {
                     case layer_setshortnotevelocityfromtable: // layer_setshortnotevelocityfromtable
                         sp3A = seqPlayer->shortNoteVelocityTable[cmd & 0x0f];
-                        (*layer).velocitySquare = (f32)(sp3A * sp3A);
+                        (*layer).velocitySquare = (f32)sqr(sp3A);
                         break;
                     case layer_setshortnotedurationfromtable: // layer_setshortnotedurationfromtable
                         (*layer).noteDuration = seqPlayer->shortNoteDurationTable[cmd & 0x0f];

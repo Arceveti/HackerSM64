@@ -6,6 +6,7 @@
 #include "synthesis.h"
 #include "seqplayer.h"
 #include "effects.h"
+#include "engine/math_util.h"
 #include "game/game_init.h"
 #include "game/puppyprint.h"
 #include "game/vc_check.h"
@@ -85,9 +86,9 @@ void unk_pools_init(u32 size1, u32 size2);
  * Computes a newton's method step for f(x) = x^k - d
  */
 f64 root_newton_step(f64 x, s32 k, f64 d) {
-    f64 deg2 = x * x;
-    f64 deg4 = deg2 * deg2;
-    f64 deg8 = deg4 * deg4;
+    f64 deg2 = sqr(x);
+    f64 deg4 = sqr(deg2);
+    f64 deg8 = sqr(deg4);
     s32 degree = k - 9;
     f64 fx;
 
@@ -128,7 +129,7 @@ f64 kth_root(f64 d, s32 k) {
             diff = next - root;
 
             if (diff < 0) {
-                diff = -diff;
+                diff = -diff; // abs f64
             }
 
             if (diff < 1e-07) {
@@ -312,7 +313,7 @@ void puppyprint_get_allocated_pools(s32 *audioPoolList) {
     };
 
     for (i = 0, j = 0; j < NUM_AUDIO_POOLS; i += 2, j++) {
-        audioPoolList[i] = (s32) pools[j]->size;
+        audioPoolList[i + 0] = (s32) pools[j]->size;
         audioPoolList[i + 1] = (s32) (pools[j]->cur - pools[j]->start);
     }
 }
@@ -459,7 +460,7 @@ void *alloc_bank_or_seq(struct SoundMultiPool *loadedPool, s32 arg1, s32 size, s
             tp->nextSide = 1;
         } else if (bothDiscardable) {
             // Use the opposite side from last time.
-        } else if (firstVal == SOUND_LOAD_STATUS_DISCARDABLE) { // ??! (I blame copt)
+        } else if (firstVal == SOUND_LOAD_STATUS_DISCARDABLE) { //! ??! (I blame copt)
             tp->nextSide = 0;
         } else if (rightDiscardable) {
             tp->nextSide = 1;

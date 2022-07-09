@@ -12,18 +12,18 @@
 #include "engine/math_util.h"
 
 
-#define DMEM_ADDR_TEMP 0x0
-#define DMEM_ADDR_RESAMPLED 0x20
-#define DMEM_ADDR_RESAMPLED2 0x160
-#define DMEM_ADDR_UNCOMPRESSED_NOTE 0x180
-#define DMEM_ADDR_NOTE_PAN_TEMP 0x200
-#define DMEM_ADDR_STEREO_STRONG_TEMP_DRY 0x200
-#define DMEM_ADDR_STEREO_STRONG_TEMP_WET 0x340
-#define DMEM_ADDR_COMPRESSED_ADPCM_DATA 0x3f0
-#define DMEM_ADDR_LEFT_CH 0x4c0
-#define DMEM_ADDR_RIGHT_CH 0x600
-#define DMEM_ADDR_WET_LEFT_CH 0x740
-#define DMEM_ADDR_WET_RIGHT_CH 0x880
+#define DMEM_ADDR_TEMP                      0x000
+#define DMEM_ADDR_RESAMPLED                 0x020
+#define DMEM_ADDR_RESAMPLED2                0x160
+#define DMEM_ADDR_UNCOMPRESSED_NOTE         0x180
+#define DMEM_ADDR_NOTE_PAN_TEMP             0x200
+#define DMEM_ADDR_STEREO_STRONG_TEMP_DRY    0x200
+#define DMEM_ADDR_STEREO_STRONG_TEMP_WET    0x340
+#define DMEM_ADDR_COMPRESSED_ADPCM_DATA     0x3f0
+#define DMEM_ADDR_LEFT_CH                   0x4c0
+#define DMEM_ADDR_RIGHT_CH                  0x600
+#define DMEM_ADDR_WET_LEFT_CH               0x740
+#define DMEM_ADDR_WET_RIGHT_CH              0x880
 
 #define aSetLoadBufferPair(pkt, c, off)                                                                \
     aSetBuffer(pkt, 0, c + DMEM_ADDR_WET_LEFT_CH, 0, DEFAULT_LEN_1CH - c);                             \
@@ -153,7 +153,7 @@ static u8 reverbMultsL[NUM_ALLPASS / 3] = {0};
 static u8 reverbMultsR[NUM_ALLPASS / 3] = {0};
 static s32 **delayBufsL;
 static s32 **delayBufsR;
-#endif
+#endif // BETTER_REVERB
 
 struct VolumeChange {
     u16 sourceLeft;
@@ -1244,7 +1244,7 @@ u64 *synthesis_process_notes(s16 *aiBuf, s32 bufLen, u64 *cmd) {
                 leftRight = 1;
             } else if (noteSubEu->headsetPanLeft != 0 || synthesisState->prevHeadsetPanLeft != 0) {
                 leftRight = 2;
-#else
+#else // !VERSION_EU
             if (note->needsInit) {
                 flags = A_INIT;
                 note->needsInit = FALSE;
@@ -1257,8 +1257,7 @@ u64 *synthesis_process_notes(s16 *aiBuf, s32 bufLen, u64 *cmd) {
                 leftRight = 1;
             } else if (note->headsetPanLeft != 0 || note->prevHeadsetPanLeft != 0) {
                 leftRight = 2;
-#endif
-
+#endif // !VERSION_EU
             } else {
                 leftRight = 0;
             }
@@ -1270,7 +1269,7 @@ u64 *synthesis_process_notes(s16 *aiBuf, s32 bufLen, u64 *cmd) {
                 cmd = note_apply_headset_pan_effects(cmd, noteSubEu, synthesisState, bufLen * 2, flags, leftRight);
             }
         }
-#else
+#else // !VERSION_EU
             cmd = process_envelope(cmd, note, bufLen, 0, leftRight, flags);
 
             if (note->usesHeadsetPanEffects) {
@@ -1285,7 +1284,7 @@ u64 *synthesis_process_notes(s16 *aiBuf, s32 bufLen, u64 *cmd) {
     t9 *= 2;
     aSetBuffer(cmd++, 0, 0, DMEM_ADDR_TEMP, t9);
     aSaveBuffer(cmd++, VIRTUAL_TO_PHYSICAL2(aiBuf));
-#endif
+#endif // !VERSION_EU
 
     return cmd;
 }
@@ -1607,7 +1606,7 @@ void note_init_volume(struct Note *note) {
 
 void note_set_vel_pan_reverb(struct Note *note, f32 velocity, f32 pan, u8 reverbVol) {
     f32 volLeft, volRight;
-    s32 panIndex = (s32)(pan * 127.5f) & 127;
+    s32 panIndex = ((s32)(pan * 127.5f) & 127);
     if (note->stereoHeadsetEffects && gSoundMode == SOUND_MODE_HEADSET) {
         s8 smallPanIndex;
         s8 temp = (s8)(pan * 10.0f);
@@ -1616,17 +1615,17 @@ void note_set_vel_pan_reverb(struct Note *note, f32 velocity, f32 pan, u8 reverb
         } else {
             smallPanIndex = 9;
         }
-        note->headsetPanLeft = gHeadsetPanQuantization[smallPanIndex];
+        note->headsetPanLeft  = gHeadsetPanQuantization[smallPanIndex];
         note->headsetPanRight = gHeadsetPanQuantization[9 - smallPanIndex];
         note->stereoStrongRight = FALSE;
-        note->stereoStrongLeft = FALSE;
+        note->stereoStrongLeft  = FALSE;
         note->usesHeadsetPanEffects = TRUE;
         volLeft = gHeadsetPanVolume[panIndex];
         volRight = gHeadsetPanVolume[127 - panIndex];
     } else if (note->stereoHeadsetEffects && gSoundMode == SOUND_MODE_STEREO) {
-        u8 strongLeft = FALSE;
+        u8 strongLeft  = FALSE;
         u8 strongRight = FALSE;
-        note->headsetPanLeft = 0;
+        note->headsetPanLeft  = 0;
         note->headsetPanRight = 0;
         note->usesHeadsetPanEffects = FALSE;
         volLeft = gStereoPanVolume[panIndex];
@@ -1639,7 +1638,7 @@ void note_set_vel_pan_reverb(struct Note *note, f32 velocity, f32 pan, u8 reverb
         note->stereoStrongRight = strongRight;
         note->stereoStrongLeft = strongLeft;
     } else if (gSoundMode == SOUND_MODE_MONO) {
-        volLeft = 0.707f;
+        volLeft  = 0.707f;
         volRight = 0.707f;
     } else {
         volLeft = gDefaultPanVolume[panIndex];
@@ -1649,8 +1648,8 @@ void note_set_vel_pan_reverb(struct Note *note, f32 velocity, f32 pan, u8 reverb
     if (velocity < 0) {
         velocity = 0;
     }
-    note->targetVolLeft = (u16)(s32)(velocity * volLeft) & ~0x80FF;
-    note->targetVolRight = (u16)(s32)(velocity * volRight) & ~0x80FF;
+    note->targetVolLeft  = ((u16)(s32)(velocity *  volLeft) & ~0x80FF);
+    note->targetVolRight = ((u16)(s32)(velocity * volRight) & ~0x80FF);
     if (note->targetVolLeft == 0) {
         note->targetVolLeft++;
     }
@@ -1659,7 +1658,7 @@ void note_set_vel_pan_reverb(struct Note *note, f32 velocity, f32 pan, u8 reverb
     }
     if (note->reverbVol != reverbVol) {
         note->reverbVol = reverbVol;
-        note->reverbVolShifted = reverbVol << 8;
+        note->reverbVolShifted = (reverbVol << 8);
         note->envMixerNeedsInit = TRUE;
         return;
     }
@@ -1698,4 +1697,4 @@ void note_disable(struct Note *note) {
     note->prevParentLayer = NO_LAYER;
 }
 #endif // !VERSION_EU
-#endif
+#endif // !VERSION_SH
