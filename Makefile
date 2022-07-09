@@ -57,7 +57,7 @@ $(eval $(call validate-option,LIBGCCDIR,trap divbreak nocheck))
 #   sram - uses SRAM 256Kbit
 SAVETYPE ?= eep4k
 $(eval $(call validate-option,SAVETYPE,eep4k eep16k sram))
-ifeq ($(SAVETYPE),eep4k)
+ifeq      ($(SAVETYPE),eep4k)
   DEFINES += EEP=1 EEP4K=1
 else ifeq ($(SAVETYPE),eep16k)
   DEFINES += EEP=1 EEP16K=1
@@ -102,7 +102,7 @@ TARGET := sm64
 GRUCODE ?= f3dzex
 $(eval $(call validate-option,GRUCODE,f3dex f3dex2 f3dex2pl f3dzex super3d l3dex2))
 
-ifeq ($(GRUCODE),f3dex) # Fast3DEX
+ifeq      ($(GRUCODE),f3dex) # Fast3DEX
   DEFINES += F3DEX_GBI=1 F3DEX_GBI_SHARED=1
 else ifeq ($(GRUCODE),f3dex2) # Fast3DEX2
   DEFINES += F3DEX_GBI_2=1 F3DEX_GBI_SHARED=1
@@ -188,9 +188,9 @@ GCC_GRAPH_NODE_OPT_FLAGS = \
   -falign-functions=32
 #==============================================================================#
 
-ifeq ($(COMPILER),gcc)
-  NON_MATCHING := 1
-  MIPSISET     := -mips3
+ifeq      ($(COMPILER),gcc)
+  NON_MATCHING        := 1
+  MIPSISET            := -mips3
   OPT_FLAGS           := $(GCC_MAIN_OPT_FLAGS)
   COLLISION_OPT_FLAGS  = $(GCC_COLLISION_OPT_FLAGS)
   MATH_UTIL_OPT_FLAGS  = $(GCC_MATH_UTIL_OPT_FLAGS)
@@ -198,8 +198,8 @@ ifeq ($(COMPILER),gcc)
 else ifeq ($(COMPILER),clang)
   NON_MATCHING := 1
   # clang doesn't support ABI 'o32' for 'mips3'
-  MIPSISET     := -mips2
-  OPT_FLAGS    := $(DEFAULT_OPT_FLAGS)
+  MIPSISET            := -mips2
+  OPT_FLAGS           := $(DEFAULT_OPT_FLAGS)
   COLLISION_OPT_FLAGS  = $(DEFAULT_OPT_FLAGS)
   MATH_UTIL_OPT_FLAGS  = $(DEFAULT_OPT_FLAGS)
   GRAPH_NODE_OPT_FLAGS = $(DEFAULT_OPT_FLAGS)
@@ -225,7 +225,7 @@ TARGET_STRING := sm64
 
 # UNF - whether to use UNFLoader flashcart library
 #   1 - includes code in ROM
-#   0 - does not 
+#   0 - does not
 UNF ?= 0
 $(eval $(call validate-option,UNF,0 1))
 ifeq ($(UNF),1)
@@ -237,7 +237,7 @@ endif
 # ISVPRINT - whether to fake IS-Viewer presence,
 # allowing for usage of CEN64 (and possibly Project64) to print messages to terminal.
 #   1 - includes code in ROM
-#   0 - does not 
+#   0 - does not
 ISVPRINT ?= 0
 $(eval $(call validate-option,ISVPRINT,0 1))
 ifeq ($(ISVPRINT),1)
@@ -255,7 +255,7 @@ endif
 
 # HVQM - whether to use HVQM fmv library
 #   1 - includes code in ROM
-#   0 - does not 
+#   0 - does not
 HVQM ?= 0
 $(eval $(call validate-option,HVQM,0 1))
 ifeq ($(HVQM),1)
@@ -269,7 +269,7 @@ BUILD_DIR      := $(BUILD_DIR_BASE)/$(VERSION)_$(CONSOLE)
 
 COMPRESS ?= rnc1
 $(eval $(call validate-option,COMPRESS,mio0 yay0 gzip rnc1 rnc2 uncomp))
-ifeq ($(COMPRESS),gzip)
+ifeq      ($(COMPRESS),gzip)
   DEFINES += GZIP=1
   LIBZRULE := $(BUILD_DIR)/libz.a
   LIBZLINK := -lz
@@ -290,7 +290,7 @@ $(eval $(call validate-option,GZIPVER,std libdef))
 
 # GODDARD - whether to use libgoddard (Mario Head)
 #   1 - includes code in ROM
-#   0 - does not 
+#   0 - does not
 GODDARD ?= 0
 $(eval $(call validate-option,GODDARD,0 1))
 ifeq ($(GODDARD),1)
@@ -355,7 +355,6 @@ ifeq ($(filter clean distclean print-%,$(MAKECMDGOALS)),)
       $(error Failed to build tools)
     endif
   $(info Building ROM...)
-
 endif
 
 
@@ -388,7 +387,7 @@ include Makefile.split
 # Source code files
 LEVEL_C_FILES     := $(wildcard levels/*/leveldata.c) $(wildcard levels/*/script.c) $(wildcard levels/*/geo.c)
 C_FILES           := $(foreach dir,$(SRC_DIRS),$(wildcard $(dir)/*.c)) $(LEVEL_C_FILES)
-LIBZ_C_FILES     := $(foreach dir,$(LIBZ_SRC_DIRS),$(wildcard $(dir)/*.c))
+LIBZ_C_FILES      := $(foreach dir,$(LIBZ_SRC_DIRS),$(wildcard $(dir)/*.c))
 GODDARD_C_FILES   := $(foreach dir,$(GODDARD_SRC_DIRS),$(wildcard $(dir)/*.c))
 S_FILES           := $(foreach dir,$(SRC_DIRS),$(wildcard $(dir)/*.s))
 GENERATED_C_FILES := $(BUILD_DIR)/assets/mario_anim_data.c $(BUILD_DIR)/assets/demo_data.c
@@ -413,7 +412,7 @@ O_FILES := $(foreach file,$(C_FILES),$(BUILD_DIR)/$(file:.c=.o)) \
            $(foreach file,$(GENERATED_C_FILES),$(file:.c=.o)) \
            lib/PR/hvqm/hvqm2sp1.o lib/PR/hvqm/hvqm2sp2.o
 
-LIBZ_O_FILES := $(foreach file,$(LIBZ_C_FILES),$(BUILD_DIR)/$(file:.c=.o))
+LIBZ_O_FILES    := $(foreach file,$(LIBZ_C_FILES),$(BUILD_DIR)/$(file:.c=.o))
 GODDARD_O_FILES := $(foreach file,$(GODDARD_C_FILES),$(BUILD_DIR)/$(file:.c=.o))
 
 # Automatic dependency files
@@ -424,7 +423,7 @@ DEP_FILES := $(O_FILES:.o=.d) $(LIBZ_O_FILES:.o=.d) $(GODDARD_O_FILES:.o=.d) $(B
 #==============================================================================#
 
 # detect prefix for MIPS toolchain
-ifneq ($(call find-command,mips64-elf-ld),)
+ifneq      ($(call find-command,mips64-elf-ld),)
   CROSS := mips64-elf-
 else ifneq ($(call find-command,mips-n64-ld),)
   CROSS := mips-n64-
@@ -442,28 +441,28 @@ endif
 
 export LD_LIBRARY_PATH=./tools
 
-AS        := $(CROSS)as
-ifeq ($(COMPILER),gcc)
-  CC      := $(CROSS)gcc
-  $(BUILD_DIR)/actors/%.o:           OPT_FLAGS := -Ofast -mlong-calls
-  $(BUILD_DIR)/levels/%.o:           OPT_FLAGS := -Ofast -mlong-calls
+AS      := $(CROSS)as
+ifeq      ($(COMPILER),gcc)
+  CC    := $(CROSS)gcc
+  $(BUILD_DIR)/actors/%.o: OPT_FLAGS := -Ofast -mlong-calls
+  $(BUILD_DIR)/levels/%.o: OPT_FLAGS := -Ofast -mlong-calls
 else ifeq ($(COMPILER),clang)
-  CC      := clang
+  CC    := clang
 endif
 # Prefer gcc's cpp if installed on the system
 ifneq (,$(call find-command,cpp-10))
-  CPP     := cpp-10
+  CPP   := cpp-10
 else
-  CPP     := cpp
+  CPP   := cpp
 endif
 ifneq ($(call find-command,mips-n64-ld),)
-LD        := mips-n64-ld
+LD      := mips-n64-ld
 else
-LD        := tools/mips64-elf-ld
+LD      := tools/mips64-elf-ld
 endif
-AR        := $(CROSS)ar
-OBJDUMP   := $(CROSS)objdump
-OBJCOPY   := $(CROSS)objcopy
+AR      := $(CROSS)ar
+OBJDUMP := $(CROSS)objdump
+OBJCOPY := $(CROSS)objcopy
 
 ifeq ($(TARGET_N64),1)
   TARGET_CFLAGS := -nostdinc -DTARGET_N64 -D_LANGUAGE_C
@@ -480,7 +479,7 @@ DEF_INC_CFLAGS := $(foreach i,$(INCLUDE_DIRS),-I$(i)) $(C_DEFINES)
 
 # C compiler options
 CFLAGS = -G 0 $(OPT_FLAGS) $(TARGET_CFLAGS) $(MIPSISET) $(DEF_INC_CFLAGS)
-ifeq ($(COMPILER),gcc)
+ifeq      ($(COMPILER),gcc)
   CFLAGS += -mno-shared -march=vr4300 -mfix4300 -mabi=32 -mhard-float -mdivide-breaks -fno-stack-protector -fno-common -fno-zero-initialized-in-bss -fno-PIC -mno-abicalls -fno-strict-aliasing -fno-inline-functions -ffreestanding -fwrapv -Wall -Wextra
   CFLAGS += -Wno-missing-braces
 else ifeq ($(COMPILER),clang)
@@ -518,9 +517,9 @@ EXTRACT_DATA_FOR_MIO  := $(TOOLS_DIR)/extract_data_for_mio
 SKYCONV               := $(TOOLS_DIR)/skyconv
 FIXLIGHTS_PY          := $(TOOLS_DIR)/fixlights.py
 ifeq ($(GZIPVER),std)
-GZIP                  := gzip
+  GZIP                := gzip
 else
-GZIP                  := libdeflate-gzip
+  GZIP                := libdeflate-gzip
 endif
 # Use the system installed armips if available. Otherwise use the one provided with this repository.
 ifneq (,$(call find-command,armips))
@@ -537,12 +536,12 @@ SHA1SUM = sha1sum
 PRINT = printf
 
 ifeq ($(COLOR),1)
-NO_COL  := \033[0m
-RED     := \033[0;31m
-GREEN   := \033[0;32m
-BLUE    := \033[0;34m
-YELLOW  := \033[0;33m
-BLINK   := \033[32;5m
+  NO_COL := \033[0m
+  RED    := \033[0;31m
+  GREEN  := \033[0;32m
+  BLUE   := \033[0;34m
+  YELLOW := \033[0;33m
+  BLINK  := \033[32;5m
 endif
 
 # For non-IDO, use objcopy instead of extract_data_for_mio
@@ -563,9 +562,9 @@ all: $(ROM)
 	@$(SHA1SUM) $(ROM)
 	@$(PRINT) "${BLINK}Build succeeded.\n$(NO_COL)"
 	@$(PRINT) "==== Build Options ====$(NO_COL)\n"
-	@$(PRINT) "${GREEN}Version:        $(BLUE)$(VERSION)$(NO_COL)\n"
-	@$(PRINT) "${GREEN}Microcode:      $(BLUE)$(GRUCODE)$(NO_COL)\n"
-	@$(PRINT) "${GREEN}Console:        $(BLUE)$(CONSOLE)$(NO_COL)\n"
+	@$(PRINT) "${GREEN}Version:   $(BLUE)$(VERSION)$(NO_COL)\n"
+	@$(PRINT) "${GREEN}Microcode: $(BLUE)$(GRUCODE)$(NO_COL)\n"
+	@$(PRINT) "${GREEN}Console:   $(BLUE)$(CONSOLE)$(NO_COL)\n"
 
 clean:
 	$(RM) -r $(BUILD_DIR_BASE)
@@ -602,8 +601,8 @@ endif
 $(CRASH_TEXTURE_C_FILES): TEXTURE_ENCODING := u32
 
 ifeq ($(COMPILER),gcc)
-$(BUILD_DIR)/src/libz/%.o: OPT_FLAGS := -Os
-$(BUILD_DIR)/src/libz/%.o: CFLAGS += -Wno-implicit-fallthrough -Wno-unused-parameter -Wno-pointer-sign
+  $(BUILD_DIR)/src/libz/%.o: OPT_FLAGS := -Os
+  $(BUILD_DIR)/src/libz/%.o: CFLAGS += -Wno-implicit-fallthrough -Wno-unused-parameter -Wno-pointer-sign
 endif
 
 ifeq ($(VERSION),eu)
@@ -629,13 +628,13 @@ else
   endif
 endif
 
-$(BUILD_DIR)/src/usb/usb.o: OPT_FLAGS := -O0
-$(BUILD_DIR)/src/usb/usb.o: CFLAGS += -Wno-unused-variable -Wno-sign-compare -Wno-unused-function
-$(BUILD_DIR)/src/usb/debug.o: OPT_FLAGS := -O0
-$(BUILD_DIR)/src/usb/debug.o: CFLAGS += -Wno-unused-parameter -Wno-maybe-uninitialized
+$(BUILD_DIR)/src/usb/usb.o:                   OPT_FLAGS := -O0
+$(BUILD_DIR)/src/usb/usb.o:                   CFLAGS    += -Wno-unused-variable -Wno-sign-compare -Wno-unused-function
+$(BUILD_DIR)/src/usb/debug.o:                 OPT_FLAGS := -O0
+$(BUILD_DIR)/src/usb/debug.o:                 CFLAGS    += -Wno-unused-parameter -Wno-maybe-uninitialized
 # File specific opt flags
-$(BUILD_DIR)/src/audio/heap.o:          OPT_FLAGS := -Os -fno-jump-tables
-$(BUILD_DIR)/src/audio/synthesis.o:     OPT_FLAGS := -Os -fno-jump-tables
+$(BUILD_DIR)/src/audio/heap.o:                OPT_FLAGS := -Os -fno-jump-tables
+$(BUILD_DIR)/src/audio/synthesis.o:           OPT_FLAGS := -Os -fno-jump-tables
 
 $(BUILD_DIR)/src/engine/surface_collision.o:  OPT_FLAGS := $(COLLISION_OPT_FLAGS)
 $(BUILD_DIR)/src/engine/math_util.o:          OPT_FLAGS := $(MATH_UTIL_OPT_FLAGS)
@@ -707,18 +706,18 @@ $(BUILD_DIR)/levels/%/leveldata.bin: $(BUILD_DIR)/levels/%/leveldata.elf
 	$(call print,Extracting compressible data from:,$<,$@)
 	$(V)$(EXTRACT_DATA_FOR_MIO) $< $@
 
-ifeq ($(COMPRESS),gzip)
-include gziprules.mk
+ifeq      ($(COMPRESS),gzip)
+  include gziprules.mk
 else ifeq ($(COMPRESS),rnc1)
-include rnc1rules.mk
+  include rnc1rules.mk
 else ifeq ($(COMPRESS),rnc2)
-include rnc2rules.mk
+  include rnc2rules.mk
 else ifeq ($(COMPRESS),yay0)
-include yay0rules.mk
+  include yay0rules.mk
 else ifeq ($(COMPRESS),mio0)
-include mio0rules.mk
+  include mio0rules.mk
 else ifeq ($(COMPRESS),uncomp)
-include uncomprules.mk
+  include uncomprules.mk
 endif
 
 #==============================================================================#
