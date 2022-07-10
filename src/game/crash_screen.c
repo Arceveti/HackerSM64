@@ -43,7 +43,7 @@ u32 gCrashScreenFont[7 * 26 + 1] = {
     #include "textures/crash_custom/crash_screen_font.ia1.inc.c"
 };
 
-#define STACK_SIZE (s32)(0x800 / sizeof(u64))
+#define STACK_SIZE 100//(s32)(0x800 / sizeof(u64))
 
 struct FunctionInStack {
     u32 addr;
@@ -323,30 +323,28 @@ void draw_crash_log(void) {
 }
 #endif
 
-//! Either this function, the one below it, or find_function_in_stack, is broken and gives the wrong function addresses/names.
 void fill_function_stack_trace(OSThread *thread) {
     __OSThreadContext *tc = &thread->context;
     u32 temp_sp = (tc->sp + 0x14);
     struct FunctionInStack *function = NULL;
     char *fname;
 
+    if ((u32) find_function_in_stack == MAP_PARSER_ADDRESS) {
+        return;
+    }
+
     // Fill the stack buffer.
     for (s32 i = 0; i < STACK_SIZE; i++) {
-        if ((u32) find_function_in_stack == MAP_PARSER_ADDRESS) {
-            return;
-        }
-
         fname = find_function_in_stack(&temp_sp);
 
         function = &sAllFunctionStack[i];
-        function->name = fname;
         function->addr = temp_sp;
+        function->name = fname;
 
         if (!((fname == NULL) || ((*(u32*)temp_sp & 0x80000000) == 0))) {
-            //! Somehow fname and temp_sp are different here than above.
             function = &sKnownFunctionStack[sNumKnownFunctions++];
-            function->name = fname;
             function->addr = temp_sp;
+            function->name = fname;
         }
     }
 }
@@ -396,7 +394,7 @@ void draw_stacktrace(OSThread *thread, UNUSED s32 cause) {
 
         crash_screen_print(30, y, "%08X:", faddr);
 
-        if (!sSkipUnknownsInStackTrace && ((fname == NULL) || ((*(u32*)temp_sp & 0x80000000) == 0))) {
+        if (!sSkipUnknownsInStackTrace && ((fname == NULL) || ((*(u32*)faddr & 0x80000000) == 0))) {
             // Print unknown function
             crash_screen_print(90, y, "@C0C0C0FFUNKNOWN (0x%08X)", *(u32*)faddr);
         } else {
