@@ -7,7 +7,7 @@
 
 
 // HackerSM64 version number. DO NOT CHANGE THIS UNLESS YOU ARE A HACKERSM64 DEVELOPER.
-#define HACKERSM64_VERSION "2.1.0"
+#define HACKERSM64_VERSION "2.1.0 beta"
 
 
 #include "config/config_audio.h"
