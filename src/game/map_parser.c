@@ -62,11 +62,9 @@ extern u8 _engineSegmentTextEnd[];
 extern u8 _goddardSegmentStart[];
 extern u8 _goddardSegmentTextEnd[];
 
-char *find_function_in_stack(u32 *sp) {
+char *find_function_in_stack(u32 **sp) {
     for (int i = 0; i < STACK_TRAVERSAL_LIMIT; i++) {
-        u32 val = *sp;
-        val = *(u32 *)val;
-        *sp += 4;
+        u32 val = *(*sp)++;
 
         if (((val >= (u32)_mainSegmentStart   ) && (val <= (u32)_mainSegmentTextEnd   ))
          || ((val >= (u32)_engineSegmentStart ) && (val <= (u32)_engineSegmentTextEnd ))
@@ -77,4 +75,3 @@ char *find_function_in_stack(u32 *sp) {
 
     return NULL;
 }
-
