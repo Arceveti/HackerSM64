@@ -15,7 +15,7 @@ enum Benchmark {
     BENCHMARK_NONE,
     BENCHMARK_GAME,
     BENCHMARK_AUDIO,
-    BENCHMARK_GRAPHICS
+    BENCHMARK_GRAPHICS,
 };
 
 enum PuppyprintTextAlign {

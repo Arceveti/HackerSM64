@@ -49,7 +49,7 @@ struct Controller {
 };
 
 // -- String --
-typedef char String[];
+typedef char * String;
 
 // -- Booleans --
 typedef u8  Bool8;

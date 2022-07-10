@@ -149,7 +149,7 @@ enum StarFlags {
     STAR_FLAG_ACT_5         = (1 << 4), // 0x10
     STAR_FLAG_ACT_6         = (1 << 5), // 0x20
     STAR_FLAG_ACT_100_COINS = (1 << 6), // 0x40
-    STAR_FLAG_LAST          = STAR_FLAG_ACT_100_COINS
+    STAR_FLAG_LAST          = STAR_FLAG_ACT_100_COINS,
 };
 
 #define SAVE_FLAG_TO_STAR_FLAG(cmd) (((cmd) >> 24) & 0x7F)
@@ -211,7 +211,7 @@ s32 check_warp_checkpoint(struct WarpNode *warpNode);
 enum EuLanguages {
     LANGUAGE_ENGLISH,
     LANGUAGE_FRENCH,
-    LANGUAGE_GERMAN
+    LANGUAGE_GERMAN,
 };
 
 void eu_set_language(u16 language);

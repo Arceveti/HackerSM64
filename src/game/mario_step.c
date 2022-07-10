@@ -500,8 +500,6 @@ struct Surface *check_ledge_grab(struct MarioState *m, struct WallCollisionData 
     return prevWall;
 }
 
-#undef hdot_surf
-
 s32 bonk_or_hit_lava_wall(struct MarioState *m, struct WallCollisionData *wallData) {
     s16 i;
     s16 wallDYaw;

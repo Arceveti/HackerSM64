@@ -58,7 +58,7 @@ enum ObjectList {
                           //      if there are not enough object slots: they will also
                           //      be manually unloaded to make room for slots if the list
                           //      gets exhausted.
-    NUM_OBJ_LISTS
+    NUM_OBJ_LISTS,
 };
 
 

@@ -13,7 +13,7 @@ enum ObjCollisionFlags {
     OBJ_COL_FLAG_HIT_WALL   = (1 << 1),
     OBJ_COL_FLAG_UNDERWATER = (1 << 2),
     OBJ_COL_FLAG_NO_Y_VEL   = (1 << 3),
-    OBJ_COL_FLAGS_LANDED    = (OBJ_COL_FLAG_GROUNDED | OBJ_COL_FLAG_NO_Y_VEL)
+    OBJ_COL_FLAGS_LANDED    = (OBJ_COL_FLAG_GROUNDED | OBJ_COL_FLAG_NO_Y_VEL),
 };
 
 //! Lots of these are duplicates

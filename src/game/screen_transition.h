@@ -11,12 +11,12 @@ enum TextureTransitionID {
     TEX_TRANS_STAR,
     TEX_TRANS_CIRCLE,
     TEX_TRANS_MARIO,
-    TEX_TRANS_BOWSER
+    TEX_TRANS_BOWSER,
 };
 
 enum TextureTransitionType {
     TRANS_TYPE_MIRROR,
-    TRANS_TYPE_CLAMP
+    TRANS_TYPE_CLAMP,
 };
 
 enum ColorTransitionFade {

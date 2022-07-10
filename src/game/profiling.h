@@ -30,7 +30,7 @@ enum ProfilerTime {
 enum ProfilerRSPTime {
     PROFILER_RSP_GFX,
     PROFILER_RSP_AUDIO,
-    PROFILER_RSP_COUNT
+    PROFILER_RSP_COUNT,
 };
 
 #ifdef USE_PROFILER
