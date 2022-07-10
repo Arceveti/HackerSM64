@@ -43,7 +43,7 @@ u32 gCrashScreenFont[7 * 26 + 1] = {
     #include "textures/crash_custom/crash_screen_font.ia1.inc.c"
 };
 
-#define STACK_SIZE 128
+#define STACK_SIZE (s32)(0x800 / sizeof(u64))
 
 struct FunctionInStack {
     u32 addr;
@@ -276,7 +276,7 @@ void draw_crash_context(OSThread *thread, s32 cause) {
         }
     }
 
-    s32 y = 40;
+    s32 y = 30;
     crash_screen_print(30, (y += 10), "@3FC07FFFPC:@FFFFFFFF%08X    @3FC07FFFSR:@FFFFFFFF%08X    @3FC07FFFVA:@FFFFFFFF%08X", (u32) tc->pc, (u32) tc->sr, (u32) tc->badvaddr);
     crash_screen_print(30, (y += 10), "@3FC07FFFAT:@FFFFFFFF%08X    @3FC07FFFV0:@FFFFFFFF%08X    @3FC07FFFV1:@FFFFFFFF%08X", (u32) tc->at, (u32) tc->v0, (u32) tc->v1);
     crash_screen_print(30, (y += 10), "@3FC07FFFA0:@FFFFFFFF%08X    @3FC07FFFA1:@FFFFFFFF%08X    @3FC07FFFA2:@FFFFFFFF%08X", (u32) tc->a0, (u32) tc->a1, (u32) tc->a2);
@@ -293,7 +293,7 @@ void draw_crash_context(OSThread *thread, s32 cause) {
     osWritebackDCacheAll();
 
     s32 regNum = 0;
-    crash_screen_print_float_reg( 30, 170, (regNum += 2), &tc->fp0.f.f_even);
+    crash_screen_print_float_reg( 30, 170, (regNum     ), &tc->fp0.f.f_even);
     crash_screen_print_float_reg(120, 170, (regNum += 2), &tc->fp2.f.f_even);
     crash_screen_print_float_reg(210, 170, (regNum += 2), &tc->fp4.f.f_even);
     crash_screen_print_float_reg( 30, 180, (regNum += 2), &tc->fp6.f.f_even);
@@ -323,16 +323,17 @@ void draw_crash_log(void) {
 }
 #endif
 
+//! Either this function, the one below it, or find_function_in_stack, is broken and gives the wrong function addresses/names.
 void fill_function_stack_trace(OSThread *thread) {
     __OSThreadContext *tc = &thread->context;
     u32 temp_sp = (tc->sp + 0x14);
-    struct FunctionInStack *function;
+    struct FunctionInStack *function = NULL;
     char *fname;
 
     // Fill the stack buffer.
     for (s32 i = 0; i < STACK_SIZE; i++) {
         if ((u32) find_function_in_stack == MAP_PARSER_ADDRESS) {
-            break;
+            return;
         }
 
         fname = find_function_in_stack(&temp_sp);
@@ -342,17 +343,15 @@ void fill_function_stack_trace(OSThread *thread) {
         function->addr = temp_sp;
 
         if (!((fname == NULL) || ((*(u32*)temp_sp & 0x80000000) == 0))) {
-            function = &sKnownFunctionStack[sNumKnownFunctions];
+            //! Somehow fname and temp_sp are different here than above.
+            function = &sKnownFunctionStack[sNumKnownFunctions++];
             function->name = fname;
             function->addr = temp_sp;
-
-            sNumKnownFunctions++;
         }
     }
-
 }
 
-#define STACK_TRACE_NUM_VISIBLE_LINES 18
+#define STACK_TRACE_NUM_ROWS 18
 
 // prints any function pointers it finds in the stack format:
 // SP address: function name
@@ -360,9 +359,10 @@ void draw_stacktrace(OSThread *thread, UNUSED s32 cause) {
     __OSThreadContext *tc = &thread->context;
     u32 temp_sp = (tc->sp + 0x14);
     s32 currIndex;
+    u32 faddr;
     char *fname;
-
-    struct FunctionInStack *function;
+    struct FunctionInStack *functionList = (sSkipUnknownsInStackTrace ? sKnownFunctionStack : sAllFunctionStack);
+    struct FunctionInStack *function = NULL;
 
     crash_screen_print(30, 20, "STACK TRACE FROM %08X:", temp_sp);
     crash_screen_print(30, 30, "@FF7F7FFFCURRFUNC:");
@@ -375,50 +375,46 @@ void draw_stacktrace(OSThread *thread, UNUSED s32 cause) {
     osWritebackDCacheAll();
 
     // Print
-    for (s32 j = 0; j < STACK_TRACE_NUM_VISIBLE_LINES; j++) {
+    for (s32 j = 0; j < STACK_TRACE_NUM_ROWS; j++) {
         s32 y = (40 + (j * 10));
 
         if ((u32) find_function_in_stack == MAP_PARSER_ADDRESS) {
             crash_screen_print(30, y, "STACK TRACE DISABLED");
             break;
+        }
+
+        currIndex = sStackTraceIndex + j;
+
+        if (currIndex >= sNumShownFunctions) {
+            break;
+        }
+
+        function = &functionList[currIndex];
+
+        faddr = function->addr;
+        fname = function->name;
+
+        crash_screen_print(30, y, "%08X:", faddr);
+
+        if (!sSkipUnknownsInStackTrace && ((fname == NULL) || ((*(u32*)temp_sp & 0x80000000) == 0))) {
+            // Print unknown function
+            crash_screen_print(90, y, "@C0C0C0FFUNKNOWN (0x%08X)", *(u32*)faddr);
         } else {
-            if ((u32) find_function_in_stack == MAP_PARSER_ADDRESS) {
-                break;
-            }
-
-            currIndex = sStackTraceIndex + j;
-
-            if (currIndex >= sNumShownFunctions) {
-                break;
-            }
-
-            if (sSkipUnknownsInStackTrace) {
-                function = &sKnownFunctionStack[currIndex];
-            } else {
-                function = &sAllFunctionStack[currIndex];
-            }
-
-            temp_sp = function->addr;
-            fname   = function->name;
-
-            crash_screen_print(30, y, "%08X:", temp_sp);
-
-            if (!sSkipUnknownsInStackTrace && ((fname == NULL) || ((*(u32*)temp_sp & 0x80000000)))) {
-                // Print unknown
-                crash_screen_print(90, y, "@C0C0C0FFUNKNOWN (0x%08X)", *(u32*)temp_sp);
-                // }
-            } else {// Known function
-                // Print with name
-                crash_screen_print(90, y, "@FFFFC0FF%s", fname);
-            }
+            // Print known function
+            crash_screen_print(90, y, "@FFFFC0FF%s", fname);
         }
     }
 
     // Scroll bar
     const s32 totalHeight = 180;
-    const s32 height = 10;
+    s32 height;
+    if (sNumShownFunctions <= STACK_TRACE_NUM_ROWS) {
+        height = totalHeight;
+    } else {
+        height = MAX(10, (totalHeight / (sNumShownFunctions - STACK_TRACE_NUM_ROWS)));
+    }
     const s32 moveHeight = totalHeight - height;
-    const s32 scaledPos = (sStackTraceIndex * moveHeight / (sNumShownFunctions - STACK_TRACE_NUM_VISIBLE_LINES));
+    const s32 scaledPos = (sStackTraceIndex * moveHeight / (sNumShownFunctions - STACK_TRACE_NUM_ROWS));
 
     if ((scaledPos >= 0) && (scaledPos <= moveHeight)) {
         crash_screen_draw_rect(294, (38 + scaledPos), 1, height, COLOR_RGBA16_LIGHT_GRAY, FALSE);
@@ -505,29 +501,31 @@ void draw_controls(UNUSED OSThread *thread) {
     osWritebackDCacheAll();
 }
 
-void take_screenshot(void) {\
+#define FRAMEBUFFER_SIZE ((SCREEN_WIDTH * SCREEN_HEIGHT) * sizeof(RGBA16))
+
+void crash_screen_take_screenshot(void) {
     if (gIsConsole) {
         // Save a screenshot of the game to a framebuffer that's not sRenderedFramebuffer or sRenderingFramebuffer
         sScreenshotFrameBuffer = ((sRenderingFramebuffer + 1) % 3);
-        memcpy(gFramebuffers[sScreenshotFrameBuffer], gFramebuffers[sRenderingFramebuffer], ((SCREEN_WIDTH * SCREEN_HEIGHT) * sizeof(RGBA16)));
+        memcpy(gFramebuffers[sScreenshotFrameBuffer], gFramebuffers[sRenderingFramebuffer], FRAMEBUFFER_SIZE);
     } else {
         sScreenshotFrameBuffer = sRenderedFramebuffer;
-        sRenderedFramebuffer  = ((sScreenshotFrameBuffer  + 1) % 3);
+        sRenderedFramebuffer = ((sScreenshotFrameBuffer + 1) % 3);
         sRenderingFramebuffer = ((sRenderedFramebuffer + 1) % 3);
-        memcpy(gFramebuffers[sRenderingFramebuffer], gFramebuffers[sScreenshotFrameBuffer], ((SCREEN_WIDTH * SCREEN_HEIGHT) * sizeof(RGBA16)));
+        memcpy(gFramebuffers[sRenderingFramebuffer], gFramebuffers[sScreenshotFrameBuffer], FRAMEBUFFER_SIZE);
     }
 }
 
 void reset_crash_screen_framebuffer(void) {
     if (sDrawFrameBuffer) {
-        memcpy(gFramebuffers[sRenderingFramebuffer], gFramebuffers[sScreenshotFrameBuffer], ((SCREEN_WIDTH * SCREEN_HEIGHT) * sizeof(RGBA16)));
+        memcpy(gFramebuffers[sRenderingFramebuffer], gFramebuffers[sScreenshotFrameBuffer], FRAMEBUFFER_SIZE);
     } else {
         crash_screen_draw_rect(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, COLOR_RGBA16_BLACK, FALSE);
     }
 }
 
 void update_crash_screen_framebuffer(void) {
-    memcpy(gFramebuffers[sRenderedFramebuffer], gFramebuffers[sRenderingFramebuffer], ((SCREEN_WIDTH * SCREEN_HEIGHT) * sizeof(RGBA16)));
+    memcpy(gFramebuffers[sRenderedFramebuffer], gFramebuffers[sRenderingFramebuffer], FRAMEBUFFER_SIZE);
 }
 
 void update_crash_screen_input(void) {
@@ -555,7 +553,7 @@ void update_crash_screen_input(void) {
             sUpdateBuffer = TRUE;
         }
 
-        if (gPlayer1Controller->rawStickX >  60 && !(sAnalogFlags & ANALOG_FLAG_RIGHT)) {
+        if (gPlayer1Controller->rawStickX > 60 && !(sAnalogFlags & ANALOG_FLAG_RIGHT)) {
             sCrashPage++;
             sUpdateBuffer = TRUE;
             sAnalogFlags |= ANALOG_FLAG_RIGHT;
@@ -574,7 +572,7 @@ void update_crash_screen_input(void) {
         s32 scrollDown = ((gPlayer1Controller->buttonDown & (D_CBUTTONS | D_JPAD))
                        || (gPlayer1Controller->rawStickY < -60));
         s32 scrollUp   = ((gPlayer1Controller->buttonDown & (U_CBUTTONS | U_JPAD))
-                       || (gPlayer1Controller->rawStickY >  60));
+                       || (gPlayer1Controller->rawStickY > 60));
 
         // Page-specific inputs.
         switch (sCrashPage) {
@@ -593,7 +591,7 @@ void update_crash_screen_input(void) {
                     sUpdateBuffer = TRUE;
                 }
                 if (scrollDown) {
-                    if (sStackTraceIndex < (sNumShownFunctions - STACK_TRACE_NUM_VISIBLE_LINES)) {
+                    if (sStackTraceIndex < (sNumShownFunctions - STACK_TRACE_NUM_ROWS)) {
                         sStackTraceIndex++;
                     }
                     sUpdateBuffer = TRUE;
@@ -702,7 +700,7 @@ void thread2_crash_screen(UNUSED void *arg) {
         if (thread == NULL) {
             osRecvMesg(&gCrashScreen.mesgQueue, &mesg, OS_MESG_BLOCK);
             thread = get_crashed_thread();
-            take_screenshot();
+            crash_screen_take_screenshot();
             if (thread) {
                 if ((u32) map_data_init != MAP_PARSER_ADDRESS) {
                     map_data_init();
