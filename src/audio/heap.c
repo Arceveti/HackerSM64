@@ -1220,8 +1220,9 @@ void audio_reset_session(void) {
             }
 
             for (i = 0; i < gMaxSimultaneousNotes; i++) {
-                if (gNotes[i].enabled)
+                if (gNotes[i].enabled) {
                     break;
+                }
             }
 
             if (i == gMaxSimultaneousNotes) {
@@ -1243,8 +1244,9 @@ void audio_reset_session(void) {
         remainingDmas = gCurrAudioFrameDmaCount;
         while (remainingDmas > 0) {
             for (i = 0; i < gCurrAudioFrameDmaCount; i++) {
-                if (osRecvMesg(&gCurrAudioFrameDmaQueue, NULL, OS_MESG_NOBLOCK) == 0)
+                if (osRecvMesg(&gCurrAudioFrameDmaQueue, NULL, OS_MESG_NOBLOCK) == 0) {
                     remainingDmas--;
+                }
             }
         }
         gCurrAudioFrameDmaCount = 0;
@@ -1287,15 +1289,17 @@ void audio_reset_session(void) {
     gAudioBufferParameters.minAiBufferLength *= gAudioBufferParameters.presetUnk4;
     gAudioBufferParameters.updatesPerFrame *= gAudioBufferParameters.presetUnk4;
 
-    if (gIsConsole)
+    if (gIsConsole) {
         gMaxSimultaneousNotes = MAX_SIMULTANEOUS_NOTES_CONSOLE;
-    else
+    } else {
         gMaxSimultaneousNotes = MAX_SIMULTANEOUS_NOTES_EMULATOR;
+    }
     
-    if (gMaxSimultaneousNotes > MAX_SIMULTANEOUS_NOTES)
+    if (gMaxSimultaneousNotes > MAX_SIMULTANEOUS_NOTES) {
         gMaxSimultaneousNotes = MAX_SIMULTANEOUS_NOTES;
-    else if (gMaxSimultaneousNotes < 0)
+    } else if (gMaxSimultaneousNotes < 0) {
         gMaxSimultaneousNotes = 0;
+    }
 
  #ifdef VERSION_SH
     if (gAudioBufferParameters.presetUnk4 >= 2) {
