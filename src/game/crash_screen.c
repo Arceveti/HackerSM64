@@ -26,7 +26,8 @@ enum crashPages {
     PAGE_DISASM,
     PAGE_ASSERTS,
     PAGE_CONTROLS,
-    PAGE_COUNT
+    PAGE_COUNT,
+    PAGES_MAX = 255,
 };
 
 enum AnalogFlags {
@@ -42,16 +43,27 @@ u32 gCrashScreenFont[7 * 26 + 1] = {
     #include "textures/crash_custom/crash_screen_font.ia1.inc.c"
 };
 
-static s8 sAnalogFlags = ANALOG_FLAGS_NONE;
-static u8 sDrawCrashScreen = TRUE;
-static u8 sDrawFrameBuffer = TRUE;
-static u8 sSkipUnknownsInStackTrace = FALSE;
-static u32 sProgramPosition = 0;
-static u32 sStackTracePrevPos = 0;
-static u32 sStackTraceNextPos = 0;
+#define STACK_SIZE 128
 
-u8 crashPage = 0;
-u8 updateBuffer = TRUE;
+struct FunctionInStack {
+    u32 addr;
+    char *name;
+};
+
+struct FunctionInStack sAllFunctionStack[STACK_SIZE];
+struct FunctionInStack sKnownFunctionStack[STACK_SIZE];
+static s32 sNumKnownFunctions = 0;
+static s32 sNumShownFunctions = STACK_SIZE;
+
+static s8 sAnalogFlags = ANALOG_FLAGS_NONE;
+static s8 sDrawCrashScreen = TRUE;
+static s8 sDrawFrameBuffer = TRUE;
+static s8 sSkipUnknownsInStackTrace = FALSE;
+static u32 sProgramPosition = 0;
+static s32 sStackTraceIndex = 0;
+
+u8 sCrashPage = PAGE_CONTEXT;
+u8 sUpdateBuffer = TRUE;
 
 
 char *gCauseDesc[18] = {
@@ -85,26 +97,28 @@ extern u64 osClockRate;
 extern far char *parse_map(u32 pc);
 extern far void map_data_init(void);
 extern far char *find_function_in_stack(u32 *sp);
-extern far char *find_prev_function_in_stack(u32 *sp);
 
 struct {
     OSThread thread;
     u64 stack[0x800 / sizeof(u64)];
     OSMesgQueue mesgQueue;
     OSMesg mesg;
-    RGBA16 *framebuffer;
     u16 width;
     u16 height;
 } gCrashScreen;
 
+extern u16 sRenderedFramebuffer;
+extern u16 sRenderingFramebuffer;
+u16 sScreenshotFrameBuffer;
+
 void crash_screen_draw_rect(s32 x, s32 y, s32 w, s32 h, RGBA16 color, s32 isTransparent) {
     s32 i, j;
 
-    RGBA16 *ptr = gCrashScreen.framebuffer + (gCrashScreen.width * y) + x;
+    RGBA16 *ptr = gFramebuffers[sRenderingFramebuffer] + (gCrashScreen.width * y) + x;
     for (i = 0; i < h; i++) {
         for (j = 0; j < w; j++) {
             if (isTransparent) {
-                *ptr = ((*ptr & color) >> 2) | 1;
+                *ptr = (((*ptr & color) >> 2) | 0x1);
             } else {
                 *ptr = color;
             }
@@ -121,10 +135,10 @@ void crash_screen_draw_glyph(s32 x, s32 y, s32 glyph, RGBA16 color) {
 
     const u32 *data = &gCrashScreenFont[glyph / 5 * 7];
 
-    RGBA16 *ptr = gCrashScreen.framebuffer + (gCrashScreen.width * y) + x;
+    RGBA16 *ptr = gFramebuffers[sRenderingFramebuffer] + (gCrashScreen.width * y) + x;
 
     for (i = 0; i < 7; i++) {
-        bit = 0x80000000U >> ((glyph % 5) * 6);
+        bit = (0x80000000U >> ((glyph % 5) * 6));
         rowMask = *data++;
 
         for (j = 0; j < 6; j++) {
@@ -144,12 +158,12 @@ static char *write_to_buf(char *buffer, const char *data, size_t size) {
 
 u32 index_to_hex(u32 glyph) {
     u32 ret = 0;
-    if (glyph >= 48 && glyph <= 57) { // 0-9
-        ret = (glyph - 48);
-    } else if (glyph >= 65 && glyph <= 70) { // A-F
-        ret = (glyph - 65) + 10;
-    } else if (glyph >= 97 && glyph <= 102) { // a-f
-        ret = (glyph - 97) + 10;
+    if (glyph >= '0' && glyph <= '9') {
+        ret = (glyph - '0');
+    } else if (glyph >= 'A' && glyph <= 'F') {
+        ret = (glyph - 'A') + 10;
+    } else if (glyph >= 'a' && glyph <= 'f') {
+        ret = (glyph - 'a') + 10;
     }
     return (ret & 0xF);
 }
@@ -172,7 +186,7 @@ void crash_screen_print(s32 x, s32 y, const char *fmt, ...) {
         while (*ptr) {
             glyph = (*ptr & 0x7f);
 
-            if (glyph == 64) { // @
+            if (glyph == '@') {
                 ptr++;
                 if (!*ptr) {
                     break;
@@ -220,7 +234,12 @@ void crash_screen_print_float_reg(s32 x, s32 y, s32 regNum, void *addr) {
     s32 exponent = ((bits & 0x7f800000U) >> 0x17) - 0x7F;
 
     if ((exponent >= -0x7E && exponent <= 0x7F) || bits == 0x0) {
-        crash_screen_print(x, y, "@3FC07FFFF%02d:@FFFFFFFF%.3e",  regNum, *(f32 *) addr);
+        f32 val = *(f32 *) addr;
+        if (val >= 0) {
+            crash_screen_print(x, y, "@3FC07FFFF%02d: @FFFFFFFF%.3e",  regNum, *(f32 *) addr);
+        } else {
+            crash_screen_print(x, y, "@3FC07FFFF%02d:@FFFFFFFF%.3e",  regNum, *(f32 *) addr);
+        }
     } else {
         crash_screen_print(x, y, "@3FC07FFFF%02d:@FFFFFFFF%08XD", regNum, *(u32 *) addr);
     }
@@ -244,7 +263,9 @@ void draw_crash_context(OSThread *thread, s32 cause) {
     __OSThreadContext *tc = &thread->context;
     crash_screen_print(30, 20, "@7F7FFFFFTHREAD:%d", thread->id);
     crash_screen_print(90, 20, "@FF3F00FF(%s)", gCauseDesc[cause]);
+
     osWritebackDCacheAll();
+
     if ((u32)parse_map != MAP_PARSER_ADDRESS) {
         char *fname = parse_map(tc->pc);
         crash_screen_print(30, 30, "@FF7F7FFFCRASH AT:");
@@ -254,36 +275,40 @@ void draw_crash_context(OSThread *thread, s32 cause) {
             crash_screen_print(90, 30, "@FFFF7FFF%s", fname);
         }
     }
-    crash_screen_print(30,  40, "@3FC07FFFPC:@FFFFFFFF%08X    @3FC07FFFSR:@FFFFFFFF%08X    @3FC07FFFVA:@FFFFFFFF%08X", (u32) tc->pc, (u32) tc->sr, (u32) tc->badvaddr);
-    crash_screen_print(30,  50, "@3FC07FFFAT:@FFFFFFFF%08X    @3FC07FFFV0:@FFFFFFFF%08X    @3FC07FFFV1:@FFFFFFFF%08X", (u32) tc->at, (u32) tc->v0, (u32) tc->v1);
-    crash_screen_print(30,  60, "@3FC07FFFA0:@FFFFFFFF%08X    @3FC07FFFA1:@FFFFFFFF%08X    @3FC07FFFA2:@FFFFFFFF%08X", (u32) tc->a0, (u32) tc->a1, (u32) tc->a2);
-    crash_screen_print(30,  70, "@3FC07FFFA3:@FFFFFFFF%08X    @3FC07FFFT0:@FFFFFFFF%08X    @3FC07FFFT1:@FFFFFFFF%08X", (u32) tc->a3, (u32) tc->t0, (u32) tc->t1);
-    crash_screen_print(30,  80, "@3FC07FFFT2:@FFFFFFFF%08X    @3FC07FFFT3:@FFFFFFFF%08X    @3FC07FFFT4:@FFFFFFFF%08X", (u32) tc->t2, (u32) tc->t3, (u32) tc->t4);
-    crash_screen_print(30,  90, "@3FC07FFFT5:@FFFFFFFF%08X    @3FC07FFFT6:@FFFFFFFF%08X    @3FC07FFFT7:@FFFFFFFF%08X", (u32) tc->t5, (u32) tc->t6, (u32) tc->t7);
-    crash_screen_print(30, 100, "@3FC07FFFS0:@FFFFFFFF%08X    @3FC07FFFS1:@FFFFFFFF%08X    @3FC07FFFS2:@FFFFFFFF%08X", (u32) tc->s0, (u32) tc->s1, (u32) tc->s2);
-    crash_screen_print(30, 110, "@3FC07FFFS3:@FFFFFFFF%08X    @3FC07FFFS4:@FFFFFFFF%08X    @3FC07FFFS5:@FFFFFFFF%08X", (u32) tc->s3, (u32) tc->s4, (u32) tc->s5);
-    crash_screen_print(30, 120, "@3FC07FFFS6:@FFFFFFFF%08X    @3FC07FFFS7:@FFFFFFFF%08X    @3FC07FFFT8:@FFFFFFFF%08X", (u32) tc->s6, (u32) tc->s7, (u32) tc->t8);
-    crash_screen_print(30, 130, "@3FC07FFFT9:@FFFFFFFF%08X    @3FC07FFFGP:@FFFFFFFF%08X    @3FC07FFFSP:@FFFFFFFF%08X", (u32) tc->t9, (u32) tc->gp, (u32) tc->sp);
-    crash_screen_print(30, 140, "@3FC07FFFS8:@FFFFFFFF%08X    @3FC07FFFRA:@FFFFFFFF%08X",                              (u32) tc->s8, (u32) tc->ra);
+
+    s32 y = 40;
+    crash_screen_print(30, (y += 10), "@3FC07FFFPC:@FFFFFFFF%08X    @3FC07FFFSR:@FFFFFFFF%08X    @3FC07FFFVA:@FFFFFFFF%08X", (u32) tc->pc, (u32) tc->sr, (u32) tc->badvaddr);
+    crash_screen_print(30, (y += 10), "@3FC07FFFAT:@FFFFFFFF%08X    @3FC07FFFV0:@FFFFFFFF%08X    @3FC07FFFV1:@FFFFFFFF%08X", (u32) tc->at, (u32) tc->v0, (u32) tc->v1);
+    crash_screen_print(30, (y += 10), "@3FC07FFFA0:@FFFFFFFF%08X    @3FC07FFFA1:@FFFFFFFF%08X    @3FC07FFFA2:@FFFFFFFF%08X", (u32) tc->a0, (u32) tc->a1, (u32) tc->a2);
+    crash_screen_print(30, (y += 10), "@3FC07FFFA3:@FFFFFFFF%08X    @3FC07FFFT0:@FFFFFFFF%08X    @3FC07FFFT1:@FFFFFFFF%08X", (u32) tc->a3, (u32) tc->t0, (u32) tc->t1);
+    crash_screen_print(30, (y += 10), "@3FC07FFFT2:@FFFFFFFF%08X    @3FC07FFFT3:@FFFFFFFF%08X    @3FC07FFFT4:@FFFFFFFF%08X", (u32) tc->t2, (u32) tc->t3, (u32) tc->t4);
+    crash_screen_print(30, (y += 10), "@3FC07FFFT5:@FFFFFFFF%08X    @3FC07FFFT6:@FFFFFFFF%08X    @3FC07FFFT7:@FFFFFFFF%08X", (u32) tc->t5, (u32) tc->t6, (u32) tc->t7);
+    crash_screen_print(30, (y += 10), "@3FC07FFFS0:@FFFFFFFF%08X    @3FC07FFFS1:@FFFFFFFF%08X    @3FC07FFFS2:@FFFFFFFF%08X", (u32) tc->s0, (u32) tc->s1, (u32) tc->s2);
+    crash_screen_print(30, (y += 10), "@3FC07FFFS3:@FFFFFFFF%08X    @3FC07FFFS4:@FFFFFFFF%08X    @3FC07FFFS5:@FFFFFFFF%08X", (u32) tc->s3, (u32) tc->s4, (u32) tc->s5);
+    crash_screen_print(30, (y += 10), "@3FC07FFFS6:@FFFFFFFF%08X    @3FC07FFFS7:@FFFFFFFF%08X    @3FC07FFFT8:@FFFFFFFF%08X", (u32) tc->s6, (u32) tc->s7, (u32) tc->t8);
+    crash_screen_print(30, (y += 10), "@3FC07FFFT9:@FFFFFFFF%08X    @3FC07FFFGP:@FFFFFFFF%08X    @3FC07FFFSP:@FFFFFFFF%08X", (u32) tc->t9, (u32) tc->gp, (u32) tc->sp);
+    crash_screen_print(30, (y += 10), "@3FC07FFFS8:@FFFFFFFF%08X    @3FC07FFFRA:@FFFFFFFF%08X",                              (u32) tc->s8, (u32) tc->ra);
     crash_screen_print_fpcsr(tc->fpcsr);
 
     osWritebackDCacheAll();
-    crash_screen_print_float_reg( 30, 170,  0, &tc->fp0.f.f_even);
-    crash_screen_print_float_reg(120, 170,  2, &tc->fp2.f.f_even);
-    crash_screen_print_float_reg(210, 170,  4, &tc->fp4.f.f_even);
-    crash_screen_print_float_reg( 30, 180,  6, &tc->fp6.f.f_even);
-    crash_screen_print_float_reg(120, 180,  8, &tc->fp8.f.f_even);
-    crash_screen_print_float_reg(210, 180, 10, &tc->fp10.f.f_even);
-    crash_screen_print_float_reg( 30, 190, 12, &tc->fp12.f.f_even);
-    crash_screen_print_float_reg(120, 190, 14, &tc->fp14.f.f_even);
-    crash_screen_print_float_reg(210, 190, 16, &tc->fp16.f.f_even);
-    crash_screen_print_float_reg( 30, 200, 18, &tc->fp18.f.f_even);
-    crash_screen_print_float_reg(120, 200, 20, &tc->fp20.f.f_even);
-    crash_screen_print_float_reg(210, 200, 22, &tc->fp22.f.f_even);
-    crash_screen_print_float_reg( 30, 210, 24, &tc->fp24.f.f_even);
-    crash_screen_print_float_reg(120, 210, 26, &tc->fp26.f.f_even);
-    crash_screen_print_float_reg(210, 210, 28, &tc->fp28.f.f_even);
-    crash_screen_print_float_reg( 30, 220, 30, &tc->fp30.f.f_even);
+
+    s32 regNum = 0;
+    crash_screen_print_float_reg( 30, 170, (regNum += 2), &tc->fp0.f.f_even);
+    crash_screen_print_float_reg(120, 170, (regNum += 2), &tc->fp2.f.f_even);
+    crash_screen_print_float_reg(210, 170, (regNum += 2), &tc->fp4.f.f_even);
+    crash_screen_print_float_reg( 30, 180, (regNum += 2), &tc->fp6.f.f_even);
+    crash_screen_print_float_reg(120, 180, (regNum += 2), &tc->fp8.f.f_even);
+    crash_screen_print_float_reg(210, 180, (regNum += 2), &tc->fp10.f.f_even);
+    crash_screen_print_float_reg( 30, 190, (regNum += 2), &tc->fp12.f.f_even);
+    crash_screen_print_float_reg(120, 190, (regNum += 2), &tc->fp14.f.f_even);
+    crash_screen_print_float_reg(210, 190, (regNum += 2), &tc->fp16.f.f_even);
+    crash_screen_print_float_reg( 30, 200, (regNum += 2), &tc->fp18.f.f_even);
+    crash_screen_print_float_reg(120, 200, (regNum += 2), &tc->fp20.f.f_even);
+    crash_screen_print_float_reg(210, 200, (regNum += 2), &tc->fp22.f.f_even);
+    crash_screen_print_float_reg( 30, 210, (regNum += 2), &tc->fp24.f.f_even);
+    crash_screen_print_float_reg(120, 210, (regNum += 2), &tc->fp26.f.f_even);
+    crash_screen_print_float_reg(210, 210, (regNum += 2), &tc->fp28.f.f_even);
+    crash_screen_print_float_reg( 30, 220, (regNum += 2), &tc->fp30.f.f_even);
 }
 
 #ifdef PUPPYPRINT_DEBUG
@@ -298,12 +323,46 @@ void draw_crash_log(void) {
 }
 #endif
 
+void fill_function_stack_trace(OSThread *thread) {
+    __OSThreadContext *tc = &thread->context;
+    u32 temp_sp = (tc->sp + 0x14);
+    struct FunctionInStack *function;
+    char *fname;
+
+    // Fill the stack buffer.
+    for (s32 i = 0; i < STACK_SIZE; i++) {
+        if ((u32) find_function_in_stack == MAP_PARSER_ADDRESS) {
+            break;
+        }
+
+        fname = find_function_in_stack(&temp_sp);
+
+        function = &sAllFunctionStack[i];
+        function->name = fname;
+        function->addr = temp_sp;
+
+        if (!((fname == NULL) || ((*(u32*)temp_sp & 0x80000000) == 0))) {
+            function = &sKnownFunctionStack[sNumKnownFunctions];
+            function->name = fname;
+            function->addr = temp_sp;
+
+            sNumKnownFunctions++;
+        }
+    }
+
+}
+
+#define STACK_TRACE_NUM_VISIBLE_LINES 18
+
 // prints any function pointers it finds in the stack format:
 // SP address: function name
 void draw_stacktrace(OSThread *thread, UNUSED s32 cause) {
     __OSThreadContext *tc = &thread->context;
     u32 temp_sp = (tc->sp + 0x14);
+    s32 currIndex;
     char *fname;
+
+    struct FunctionInStack *function;
 
     crash_screen_print(30, 20, "STACK TRACE FROM %08X:", temp_sp);
     crash_screen_print(30, 30, "@FF7F7FFFCURRFUNC:");
@@ -315,75 +374,54 @@ void draw_stacktrace(OSThread *thread, UNUSED s32 cause) {
 
     osWritebackDCacheAll();
 
-    s32 numSkipped = 0;
+    // Print
+    for (s32 j = 0; j < STACK_TRACE_NUM_VISIBLE_LINES; j++) {
+        s32 y = (40 + (j * 10));
 
-    // Find the previous position for scrolling up.
-    if (sProgramPosition < temp_sp) {
-        sProgramPosition = temp_sp;
-        sStackTracePrevPos = temp_sp;
-    } else {
-        sStackTracePrevPos = sProgramPosition;
-
-        fname = find_prev_function_in_stack(&sStackTracePrevPos);
-
-        if (sSkipUnknownsInStackTrace) {
-            while (((fname == NULL) || ((*(u32*)sStackTracePrevPos & 0x80000000) == 0)) && (numSkipped < 100)) {
-                fname = find_prev_function_in_stack(&sStackTracePrevPos);
-                numSkipped++;
-            }
-        }
-    }
-
-    u32 addr = sProgramPosition;
-
-    numSkipped = 0;
-
-    for (int i = 0; i < 18; i++) {
-        s32 y = (40 + (i * 10));
         if ((u32) find_function_in_stack == MAP_PARSER_ADDRESS) {
             crash_screen_print(30, y, "STACK TRACE DISABLED");
             break;
         } else {
             if ((u32) find_function_in_stack == MAP_PARSER_ADDRESS) {
-                return;
+                break;
             }
 
-            fname = find_function_in_stack(&addr);
+            currIndex = sStackTraceIndex + j;
 
-            // The next position when scrolling down.
-            if (i == 0) {
-                sStackTraceNextPos = addr;
+            if (currIndex >= sNumShownFunctions) {
+                break;
             }
 
-            if ((fname == NULL) || ((*(u32*)addr & 0x80000000) == 0)) {
-                if (sSkipUnknownsInStackTrace) {
-                    if (numSkipped < 100) {
-                        i--;
-                        numSkipped++;
-                    } else {
-                        break;
-                    }
-                } else {
-                    crash_screen_print(30, y, "%08X:", addr);
-                    crash_screen_print(90, y, "@C0C0C0FFUNKNOWN (0x%08X)", *(u32*)addr);
-                }
+            if (sSkipUnknownsInStackTrace) {
+                function = &sKnownFunctionStack[currIndex];
             } else {
-                crash_screen_print(30, y, "%08X:", addr);
+                function = &sAllFunctionStack[currIndex];
+            }
+
+            temp_sp = function->addr;
+            fname   = function->name;
+
+            crash_screen_print(30, y, "%08X:", temp_sp);
+
+            if (!sSkipUnknownsInStackTrace && ((fname == NULL) || ((*(u32*)temp_sp & 0x80000000)))) {
+                // Print unknown
+                crash_screen_print(90, y, "@C0C0C0FFUNKNOWN (0x%08X)", *(u32*)temp_sp);
+                // }
+            } else {// Known function
+                // Print with name
                 crash_screen_print(90, y, "@FFFFC0FF%s", fname);
             }
         }
     }
 
     // Scroll bar
-    u32 ramPos = (sProgramPosition - tc->sp);
-    const u32 ramSize = 0x10000;
-    u32 height = 10;
-    if (ramPos <= ramSize) {
-        const s32 totalHeight = (180 - height);
-        s32 scaledPos = ((f32)ramPos * (f32)totalHeight / (f32)ramSize);
-        if ((scaledPos > 0) && (scaledPos < totalHeight)) {
-            crash_screen_draw_rect(294, (38 + scaledPos), 1, height, COLOR_RGBA16_LIGHT_GRAY, FALSE);
-        }
+    const s32 totalHeight = 180;
+    const s32 height = 10;
+    const s32 moveHeight = totalHeight - height;
+    const s32 scaledPos = (sStackTraceIndex * moveHeight / (sNumShownFunctions - STACK_TRACE_NUM_VISIBLE_LINES));
+
+    if ((scaledPos >= 0) && (scaledPos <= moveHeight)) {
+        crash_screen_draw_rect(294, (38 + scaledPos), 1, height, COLOR_RGBA16_LIGHT_GRAY, FALSE);
     }
 
     crash_screen_draw_rect(25,  28, 270, 1, COLOR_RGBA16_LIGHT_GRAY, FALSE);
@@ -417,12 +455,13 @@ void draw_disasm(OSThread *thread) {
 
     // Scroll bar
     u32 ramPos = (sProgramPosition - 0x80000000);
-    const u32 ramSize = 0x800000;
-    const u32 height = 10;
+    const s32 ramSize = 0x800000;
     if (ramPos <= ramSize) {
-        const s32 totalHeight = (190 - height);
-        s32 scaledPos = ((f32)ramPos * (f32)totalHeight / (f32)ramSize);
-        if ((scaledPos > 0) && (scaledPos < totalHeight)) {
+        const s32 totalHeight = 190;
+        const s32 height = 10;
+        const s32 moveHeight = totalHeight - height;
+        const s32 scaledPos = (ramPos * moveHeight / ramSize);
+        if ((scaledPos > 0) && (scaledPos < moveHeight)) {
             crash_screen_draw_rect(294, (28 + scaledPos), 1, height, COLOR_RGBA16_LIGHT_GRAY, FALSE);
         }
     }
@@ -466,32 +505,40 @@ void draw_controls(UNUSED OSThread *thread) {
     osWritebackDCacheAll();
 }
 
-extern u16 sRenderedFramebuffer;
+void take_screenshot(void) {\
+    if (gIsConsole) {
+        // Save a screenshot of the game to a framebuffer that's not sRenderedFramebuffer or sRenderingFramebuffer
+        sScreenshotFrameBuffer = ((sRenderingFramebuffer + 1) % 3);
+        memcpy(gFramebuffers[sScreenshotFrameBuffer], gFramebuffers[sRenderingFramebuffer], ((SCREEN_WIDTH * SCREEN_HEIGHT) * sizeof(RGBA16)));
+    } else {
+        sScreenshotFrameBuffer = sRenderedFramebuffer;
+        sRenderedFramebuffer  = ((sScreenshotFrameBuffer  + 1) % 3);
+        sRenderingFramebuffer = ((sRenderedFramebuffer + 1) % 3);
+        memcpy(gFramebuffers[sRenderingFramebuffer], gFramebuffers[sScreenshotFrameBuffer], ((SCREEN_WIDTH * SCREEN_HEIGHT) * sizeof(RGBA16)));
+    }
+}
 
-void reload_crash_screen_framebuffer(void) {
+void reset_crash_screen_framebuffer(void) {
     if (sDrawFrameBuffer) {
-        s32 crashScreenFrameBufferIndex;
-        if (gIsConsole) {
-            crashScreenFrameBufferIndex = ((sRenderedFramebuffer + 1) % 3);
-        } else {
-            crashScreenFrameBufferIndex = 2;
-        }
-        memcpy(gFramebuffers[crashScreenFrameBufferIndex], gFramebuffers[sRenderedFramebuffer], ((SCREEN_WIDTH * SCREEN_HEIGHT) * sizeof(RGBA16)));
-        gCrashScreen.framebuffer = (RGBA16 *) gFramebuffers[crashScreenFrameBufferIndex];
+        memcpy(gFramebuffers[sRenderingFramebuffer], gFramebuffers[sScreenshotFrameBuffer], ((SCREEN_WIDTH * SCREEN_HEIGHT) * sizeof(RGBA16)));
     } else {
         crash_screen_draw_rect(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, COLOR_RGBA16_BLACK, FALSE);
     }
 }
 
+void update_crash_screen_framebuffer(void) {
+    memcpy(gFramebuffers[sRenderedFramebuffer], gFramebuffers[sRenderingFramebuffer], ((SCREEN_WIDTH * SCREEN_HEIGHT) * sizeof(RGBA16)));
+}
+
 void update_crash_screen_input(void) {
     if (gPlayer1Controller->buttonPressed & Z_TRIG) {
         sDrawCrashScreen ^= TRUE;
-        updateBuffer = TRUE;
+        sUpdateBuffer = TRUE;
     }
 
     if (gPlayer1Controller->buttonPressed & START_BUTTON) {
         sDrawFrameBuffer ^= TRUE;
-        updateBuffer = TRUE;
+        sUpdateBuffer = TRUE;
     }
 
     if (!sDrawCrashScreen && !sDrawFrameBuffer) {
@@ -500,25 +547,25 @@ void update_crash_screen_input(void) {
 
     if (sDrawCrashScreen) {
         if (gPlayer1Controller->buttonPressed & (R_CBUTTONS | R_JPAD)) {
-            crashPage++;
-            updateBuffer = TRUE;
+            sCrashPage++;
+            sUpdateBuffer = TRUE;
         }
         if (gPlayer1Controller->buttonPressed & (L_CBUTTONS | L_JPAD)) {
-            crashPage--;
-            updateBuffer = TRUE;
+            sCrashPage--;
+            sUpdateBuffer = TRUE;
         }
 
-        if (gPlayer1Controller->rawStickX > 60 && !(sAnalogFlags & ANALOG_FLAG_RIGHT)) {
-            crashPage++;
-            updateBuffer = TRUE;
+        if (gPlayer1Controller->rawStickX >  60 && !(sAnalogFlags & ANALOG_FLAG_RIGHT)) {
+            sCrashPage++;
+            sUpdateBuffer = TRUE;
             sAnalogFlags |= ANALOG_FLAG_RIGHT;
         } else if (gPlayer1Controller->rawStickX < 10) {
             sAnalogFlags &= ~ANALOG_FLAG_RIGHT;
         }
 
         if (gPlayer1Controller->rawStickX < -60 && !(sAnalogFlags & ANALOG_FLAG_LEFT)) {
-            crashPage--;
-            updateBuffer = TRUE;
+            sCrashPage--;
+            sUpdateBuffer = TRUE;
             sAnalogFlags |= ANALOG_FLAG_LEFT;
         } else if (gPlayer1Controller->rawStickX > -10) {
             sAnalogFlags &= ~ANALOG_FLAG_LEFT;
@@ -527,52 +574,55 @@ void update_crash_screen_input(void) {
         s32 scrollDown = ((gPlayer1Controller->buttonDown & (D_CBUTTONS | D_JPAD))
                        || (gPlayer1Controller->rawStickY < -60));
         s32 scrollUp   = ((gPlayer1Controller->buttonDown & (U_CBUTTONS | U_JPAD))
-                       || (gPlayer1Controller->rawStickY > 60));
+                       || (gPlayer1Controller->rawStickY >  60));
 
         // Page-specific inputs.
-        switch (crashPage) {
+        switch (sCrashPage) {
             case PAGE_STACKTRACE:
-                if (scrollDown) {
-                    sProgramPosition = sStackTraceNextPos;
-                    updateBuffer = TRUE;
-                }
-                if (scrollUp) {
-                    sProgramPosition = sStackTracePrevPos;
-                    updateBuffer = TRUE;
-                }
-
                 if (gPlayer1Controller->buttonPressed & A_BUTTON) {
                     sSkipUnknownsInStackTrace ^= TRUE;
-                    sProgramPosition = 0;
-                    sStackTracePrevPos = 0;
-                    sStackTraceNextPos = 0;
-                    updateBuffer = TRUE;
+                    sNumShownFunctions = (sSkipUnknownsInStackTrace ? sNumKnownFunctions : STACK_SIZE);
+                    sStackTraceIndex = 0;
+                    sUpdateBuffer = TRUE;
+                }
+
+                if (scrollUp) {
+                    if (sStackTraceIndex > 0) {
+                        sStackTraceIndex--;
+                    }
+                    sUpdateBuffer = TRUE;
+                }
+                if (scrollDown) {
+                    if (sStackTraceIndex < (sNumShownFunctions - STACK_TRACE_NUM_VISIBLE_LINES)) {
+                        sStackTraceIndex++;
+                    }
+                    sUpdateBuffer = TRUE;
                 }
                 break;
             case PAGE_DISASM:
-                if (scrollDown) {
-                    sProgramPosition += 4;
-                    updateBuffer = TRUE;
-                }
                 if (scrollUp) {
                     sProgramPosition -= 4;
-                    updateBuffer = TRUE;
+                    sUpdateBuffer = TRUE;
+                }
+                if (scrollDown) {
+                    sProgramPosition += 4;
+                    sUpdateBuffer = TRUE;
                 }
                 break;
         }
 
-        if ((crashPage >= PAGE_COUNT) && (crashPage != 255)) {
-            crashPage = 0;
+        if ((sCrashPage >= PAGE_COUNT) && (sCrashPage != PAGES_MAX)) {
+            sCrashPage = PAGE_CONTEXT;
         }
-        if (crashPage == 255) {
-            crashPage = (PAGE_COUNT - 1);
+        if (sCrashPage == PAGES_MAX) {
+            sCrashPage = (PAGE_COUNT - 1);
         }
     }
 }
 
 void draw_crash_screen(OSThread *thread) {
     __OSThreadContext *tc = &thread->context;
-    u8 prevPage = crashPage;
+    u8 prevPage = sCrashPage;
 
     s32 cause = ((tc->cause >> 2) & 0x1F);
     if (cause == 23) { // EXC_WATCH
@@ -584,23 +634,22 @@ void draw_crash_screen(OSThread *thread) {
 
     update_crash_screen_input();
 
-    if (updateBuffer) {
-        if (crashPage != prevPage) {
+    if (sUpdateBuffer) {
+        if (sCrashPage != prevPage) {
             sProgramPosition = 0;
-            sStackTracePrevPos = 0;
-            sStackTraceNextPos = 0;
+            sStackTraceIndex = 0;
         }
 
-        reload_crash_screen_framebuffer();
+        reset_crash_screen_framebuffer();
 
         if (sDrawCrashScreen) {
             if (sDrawFrameBuffer) {
                 crash_screen_draw_rect(25, 8, 270, 222, COLOR_RGBA16_CRASH_BACKGROUND, TRUE);
             }
             crash_screen_print( 30, 10, "@C0C0C0FFHackerSM64 v%s", HACKERSM64_VERSION);
-            crash_screen_print(234, 10, "@C0C0C0FF<Page:%02d>", crashPage);
+            crash_screen_print(234, 10, "@C0C0C0FF<Page:%02d>", sCrashPage);
             crash_screen_draw_rect(25, 18, 270, 1, COLOR_RGBA16_LIGHT_GRAY, FALSE);
-            switch (crashPage) {
+            switch (sCrashPage) {
                 case PAGE_CONTEXT:    draw_crash_context(thread, cause); break;
 #ifdef PUPPYPRINT_DEBUG
                 case PAGE_LOG: 		  draw_crash_log(); break;
@@ -612,10 +661,12 @@ void draw_crash_screen(OSThread *thread) {
             }
         }
 
+        update_crash_screen_framebuffer();
+
         osWritebackDCacheAll();
         osViBlack(FALSE);
-        osViSwapBuffer(gCrashScreen.framebuffer);
-        updateBuffer = FALSE;
+        osViSwapBuffer(gFramebuffers[sRenderedFramebuffer]);
+        sUpdateBuffer = FALSE;
     }
 }
 
@@ -649,13 +700,14 @@ void thread2_crash_screen(UNUSED void *arg) {
 
     while (TRUE) {
         if (thread == NULL) {
-            osRecvMesg(&gCrashScreen.mesgQueue, &mesg, 1);
+            osRecvMesg(&gCrashScreen.mesgQueue, &mesg, OS_MESG_BLOCK);
             thread = get_crashed_thread();
-            reload_crash_screen_framebuffer();
+            take_screenshot();
             if (thread) {
                 if ((u32) map_data_init != MAP_PARSER_ADDRESS) {
                     map_data_init();
                 }
+                fill_function_stack_trace(thread);
 #ifdef FUNNY_CRASH_SOUND
                 gCrashScreen.thread.priority = 15;
                 stop_sounds_in_continuous_banks();
@@ -666,7 +718,6 @@ void thread2_crash_screen(UNUSED void *arg) {
                 audio_signal_game_loop_tick();
                 crash_screen_sleep(200);
 #endif
-                continue;
             }
         } else {
             if (gControllerBits) {
@@ -682,7 +733,6 @@ void thread2_crash_screen(UNUSED void *arg) {
 }
 
 void crash_screen_init(void) {
-    reload_crash_screen_framebuffer();
     gCrashScreen.width = SCREEN_WIDTH;
     gCrashScreen.height = SCREEN_HEIGHT;
     osCreateMesgQueue(&gCrashScreen.mesgQueue, &gCrashScreen.mesg, 1);
