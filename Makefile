@@ -196,7 +196,7 @@ ifeq      ($(COMPILER),gcc)
   MATH_UTIL_OPT_FLAGS  = $(GCC_MATH_UTIL_OPT_FLAGS)
   GRAPH_NODE_OPT_FLAGS = $(GCC_GRAPH_NODE_OPT_FLAGS)
 else ifeq ($(COMPILER),clang)
-  NON_MATCHING := 1
+  NON_MATCHING        := 1
   # clang doesn't support ABI 'o32' for 'mips3'
   MIPSISET            := -mips2
   OPT_FLAGS           := $(DEFAULT_OPT_FLAGS)
