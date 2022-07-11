@@ -38,6 +38,27 @@
 #define NORETURN
 #endif
 
+// Always inline a function
+#ifdef __GNUC__
+#define ALWAYS_INLINE inline __attribute__((always_inline))
+#else
+#define ALWAYS_INLINE inline
+#endif
+
+// Use Os when compiling the function
+#ifdef __GNUC__
+#define OPTIMIZE_OS inline __attribute__((optimize("Os")))
+#else
+#define OPTIMIZE_OS inline
+#endif
+
+// Use Ofast when compiling the function
+#ifdef __GNUC__
+#define OPTIMIZE_OFAST inline __attribute__((optimize("Ofast")))
+#else
+#define OPTIMIZE_OFAST inline
+#endif
+
 // Static assertions
 #ifdef __GNUC__
 #define STATIC_ASSERT(cond, msg) _Static_assert(cond, msg)
@@ -45,32 +66,32 @@
 #define STATIC_ASSERT(cond, msg) typedef char GLUE2(static_assertion_failed, __LINE__)[(cond) ? 1 : -1]
 #endif
 
-// Align to 8-byte boundary for DMA requirements
+// Align to 8-byte boundary (for DMA requirements)
 #ifdef __GNUC__
 #define ALIGNED8 __attribute__((aligned(8)))
 #else
 #define ALIGNED8
 #endif
 
-// Align to 16-byte boundary for audio lib requirements
+// Align to 16-byte boundary (for audio lib requirements)
 #ifdef __GNUC__
 #define ALIGNED16 __attribute__((aligned(16)))
 #else
 #define ALIGNED16
 #endif
 
-// Align to 16-byte boundary for audio lib requirements
+// Align to 32-byte boundary
+#ifdef __GNUC__
+#define ALIGNED32 __attribute__((aligned(32)))
+#else
+#define ALIGNED32
+#endif
+
+// Align to 64-byte boundary
 #ifdef __GNUC__
 #define ALIGNED64 __attribute__((aligned(64)))
 #else
 #define ALIGNED64
-#endif
-
-// Align to 16-byte boundary for audio lib requirements
-#ifdef __GNUC__
-#define ALWAYS_INLINE inline __attribute__((always_inline))
-#else
-#define ALWAYS_INLINE inline
 #endif
 
 // round up to the next multiple.

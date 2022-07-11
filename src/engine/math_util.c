@@ -1661,8 +1661,7 @@ void find_surface_on_ray_between_points(Vec3f pos1, Vec3f pos2, struct Surface *
 
 // Converts a floating point matrix to a fixed point matrix
 // Makes some assumptions about certain fields in the matrix, which will always be true for valid matrices.
-__attribute__((optimize("Os"))) __attribute__((aligned(32)))
-void mtxf_to_mtx_fast(s16* dst, float* src) {
+OPTIMIZE_OS ALIGNED32 void mtxf_to_mtx_fast(s16* dst, float* src) {
     int i;
     float scale = construct_float((float)0x00010000 / WORLD_SCALE);
     // Iterate over rows of values in the input matrix
