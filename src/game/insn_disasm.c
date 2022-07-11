@@ -88,15 +88,14 @@ char registerMaps[][4] = {
     "$V0", "$V1",
     "$A0", "$A1", "$A2", "$A3",
     "$T0", "$T1", "$T2", "$T3", "$T4", "$T5", "$T6", "$T7",
-    "$S0", "$S1", "$S2", "$S3", "$S4", "$S5", "$S6", "$S7",
-    "$T8", "$T9",
+    "$S0", "$S1", "$S2", "$S3", "$S4", "$S5", "$S6", "$S7", "$T8", "$T9",
     "$K0", "$K1",
     "$GP", "$SP", "$FP", "$RA",
 };
 
 char *insn_disasm(InsnData insn, u32 isPC) {
     char *strp = &insn_as_string[0];
-    int successful_print = 0;
+    s32 successful_print = FALSE;
     u32 target;
 
     if (insn.d == 0) { // trivial case
@@ -115,49 +114,53 @@ char *insn_disasm(InsnData insn, u32 isPC) {
         if (insn.i.opcode != 0 && insn.i.opcode == insn_db[i].opcode) {
             switch (insn_db[i].arbitraryParam) {
                 case PARAM_SWAP_RS_IMM:
-                    strp += sprintf(strp, "@FFFFC0FF%-8s @7FC0FFFF%s %s @7FFF7FFF0x%04X", insn_db[i].name,
-                                               registerMaps[insn.i.rt],
-                                               registerMaps[insn.i.rs],
-                                               insn.i.immediate
-                    ); break;
+                    strp += sprintf(strp, "@FFFFC0FF%-6s @7FC0FFFF%s %s @7FFF7FFF0x%04X", insn_db[i].name,
+                                registerMaps[insn.i.rt],
+                                registerMaps[insn.i.rs],
+                                insn.i.immediate
+                    );
+                    break;
                 case PARAM_LUI:
-                    strp += sprintf(strp, "@FFFFC0FF%-8s @7FC0FFFF%s @7FFF7FFF0x%04X", insn_db[i].name,
-                                               registerMaps[insn.i.rt],
-                                               insn.i.immediate
-                    ); break;
+                    strp += sprintf(strp, "@FFFFC0FF%-6s @7FC0FFFF%s @7FFF7FFF0x%04X", insn_db[i].name,
+                                registerMaps[insn.i.rt],
+                                insn.i.immediate
+                    );
+                    break;
                 case PARAM_JAL:
-                    target = 0x80000000 | ((insn.d & 0x1FFFFFF) * 4);
+                    target = (0x80000000 | ((insn.d & 0x1FFFFFF) * 4));
                     if ((u32)parse_map != MAP_PARSER_ADDRESS) {
-                        strp += sprintf(strp, "@FFFFC0FF%-8s @FFFF7FFF%s", insn_db[i].name,
-                                                         parse_map(target)
+                        strp += sprintf(strp, "@FFFFC0FF%-6s @FFFF7FFF%s", insn_db[i].name,
+                                    parse_map(target)
                         );
                     } else {
                         strp += sprintf(strp, "@FFFFC0FF%-8s @7FC0FFFF%08X", insn_db[i].name,
-                                                           target
+                                    target
                         );
                     }
                     break;
                 case PARAM_NONE:
-                    strp += sprintf(strp, "@FFFFC0FF%-8s @7FC0FFFF%s @7FFF7FFF0x%04X @c7FFFFFF(%s)", insn_db[i].name,
-                                                   registerMaps[insn.i.rt],
-                                                   insn.i.immediate,
-                                                   registerMaps[insn.i.rs]
-                    ); break;
+                    strp += sprintf(strp, "@FFFFC0FF%-6s @7FC0FFFF%s @7FFF7FFF0x%04X @c7FFFFFF(%s)", insn_db[i].name,
+                                registerMaps[insn.i.rt],
+                                insn.i.immediate,
+                                registerMaps[insn.i.rs]
+                    );
+                    break;
 
             }
-            successful_print = 1;
+            successful_print = TRUE;
             break;
         } else if (insn.i.rdata.function != 0 && insn.i.rdata.function == insn_db[i].function) {
-                strp += sprintf(strp, "@FFFFC0FF%-8s @7FC0FFFF%s %s %s", insn_db[i].name,
-                                                   registerMaps[insn.i.rdata.rd],
-                                                   registerMaps[insn.i.rs],
-                                                   registerMaps[insn.i.rt]
+                strp += sprintf(strp, "@FFFFC0FF%-6s @7FC0FFFF%s %s %s", insn_db[i].name,
+                            registerMaps[insn.i.rdata.rd],
+                            registerMaps[insn.i.rs],
+                            registerMaps[insn.i.rt]
                         );
-                successful_print = 1;
+                successful_print = TRUE;
                 break;
         }
     }
-    if (successful_print == 0) {
+
+    if (!successful_print) {
         strp += sprintf(strp, "unimpl %08X", insn.d);
     }
 
