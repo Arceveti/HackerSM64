@@ -108,8 +108,6 @@ struct {
     u64 stack[0x800 / sizeof(u64)];
     OSMesgQueue mesgQueue;
     OSMesg mesg;
-    u16 width;
-    u16 height;
 } gCrashScreen;
 
 extern u16 sRenderedFramebuffer;
@@ -119,7 +117,7 @@ u16 sScreenshotFrameBuffer;
 void crash_screen_draw_rect(s32 x, s32 y, s32 w, s32 h, RGBA16 color, s32 isTransparent) {
     s32 i, j;
 
-    RGBA16 *ptr = gFramebuffers[sRenderingFramebuffer] + (gCrashScreen.width * y) + x;
+    RGBA16 *ptr = gFramebuffers[sRenderingFramebuffer] + (SCREEN_WIDTH * y) + x;
 
     for (i = 0; i < h; i++) {
         for (j = 0; j < w; j++) {
@@ -131,7 +129,7 @@ void crash_screen_draw_rect(s32 x, s32 y, s32 w, s32 h, RGBA16 color, s32 isTran
             ptr++;
         }
 
-        ptr += gCrashScreen.width - w;
+        ptr += SCREEN_WIDTH - w;
     }
 }
 
@@ -142,7 +140,7 @@ void crash_screen_draw_glyph(s32 x, s32 y, s32 glyph, RGBA16 color) {
 
     u32 *data = &gCrashScreenFont[glyph / 5 * 7];
 
-    RGBA16 *ptr = gFramebuffers[sRenderingFramebuffer] + (gCrashScreen.width * y) + x;
+    RGBA16 *ptr = gFramebuffers[sRenderingFramebuffer] + (SCREEN_WIDTH * y) + x;
 
     for (i = 0; i < 7; i++) {
         bit = (0x80000000U >> ((glyph % 5) * 6));
@@ -156,7 +154,7 @@ void crash_screen_draw_glyph(s32 x, s32 y, s32 glyph, RGBA16 color) {
             bit >>= 1;
         }
 
-        ptr += gCrashScreen.width - 6;
+        ptr += SCREEN_WIDTH - 6;
     }
 }
 
@@ -743,8 +741,6 @@ void thread2_crash_screen(UNUSED void *arg) {
 }
 
 void crash_screen_init(void) {
-    gCrashScreen.width = SCREEN_WIDTH;
-    gCrashScreen.height = SCREEN_HEIGHT;
     osCreateMesgQueue(&gCrashScreen.mesgQueue, &gCrashScreen.mesg, 1);
     osCreateThread(&gCrashScreen.thread, THREAD_2_CRASH_SCREEN, thread2_crash_screen, NULL,
                    (u8 *) gCrashScreen.stack + sizeof(gCrashScreen.stack),
