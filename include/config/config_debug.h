@@ -57,3 +57,6 @@
 
 // Forces a crash when the game starts. Useful for debugging the crash screen.
 // #define DEBUG_FORCE_CRASH_ON_BOOT
+
+// Plays a Mario "WAAAOOOW" sound effect when the game crashes.
+// #define FUNNY_CRASH_SOUND
