@@ -14,6 +14,7 @@ enum ThreadID {
     THREAD_7_HVQM,
     THREAD_8_TIMEKEEPER,
     THREAD_9_DA_COUNTER,
+    THREAD_20_CRASH_SCREEN_CRASH_SCREEN,
 };
 
 struct RumbleData {

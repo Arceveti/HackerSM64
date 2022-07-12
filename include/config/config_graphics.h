@@ -5,7 +5,7 @@
  *********************/
 
 // The size of the master display list (gDisplayListHead). 6400 is vanilla.
-#define GFX_POOL_SIZE 0x4000
+#define GFX_POOL_SIZE 0x4000 + 50000
 
 // Show a watermark on the title screen that reads "Made with HackerSM64", instead of the copyright message.
 #define INTRO_CREDIT

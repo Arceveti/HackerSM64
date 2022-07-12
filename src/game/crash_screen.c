@@ -38,9 +38,13 @@ enum AnalogFlags {
     ANALOG_FLAG_DOWN  = BIT(3),
 };
 
+// ALIGNED8 const Texture texture_crash_screen_crashed_2[] = {
+//     #include "textures/crash_custom/crash_screen_crashed.i4.inc.c"
+// };
+
 // A height of 7 pixels for each character * 26 rows of characters + 1 row unused.
-u32 gCrashScreenFont[7 * 26 + 1] = {
-    #include "textures/crash_custom/crash_screen_font.ia1.inc.c"
+ALIGNED8 u32 gCrashScreenFont[7 * 26 + 1] = {
+    #include "textures/crash_screen/crash_screen_font.custom.ia1.inc.c"
 };
 
 #define STACK_SIZE 256 // (s32)(0x800 / sizeof(u64))
@@ -109,6 +113,13 @@ struct {
     OSMesgQueue mesgQueue;
     OSMesg mesg;
 } gCrashScreen;
+
+struct {
+    OSThread thread;
+    u64 stack[0x800 / sizeof(u64)];
+    OSMesgQueue mesgQueue;
+    OSMesg mesg;
+} gCrashScreen2;
 
 extern u16 sRenderedFramebuffer;
 extern u16 sRenderingFramebuffer;
@@ -579,6 +590,7 @@ void update_crash_screen_input(void) {
                         sStackTraceIndex++;
                     }
                     sUpdateBuffer = TRUE;
+                    FORCE_CRASH
                 }
                 break;
             case PAGE_DISASM:
@@ -657,7 +669,7 @@ OSThread *get_crashed_thread(void) {
 
     while (thread->priority != -1) {
         if (thread->priority > OS_PRIORITY_IDLE
-         && thread->priority < OS_PRIORITY_APPMAX
+         && thread->priority <= OS_PRIORITY_APPMAX  - 1
          && ((thread->flags & (BIT(0) | BIT(1))) != 0)) {
             return thread;
         }
@@ -740,10 +752,125 @@ void thread2_crash_screen(UNUSED void *arg) {
     }
 }
 
+
+extern u8 _crash_screen_crash_screenSegmentRomStart[];
+extern u8 _crash_screen_crash_screenSegmentRomEnd[];
+extern void dma_read(u8 *dest, u8 *srcStart, u8 *srcEnd);
+
+#define SRC_IMG_SIZE ((SCREEN_WIDTH * SCREEN_HEIGHT) / 2)
+
+Texture tex[SRC_IMG_SIZE];
+
+void draw_crashed_image_i4(void) {
+
+    u8 *segStart = _crash_screen_crash_screenSegmentRomStart;
+    u8 *segEnd = segStart + SRC_IMG_SIZE;//_crash_screen_crash_screenSegmentRomEnd;
+
+    dma_read(tex, segStart, segEnd);
+
+    u8 srcColor;
+    Color color;
+    RGBA16 *ptr = gFramebuffers[sRenderingFramebuffer];
+
+    for (s32 i = 0; i < (SCREEN_WIDTH * SCREEN_HEIGHT); i++) {
+        srcColor = tex[i / 2];
+
+        if (i & 0x1) {
+            color = (srcColor & 0xF) << 4;
+        } else {
+            color = (srcColor & 0xF0);
+        }
+
+        *ptr++ = GPACK_RGBA5551(color, color, color, 1);
+    }
+
+    // for (s32 i = 0; i < ((SCREEN_WIDTH * SCREEN_HEIGHT) / 8); i++) {
+    //     srcColor = texture_crash_screen_crashed_2[i];
+
+    //     for (s32 j = ((8 - 1) * 4); j >= 0; j -= 4) {
+    //         color = (((srcColor >> j) & 0xF) << 4);
+
+    //         *ptr++ = GPACK_RGBA5551(color, color, color, 1);
+    //     }
+    // }
+}
+
+OSThread *get_crashed_crash_screen_thread(void) {
+    OSThread *thread = __osGetCurrFaultedThread();
+
+    while (thread->priority != -1) {
+        if (thread->priority > OS_PRIORITY_IDLE
+         && thread->priority <= OS_PRIORITY_APPMAX
+         && ((thread->flags & (BIT(0) | BIT(1))) != 0)) {
+            return thread;
+        }
+        thread = thread->tlnext;
+    }
+    return NULL;
+}
+
+void thread20_crash_screen_2(UNUSED void *arg) {
+    OSMesg mesg;
+    OSThread *thread = NULL;
+
+    osSetEventMesg(OS_EVENT_CPU_BREAK, &gCrashScreen2.mesgQueue, (OSMesg) 1);
+    osSetEventMesg(OS_EVENT_FAULT,     &gCrashScreen2.mesgQueue, (OSMesg) 2);
+
+    while (TRUE) {
+        if (thread == NULL) {
+            osRecvMesg(&gCrashScreen2.mesgQueue, &mesg, OS_MESG_BLOCK);
+            // crash_screen_take_screenshot();
+            thread = get_crashed_thread();
+            // OSThread *currThread = __osGetCurrFaultedThread();
+            // while (currThread->priority != -1) {
+            //     if (currThread == &gCrashScreen.thread) {
+            //         thread = currThread;
+            //         break;
+            //     }
+            //     currThread = currThread->tlnext;
+            // }
+
+            if (thread) {
+// #ifdef FUNNY_CRASH_SOUND
+//                 // gCrashScreen.thread.priority = 15;
+//                 stop_sounds_in_continuous_banks();
+//                 stop_background_music(sBackgroundMusicQueue[0].seqId);
+//                 audio_signal_game_loop_tick();
+//                 crash_screen_sleep(200);
+//                 play_sound(SOUND_MARIO_WAAAOOOW, gGlobalSoundSource);
+//                 audio_signal_game_loop_tick();
+//                 crash_screen_sleep(200);
+// #endif
+            }
+        } else {
+//             if (gControllerBits) {
+// #if ENABLE_RUMBLE
+//                 block_until_rumble_pak_free();
+// #endif
+//                 osContStartReadData(&gSIEventMesgQueue);
+//             }
+//             read_controller_inputs(THREAD_2_CRASH_SCREEN);
+            // draw_crash_screen(thread);
+        }
+            draw_crashed_image_i4();
+
+            memcpy(gFramebuffers[sRenderedFramebuffer], gFramebuffers[sRenderingFramebuffer], FRAMEBUFFER_SIZE);
+            // osWritebackDCacheAll();
+            // osViBlack(FALSE);
+            osViSwapBuffer(gFramebuffers[sRenderedFramebuffer]);
+    }
+}
+
 void crash_screen_init(void) {
-    osCreateMesgQueue(&gCrashScreen.mesgQueue, &gCrashScreen.mesg, 1);
-    osCreateThread(&gCrashScreen.thread, THREAD_2_CRASH_SCREEN, thread2_crash_screen, NULL,
-                   (u8 *) gCrashScreen.stack + sizeof(gCrashScreen.stack),
+    osCreateMesgQueue(&gCrashScreen2.mesgQueue, &gCrashScreen2.mesg, 1);
+    osCreateThread(&gCrashScreen2.thread, THREAD_20_CRASH_SCREEN_CRASH_SCREEN, thread20_crash_screen_2, NULL,
+                   (u8 *) gCrashScreen2.stack + sizeof(gCrashScreen2.stack),
                    OS_PRIORITY_APPMAX);
-    osStartThread(&gCrashScreen.thread);
+    osStartThread(&gCrashScreen2.thread);
+
+    // osCreateMesgQueue(&gCrashScreen.mesgQueue, &gCrashScreen.mesg, 1);
+    // osCreateThread(&gCrashScreen.thread, THREAD_2_CRASH_SCREEN, thread2_crash_screen, NULL,
+    //                (u8 *) gCrashScreen.stack + sizeof(gCrashScreen.stack),
+    //                OS_PRIORITY_APPMAX - 1);
+    // osStartThread(&gCrashScreen.thread);
 }
