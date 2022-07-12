@@ -1735,6 +1735,11 @@ s32 execute_mario_action(struct MarioState *m) {
     vec3f_copy(m->prevPos, m->pos);
 
     if (m->action) {
+#ifdef DEBUG_FORCE_CRASH_ON_L
+        if (gPlayer1Controller->buttonDown & L_TRIG) {
+            FORCE_CRASH
+        }
+#endif
 #ifdef ENABLE_DEBUG_FREE_MOVE
         if ((gPlayer1Controller->buttonDown & U_JPAD) && !(gPlayer1Controller->buttonDown & (L_TRIG | Z_TRIG))) {
             set_camera_mode(m->area->camera, CAMERA_MODE_8_DIRECTIONS, 1);
