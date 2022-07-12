@@ -2867,7 +2867,7 @@ UNUSED void Unknown801A4F58(void) {
     cbufOn = sScreenView->colourBufs[gGdFrameBufNum];
     zbuf = sScreenView->zbuf;
 
-    for (i = 0; i < (SCREEN_WIDTH * SCREEN_HEIGHT); i++) { // L801A4FCC
+    for (i = 0; i < SCREEN_SIZE; i++) { // L801A4FCC
         colour = cbufOff[i];
         if (colour) {
             r = (s16)((colour >> 11) & 0x1F) - 1;
