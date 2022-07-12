@@ -8,7 +8,7 @@ struct BowserFallingPlatformData {
 };
 
 struct BowserFallingPlatformData sBowserFallingPlatform[] = {
-    { NULL, 0, 0, 0 },
+    { NULL,                                 0,     0,      0 },
     { bowser_3_seg7_collision_07004B94,  -800, -1000, -20992 },
     { bowser_3_seg7_collision_07004C18, -1158,   390, -18432 },
     { bowser_3_seg7_collision_07004C9C, -1158,   390,  -7680 },

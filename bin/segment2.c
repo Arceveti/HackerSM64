@@ -38,7 +38,8 @@ static const u8 small_font_kerning_2[80] = {
 };
 
 const u8 *const puppyprint_kerning_lut[2][80] = {
-    small_font_kerning_1, small_font_kerning_2
+    small_font_kerning_1,
+    small_font_kerning_2
 };
 
 #endif

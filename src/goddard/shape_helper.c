@@ -29,19 +29,31 @@ struct ObjShape *gShapeSilverStar = NULL;  // @ 801A82F8
 // Not sure what this data is, but it looks like stub animation data
 
 static struct GdAnimTransform unusedAnimData1[] = {
-    { {1.0, 1.0, 1.0}, {0.0, 0.0, 0.0}, {0.0, 0.0, 0.0} },
+    {
+        {1.0, 1.0, 1.0},
+        {0.0, 0.0, 0.0},
+        {0.0, 0.0, 0.0}
+    },
 };
 
 UNUSED static struct AnimDataInfo unusedAnim1 = { ARRAY_COUNT(unusedAnimData1), GD_ANIM_SCALE3F_ROT3F_POS3F_2, unusedAnimData1 };
 
 static struct GdAnimTransform unusedAnimData2[] = {
-    { {1.0, 1.0, 1.0}, {0.0, 0.0, 0.0}, {0.0, 0.0, 0.0} },
+    {
+        {1.0, 1.0, 1.0},
+        {0.0, 0.0, 0.0},
+        {0.0, 0.0, 0.0}
+    },
 };
 
 UNUSED static struct AnimDataInfo unusedAnim2 = { ARRAY_COUNT(unusedAnimData2), GD_ANIM_SCALE3F_ROT3F_POS3F_2, unusedAnimData2 };
 
 static struct GdAnimTransform unusedAnimData3[] = {
-    { {1.0, 1.0, 1.0}, {0.0, 0.0, 0.0}, {0.0, 0.0, 0.0} },
+    {
+        {1.0, 1.0, 1.0},
+        {0.0, 0.0, 0.0},
+        {0.0, 0.0, 0.0}
+    },
 };
 
 UNUSED static struct AnimDataInfo unusedAnim3 = { ARRAY_COUNT(unusedAnimData3), GD_ANIM_SCALE3F_ROT3F_POS3F_2, unusedAnimData3 };
