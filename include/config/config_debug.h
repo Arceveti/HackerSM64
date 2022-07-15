@@ -59,7 +59,7 @@
 // #define DEBUG_FORCE_CRASH_ON_BOOT
 
 // Forces a crash when the player presses L in-game.
-#define DEBUG_FORCE_CRASH_ON_L
+// #define DEBUG_FORCE_CRASH_ON_L
 
 // Includes an image which display swhen the crash screen crashes.
 // REQUIRES 'make clean'.
