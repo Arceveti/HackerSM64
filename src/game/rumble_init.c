@@ -259,7 +259,7 @@ void cancel_rumble(void) {
     gRumblePakTimer = 0;
 }
 
-void create_thread_6(void) {
+void create_rumble_thread(void) {
     osCreateMesgQueue(&gRumbleThreadVIMesgQueue, gRumbleThreadVIMesgBuf, 1);
     osCreateThread(&gRumblePakThread, THREAD_6_RUMBLE, thread6_rumble_loop, NULL, gThread6Stack + 0x2000, 30);
     osStartThread(&gRumblePakThread);

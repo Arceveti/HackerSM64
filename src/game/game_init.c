@@ -747,7 +747,7 @@ void thread5_game_loop(UNUSED void *arg) {
 #endif
     init_controllers();
 #if ENABLE_RUMBLE
-    create_thread_6();
+    create_rumble_thread();
 #endif
 #ifdef HVQM
     createHvqmThread();
