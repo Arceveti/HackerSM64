@@ -39,8 +39,8 @@ enum AnalogFlags {
 };
 
 // A height of 7 pixels for each character * 26 rows of characters + 1 row unused.
-u32 gCrashScreenFont[7 * 26 + 1] = {
-    #include "textures/crash_custom/crash_screen_font.ia1.inc.c"
+ALIGNED8 u32 gCrashScreenFont[7 * 26 + 1] = {
+    #include "textures/crash_screen/crash_screen_font.custom.ia1.inc.c"
 };
 
 #define STACK_SIZE 256 // (s32)(0x800 / sizeof(u64))
@@ -109,6 +109,15 @@ struct {
     OSMesgQueue mesgQueue;
     OSMesg mesg;
 } gCrashScreen;
+
+#ifdef CRASH_SCREEN_CRASH_SCREEN
+struct {
+    OSThread thread;
+    u64 stack[0x800 / sizeof(u64)];
+    OSMesgQueue mesgQueue;
+    OSMesg mesg;
+} gCrashScreen2;
+#endif
 
 extern u16 sRenderedFramebuffer;
 extern u16 sRenderingFramebuffer;
@@ -213,8 +222,8 @@ void crash_screen_print(s32 x, s32 y, const char *fmt, ...) {
                     rgba[i] = component;
                     component = 0;
                 }
-                color = GPACK_RGBA5551(rgba[0], rgba[1], rgba[2], rgba[3]);
 
+                color = GPACK_RGBA5551(rgba[0], rgba[1], rgba[2], rgba[3]);
             } else {
                 if (glyph != 0xff) {
                     crash_screen_draw_glyph(x, y, glyph, color);
@@ -480,7 +489,7 @@ void draw_controls(UNUSED OSThread *thread) {
     osWritebackDCacheAll();
 }
 
-#define FRAMEBUFFER_SIZE ((SCREEN_WIDTH * SCREEN_HEIGHT) * sizeof(RGBA16))
+#define FRAMEBUFFER_SIZE (SCREEN_SIZE * sizeof(RGBA16))
 
 void crash_screen_take_screenshot(void) {
     if (gIsConsole) {
@@ -579,6 +588,7 @@ void update_crash_screen_input(void) {
                         sStackTraceIndex++;
                     }
                     sUpdateBuffer = TRUE;
+                    FORCE_CRASH
                 }
                 break;
             case PAGE_DISASM:
@@ -657,7 +667,7 @@ OSThread *get_crashed_thread(void) {
 
     while (thread->priority != -1) {
         if (thread->priority > OS_PRIORITY_IDLE
-         && thread->priority < OS_PRIORITY_APPMAX
+         && thread->priority <= OS_PRIORITY_APPMAX
          && ((thread->flags & (BIT(0) | BIT(1))) != 0)) {
             return thread;
         }
@@ -699,6 +709,78 @@ extern struct SequenceQueueItem sBackgroundMusicQueue[6];
 #endif
 extern void read_controller_inputs(s32 threadID);
 
+#ifdef CRASH_SCREEN_CRASH_SCREEN
+extern u8 _crash_screen_crash_screenSegmentRomStart[];
+extern u8 _crash_screen_crash_screenSegmentRomEnd[];
+extern void dma_read(u8 *dest, u8 *srcStart, u8 *srcEnd);
+
+#define SRC_IMG_SIZE (SCREEN_SIZE / 2)
+
+void draw_crashed_image_i4(void) {
+    u8 srcColor;
+    Color color;
+    RGBA16 *fb_u16 = gFramebuffers[sRenderingFramebuffer];
+
+    u8 *segStart = _crash_screen_crash_screenSegmentRomStart;
+    u8 *segEnd = _crash_screen_crash_screenSegmentRomEnd;
+    u32 size = (u32) (segEnd - segStart);
+    u8 *fb_u8 = (u8*) ((u32) fb_u16 + (SCREEN_SIZE * sizeof(RGBA16*)) - size);
+
+    // Make sure the source image is the correct size.
+    if (size != SRC_IMG_SIZE) {
+        return;
+    }
+
+    // DMA the data directly onto the framebuffer.
+    dma_read(fb_u8, segStart, segEnd);
+
+    // Copy and convert the image data from the framebuffer to itself.
+    for (s32 i = 0; i < SRC_IMG_SIZE; i++) {
+        srcColor = *fb_u8++;
+
+        color = (srcColor & 0xF0);
+        *fb_u16++ = ((color <<  8) | (color << 3) | (color >> 2) | 0x1); // GPACK_RGBA5551
+
+        color = (srcColor & 0x0F);
+        *fb_u16++ = ((color << 12) | (color << 7) | (color << 2) | 0x1); // GPACK_RGBA5551
+    }
+}
+
+void thread20_crash_screen_2(UNUSED void *arg) {
+    OSMesg mesg;
+    OSThread *thread = NULL;
+
+    osSetEventMesg(OS_EVENT_CPU_BREAK, &gCrashScreen2.mesgQueue, (OSMesg) 1);
+    osSetEventMesg(OS_EVENT_FAULT,     &gCrashScreen2.mesgQueue, (OSMesg) 2);
+
+    while (TRUE) {
+        if (thread == NULL) {
+            osRecvMesg(&gCrashScreen2.mesgQueue, &mesg, OS_MESG_BLOCK);
+            thread = get_crashed_thread();
+            if (thread) {
+#ifdef FUNNY_CRASH_SOUND
+                gCrashScreen2.thread.priority = 15;
+                stop_sounds_in_continuous_banks();
+                stop_background_music(sBackgroundMusicQueue[0].seqId);
+                audio_signal_game_loop_tick();
+                crash_screen_sleep(200);
+                play_sound(SOUND_MARIO_MAMA_MIA, gGlobalSoundSource);
+                audio_signal_game_loop_tick();
+                crash_screen_sleep(200);
+#endif
+                draw_crashed_image_i4();
+
+                memcpy(gFramebuffers[sRenderedFramebuffer], gFramebuffers[sRenderingFramebuffer], FRAMEBUFFER_SIZE);
+
+                osWritebackDCacheAll();
+                osViBlack(FALSE);
+                osViSwapBuffer(gFramebuffers[sRenderedFramebuffer]);
+            }
+        }
+    }
+}
+#endif
+
 void thread2_crash_screen(UNUSED void *arg) {
     OSMesg mesg;
     OSThread *thread = NULL;
@@ -725,6 +807,13 @@ void thread2_crash_screen(UNUSED void *arg) {
                 play_sound(SOUND_MARIO_WAAAOOOW, gGlobalSoundSource);
                 audio_signal_game_loop_tick();
                 crash_screen_sleep(200);
+#endif
+#ifdef CRASH_SCREEN_CRASH_SCREEN
+                osCreateMesgQueue(&gCrashScreen2.mesgQueue, &gCrashScreen2.mesg, 1);
+                osCreateThread(&gCrashScreen2.thread, THREAD_20_CRASH_SCREEN_CRASH_SCREEN, thread20_crash_screen_2, NULL,
+                            (u8 *) gCrashScreen2.stack + sizeof(gCrashScreen2.stack),
+                            OS_PRIORITY_APPMAX);
+                osStartThread(&gCrashScreen2.thread);
 #endif
             }
         } else {
