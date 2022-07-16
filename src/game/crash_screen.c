@@ -588,7 +588,6 @@ void update_crash_screen_input(void) {
                         sStackTraceIndex++;
                     }
                     sUpdateBuffer = TRUE;
-                    FORCE_CRASH
                 }
                 break;
             case PAGE_DISASM:
