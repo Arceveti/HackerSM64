@@ -61,7 +61,7 @@
 // Forces a crash when the player presses L in-game.
 // #define DEBUG_FORCE_CRASH_ON_L
 
-// Includes an image which display swhen the crash screen crashes.
+// Includes an image which displays when the crash screen crashes.
 // REQUIRES 'make clean'.
 // Uses 38.4 kb of rom space.
 #define CRASH_SCREEN_CRASH_SCREEN
