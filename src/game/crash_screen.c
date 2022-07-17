@@ -70,9 +70,9 @@ u8 sUpdateBuffer = TRUE;
 char *gCauseDesc[18] = {
     "Interrupt",
     "TLB modification",
-    "TLB exception on load",
+    "TLB exception on load or inst.",
     "TLB exception on store",
-    "Address error on load",
+    "Address error on load or inst.",
     "Address error on store",
     "Bus error on inst.",
     "Bus error on data",
@@ -97,6 +97,13 @@ char *gFpcsrDesc[6] = {
     "Inexact operation",
 };
 
+char *gRegNames[] = {
+    "AT", "V0", "V1", "A0", "A1", "A2", "A3",
+    "T0", "T1", "T2", "T3", "T4", "T5", "T6", "T7",
+    "S0", "S1", "S2", "S3", "S4", "S5", "S6", "S7",
+    "T8", "T9",             "GP", "SP", "S8", "RA",
+};
+
 
 extern u64 osClockRate;
 extern far char *parse_map(u32 pc);
@@ -117,7 +124,7 @@ struct {
     OSMesgQueue mesgQueue;
     OSMesg mesg;
 } gCrashScreen2;
-#endif
+#endif // CRASH_SCREEN_CRASH_SCREEN
 
 extern u16 sRenderedFramebuffer;
 extern u16 sRenderingFramebuffer;
@@ -185,7 +192,7 @@ u32 index_to_hex(u32 glyph) {
 
 void crash_screen_print(s32 x, s32 y, const char *fmt, ...) {
     u32 glyph;
-    char buf[0x108];
+    char buf[0x100];
     bzero(&buf, sizeof(buf));
 
     va_list args;
@@ -274,10 +281,48 @@ void crash_screen_print_fpcsr(u32 fpcsr) {
     }
 }
 
+void crash_screen_print_registers(__OSThreadContext *tc) {
+    s32 regNum = 0;
+    u64 *reg = &tc->at;
+
+    crash_screen_print(30, 40, "@3FC07FFFPC:@FFFFFFFF%08X    @3FC07FFFSR:@FFFFFFFF%08X    @3FC07FFFVA:@FFFFFFFF%08X", (u32) tc->pc, (u32) tc->sr, (u32) tc->badvaddr);
+
+    for (s32 y = 0; y < 10; y++) {
+        for (s32 x = 0; x < 3; x++) {
+            crash_screen_print((30 + (x * 90)), (50 + (y * 10)), "@3FC07FFF%s:@FFFFFFFF%08X", gRegNames[regNum], (u32) *(reg + regNum));
+            regNum++;
+
+            if ((reg + regNum) > &tc->ra) {
+                return;
+            }
+        }
+    }
+}
+
+void crash_screen_print_float_registers(__OSThreadContext *tc) {
+    s32 regNum = 0;
+    __OSfp *osfp = &tc->fp0;
+
+    crash_screen_print_fpcsr(tc->fpcsr);
+
+    for (s32 y = 0; y < 6; y++) {
+        for (s32 x = 0; x < 3; x++) {
+            crash_screen_print_float_reg((30 + (x * 90)), (170 + (y * 10)), regNum, &osfp->f.f_even);
+
+            osfp++;
+            regNum += 2;
+
+            if (regNum > 30) {
+                return;
+            }
+        }
+    }
+}
+
 void draw_crash_context(OSThread *thread, s32 cause) {
     __OSThreadContext *tc = &thread->context;
     crash_screen_print(30, 20, "@7F7FFFFFTHREAD:%d", thread->id);
-    crash_screen_print(90, 20, "@FF3F00FF(%s)", gCauseDesc[cause]);
+    crash_screen_print(90, 20, "@FF3F00FF%s", gCauseDesc[cause]);
 
     osWritebackDCacheAll();
 
@@ -291,39 +336,11 @@ void draw_crash_context(OSThread *thread, s32 cause) {
         }
     }
 
-    s32 y = 30;
-    crash_screen_print(30, (y += 10), "@3FC07FFFPC:@FFFFFFFF%08X    @3FC07FFFSR:@FFFFFFFF%08X    @3FC07FFFVA:@FFFFFFFF%08X", (u32) tc->pc, (u32) tc->sr, (u32) tc->badvaddr);
-    crash_screen_print(30, (y += 10), "@3FC07FFFAT:@FFFFFFFF%08X    @3FC07FFFV0:@FFFFFFFF%08X    @3FC07FFFV1:@FFFFFFFF%08X", (u32) tc->at, (u32) tc->v0, (u32) tc->v1);
-    crash_screen_print(30, (y += 10), "@3FC07FFFA0:@FFFFFFFF%08X    @3FC07FFFA1:@FFFFFFFF%08X    @3FC07FFFA2:@FFFFFFFF%08X", (u32) tc->a0, (u32) tc->a1, (u32) tc->a2);
-    crash_screen_print(30, (y += 10), "@3FC07FFFA3:@FFFFFFFF%08X    @3FC07FFFT0:@FFFFFFFF%08X    @3FC07FFFT1:@FFFFFFFF%08X", (u32) tc->a3, (u32) tc->t0, (u32) tc->t1);
-    crash_screen_print(30, (y += 10), "@3FC07FFFT2:@FFFFFFFF%08X    @3FC07FFFT3:@FFFFFFFF%08X    @3FC07FFFT4:@FFFFFFFF%08X", (u32) tc->t2, (u32) tc->t3, (u32) tc->t4);
-    crash_screen_print(30, (y += 10), "@3FC07FFFT5:@FFFFFFFF%08X    @3FC07FFFT6:@FFFFFFFF%08X    @3FC07FFFT7:@FFFFFFFF%08X", (u32) tc->t5, (u32) tc->t6, (u32) tc->t7);
-    crash_screen_print(30, (y += 10), "@3FC07FFFS0:@FFFFFFFF%08X    @3FC07FFFS1:@FFFFFFFF%08X    @3FC07FFFS2:@FFFFFFFF%08X", (u32) tc->s0, (u32) tc->s1, (u32) tc->s2);
-    crash_screen_print(30, (y += 10), "@3FC07FFFS3:@FFFFFFFF%08X    @3FC07FFFS4:@FFFFFFFF%08X    @3FC07FFFS5:@FFFFFFFF%08X", (u32) tc->s3, (u32) tc->s4, (u32) tc->s5);
-    crash_screen_print(30, (y += 10), "@3FC07FFFS6:@FFFFFFFF%08X    @3FC07FFFS7:@FFFFFFFF%08X    @3FC07FFFT8:@FFFFFFFF%08X", (u32) tc->s6, (u32) tc->s7, (u32) tc->t8);
-    crash_screen_print(30, (y += 10), "@3FC07FFFT9:@FFFFFFFF%08X    @3FC07FFFGP:@FFFFFFFF%08X    @3FC07FFFSP:@FFFFFFFF%08X", (u32) tc->t9, (u32) tc->gp, (u32) tc->sp);
-    crash_screen_print(30, (y += 10), "@3FC07FFFS8:@FFFFFFFF%08X    @3FC07FFFRA:@FFFFFFFF%08X",                              (u32) tc->s8, (u32) tc->ra);
-    crash_screen_print_fpcsr(tc->fpcsr);
+    crash_screen_print_registers(tc);
 
     osWritebackDCacheAll();
 
-    s32 regNum = 0;
-    crash_screen_print_float_reg( 30, 170, (regNum     ), &tc->fp0.f.f_even);
-    crash_screen_print_float_reg(120, 170, (regNum += 2), &tc->fp2.f.f_even);
-    crash_screen_print_float_reg(210, 170, (regNum += 2), &tc->fp4.f.f_even);
-    crash_screen_print_float_reg( 30, 180, (regNum += 2), &tc->fp6.f.f_even);
-    crash_screen_print_float_reg(120, 180, (regNum += 2), &tc->fp8.f.f_even);
-    crash_screen_print_float_reg(210, 180, (regNum += 2), &tc->fp10.f.f_even);
-    crash_screen_print_float_reg( 30, 190, (regNum += 2), &tc->fp12.f.f_even);
-    crash_screen_print_float_reg(120, 190, (regNum += 2), &tc->fp14.f.f_even);
-    crash_screen_print_float_reg(210, 190, (regNum += 2), &tc->fp16.f.f_even);
-    crash_screen_print_float_reg( 30, 200, (regNum += 2), &tc->fp18.f.f_even);
-    crash_screen_print_float_reg(120, 200, (regNum += 2), &tc->fp20.f.f_even);
-    crash_screen_print_float_reg(210, 200, (regNum += 2), &tc->fp22.f.f_even);
-    crash_screen_print_float_reg( 30, 210, (regNum += 2), &tc->fp24.f.f_even);
-    crash_screen_print_float_reg(120, 210, (regNum += 2), &tc->fp26.f.f_even);
-    crash_screen_print_float_reg(210, 210, (regNum += 2), &tc->fp28.f.f_even);
-    crash_screen_print_float_reg( 30, 220, (regNum += 2), &tc->fp30.f.f_even);
+    crash_screen_print_float_registers(tc);
 }
 
 #ifdef PUPPYPRINT_DEBUG
@@ -342,7 +359,7 @@ void draw_crash_log(void) {
 
 // prints any function pointers it finds in the stack format:
 // SP address: function name
-void draw_stacktrace(OSThread *thread, UNUSED s32 cause) {
+void draw_stacktrace(OSThread *thread) {
     __OSThreadContext *tc = &thread->context;
     u32 temp_sp = (tc->sp + 0x14);
     s32 currIndex;
@@ -395,6 +412,8 @@ void draw_stacktrace(OSThread *thread, UNUSED s32 cause) {
             }
         }
     }
+
+    osWritebackDCacheAll();
 
     // Scroll bar
     const s32 totalHeight = 180;
@@ -616,10 +635,10 @@ void draw_crash_screen(OSThread *thread) {
     u8 prevPage = sCrashPage;
 
     s32 cause = ((tc->cause >> 2) & 0x1F);
-    if (cause == 23) { // EXC_WATCH
+    if (cause == (EXC_WATCH >> 2)) {
         cause = 16;
     }
-    if (cause == 31) { // EXC_VCED
+    if (cause == (EXC_VCED >> 2)) {
         cause = 17;
     }
 
@@ -645,7 +664,7 @@ void draw_crash_screen(OSThread *thread) {
 #ifdef PUPPYPRINT_DEBUG
                 case PAGE_LOG: 		  draw_crash_log(); break;
 #endif
-                case PAGE_STACKTRACE: draw_stacktrace(thread, cause); break;
+                case PAGE_STACKTRACE: draw_stacktrace(thread); break;
                 case PAGE_DISASM:     draw_disasm(thread); break;
                 case PAGE_ASSERTS:    draw_assert(thread); break;
                 case PAGE_CONTROLS:   draw_controls(thread); break;
