@@ -38,8 +38,13 @@ enum AnalogFlags {
     ANALOG_FLAG_DOWN  = BIT(3),
 };
 
-// A height of 7 pixels for each character * 26 rows of characters + 1 row unused.
-ALIGNED8 u32 gCrashScreenFont[7 * 26 + 1] = {
+#define CRASH_SCREEN_FONT_CHAR_WIDTH     5
+#define CRASH_SCREEN_FONT_CHAR_HEIGHT    7
+#define CRASH_SCREEN_FONT_CHARS_PER_ROW  6
+#define CRASH_SCREEN_FONT_NUM_ROWS      22
+
+// A height of 7 pixels for each character * 22 rows of characters + 1 row unused.
+ALIGNED8 u32 gCrashScreenFont[(CRASH_SCREEN_FONT_CHAR_HEIGHT * CRASH_SCREEN_FONT_NUM_ROWS) + 1] = {
     #include "textures/crash_screen/crash_screen_font.custom.ia1.inc.c"
 };
 
@@ -130,10 +135,14 @@ extern u16 sRenderedFramebuffer;
 extern u16 sRenderingFramebuffer;
 u16 sScreenshotFrameBuffer;
 
+RGBA16 *crash_screen_get_frame_buffer_pixel_ptr(s32 x, s32 y) {
+    return (gFramebuffers[sRenderingFramebuffer] + (SCREEN_WIDTH * y) + x);
+}
+
 void crash_screen_draw_rect(s32 x, s32 y, s32 w, s32 h, RGBA16 color, s32 isTransparent) {
     s32 i, j;
 
-    RGBA16 *ptr = gFramebuffers[sRenderingFramebuffer] + (SCREEN_WIDTH * y) + x;
+    RGBA16 *ptr = crash_screen_get_frame_buffer_pixel_ptr(x, y);
 
     for (i = 0; i < h; i++) {
         for (j = 0; j < w; j++) {
@@ -154,15 +163,15 @@ void crash_screen_draw_glyph(s32 x, s32 y, s32 glyph, RGBA16 color) {
     u32 rowMask;
     s32 i, j;
 
-    u32 *data = &gCrashScreenFont[glyph / 5 * 7];
+    u32 *data = &gCrashScreenFont[(glyph / CRASH_SCREEN_FONT_CHARS_PER_ROW) * CRASH_SCREEN_FONT_CHAR_HEIGHT];
 
-    RGBA16 *ptr = gFramebuffers[sRenderingFramebuffer] + (SCREEN_WIDTH * y) + x;
+    RGBA16 *ptr = crash_screen_get_frame_buffer_pixel_ptr(x, y);
 
-    for (i = 0; i < 7; i++) {
-        bit = (0x80000000U >> ((glyph % 5) * 6));
+    for (i = 0; i < CRASH_SCREEN_FONT_CHAR_HEIGHT; i++) {
+        bit = (0x80000000U >> ((glyph % CRASH_SCREEN_FONT_CHARS_PER_ROW) * CRASH_SCREEN_FONT_CHAR_WIDTH));
         rowMask = *data++;
 
-        for (j = 0; j < 6; j++) {
+        for (j = 0; j < CRASH_SCREEN_FONT_CHAR_WIDTH; j++) {
             if (bit & rowMask) {
                 *ptr = color;
             }
@@ -170,7 +179,7 @@ void crash_screen_draw_glyph(s32 x, s32 y, s32 glyph, RGBA16 color) {
             bit >>= 1;
         }
 
-        ptr += SCREEN_WIDTH - 6;
+        ptr += (SCREEN_WIDTH - CRASH_SCREEN_FONT_CHAR_WIDTH);
     }
 }
 
