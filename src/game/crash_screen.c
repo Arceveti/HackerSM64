@@ -17,7 +17,7 @@
 
 #include "printf.h"
 
-enum crashPages {
+enum CrashPages {
     PAGE_CONTEXT,
 #ifdef PUPPYPRINT_DEBUG
     PAGE_LOG,
@@ -336,8 +336,17 @@ void crash_screen_print_float_registers(__OSThreadContext *tc) {
     }
 }
 
-void draw_crash_context(OSThread *thread, s32 cause) {
+void draw_crash_context(OSThread *thread) {
     __OSThreadContext *tc = &thread->context;
+
+    s32 cause = ((tc->cause >> 2) & 0x1F);
+    if (cause == (EXC_WATCH >> 2)) {
+        cause = 16;
+    }
+    if (cause == (EXC_VCED >> 2)) {
+        cause = 17;
+    }
+
     crash_screen_print(30, 20, "@7F7FFFFFTHREAD:%d", thread->id);
     crash_screen_print(90, 20, "@FF3F00FF(%s)", gCauseDesc[cause]);
 
@@ -361,7 +370,7 @@ void draw_crash_context(OSThread *thread, s32 cause) {
 }
 
 #ifdef PUPPYPRINT_DEBUG
-void draw_crash_log(void) {
+void draw_crash_log(UNUSED OSThread *thread) {
     s32 i;
     osWritebackDCacheAll();
  #define LINE_HEIGHT (25 + ((LOG_BUFFER_SIZE - 1) * 10))
@@ -658,17 +667,21 @@ void update_crash_screen_input(void) {
     }
 }
 
-void draw_crash_screen(OSThread *thread) {
-    __OSThreadContext *tc = &thread->context;
-    u8 prevPage = sCrashPage;
+typedef void (*CrashScrenPageFunc)(OSThread *thread);
 
-    s32 cause = ((tc->cause >> 2) & 0x1F);
-    if (cause == (EXC_WATCH >> 2)) {
-        cause = 16;
-    }
-    if (cause == (EXC_VCED >> 2)) {
-        cause = 17;
-    }
+CrashScrenPageFunc CrashScreenPageJumpTable[] = {
+    /*PAGE_CONTEXT   */ draw_crash_context,
+#ifdef PUPPYPRINT_DEBUG
+    /*PAGE_LOG       */ draw_crash_log,
+#endif
+    /*PAGE_STACKTRACE*/ draw_stacktrace,
+    /*PAGE_DISASM    */ draw_disasm,
+    /*PAGE_ASSERTS   */ draw_assert,
+    /*PAGE_CONTROLS  */ draw_controls,
+};
+
+void draw_crash_screen(OSThread *thread) {
+    u8 prevPage = sCrashPage;
 
     update_crash_screen_input();
 
@@ -687,16 +700,7 @@ void draw_crash_screen(OSThread *thread) {
             crash_screen_print( 30, 10, "@C0C0C0FFHackerSM64 v%s", HACKERSM64_VERSION);
             crash_screen_print(234, 10, "@C0C0C0FF<Page:%02d>", sCrashPage);
             crash_screen_draw_rect(25, 18, 270, 1, COLOR_RGBA16_LIGHT_GRAY, FALSE);
-            switch (sCrashPage) {
-                case PAGE_CONTEXT:    draw_crash_context(thread, cause); break;
-#ifdef PUPPYPRINT_DEBUG
-                case PAGE_LOG: 		  draw_crash_log(); break;
-#endif
-                case PAGE_STACKTRACE: draw_stacktrace(thread); break;
-                case PAGE_DISASM:     draw_disasm(thread);     break;
-                case PAGE_ASSERTS:    draw_assert(thread);     break;
-                case PAGE_CONTROLS:   draw_controls(thread);   break;
-            }
+            CrashScreenPageJumpTable[sCrashPage](thread);
         }
 
         update_crash_screen_framebuffer();
