@@ -441,7 +441,7 @@ void crash_screen_draw_scroll_bar(u32 topY, u32 bottomY, u32 numVisibleEntries, 
     u32 scrollPos = (currEntry * (scrollableHeight / numScrollableEntries));
 
     // Draw the scroll bar rectangle.
-    crash_screen_draw_rect(((CRASH_SCREEN_X1 + CRASH_SCREEN_W) - 1), (topY + scrollPos), 1, scrollBarHeight, color, FALSE);
+    crash_screen_draw_rect((CRASH_SCREEN_X2 - 1), (topY + scrollPos), 1, scrollBarHeight, color, FALSE);
 }
 
 #define STACK_TRACE_NUM_ROWS 18
