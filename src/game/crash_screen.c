@@ -262,6 +262,7 @@ u32 index_to_hex(u32 glyph) {
 void crash_screen_print(s32 x, s32 y, const char *fmt, ...) {
     u32 glyph;
     char buf[0x100];
+
     bzero(&buf, sizeof(buf));
 
     va_list args;
@@ -398,12 +399,8 @@ void draw_crash_context(OSThread *thread) {
     __OSThreadContext *tc = &thread->context;
 
     s32 cause = ((tc->cause >> 2) & 0x1F);
-    if (cause == (EXC_WATCH >> 2)) {
-        cause = 16;
-    }
-    if (cause == (EXC_VCED >> 2)) {
-        cause = 17;
-    }
+    if (cause == (EXC_WATCH >> 2)) cause = 16;
+    if (cause == (EXC_VCED  >> 2)) cause = 17;
 
     crash_screen_print(TEXT_X( 0), TEXT_Y(1), "@7F7FFFFFTHREAD:%d", thread->id);
     crash_screen_print(TEXT_X(10), TEXT_Y(1), "@FF3F00FF(%s)", gCauseDesc[cause]);
