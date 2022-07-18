@@ -38,57 +38,68 @@ enum AnalogFlags {
     ANALOG_FLAG_DOWN  = BIT(3),
 };
 
-// Crash screen font properties
+// Crash screen font properties.
 #define CRASH_SCREEN_FONT_CHAR_WIDTH     5
 #define CRASH_SCREEN_FONT_CHAR_HEIGHT    7
 #define CRASH_SCREEN_FONT_CHARS_PER_ROW  6
 #define CRASH_SCREEN_FONT_NUM_ROWS      22
 
-// Spacing between chars
+// Spacing between chars.
 #define CRASH_SCREEN_SPACING_HORIZONTAL  1
 #define CRASH_SCREEN_SPACING_VERTICAL    3
 
-// The amount of space each char uses
+// The amount of space each char uses.
 #define CRASH_SCREEN_LETTER_WIDTH       (CRASH_SCREEN_FONT_CHAR_WIDTH + CRASH_SCREEN_SPACING_HORIZONTAL) //  6
 #define CRASH_SCREEN_ROW_HEIGHT         (CRASH_SCREEN_FONT_CHAR_HEIGHT + CRASH_SCREEN_SPACING_VERTICAL)  // 10
 
-// Number of chars that can fit in the crash screen
-#define CRASH_SCREEN_TEXT_WIDTH  44
-#define CRASH_SCREEN_TEXT_HEIGHT 22
+// Width and height of crash screen.
+#define CRASH_SCREEN_W 270
+#define CRASH_SCREEN_H 222
 
-// Number of pixels between the text and the edge of the crash screen
-#define CRASH_SCEEEN_TEXT_MARGIN_X 3
-#define CRASH_SCEEEN_TEXT_MARGIN_Y 1
+// Number of chars that can fit in the crash screen.
+#define CRASH_SCREEN_NUM_CHARS_X ((CRASH_SCREEN_W - 1) / CRASH_SCREEN_LETTER_WIDTH) // 44
+#define CRASH_SCREEN_NUM_CHARS_Y ((CRASH_SCREEN_H - 1) / CRASH_SCREEN_ROW_HEIGHT)   // 22
 
-// Width and height of crash screen
-#define CRASH_SCREEN_W ((CRASH_SCREEN_TEXT_WIDTH  * CRASH_SCREEN_LETTER_WIDTH) + (CRASH_SCEEEN_TEXT_MARGIN_X * 2)) // 270
-#define CRASH_SCREEN_H ((CRASH_SCREEN_TEXT_HEIGHT * CRASH_SCREEN_ROW_HEIGHT  ) + (CRASH_SCEEEN_TEXT_MARGIN_Y * 2)) // 222
+// Width and height of the text grid.
+#define CRASH_SCREEN_TEXT_W (CRASH_SCREEN_NUM_CHARS_X * CRASH_SCREEN_LETTER_WIDTH) // 264
+#define CRASH_SCREEN_TEXT_H (CRASH_SCREEN_NUM_CHARS_Y * CRASH_SCREEN_ROW_HEIGHT)   // 220
 
-// Top left corner of crash screen (round up)
+// Number of pixels between the text and the edge of the crash screen.
+#define CRASH_SCREEN_TEXT_MARGIN_X ((CRASH_SCREEN_W - CRASH_SCREEN_TEXT_W) / 2) // 3
+#define CRASH_SCREEN_TEXT_MARGIN_Y ((CRASH_SCREEN_H - CRASH_SCREEN_TEXT_H) / 2) // 1
+
+// Top left corner of crash screen (round up).
 #define CRASH_SCREEN_X1 (((SCREEN_WIDTH  - CRASH_SCREEN_W) / 2) - 0) // 25
 #define CRASH_SCREEN_Y1 (((SCREEN_HEIGHT - CRASH_SCREEN_H) / 2) - 1) //  8
 
-// Bottom right corner of crash screen
+// Bottom right corner of crash screen.
 #define CRASH_SCREEN_X2 (CRASH_SCREEN_X1 + CRASH_SCREEN_W) // 295
 #define CRASH_SCREEN_Y2 (CRASH_SCREEN_Y1 + CRASH_SCREEN_H) // 230
 
-// Start position of text
-#define CRASH_SCREEN_TEXT_START_X (CRASH_SCREEN_X1 + CRASH_SCEEEN_TEXT_MARGIN_X + 1) // 28
-#define CRASH_SCREEN_TEXT_START_Y (CRASH_SCREEN_Y1 + CRASH_SCEEEN_TEXT_MARGIN_Y + 1) // 10
+// Top left corner of the text grid.
+#define CRASH_SCREEN_TEXT_X1 (CRASH_SCREEN_X1 + CRASH_SCREEN_TEXT_MARGIN_X + 1) // 28
+#define CRASH_SCREEN_TEXT_Y1 (CRASH_SCREEN_Y1 + CRASH_SCREEN_TEXT_MARGIN_Y + 1) // 10
 
-// Macros for text size/position
+// Bottom right corner of the text grid.
+#define CRASH_SCREEN_TEXT_X2 (CRASH_SCREEN_TEXT_X1 + CRASH_SCREEN_TEXT_W) // 292
+#define CRASH_SCREEN_TEXT_Y2 (CRASH_SCREEN_TEXT_Y1 + CRASH_SCREEN_TEXT_H) // 230
+
+// Macros for string size.
 #define TEXT_WIDTH(numChars)  ((numChars) * CRASH_SCREEN_LETTER_WIDTH) // n *  6
 #define TEXT_HEIGHT(numChars) ((numChars) * CRASH_SCREEN_ROW_HEIGHT  ) // n * 10
 
-#define TEXT_X(numChars) (CRASH_SCREEN_TEXT_START_X + TEXT_WIDTH(numChars) ) // 28 + (n *  6)
-#define TEXT_Y(numChars) (CRASH_SCREEN_TEXT_START_Y + TEXT_HEIGHT(numChars)) // 10 + (n * 10)
+// Macros to convert a position on the text grid to screen coords.
+#define TEXT_X(numChars) (CRASH_SCREEN_TEXT_X1 + TEXT_WIDTH(numChars) ) // 28 + (n *  6)
+#define TEXT_Y(numChars) (CRASH_SCREEN_TEXT_Y1 + TEXT_HEIGHT(numChars)) // 10 + (n * 10)
 
 #define DIVIDER_Y(numChars) (TEXT_Y(numChars) - 2)
+
 
 // Crash screen font. Each row of the image fits in one u32 pointer.
 ALIGNED32 u32 gCrashScreenFont[CRASH_SCREEN_FONT_CHAR_HEIGHT * CRASH_SCREEN_FONT_NUM_ROWS] = {
     #include "textures/crash_screen/crash_screen_font.custom.ia1.inc.c"
 };
+
 
 #define STACK_SIZE 256 // (s32)(0x800 / sizeof(u64))
 
@@ -178,6 +189,7 @@ struct CrashScreen gCrashScreen2;
 extern u16 sRenderedFramebuffer;
 extern u16 sRenderingFramebuffer;
 u16 sScreenshotFrameBuffer;
+
 
 RGBA16 *crash_screen_get_frame_buffer_pixel_ptr(s32 x, s32 y) {
     return (gFramebuffers[sRenderingFramebuffer] + (SCREEN_WIDTH * y) + x);
