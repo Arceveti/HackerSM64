@@ -25,6 +25,7 @@
 #define UNUSED
 #endif
 
+// Fall through a switch case
 #ifdef __GNUC__
 #define FALL_THROUGH __attribute__((fallthrough))
 #else
