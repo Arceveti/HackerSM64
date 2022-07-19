@@ -164,7 +164,7 @@ ALIGNED16 struct GraphNodeObject      *gCurGraphNodeObject     = NULL;
 ALIGNED16 struct GraphNodeHeldObject  *gCurGraphNodeHeldObject = NULL;
 u16 gAreaUpdateCounter = 0;
 
-LookAt *gCurLookAt = NULL;
+LookAt* gCurLookAt = NULL;
 
 #if SILHOUETTE
 // AA_EN        Enable anti aliasing (not actually used for AA in this case).
@@ -521,7 +521,7 @@ void geo_process_perspective(struct GraphNodePerspective *node) {
 
         Gfx* dlHead = gDisplayListHead;
 
-        guPerspective(mtx, &perspNorm, node->fov, sAspectRatio, node->near / WORLD_SCALE, node->far / WORLD_SCALE, 1.0f);
+        guPerspective(mtx, &perspNorm, node->fov, sAspectRatio, (node->near / WORLD_SCALE), (node->far / WORLD_SCALE), 1.0f);
         gSPPerspNormalize(dlHead++, perspNorm);
 
         gSPMatrix(dlHead++, VIRTUAL_TO_PHYSICAL(mtx), (G_MTX_PROJECTION | G_MTX_LOAD | G_MTX_NOPUSH));
@@ -592,7 +592,7 @@ Vec3f globalLightDirection = {
 };
 
 void setup_global_light() {
-    Lights1 *curLight = (Lights1*)alloc_display_list(sizeof(Lights1));
+    Lights1* curLight = (Lights1*)alloc_display_list(sizeof(Lights1));
     bcopy(&defaultLight, curLight, sizeof(Lights1));
 
     Vec3f transformedLightDirection;
@@ -1319,14 +1319,13 @@ void geo_process_node_and_siblings(struct GraphNode *firstNode) {
 void geo_process_root(struct GraphNodeRoot *node, Vp *b, Vp *c, s32 clearColor) {
     if (node->node.flags & GRAPH_RENDER_ACTIVE) {
         Mtx *initialMatrix;
-        Vp *viewport = alloc_display_list(sizeof(*viewport));
+        Vp *viewport = alloc_display_list(sizeof(*viewport));geo_process_root
 
         gDisplayListHeap = alloc_only_pool_init((main_pool_available() - sizeof(struct AllocOnlyPool)), MEMORY_POOL_LEFT);
         initialMatrix = alloc_display_list(sizeof(*initialMatrix));
         gCurLookAt = (LookAt*)alloc_display_list(sizeof(LookAt));
         bzero(gCurLookAt, sizeof(LookAt));
-        gCurLookAt->l[1].l.col[1] = 0x80;
-        gCurLookAt->l[1].l.colc[1] = 0x80;
+
         gMatStackIndex = 0;
         gCurrAnimType = ANIM_TYPE_NONE;
         vec3s_set(viewport->vp.vtrans, (node->x     * 4), (node->y      * 4), 511);

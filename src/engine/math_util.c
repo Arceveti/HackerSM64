@@ -660,7 +660,7 @@ void mtxf_billboard(Mat4 dest, Mat4 mtx, Vec3f position, Vec3f scale, s32 roll) 
     f32 sx = scale[0];
     f32 sy = scale[1];
     f32 sz = scale[2];
-    Mat4 *cameraMat = &gCameraTransform;
+    Mat4* cameraMat = &gCameraTransform;
     for (i = 0; i < 3; i++) {
         for (j = 0; j < 3; j++) {
             dest[i][j] = (*cameraMat)[j][i];

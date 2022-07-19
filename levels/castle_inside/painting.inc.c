@@ -557,8 +557,6 @@ static const PaintingData *const inside_castle_seg7_painting_texture_maps_070225
     inside_castle_seg7_painting_texture_map_top_07021FFC,
 };
 
-UNUSED static const u64 castle_inside_unused_0 = 0x0;
-
 // 0x07022598 - 0x070225D8
 static const Vtx inside_castle_seg7_vertex_hmc[] = {
     {{{     0,      0,      0}, 0, {     0,      0}, {0x00, 0x00, 0x7f, 0xff}}},
