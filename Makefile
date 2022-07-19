@@ -810,7 +810,7 @@ $(BUILD_DIR)/include/level_headers.h: levels/level_headers.h.in
 
 # Generate version_data.h
 $(BUILD_DIR)/src/game/version_data.h: tools/make_version.sh
-	@$(PRINT) "$(GREEN)Generating:  $(BLUE)$@ $(NO_COL)\n"
+	@$(PRINT) "$(GREEN)Generating: $(BLUE)$@ $(NO_COL)\n"
 	$(V)tools/make_version.sh $(CROSS) > $@
 
 #==============================================================================#
