@@ -271,7 +271,7 @@ void sound_alloc_pool_init(struct SoundAllocPool *pool, void *memAddr, u32 size)
 #ifdef VERSION_SH
     pool->size = size - ((uintptr_t) memAddr & 0xf);
 #else
-    pool->size = size;
+    pool->size = ALIGN16(size);
 #endif
     pool->numAllocatedEntries = 0;
 }
@@ -398,6 +398,8 @@ void *alloc_bank_or_seq(struct SoundMultiPool *loadedPool, s32 arg1, s32 size, s
     u32 leftNotLoaded, rightNotLoaded;
     u32 leftAvail, rightAvail;
 #endif
+
+size = ALIGN16(size);
 
 #ifdef VERSION_SH
     switch (poolIdx) {
@@ -646,7 +648,7 @@ void *alloc_bank_or_seq(struct SoundMultiPool *loadedPool, s32 arg1, s32 size, s
 #ifdef VERSION_SH
                 tp->entries[1].ptr = (u8 *) ((uintptr_t) (pool->start + pool->size - size) & ~0x0f);
 #else
-                tp->entries[1].ptr = pool->start + pool->size - size - 0x10;
+                tp->entries[1].ptr = pool->start + pool->size - size;
 #endif
                 tp->entries[1].id = id;
                 tp->entries[1].size = size;
