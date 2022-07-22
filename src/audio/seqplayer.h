@@ -18,11 +18,13 @@ enum PortamentoModes {
 };
 
 enum SeqChannelLayerCommands {
+    layer_unk_0x7f_reset_instorwave = 0x7f, // needs asm
     layer_end = 0xff, // function return or end of script
     layer_call = 0xfc,
     layer_loop = 0xf8, // loop start, N iterations (or 256 if N = 0)
     layer_loopend = 0xf7,
     layer_jump = 0xfb,
+    layer_unk_0xf4_advance = 0xf4, // needs asm
     layer_setshortnotevelocity = 0xc1,
     layer_setpan = 0xca,
     layer_transpose = 0xc2, // set transposition in semitones
@@ -33,6 +35,10 @@ enum SeqChannelLayerCommands {
     layer_setinstr = 0xc6,
     layer_portamento = 0xc7,
     layer_disableportamento = 0xc8,
+    layer_unk_0xcb_set_envelope_and_releaserate = 0xcb, // needs asm
+    layer_unk_0xcc_ignoredrumpan = 0xcc, // needs asm
+    layer_unk_0xcd_set_reverbbits = 0xcd, // needs asm
+    layer_unk_oxce_set_freqscalemultiplier = 0xce, // needs asm
     // cmd & 0xf0
         layer_setshortnotevelocityfromtable = 0xd0,
         layer_setshortnotedurationfromtable = 0xe0,
