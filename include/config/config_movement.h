@@ -117,3 +117,11 @@
 // Sends a raycast between Mario's current and next position so that walls don't get skipped.
 // This also removes subframe steps (quarter steps).
 // #define RAYCAST_WALL_COLLISION
+
+/** 
+ * This bug allows mario to move when initiating a dialog,
+ * just as long as mario doesn't enter an action that can
+ * be interrupted with text
+ * Uncomment this to fix this bug, and frustrate speedrunners
+ */
+// #define BUGFIX_DIALOG_TIME_STOP

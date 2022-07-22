@@ -7,7 +7,8 @@
 // Do not restart the music on cap grabs.
 #define PERSISTENT_CAP_MUSIC
 
-// Increases the audio heap size to allow for larger/more custom sequences/banks/sfx to be imported without causing issues (not supported for SH).
+// Increase audio heap size to allow for larger/more custom sequences/banks/sfx to be imported without causing issues (not supported for SH).
+// NOTE: This is REQUIRED in order to use the extended 0C audio bank. Do not disable this if you're planning on using it.
 #define EXPAND_AUDIO_HEAP
 
 /**

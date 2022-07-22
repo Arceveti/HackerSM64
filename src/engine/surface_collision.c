@@ -77,10 +77,10 @@ s32 check_wall_triangle_edge(Vec3f vert, Vec3f v2, f32 *d00, f32 *d01, f32 *invD
             return TRUE;
         }
 
-        *d00 = (vert[0] * v) - v2[0];
-        *d01 = (vert[2] * v) - v2[2];
+        *d00 = ((vert[0] * v) - v2[0]);
+        *d01 = ((vert[2] * v) - v2[2]);
         *invDenom = sqrtf(sqr(*d00) + sqr(*d01));
-        *offset = *invDenom - margin_radius;
+        *offset = (*invDenom - margin_radius);
 
         return (*offset > 0.0f);
     }
