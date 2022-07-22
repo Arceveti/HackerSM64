@@ -105,12 +105,37 @@ struct Instrument **instOut = _instOut;\
 }
 #endif // !COPT
 
+void seq_channel_drum(u8 *cmdSemitone, struct SequenceChannelLayer *layer, struct SequenceChannel *seqChannel) {
+    struct Drum *drum;
+
+    *cmdSemitone += (*seqChannel).transposition + (*layer).transposition;
+    if (*cmdSemitone >= gCtlEntries[seqChannel->bankId].numDrums) {
+        *cmdSemitone  = gCtlEntries[seqChannel->bankId].numDrums;
+        if (*cmdSemitone == 0) {
+            layer->stopSomething = TRUE;
+            return;
+        }
+
+        (*cmdSemitone)--;
+    }
+
+    drum = gCtlEntries[seqChannel->bankId].drums[*cmdSemitone];
+    if (drum == NULL) {
+        layer->stopSomething = TRUE;
+    } else {
+        layer->adsr.envelope = drum->envelope;
+        layer->adsr.releaseRate = drum->releaseRate;
+        layer->pan = (f32)(drum->pan) / 128.0f;
+        layer->sound = &drum->sound;
+        layer->freqScale = layer->sound->tuning;
+    }
+}
+
 void seq_channel_layer_process_script(struct SequenceChannelLayer *layer) {
     struct M64ScriptState *state;
     struct Portamento *portamento;
     struct AudioBankSound *sound;
     struct Instrument *instrument;
-    struct Drum *drum;
     s32 temp_a0_5;
     u8 cmd;                             // a0 sp3E, EU s2
     u8 cmdSemitone;                     // sp3D, t0
@@ -341,30 +366,7 @@ void seq_channel_layer_process_script(struct SequenceChannelLayer *layer) {
             layer->stopSomething = TRUE;
         } else {
             if (seqChannel->instOrWave == 0) { // drum
-                cmdSemitone += (*seqChannel).transposition + (*layer).transposition;
-                if (cmdSemitone >= gCtlEntries[seqChannel->bankId].numDrums) {
-                    cmdSemitone = gCtlEntries[seqChannel->bankId].numDrums;
-                    if (cmdSemitone == 0) {
-                        // this goto looks a bit like a function return...
-                        layer->stopSomething = TRUE;
-                        goto skip;
-                    }
-
-                    cmdSemitone--;
-                }
-
-                drum = gCtlEntries[seqChannel->bankId].drums[cmdSemitone];
-                if (drum == NULL) {
-                    layer->stopSomething = TRUE;
-                } else {
-                    layer->adsr.envelope = drum->envelope;
-                    layer->adsr.releaseRate = drum->releaseRate;
-                    layer->pan = FLOAT_CAST(drum->pan) / 128.0f;
-                    layer->sound = &drum->sound;
-                    layer->freqScale = layer->sound->tuning;
-                }
-
-            skip:;
+                seq_channel_drum(&cmdSemitone, layer, seqChannel);
             } else { // instrument
                 cmdSemitone += (*seqPlayer).transposition + (*seqChannel).transposition + (*layer).transposition;
                 if (cmdSemitone >= 0x80) {
@@ -411,7 +413,7 @@ void seq_channel_layer_process_script(struct SequenceChannelLayer *layer) {
                         }
                         portamento->extent = sp24 / freqScale - 1.0f;
                         if (PORTAMENTO_IS_SPECIAL((*layer).portamento)) {
-                            portamento->speed = 32512.0f * FLOAT_CAST((*seqPlayer).tempo)
+                            portamento->speed = 32512.0f * (f32)(*seqPlayer).tempo
                                                 / ((f32)(*layer).delay * (f32) gTempoInternalToExternal
                                                    * FLOAT_CAST((*layer).portamentoTime));
                         } else {

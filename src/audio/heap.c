@@ -1273,7 +1273,7 @@ void audio_reset_session(void) {
  #endif
     gAudioBufferParameters.samplesPerUpdateMax = gAudioBufferParameters.samplesPerUpdate + 8;
     gAudioBufferParameters.samplesPerUpdateMin = gAudioBufferParameters.samplesPerUpdate - 8;
-    gAudioBufferParameters.resampleRate = 32000.0f / FLOAT_CAST(gAudioBufferParameters.frequency);
+    gAudioBufferParameters.resampleRate = 32000.0f / (f32) gAudioBufferParameters.frequency;
  #ifdef VERSION_SH
     gAudioBufferParameters.unkUpdatesPerFrameScaled = (1.0f / 256.0f) / gAudioBufferParameters.updatesPerFrame;
  #else
@@ -1287,9 +1287,9 @@ void audio_reset_session(void) {
 
     gAudioBufferParameters.presetUnk4 = preset->unk1;
     gAudioBufferParameters.samplesPerFrameTarget *= gAudioBufferParameters.presetUnk4;
-    gAudioBufferParameters.maxAiBufferLength *= gAudioBufferParameters.presetUnk4;
-    gAudioBufferParameters.minAiBufferLength *= gAudioBufferParameters.presetUnk4;
-    gAudioBufferParameters.updatesPerFrame *= gAudioBufferParameters.presetUnk4;
+    gAudioBufferParameters.maxAiBufferLength     *= gAudioBufferParameters.presetUnk4;
+    gAudioBufferParameters.minAiBufferLength     *= gAudioBufferParameters.presetUnk4;
+    gAudioBufferParameters.updatesPerFrame       *= gAudioBufferParameters.presetUnk4;
 
     if (gIsConsole) {
         gMaxSimultaneousNotes = MAX_SIMULTANEOUS_NOTES_CONSOLE;

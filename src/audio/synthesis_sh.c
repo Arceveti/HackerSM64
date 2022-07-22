@@ -413,7 +413,7 @@ u64 *synthesis_process_note(s32 noteIndex, struct NoteSubEu *noteSubEu, struct N
     flags = 0;
     if (noteSubEu->needsInit) {
         flags = A_INIT;
-        synthesisState->restart = 0;
+        synthesisState->restart = FALSE;
         synthesisState->samplePosInt = 0;
         synthesisState->samplePosFrac = 0;
         synthesisState->curVolLeft = 0;
@@ -422,7 +422,7 @@ u64 *synthesis_process_note(s32 noteIndex, struct NoteSubEu *noteSubEu, struct N
         synthesisState->prevHeadsetPanLeft = 0;
         synthesisState->reverbVol = noteSubEu->reverbVol;
         synthesisState->unk5 = 0;
-        note->noteSubEu.finished = 0;
+        note->noteSubEu.finished = FALSE;
     }
 
     resamplingRateFixedPoint = noteSubEu->resamplingRateFixedPoint;
@@ -612,8 +612,8 @@ skip:
                 if (noteFinished) {
                     aClearBuffer(cmd++, DMEM_ADDR_UNCOMPRESSED_NOTE + s5,
                             (samplesLenAdjusted - nAdpcmSamplesProcessed) * 2);
-                    noteSubEu->finished = 1;
-                    note->noteSubEu.finished = 1;
+                    noteSubEu->finished = TRUE;
+                    note->noteSubEu.finished = TRUE;
                     func_sh_802ed644(updateIndex, noteIndex);
                     break;
                 }

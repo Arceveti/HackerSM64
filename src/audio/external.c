@@ -471,7 +471,7 @@ static void seq_player_fade_to_percentage_of_volume(s32 player, s32 fadeDuration
     }
 #endif
 
-    targetVolume = (FLOAT_CAST(percentage) / 100.0f) * seqPlayer->fadeVolume;
+    targetVolume = ((f32) percentage / 100.0f) * seqPlayer->fadeVolume;
     seqPlayer->volume = seqPlayer->fadeVolume;
 
     seqPlayer->fadeRemainingFrames = 0;
@@ -534,12 +534,12 @@ static void seq_player_fade_to_target_volume(s32 player, s32 fadeDuration, u8 ta
 
     seqPlayer->fadeRemainingFrames = 0;
     if (fadeDuration == 0) {
-        seqPlayer->fadeVolume = (FLOAT_CAST(targetVolume) / 127.0f);
+        seqPlayer->fadeVolume = ((f32) targetVolume / 127.0f);
         return;
     }
 
     seqPlayer->fadeVelocity =
-        (((f32)(FLOAT_CAST(targetVolume) / 127.0f) - seqPlayer->fadeVolume)
+        ((((f32) targetVolume / 127.0f) - seqPlayer->fadeVolume)
          / (f32) fadeDuration);
 #if defined(VERSION_EU) || defined(VERSION_SH)
     seqPlayer->state = 0;
@@ -650,8 +650,7 @@ struct SPTask *create_next_audio_frame_task(void) {
     // For the function to match we have to preserve some arbitrary variable
     // across this function call.
     flags = 0;
-    if (sAudioEnabled)
-    {
+    if (sAudioEnabled) {
         gAudioCmd = synthesis_execute(gAudioCmd, &writtenCmds, gCurrAiBuffer, gAiBufferLengths[index]);
         gAudioRandom = ((gAudioRandom + gAudioFrameCount) * gAudioFrameCount);
     }
@@ -1277,7 +1276,9 @@ static void update_game_sound(void) {
 
                                 break;
                             }
-                        // fallthrough
+                            // fallthrough
+                            FALL_THROUGH;
+
                         case SOUND_BANK_MENU:
 #if defined(VERSION_EU) || defined(VERSION_SH)
                             func_802ad728(0x02020000 | ((channelIndex & 0xff) << 8), 1);
@@ -1441,7 +1442,9 @@ static void update_game_sound(void) {
 
                                 break;
                             }
-                        // fallthrough
+                            // fallthrough
+                            FALL_THROUGH;
+
                         case SOUND_BANK_MENU:
 #if defined(VERSION_EU) || defined(VERSION_SH)
                             func_802ad728(0x02020000 | ((channelIndex & 0xff) << 8), 1);
@@ -1631,7 +1634,7 @@ static void func_8031F96C(u8 player) {
             && sChannelVolumeScaleFadeInfo[player][i].remainingFrames != 0) {
             sChannelVolumeScaleFadeInfo[player][i].current += sChannelVolumeScaleFadeInfo[player][i].velocity;
 #if defined(VERSION_EU) || defined(VERSION_SH)
-            func_802ad728((0x01000000 | (player & 0xff) << 16 | (i & 0xff) << 8),
+            func_802ad728((0x01000000 | ((player & 0xff) << 16) | ((i & 0xff) << 8)),
                           sChannelVolumeScaleFadeInfo[player][i].current);
 #else
             gSequencePlayers[player].channels[i]->volumeScale = sChannelVolumeScaleFadeInfo[player][i].current;
@@ -1640,7 +1643,7 @@ static void func_8031F96C(u8 player) {
             if (sChannelVolumeScaleFadeInfo[player][i].remainingFrames == 0) {
 #if defined(VERSION_EU) || defined(VERSION_SH)
                 func_802ad728((0x01000000 | ((player & 0xFF) << 16) | ((i & 0xFF) << 8)),
-                              (FLOAT_CAST(sChannelVolumeScaleFadeInfo[player][i].target) / 127.0f));
+                              ((f32)(sChannelVolumeScaleFadeInfo[player][i].target) / 127.0f));
 #else
                 gSequencePlayers[player].channels[i]->volumeScale =
                     sChannelVolumeScaleFadeInfo[player][i].target / 127.0f;
@@ -1676,12 +1679,12 @@ void process_level_music_dynamics(void) {
     }
 
     u32 conditionBits = (sLevelDynamics[gCurrLevelNum][1] & 0xFF00);
-    u8 musicDynIndex = ((u8) sLevelDynamics[gCurrLevelNum][1] & 0x00FF);
+    u8  musicDynIndex = (sLevelDynamics[gCurrLevelNum][1] & 0x00FF);
     i = 2;
-    while (conditionBits & 0xff00) {
+    while (conditionBits & 0xFF00) {
         j = 0;
         condIndex = 0;
-        bit = 0x8000;
+        bit = BIT(15);
         while (j < 8) {
             if (conditionBits & bit) {
                 conditionValues[condIndex] = sLevelDynamics[gCurrLevelNum][i++];
@@ -1750,8 +1753,8 @@ void process_level_music_dynamics(void) {
             // The area matches. Break out of the loop.
             tempBits = 0;
         } else {
-            tempBits      = (sLevelDynamics[gCurrLevelNum][i] & 0xff00);
-            musicDynIndex = (sLevelDynamics[gCurrLevelNum][i] & 0x00ff);
+            tempBits      = (sLevelDynamics[gCurrLevelNum][i] & 0xFF00);
+            musicDynIndex = (sLevelDynamics[gCurrLevelNum][i] & 0x00FF);
             i++;
         }
 

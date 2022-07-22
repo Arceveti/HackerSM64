@@ -488,12 +488,12 @@ void load_sequence_internal(s32 player, s32 seqId, UNUSED s32 loadAsync) {
     init_sequence_player(player);
     seqPlayer->seqId = seqId;
     seqPlayer->defaultBank[0] = bank;
-    seqPlayer->enabled = 1;
+    seqPlayer->enabled = TRUE;
     seqPlayer->seqData = sequenceData;
     seqPlayer->scriptState.pc = sequenceData;
     seqPlayer->scriptState.depth = 0;
     seqPlayer->delay = 0;
-    seqPlayer->finished = 0;
+    seqPlayer->finished = FALSE;
 }
 
 void *func_sh_802f3564(s32 seqId) {
@@ -1127,6 +1127,8 @@ void func_sh_802f4a4c(s32 audioResetStatus) {
                     break;
                 }
                 // fallthrough
+                FALL_THROUGH;
+
             case 1:
                 entry->state = 2;
                 if (entry->remaining == 0) {

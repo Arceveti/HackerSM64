@@ -323,7 +323,7 @@ void note_disable(struct Note *note) {
 }
 #else // !(VERSION_EU || VERSION_SH)
 void note_disable2(struct Note *note) {
-    note_disable(note);
+    note_disable(note); //! redundant?
 }
 #endif // !(VERSION_EU || VERSION_SH)
 
@@ -753,7 +753,7 @@ void seq_channel_layer_decay_release_internal(struct SequenceChannelLayer *seqLa
             } else {
                 note->adsr.fadeOutVel = seqLayer->adsr.releaseRate * gAudioBufferParameters.unkUpdatesPerFrameScaled;
             }
-            note->adsr.sustain = (FLOAT_CAST(seqLayer->seqChannel->adsr.sustain) * note->adsr.current) / 256.0f;
+            note->adsr.sustain = ((f32) seqLayer->seqChannel->adsr.sustain * note->adsr.current) / 256.0f;
 #else
             if (seqLayer->adsr.releaseRate == 0) {
                 note->adsr.fadeOutVel = seqLayer->seqChannel->adsr.releaseRate * 24;
@@ -817,8 +817,7 @@ s32 build_synthetic_wave(struct Note *note, struct SequenceChannelLayer *seqLaye
 
     return sampleCountIndex;
 }
-
-#else
+#else // VERSION_JP || VERSION_US
 void build_synthetic_wave(struct Note *note, struct SequenceChannelLayer *seqLayer) {
     s32 i, j;
     s32 pos;
@@ -859,20 +858,14 @@ void build_synthetic_wave(struct Note *note, struct SequenceChannelLayer *seqLay
     // Repeat sample
     for (offset = note->sampleCount; offset < 0x40; offset += note->sampleCount) {
         lim = note->sampleCount;
-        if (offset < 0 || offset > 0) { //! does the same thing either way
-            for (j = 0; j < lim; j++) {
-                note->synthesisBuffers->samples[offset + j] = note->synthesisBuffers->samples[j];
-            }
-        } else {
-            for (j = 0; j < lim; j++) {
-                note->synthesisBuffers->samples[offset + j] = note->synthesisBuffers->samples[j];
-            }
+        for (j = 0; j < lim; j++) {
+            note->synthesisBuffers->samples[offset + j] = note->synthesisBuffers->samples[j];
         }
     }
 
     osWritebackDCache(note->synthesisBuffers->samples, sizeof(note->synthesisBuffers->samples));
 }
-#endif
+#endif // VERSION_JP || VERSION_US
 
 void init_synthetic_wave(struct Note *note, struct SequenceChannelLayer *seqLayer) {
 #if defined(VERSION_EU) || defined(VERSION_SH)
@@ -885,7 +878,7 @@ void init_synthetic_wave(struct Note *note, struct SequenceChannelLayer *seqLaye
     sampleCountIndex = note->sampleCountIndex;
     waveSampleCountIndex = build_synthetic_wave(note, seqLayer, waveId);
  #if defined(VERSION_EU) || defined(VERSION_SH)
-    //! euUnknownData_8030194c[waveSampleCountIndex] == (0x40 >> waveSampleCountIndex);
+    //! euUnknownData_8030194c[x] == (0x40 >> x);
     note->synthesisState.samplePosInt = note->synthesisState.samplePosInt * euUnknownData_8030194c[waveSampleCountIndex] / euUnknownData_8030194c[sampleCountIndex];
  #else // Not a real change. Just temporary so I can remove this variable.
     note->synthesisState.samplePosInt = note->synthesisState.samplePosInt * gDefaultShortNoteVelocityTable[waveSampleCountIndex] / gDefaultShortNoteVelocityTable[sampleCountIndex];
@@ -934,7 +927,6 @@ void note_pool_clear(struct NotePool *pool) {
     struct AudioListItem *source;
     struct AudioListItem *cur;
     struct AudioListItem *dest;
-    UNUSED s32 j; // unused in EU
 
     for (i = 0; i < NOTE_POOL_COUNT; i++) {
         switch (i) {
@@ -972,8 +964,8 @@ void note_pool_clear(struct NotePool *pool) {
             audio_list_remove(cur);
             audio_list_push_back(dest, cur);
         }
-#else
-        j = 0;
+#else // VERSION_JP || VERSION_US
+        s32 j = 0;
         do {
             cur = source->next;
             if (cur == source) {
@@ -983,7 +975,7 @@ void note_pool_clear(struct NotePool *pool) {
             audio_list_push_back(dest, cur);
             j++;
         } while (j <= gMaxSimultaneousNotes);
-#endif
+#endif // VERSION_JP || VERSION_US
     }
 }
 

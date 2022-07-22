@@ -958,7 +958,7 @@ u64 *synthesis_process_notes(s16 *aiBuf, s32 bufLen, u64 *cmd) {
 
             resamplingRateFixedPoint = (u16)(s32)(resamplingRate * 32768.0f);
             samplesLenFixedPoint = note->samplePosFrac + (resamplingRateFixedPoint * bufLen) * 2;
-            note->samplePosFrac = samplesLenFixedPoint & 0xFFFF; // 16-bit store, can't reuse
+            note->samplePosFrac = (samplesLenFixedPoint & 0xFFFF); // 16-bit store, can't reuse
 
             if (note->sound == NULL) {
                 // A wave synthesis note (not ADPCM)
@@ -1146,9 +1146,9 @@ u64 *synthesis_process_notes(s16 *aiBuf, s32 bufLen, u64 *cmd) {
                             aClearBuffer(cmd++, DMEM_ADDR_UNCOMPRESSED_NOTE + s5,
                                          (samplesLenAdjusted - nAdpcmSamplesProcessed) * 2);
 #ifdef VERSION_EU
-                            noteSubEu->finished = 1;
-                            note->noteSubEu.finished = 1;
-                            note->noteSubEu.enabled = 0;
+                            noteSubEu->finished = TRUE;
+                            note->noteSubEu.finished = TRUE;
+                            note->noteSubEu.enabled = FALSE;
                             break;
                         }
 
@@ -1160,8 +1160,8 @@ u64 *synthesis_process_notes(s16 *aiBuf, s32 bufLen, u64 *cmd) {
                         }
 #else // !VERSION_EU
                             note->samplePosInt = 0;
-                            note->finished = 1;
-                            ((struct vNote *)note)->enabled = 0;
+                            note->finished = TRUE;
+                            ((struct vNote *)note)->enabled = FALSE; //! Why vNote?
                             break;
                         }
 
@@ -1424,12 +1424,15 @@ u64 *process_envelope_inner(u64 *cmd, struct Note *note, s32 nSamples, u16 inBuf
     }
 
 #ifdef VERSION_EU
-    if (targetLeft == sourceLeft && targetRight == sourceRight && !note->envMixerNeedsInit) {
+    if (targetLeft == sourceLeft
+     && targetRight == sourceRight
+     && !note->envMixerNeedsInit)
 #else
     if (vol->targetLeft == vol->sourceLeft
      && vol->targetRight == vol->sourceRight
-     && !note->envMixerNeedsInit) {
+     && !note->envMixerNeedsInit)
 #endif
+    {
         mixerFlags = A_CONTINUE;
     } else {
         mixerFlags = A_INIT;
@@ -1497,18 +1500,15 @@ u64 *process_envelope_inner(u64 *cmd, struct Note *note, s32 nSamples, u16 inBuf
 
 #ifdef VERSION_EU
 u64 *note_apply_headset_pan_effects(u64 *cmd, struct NoteSubEu *noteSubEu, struct NoteSynthesisState *note, s32 bufLen, s32 flags, s32 leftRight) {
-#else
-u64 *note_apply_headset_pan_effects(u64 *cmd, struct Note *note, s32 bufLen, s32 flags, s32 leftRight) {
-#endif
-    u16 dest;
-    u16 pitch;
-#ifdef VERSION_EU
     u8 prevPanShift;
     u8 panShift;
 #else
+u64 *note_apply_headset_pan_effects(u64 *cmd, struct Note *note, s32 bufLen, s32 flags, s32 leftRight) {
     u16 prevPanShift;
     u16 panShift;
 #endif
+    u16 dest;
+    u16 pitch;
 
     switch (leftRight) {
         case 1:

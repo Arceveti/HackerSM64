@@ -285,27 +285,9 @@ void note_vibrato_init(struct Note *note) {
 
 #if defined(VERSION_EU) || defined(VERSION_SH)
     vib->curve = gWaveSamples[2];
-    vib->seqChannel = note->parentLayer->seqChannel;
-    vib->extentChangeTimer = vib->seqChannel->vibratoExtentChangeDelay;
-
-    if (vib->extentChangeTimer == 0) {
-        vib->extent = FLOAT_CAST(vib->seqChannel->vibratoExtentTarget);
-    } else {
-        vib->extent = FLOAT_CAST(vib->seqChannel->vibratoExtentStart);
-    }
-
-    vib->rateChangeTimer = vib->seqChannel->vibratoRateChangeDelay;
-
-    if (vib->rateChangeTimer == 0) {
-        vib->rate = FLOAT_CAST(vib->seqChannel->vibratoRateTarget);
-    } else {
-        vib->rate = FLOAT_CAST(vib->seqChannel->vibratoRateStart);
-    }
-    vib->delay = vib->seqChannel->vibratoDelay;
-
-    seqPlayerState->portamento = seqPlayerState->parentLayer->portamento;
 #else
     vib->curve = gVibratoCurve;
+#endif
     vib->seqChannel = note->parentLayer->seqChannel;
     struct SequenceChannel *seqChannel = vib->seqChannel;
 
@@ -326,6 +308,9 @@ void note_vibrato_init(struct Note *note) {
     }
     vib->delay = seqChannel->vibratoDelay;
 
+#if defined(VERSION_EU) || defined(VERSION_SH)
+    seqPlayerState->portamento = seqPlayerState->parentLayer->portamento;
+#else
     note->portamento = note->parentLayer->portamento;
 #endif
 }
@@ -350,10 +335,11 @@ void adsr_init(struct AdsrState *adsr, struct AdsrEnvelope *envelope, UNUSED s16
 }
 
 #if defined(VERSION_EU) || defined(VERSION_SH)
-f32 adsr_update(struct AdsrState *adsr) {
+f32
 #else
-s32 adsr_update(struct AdsrState *adsr) {
+s32
 #endif
+adsr_update(struct AdsrState *adsr) {
     u8 action = adsr->action;
     u8 state = adsr->state;
 
@@ -435,6 +421,7 @@ s32 adsr_update(struct AdsrState *adsr) {
                 break;
             }
             // fallthrough
+            FALL_THROUGH;
 
         case ADSR_STATE_FADE:
 #if defined(VERSION_EU) || defined(VERSION_SH)
@@ -447,6 +434,7 @@ s32 adsr_update(struct AdsrState *adsr) {
                 adsr->state = ADSR_STATE_LOOP;
             }
             // fallthrough
+            FALL_THROUGH;
 
         case ADSR_STATE_HANG:
             break;
@@ -455,10 +443,11 @@ s32 adsr_update(struct AdsrState *adsr) {
         case ADSR_STATE_RELEASE: {
             adsr->current -= adsr->fadeOutVel;
 #if defined(VERSION_EU) || defined(VERSION_SH)
-            if (adsr->sustain != 0.0f && state == ADSR_STATE_DECAY) {
+            if (adsr->sustain != 0.0f && state == ADSR_STATE_DECAY)
 #else
-            if (adsr->sustain != 0 && adsr->state == ADSR_STATE_DECAY) {
+            if (adsr->sustain != 0 && adsr->state == ADSR_STATE_DECAY)
 #endif
+            {
                 if (adsr->current < adsr->sustain) {
                     adsr->current = adsr->sustain;
 #if defined(VERSION_EU) || defined(VERSION_SH)
@@ -472,21 +461,16 @@ s32 adsr_update(struct AdsrState *adsr) {
             }
 
 #if defined(VERSION_SH)
-            if (adsr->current < 0.00001f) {
-                adsr->current = 0.0f;
-                adsr->state = ADSR_STATE_DISABLED;
-            }
+            if (adsr->current < 0.00001f)
 #elif defined(VERSION_EU)
-            if (adsr->current < 0) {
-                adsr->current = 0.0f;
-                adsr->state = ADSR_STATE_DISABLED;
-            }
+            if (adsr->current < 0)
 #else
-            if (adsr->current < 100) {
+            if (adsr->current < 100)
+#endif
+            {
                 adsr->current = 0;
                 adsr->state = ADSR_STATE_DISABLED;
             }
-#endif
             break;
         }
 
