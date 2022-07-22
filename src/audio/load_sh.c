@@ -700,6 +700,7 @@ ALSeqFile *get_audio_file_header(s32 poolIdx) {
 
 void patch_audio_bank(s32 bankId, struct AudioBank *mem, struct PatchStruct *patchInfo) {
     struct Instrument *instrument;
+    struct Instrument **itInstrs;
     struct Instrument **end;
     s32 i;
     void *patched;
@@ -711,35 +712,34 @@ void patch_audio_bank(s32 bankId, struct AudioBank *mem, struct PatchStruct *pat
 
     s32 numDrums = gCtlEntries[bankId].numDrums;
     s32 numInstruments = gCtlEntries[bankId].numInstruments;
-    void **itInstrs = (void **) mem->drums;
-    if (itInstrs != NULL && numDrums != 0) {
-        mem->drums = PATCH(itInstrs, mem);
+    struct Drum **drums = mem->drums;
+    if (drums != NULL && numDrums != 0) {
+        mem->drums = PATCH(drums, mem);
         for (i = 0; i < numDrums; i++) {
             patched = mem->drums[i];
             if (patched != NULL) {
                 drum = PATCH(patched, mem);
                 mem->drums[i] = drum;
-                if (drum->loaded == 0) {
+                if (!drum->loaded) {
                     patch_sound(&drum->sound, mem, patchInfo);
                     patched = drum->envelope;
                     drum->envelope = BASE_OFFSET(patched, mem);
-                    drum->loaded = 1;
+                    drum->loaded = TRUE;
                 }
-
             }
         }
     }
 
     if (numInstruments > 0) {
-        itInstrs = (void **) mem->instruments;
-        end = numInstruments + (struct Instrument **) itInstrs;
+        itInstrs = mem->instruments;
+        end = numInstruments + itInstrs;
 
         do {
             if (*itInstrs != NULL) {
                 *itInstrs = BASE_OFFSET(*itInstrs, mem);
                 instrument = *itInstrs;
 
-                if (instrument->loaded == 0) {
+                if (!instrument->loaded) {
                     if (instrument->normalRangeLo != 0) {
                         patch_sound(&instrument->lowNotesSound, mem, patchInfo);
                     }
@@ -750,13 +750,13 @@ void patch_audio_bank(s32 bankId, struct AudioBank *mem, struct PatchStruct *pat
                     patched = instrument->envelope;
 
                     instrument->envelope = BASE_OFFSET(patched, mem);
-                    instrument->loaded = 1;
+                    instrument->loaded = TRUE;
                 }
             }
-            itInstrs = (void **) ((struct Instrument **) itInstrs) + 1;
-        } while ((struct Instrument **) itInstrs != ((void) 0, end)); //! This is definitely fake
+            itInstrs++;
+        } while (itInstrs != end);
     }
-    gCtlEntries[bankId].drums = mem->drums;
+    gCtlEntries[bankId].drums       = mem->drums;
     gCtlEntries[bankId].instruments = mem->instruments;
 #undef PATCH_MEM
 #undef PATCH
@@ -848,7 +848,7 @@ void *func_802f3f08(s32 poolIdx, s32 idx, s32 numChunks, s32 arg3, OSMesgQueue *
     }
     void *vAddr = get_bank_or_seq_wrapper(poolIdx, idx);
     if (vAddr != NULL) {
-        loadStatus = 2;
+        loadStatus = SOUND_LOAD_STATUS_COMPLETE;
         osSendMesg(retQueue, (OSMesg) (arg3 << 0x18), 0);
     } else {
         ALSeqFile *f = get_audio_file_header(poolIdx);
@@ -857,7 +857,7 @@ void *func_802f3f08(s32 poolIdx, s32 idx, s32 numChunks, s32 arg3, OSMesgQueue *
         s32 medium = f->seqArray[idx].medium;
         s32 sp18 = f->seqArray[idx].magic;
         uintptr_t devAddr = (uintptr_t) f->seqArray[idx].offset;
-        loadStatus = 2;
+        loadStatus = SOUND_LOAD_STATUS_COMPLETE;
 
         switch (sp18) {
             case 0:
@@ -922,7 +922,6 @@ void func_sh_802f41e4(s32 audioResetStatus) {
     func_sh_802f4dcc(audioResetStatus);
 }
 
-#if defined(VERSION_SH)
 u8 gShindouSoundBanksHeader[] = {
 #include "sound/ctl_header.inc.c"
 };
@@ -938,7 +937,6 @@ u8 gShindouSampleBanksHeader[] = {
 u8 gShindouSequencesHeader[] = {
 #include "sound/sequences_header.inc.c"
 };
-#endif
 
 // (void) must be omitted from parameters
 void audio_init() {
