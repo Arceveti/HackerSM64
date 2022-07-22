@@ -261,9 +261,9 @@ void port_eu_init_queues(void) {
 }
 
 extern struct EuAudioCmd sAudioCmd[0x100];
-void func_802ad6f0(s32 arg0, s32 *arg1) {
+void func_802ad6f0(s32 first, s32 *arg1) {
     struct EuAudioCmd *cmd = &sAudioCmd[D_SH_80350F18 & 0xff];
-    cmd->u.first = arg0;
+    cmd->u.first = first;
     cmd->u2.as_u32 = *arg1;
     D_SH_80350F18++;
     if (D_SH_80350F18 == D_SH_80350F19) {
@@ -271,17 +271,17 @@ void func_802ad6f0(s32 arg0, s32 *arg1) {
     }
 }
 
-void func_802ad728(u32 arg0, f32 arg1) {
-    func_802ad6f0(arg0, (s32 *) &arg1);
+void func_802ad728(u32 first, f32 arg1) {
+    func_802ad6f0(first, (s32 *) &arg1);
 }
 
-void func_802ad74c(u32 arg0, u32 arg1) {
-    func_802ad6f0(arg0, (s32 *) &arg1);
+void func_802ad74c(u32 first, u32 arg1) {
+    func_802ad6f0(first, (s32 *) &arg1);
 }
 
-void func_802ad770(u32 arg0, s8 arg1) {
+void func_802ad770(u32 first, s8 arg1) {
     s32 sp1C = (arg1 << 24);
-    func_802ad6f0(arg0, &sp1C);
+    func_802ad6f0(first, &sp1C);
 }
 
 char shindouDebugPrint133[] = "AudioSend: %d -> %d (%d)\n";
