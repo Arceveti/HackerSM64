@@ -363,18 +363,15 @@ void patch_sound(UNUSED struct AudioBankSound *sound, UNUSED u8 *memBase, UNUSED
 #define PATCH_SOUND patch_sound
 #else // !VERSION_EU
 // copt inline of the above
-#define PATCH_SOUND(_sound, mem, offset)                                                  \
-{                                                                                         \
+#define PATCH_SOUND(_sound, mem, offset) {                                                \
     struct AudioBankSound *sound = _sound;                                                \
     struct AudioBankSample *sample;                                                       \
     void *patched;                                                                        \
-    if ((*sound).sample != (void *) 0)                                                    \
-    {                                                                                     \
+    if ((*sound).sample != (void *) 0) {                                                  \
         patched = (void *)(((uintptr_t)(*sound).sample) + ((uintptr_t)((u8 *) mem)));     \
         (*sound).sample = patched;                                                        \
         sample = (*sound).sample;                                                         \
-        if ((*sample).loaded == 0)                                                        \
-        {                                                                                 \
+        if ((*sample).loaded == 0) {                                                      \
             patched = (void *)(((uintptr_t)(*sample).sampleAddr) + ((uintptr_t) offset)); \
             (*sample).sampleAddr = patched;                                               \
             patched = (void *)(((uintptr_t)(*sample).loop) + ((uintptr_t)((u8 *) mem)));  \
@@ -417,7 +414,6 @@ void patch_audio_bank(struct AudioBank *mem, u8 *offset, u32 numInstruments, u32
                     drum->envelope = BASE_OFFSET(mem, patched);
                     drum->loaded = TRUE;
                 }
-
             }
         }
     }
@@ -771,7 +767,7 @@ void audio_init() {
     }
  #endif
 
-#else // !(VERSION_JP || VERSION_US)
+#else // (VERSION_EU || VERSION_SH)
     for (i = 0; i < gAudioHeapSize / 8; i++) {
         ((u64 *) gAudioHeap)[i] = 0;
     }
@@ -789,7 +785,7 @@ void audio_init() {
     D_EU_802298D0 = 16.713f;
     gRefreshRate = 60;
     port_eu_init();
-#endif // !(VERSION_JP || VERSION_US)
+#endif // (VERSION_EU || VERSION_SH)
 
 #ifdef TARGET_N64
     eu_stubbed_printf_3(

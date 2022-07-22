@@ -66,7 +66,7 @@ STATIC_ASSERT(NUM_ALLPASS % 3 == 0, "NUM_ALLPASS must be a multiple of 3!");
     + (4 * (16 * sizeof(s16))) \
     + (4 /* gAudioUpdatesPerFrame */ * (2 * DEFAULT_LEN_2CH)) \
 )
-#else // !(VERSION_JP || VERSION_US)
+#else // (VERSION_EU || VERSION_SH)
 #define REVERB_WINDOW_HEAP_SIZE \
 ( \
     ((REVERB_WINDOW_SIZE_MAX * sizeof(s16) * 2) \
@@ -74,7 +74,7 @@ STATIC_ASSERT(NUM_ALLPASS % 3 == 0, "NUM_ALLPASS must be a multiple of 3!");
     + (4 /* gAudioUpdatesPerFrame */ * (2 * DEFAULT_LEN_2CH))) \
     * 4 /* gNumSynthesisReverbs */ \
 )
-#endif // !(VERSION_JP || VERSION_US)
+#endif // (VERSION_EU || VERSION_SH)
 
 struct ReverbRingBufferItem {
     s16 numSamplesAfterDownsampling;

@@ -51,7 +51,7 @@ void sequence_channel_process_sound(struct SequenceChannel *seqChannel, s32 reca
     }
     seqChannel->changes.as_u8 = 0;
 }
-#else // !(VERSION_EU || VERSION_SH)
+#else // (VERSION_JP || VERSION_US)
 static void sequence_channel_process_sound(struct SequenceChannel *seqChannel) {
     s32 i;
 
@@ -72,7 +72,7 @@ static void sequence_channel_process_sound(struct SequenceChannel *seqChannel) {
         }
     }
 }
-#endif // !(VERSION_EU || VERSION_SH)
+#endif // (VERSION_JP || VERSION_US)
 
 void sequence_player_process_sound(struct SequencePlayer *seqPlayer) {
     s32 i;
@@ -90,7 +90,7 @@ void sequence_player_process_sound(struct SequencePlayer *seqPlayer) {
                 sequence_player_disable(seqPlayer);
                 return;
             }
-#else // !(VERSION_EU || VERSION_SH)
+#else // (VERSION_JP || VERSION_US)
             switch (seqPlayer->state) {
                 case SEQUENCE_PLAYER_STATE_FADE_OUT:
                     sequence_player_disable(seqPlayer);
@@ -104,7 +104,7 @@ void sequence_player_process_sound(struct SequencePlayer *seqPlayer) {
                 case SEQUENCE_PLAYER_STATE_4:
                     break;
             }
-#endif // !(VERSION_EU || VERSION_SH)
+#endif // (VERSION_JP || VERSION_US)
         }
     }
 
@@ -325,13 +325,13 @@ void adsr_init(struct AdsrState *adsr, struct AdsrEnvelope *envelope, UNUSED s16
     adsr->sustain = 0.0f;
  #endif // VERSION_SH
     adsr->current = 0.0f;
-#else // !(VERSION_EU || VERSION_SH)
+#else // (VERSION_JP || VERSION_US)
     adsr->initial = 0;
     adsr->delay = 0;
     adsr->velocity = 0;
     adsr->envelope = envelope;
     adsr->volOut = volOut;
-#endif // !(VERSION_EU || VERSION_SH)
+#endif // (VERSION_JP || VERSION_US)
 }
 
 #if defined(VERSION_EU) || defined(VERSION_SH)
@@ -409,10 +409,10 @@ adsr_update(struct AdsrState *adsr) {
                     adsr->target = (f32) BSWAP16(adsr->envelope[adsr->envIndex].arg) / 32767.0f;
                     adsr->target = sqr(adsr->target);
                     adsr->velocity = (adsr->target - adsr->current) / adsr->delay;
-#else // !(VERSION_EU || VERSION_SH)
+#else // (VERSION_JP || VERSION_US)
                     adsr->target = BSWAP16(adsr->envelope[adsr->envIndex].arg);
                     adsr->velocity = ((adsr->target - adsr->current) << 0x10) / adsr->delay;
-#endif // !(VERSION_EU || VERSION_SH)
+#endif // (VERSION_JP || VERSION_US)
                     adsr->state = ADSR_STATE_FADE;
                     adsr->envIndex++;
                     break;

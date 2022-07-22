@@ -235,7 +235,7 @@ void *soundAlloc(struct SoundAllocPool *pool, u32 size) {
     }
     pool->numAllocatedEntries++;
     return start;
-#else // !(VERSION_EU || VERSION_SH)
+#else // (VERSION_JP || VERSION_US)
     u32 alignedSize = ALIGN16(size);
 
     u8 *start = pool->cur;
@@ -246,7 +246,7 @@ void *soundAlloc(struct SoundAllocPool *pool, u32 size) {
         return NULL;
     }
     return start;
-#endif // !(VERSION_EU || VERSION_SH)
+#endif // (VERSION_JP || VERSION_US)
 }
 
 #ifdef VERSION_SH
@@ -474,7 +474,7 @@ size = ALIGN16(size);
             // Both left and right sides are being loaded into.
             return NULL;
         }
-#else // !(VERSION_JP || VERSION_US)
+#else // (VERSION_EU || VERSION_SH)
 
  #ifdef VERSION_SH
         if (poolIdx == SOUND_POOL_BANK) {
@@ -604,7 +604,7 @@ size = ALIGN16(size);
  #endif // !VERSION_EU == VERSION_SH
             }
         }
-#endif // !(VERSION_JP || VERSION_US)
+#endif // (VERSION_EU || VERSION_SH)
 
         pool = &loadedPool->temporary.pool;
         if (tp->entries[tp->nextSide].id != (s8)nullID) {
@@ -694,21 +694,21 @@ size = ALIGN16(size);
     loadedPool->persistent.entries[loadedPool->persistent.numEntries].ptr = ret;
 
     if (ret == NULL) {
-#else // !(VERSION_EU || VERSION_SH)
+#else // (VERSION_JP || VERSION_US)
     loadedPool->persistent.entries[loadedPool->persistent.numEntries].ptr = soundAlloc(&loadedPool->persistent.pool, (arg1 * size));
 
     if (loadedPool->persistent.entries[loadedPool->persistent.numEntries].ptr == NULL) {
-#endif // !(VERSION_EU || VERSION_SH)
+#endif // (VERSION_JP || VERSION_US)
         switch (arg3) {
             case 2:
-#if defined(VERSION_EU)
-                eu_stubbed_printf_0("MEMORY:StayHeap OVERFLOW.");
-                return alloc_bank_or_seq(loadedPool, arg1, size, 0, id);
-#elif defined(VERSION_SH)
+#ifdef VERSION_SH
                 return alloc_bank_or_seq(poolIdx, size, 0, id);
-#else // VERSION_JP || VERSION_US
+#else // !VERSION_SH
+ #ifdef VERSION_EU
+                eu_stubbed_printf_0("MEMORY:StayHeap OVERFLOW.");
+ #endif
                 return alloc_bank_or_seq(loadedPool, arg1, size, 0, id);
-#endif // VERSION_JP || VERSION_US
+#endif // !VERSION_SH
             case 1:
 #if defined(VERSION_SH)
             case 0:
@@ -1041,7 +1041,7 @@ void init_reverb_eu(void) {
         }
     }
 }
-#else // !(VERSION_EU || VERSION_SH)
+#else // (VERSION_JP || VERSION_US)
 void init_reverb_us(s32 presetId) {
     s16 *mem;
     s32 i;
@@ -1117,8 +1117,8 @@ void init_reverb_us(s32 presetId) {
             if (sAudioIsInitialized) {
                 bzero(gSynthesisReverb.resampleStateLeft,  (16 * sizeof(s16)));
                 bzero(gSynthesisReverb.resampleStateRight, (16 * sizeof(s16)));
-                bzero(gSynthesisReverb.unk24, (16 * sizeof(s16)));
-                bzero(gSynthesisReverb.unk28, (16 * sizeof(s16)));
+                bzero(gSynthesisReverb.unk24,              (16 * sizeof(s16)));
+                bzero(gSynthesisReverb.unk28,              (16 * sizeof(s16)));
 
                 // All reverb downsample buffers are adjacent in memory, so clear them all in a single call
                 bzero(gSynthesisReverb.items[0][0].toDownsampleLeft, (DEFAULT_LEN_1CH * 4 * gAudioUpdatesPerFrame));
@@ -1138,7 +1138,7 @@ void init_reverb_us(s32 presetId) {
  #endif
     }
 }
-#endif // !(VERSION_EU || VERSION_SH)
+#endif // (VERSION_JP || VERSION_US)
 
 #if defined(VERSION_JP) || defined(VERSION_US)
 void audio_reset_session(struct AudioSessionSettings *preset, s32 presetId) {
@@ -1163,7 +1163,7 @@ void audio_reset_session(struct AudioSessionSettings *preset, s32 presetId) {
     }
 
     s8 updatesPerFrame;
-#else // !(VERSION_JP || VERSION_US)
+#else // (VERSION_EU || VERSION_SH)
 void audio_reset_session(void) {
     if (sAudioIsInitialized) {
         persistent_pool_clear(&gSeqLoadedPool.persistent);
@@ -1180,7 +1180,7 @@ void audio_reset_session(void) {
         return;
     }
     struct AudioSessionSettingsEU *preset = &gAudioSessionPresets[0];
-#endif // !(VERSION_JP || VERSION_US)
+#endif // (VERSION_EU || VERSION_SH)
 
 #ifdef PUPPYPRINT_DEBUG
     OSTime first = osGetTime();
@@ -1311,7 +1311,7 @@ void audio_reset_session(void) {
  #else
     gMaxAudioCmds = gMaxSimultaneousNotes * 0x10 * gAudioBufferParameters.updatesPerFrame + preset->numReverbs * 0x20 + 0x300;
  #endif
-#else // !(VERSION_EU || VERSION_SH)
+#else // (VERSION_JP || VERSION_US)
     gAiFrequency = osAiSetFrequency(preset->frequency);
     gMaxSimultaneousNotes = preset->maxSimultaneousNotes;
     gSamplesPerFrameTarget = ALIGN16(gAiFrequency / 60);
@@ -1341,14 +1341,14 @@ void audio_reset_session(void) {
     gTempoInternalToExternal = (u32)(updatesPerFrame * 2880000.0f / gTatumsPerBeat / 16.713f);
  #endif
     gMaxAudioCmds = gMaxSimultaneousNotes * 20 * updatesPerFrame + 320;
-#endif // !(VERSION_EU || VERSION_SH)
+#endif // (VERSION_JP || VERSION_US)
 
 #if defined(VERSION_SH)
     persistentMem = DOUBLE_SIZE_ON_64_BIT(preset->persistentSeqMem + preset->persistentBankMem + preset->unk18 + preset->unkMem28 + 0x10);
-    temporaryMem = DOUBLE_SIZE_ON_64_BIT(preset->temporarySeqMem + preset->temporaryBankMem + preset->unk24 + preset->unkMem2C + 0x10);
+    temporaryMem  = DOUBLE_SIZE_ON_64_BIT(preset->temporarySeqMem  + preset->temporaryBankMem  + preset->unk24 + preset->unkMem2C + 0x10);
 #else
     persistentMem = DOUBLE_SIZE_ON_64_BIT(preset->persistentSeqMem + preset->persistentBankMem);
-    temporaryMem = DOUBLE_SIZE_ON_64_BIT(preset->temporarySeqMem + preset->temporaryBankMem);
+    temporaryMem  = DOUBLE_SIZE_ON_64_BIT(preset->temporarySeqMem  + preset->temporaryBankMem);
 #endif
     totalMem = persistentMem + temporaryMem;
     wantMisc = gAudioSessionPool.size - totalMem - BETTER_REVERB_SIZE;
@@ -1358,7 +1358,7 @@ void audio_reset_session(void) {
     sSeqAndBankPoolSplit.wantPersistent = persistentMem;
     sSeqAndBankPoolSplit.wantTemporary = temporaryMem;
     seq_and_bank_pool_init(&sSeqAndBankPoolSplit);
-    sPersistentCommonPoolSplit.wantSeq = DOUBLE_SIZE_ON_64_BIT(preset->persistentSeqMem);
+    sPersistentCommonPoolSplit.wantSeq  = DOUBLE_SIZE_ON_64_BIT(preset->persistentSeqMem);
     sPersistentCommonPoolSplit.wantBank = DOUBLE_SIZE_ON_64_BIT(preset->persistentBankMem);
 #ifdef VERSION_SH
     sPersistentCommonPoolSplit.wantUnused = preset->unk18;
@@ -1366,7 +1366,7 @@ void audio_reset_session(void) {
     sPersistentCommonPoolSplit.wantUnused = 0;
 #endif
     persistent_pools_init(&sPersistentCommonPoolSplit);
-    sTemporaryCommonPoolSplit.wantSeq = DOUBLE_SIZE_ON_64_BIT(preset->temporarySeqMem);
+    sTemporaryCommonPoolSplit.wantSeq  = DOUBLE_SIZE_ON_64_BIT(preset->temporarySeqMem);
     sTemporaryCommonPoolSplit.wantBank = DOUBLE_SIZE_ON_64_BIT(preset->temporaryBankMem);
 #ifdef VERSION_SH
     sTemporaryCommonPoolSplit.wantUnused = preset->unk24;

@@ -270,7 +270,7 @@ struct Drum *get_drum(s32 bankId, s32 drumId) {
     return drum;
 }
  #endif // VERSION_EU
-#endif // !(VERSION_EU || VERSION_SH)
+#endif // (VERSION_JP || VERSION_US)
 
 #if defined(VERSION_EU) || defined(VERSION_SH)
 void
@@ -321,11 +321,11 @@ void note_disable(struct Note *note) {
     note->adsr.current = 0;
  #endif
 }
-#else // !(VERSION_EU || VERSION_SH)
+#else // (VERSION_JP || VERSION_US)
 void note_disable2(struct Note *note) {
     note_disable(note); //! redundant?
 }
-#endif // !(VERSION_EU || VERSION_SH)
+#endif // (VERSION_JP || VERSION_US)
 
 void process_notes(void) {
     f32 scale;
@@ -529,7 +529,7 @@ void process_notes(void) {
             noteSubEu->bookOffset = bookOffset;
             skip:;
         }
-#else // !(VERSION_EU || VERSION_SH)
+#else // (VERSION_JP || VERSION_US)
         if (note->priority != NOTE_PRIORITY_DISABLED) {
             if (note->priority == NOTE_PRIORITY_STOPPING || note->finished) {
                 if (note->adsrVolScale == 0 || note->finished) {
@@ -594,7 +594,7 @@ void process_notes(void) {
             note_set_vel_pan_reverb(note, velocity, pan, reverbVol);
             continue;
         }
-#endif // !(VERSION_EU || VERSION_SH)
+#endif // (VERSION_JP || VERSION_US)
     }
 #undef PREPEND
 #undef POP
@@ -817,7 +817,7 @@ s32 build_synthetic_wave(struct Note *note, struct SequenceChannelLayer *seqLaye
 
     return sampleCountIndex;
 }
-#else // VERSION_JP || VERSION_US
+#else // (VERSION_JP || VERSION_US)
 void build_synthetic_wave(struct Note *note, struct SequenceChannelLayer *seqLayer) {
     s32 i, j;
     s32 pos;
@@ -865,7 +865,7 @@ void build_synthetic_wave(struct Note *note, struct SequenceChannelLayer *seqLay
 
     osWritebackDCache(note->synthesisBuffers->samples, sizeof(note->synthesisBuffers->samples));
 }
-#endif // VERSION_JP || VERSION_US
+#endif // (VERSION_JP || VERSION_US)
 
 void init_synthetic_wave(struct Note *note, struct SequenceChannelLayer *seqLayer) {
 #if defined(VERSION_EU) || defined(VERSION_SH)
@@ -964,7 +964,7 @@ void note_pool_clear(struct NotePool *pool) {
             audio_list_remove(cur);
             audio_list_push_back(dest, cur);
         }
-#else // VERSION_JP || VERSION_US
+#else // (VERSION_JP || VERSION_US)
         s32 j = 0;
         do {
             cur = source->next;
@@ -975,7 +975,7 @@ void note_pool_clear(struct NotePool *pool) {
             audio_list_push_back(dest, cur);
             j++;
         } while (j <= gMaxSimultaneousNotes);
-#endif // VERSION_JP || VERSION_US
+#endif // (VERSION_JP || VERSION_US)
     }
 }
 

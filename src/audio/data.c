@@ -710,7 +710,7 @@ f32 gVolRampingRhs128[128] = {
     0.525077f, 0.524798f, 0.524522f, 0.524247f, 0.523975f, 0.523706f, 0.523439f, 0.523174f, 0.522911f,
     0.522651f, 0.522393f
 };
-#endif // VERSION_JP || VERSION_US
+#endif // (VERSION_JP || VERSION_US)
 
 #ifdef VERSION_SH
 u16 unk_sh_data_3[] = {

@@ -287,7 +287,7 @@ struct SequencePlayer {
 #if defined(VERSION_JP) || defined(VERSION_US)
     /*0x008, ?????*/ u8 loadingBankNumInstruments;
     /*0x009, ?????*/ u8 loadingBankNumDrums;
-#else // VERSION_EU || VERSION_SH
+#else // (VERSION_EU || VERSION_SH)
     /*     , 0x007, 0x007*/ s8 seqVariationEu[1];
 #endif
     /*0x00A, 0x008*/ u16 tempo; // beats per minute in JP, tatums per minute in US/EU

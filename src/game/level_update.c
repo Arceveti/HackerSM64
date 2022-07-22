@@ -59,7 +59,7 @@ const char *credits14[] = { "3TECHNICAL SUPPORT", "TAKAO SAWANO", "HIROHITO YOSH
 const char *credits15[] = { "1TECHNICAL SUPPORT", "SGI. 64PROJECT STAFF" };
 const char *credits16[] = { "2PROGRESS MANAGEMENT", "KIMIYOSHI FUKUI", "KEIZO KATO" };
 
-#else // VERSION_US || VERSION_EU
+#else // (VERSION_US || VERSION_EU)
 
 // US and EU combine camera programmer and Mario face programmer...
 const char *credits05[] = { "4CAMERA PROGRAMMER", "MARIO FACE PROGRAMMER", "TAKUMI KAWAGOE", "GILES GODDARD" };
@@ -96,7 +96,7 @@ const char *credits17[] = { "4MARIO VOICE", "PEACH VOICE", "CHARLES MARTINET", "
 
 #if defined(VERSION_JP) || defined(VERSION_SH)
 const char *credits18[] = { "3SPECIAL THANKS TO", "JYOHO KAIHATUBU", "ALL NINTENDO", "MARIO CLUB STAFF" };
-#else // VERSION_US | VERSION_EU
+#else // (VERSION_US || VERSION_EU)
 const char *credits18[] = { "3SPECIAL THANKS TO", "EAD STAFF", "ALL NINTENDO PERSONNEL", "SUPER MARIO CLUB STAFF" };
 #endif
 

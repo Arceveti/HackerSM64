@@ -420,7 +420,7 @@ void audio_reset_session_eu(s32 presetId) {
     }
  #endif // !VERSION_SH
 }
-#else // !(VERSION_EU || VERSION_SH)
+#else // (VERSION_JP || VERSION_US)
 /**
  * Called from threads: thread3_main, thread5_game_loop
  */
@@ -452,7 +452,7 @@ static void func_8031D690(s32 player, s32 fadeInTime) {
     seqPlayer->fadeVolume = 0.0f;
     seqPlayer->fadeVelocity = 0.0f;
 }
-#endif // !(VERSION_EU || VERSION_SH)
+#endif // (VERSION_JP || VERSION_US)
 
 /**
  * Called from threads: thread5_game_loop
@@ -1587,12 +1587,12 @@ void seq_player_fade_out(u8 player, u16 fadeDuration) {
         sCurrentBackgroundMusicSeqId = SEQUENCE_NONE;
     }
     func_802ad74c((0x83000000 | (player & 0xff) << 16), fd);
-#else // !(VERSION_EU || VERSION_SH)
+#else // (VERSION_JP || VERSION_US)
     if (player == SEQ_PLAYER_LEVEL) {
         sCurrentBackgroundMusicSeqId = SEQUENCE_NONE;
     }
     seq_player_fade_to_zero_volume(player, fadeDuration);
-#endif // !(VERSION_EU || VERSION_SH)
+#endif // (VERSION_JP || VERSION_US)
 }
 
 /**
