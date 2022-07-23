@@ -100,10 +100,8 @@ struct SPTask *create_next_audio_frame_task(void) {
         gAiBufferLengths[index] = gAudioBufferParameters.maxAiBufferLength;
     }
 
-    if (osRecvMesg(gShAudioMesgQueuePtr1, (OSMesg *) &sp34, 0) != -1) { //! Should this just be a while loop?
-        do {
-            func_802ad7ec(sp34);
-        } while (osRecvMesg(gShAudioMesgQueuePtr1, (OSMesg *) &sp34, 0) != -1);
+    while (osRecvMesg(gShAudioMesgQueuePtr1, (OSMesg *) &sp34, 0) != -1) {
+        func_802ad7ec(sp34);
     }
 
     flags = 0;
