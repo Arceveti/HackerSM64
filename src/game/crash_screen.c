@@ -191,14 +191,14 @@ extern u16 sRenderingFramebuffer;
 u16 sScreenshotFrameBuffer;
 
 
-RGBA16 *crash_screen_get_frame_buffer_pixel_ptr(s32 x, s32 y) {
+RGBA16 *crash_screen_get_framebuffer_pixel_ptr(s32 x, s32 y) {
     return (gFramebuffers[sRenderingFramebuffer] + (SCREEN_WIDTH * y) + x);
 }
 
 void crash_screen_draw_rect(s32 x, s32 y, s32 w, s32 h, RGBA16 color, s32 isTransparent) {
     s32 i, j;
 
-    RGBA16 *ptr = crash_screen_get_frame_buffer_pixel_ptr(x, y);
+    RGBA16 *ptr = crash_screen_get_framebuffer_pixel_ptr(x, y);
 
     for (i = 0; i < h; i++) {
         for (j = 0; j < w; j++) {
@@ -225,7 +225,7 @@ void crash_screen_draw_glyph(s32 x, s32 y, s32 glyph, RGBA16 color) {
 
     u32 *data = &gCrashScreenFont[(glyph / CRASH_SCREEN_FONT_CHARS_PER_ROW) * CRASH_SCREEN_FONT_CHAR_HEIGHT];
 
-    RGBA16 *ptr = crash_screen_get_frame_buffer_pixel_ptr(x, y);
+    RGBA16 *ptr = crash_screen_get_framebuffer_pixel_ptr(x, y);
 
     for (i = 0; i < CRASH_SCREEN_FONT_CHAR_HEIGHT; i++) {
         bit = (0x80000000U >> ((glyph % CRASH_SCREEN_FONT_CHARS_PER_ROW) * CRASH_SCREEN_FONT_CHAR_WIDTH));

@@ -250,11 +250,12 @@ static void reverb_mono_sample(s16 *outSample, s32 inSample) {
             j = -1;
             outTmp += ((historySample * reverbMultsL[k++]) >> 8);
             *curDelaySample = tmpCarryover;
-            if (i != reverbFilterCount)
+            if (i != reverbFilterCount) {
                 tmpCarryover = ((historySample * REVERB_REV_INDEX) >> 8);
+            }
         } else {
             *curDelaySample = (((historySample * (-REVERB_GAIN_INDEX)) >> 8) + tmpCarryover);
-            tmpCarryover = (((*curDelaySample * REVERB_GAIN_INDEX) >> 8) + historySample);
+            tmpCarryover    = (((*curDelaySample * REVERB_GAIN_INDEX) >> 8) + historySample);
         }
 
         if (++allpassIdxL[i] == delaysL[i]) allpassIdxL[i] = 0;
@@ -1021,7 +1022,7 @@ u64 *synthesis_process_notes(s16 *aiBuf, s32 bufLen, u64 *cmd)
 
                         if (s2 == 0 && !synthesisState->restart)
 #else
-                        s2 = note->samplePosInt & 0xf;
+                        s2 = (note->samplePosInt & 0xf);
                         samplesRemaining = endPos - note->samplePosInt;
 
                         if (s2 == 0 && !note->restart)

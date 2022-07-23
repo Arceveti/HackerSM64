@@ -973,7 +973,6 @@ static s32 puppycam_check_volume_bounds(struct sPuppyVolume *volume, s32 index) 
             *volume = *sPuppyVolumeStack[index];
             return TRUE;
         }
-
     }
 
     return FALSE;
@@ -1194,7 +1193,6 @@ static void puppycam_projection(void) {
         if (gPuppyCam.flags & PUPPYCAM_BEHAVIOUR_Y_MOVEMENT) gPuppyCam.pos[1] = gPuppyCam.targetObj->oPosY + gPuppyCam.povHeight + LENCOS(gPuppyCam.targetDist[1], pitchTotal) + gPuppyCam.shake[1] - gPuppyCam.floorY[1];
         if (gPuppyCam.flags & PUPPYCAM_BEHAVIOUR_Z_MOVEMENT) gPuppyCam.pos[2] = gPuppyCam.targetObj->oPosZ + LENCOS(LENSIN(gPuppyCam.targetDist[1], pitchTotal), gPuppyCam.yaw) + gPuppyCam.shake[2];
     }
-
 }
 
 // Calls any scripts to affect the camera, if applicable.

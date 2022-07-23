@@ -179,7 +179,7 @@ enum GeoLayoutCommands {
     CMD_BBH(GEO_CMD_NODE_START, 0x00, 0x0000)
 
 /**
- * GEO_CMD_NODE_MASTER_LIST: Create zbuffer-toggling scene graph node
+ * GEO_CMD_NODE_MASTER_LIST: Create z-buffer-toggling scene graph node
  *   0x01: u8 enableZBuffer (1 = on, 0 = off)
  *   0x02-0x03: unused
  */

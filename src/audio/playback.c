@@ -172,7 +172,6 @@ void note_set_resampling_rate(struct Note *note, f32 resamplingRateInput) {
         } else {
             resamplingRate = resamplingRateInput;
         }
-
     } else {
         tempSub->hasTwoAdpcmParts = TRUE;
         if (2 * MIN_RESAMPLING_RATE < resamplingRateInput) {

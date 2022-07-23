@@ -335,7 +335,7 @@ Gfx *intro_draw_face(RGBA16 *image, s32 imageW, s32 imageH) {
     return dl;
 }
 
-RGBA16 *intro_sample_frame_buffer(s32 imageW, s32 imageH, s32 sampleW, s32 sampleH, s32 xOffset, s32 yOffset) {
+RGBA16 *intro_sample_framebuffer(s32 imageW, s32 imageH, s32 sampleW, s32 sampleH, s32 xOffset, s32 yOffset) {
     s32 pixel;
     f32 size = (1.0f / (sampleW * sampleH));
     ColorRGBf color;
@@ -383,7 +383,6 @@ Gfx *geo_intro_face_easter_egg(s32 callContext, struct GraphNode *node, UNUSED v
         for (i = 0; i < 48; i++) {
             sFaceVisible[i] = 0;
         }
-
     } else if (callContext == GEO_CONTEXT_RENDER) {
         if (sFaceCounter == 0) {
             if (gPlayer1Controller->buttonPressed & Z_TRIG) {
@@ -400,7 +399,7 @@ Gfx *geo_intro_face_easter_egg(s32 callContext, struct GraphNode *node, UNUSED v
 
         // Draw while the first or last face is visible.
         if (sFaceVisible[0] == 1 || sFaceVisible[17] == 1) {
-            RGBA16 *image = intro_sample_frame_buffer(40, 40, 2, 2, 120, 80);
+            RGBA16 *image = intro_sample_framebuffer(40, 40, 2, 2, 120, 80);
             if (image != NULL) {
                 genNode->fnNode.node.drawingLayer = LAYER_OPAQUE;
                 dl = intro_draw_face(image, 40, 40);

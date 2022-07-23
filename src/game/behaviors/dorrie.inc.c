@@ -73,7 +73,6 @@ void dorrie_act_lower_head(void) {
         } else if (o->oTimer > 150) {
             dorrie_begin_head_raise(FALSE);
         }
-
     } else {
         o->oDorrieNeckAngle += 0x115;
     }

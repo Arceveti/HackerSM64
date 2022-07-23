@@ -2213,14 +2213,19 @@ void sequence_player_process_sequence(struct SequencePlayer *seqPlayer) {
 
     // Remove possible SOUND_LOAD_STATUS_DISCARDABLE marks.
 #ifdef VERSION_SH
-    if (gSeqLoadStatus[seqPlayer->seqId] != SOUND_LOAD_STATUS_5)
+    if (gSeqLoadStatus[seqPlayer->seqId] != SOUND_LOAD_STATUS_5) {
 #endif
         gSeqLoadStatus[seqPlayer->seqId] = SOUND_LOAD_STATUS_COMPLETE;
 
 #ifdef VERSION_SH
-    if (gBankLoadStatus[seqPlayer->defaultBank[0]] != SOUND_LOAD_STATUS_5)
+    }
+
+    if (gBankLoadStatus[seqPlayer->defaultBank[0]] != SOUND_LOAD_STATUS_5) {
 #endif
         gBankLoadStatus[seqPlayer->defaultBank[0]] = SOUND_LOAD_STATUS_COMPLETE;
+#ifdef VERSION_SH
+    }
+#endif
 
     if (seqPlayer->muted && (seqPlayer->muteBehavior & MUTE_BEHAVIOR_STOP_SCRIPT)) {
         return;
@@ -2417,8 +2422,9 @@ void sequence_player_process_sequence(struct SequencePlayer *seqPlayer) {
                     case seq_setvol: // seq_setvol
                         cmd = m64_read_u8(state);
                         seqPlayer->volumeDefault = FLOAT_CAST(cmd) / 127.0f;
-                        if (seqPlayer->volumeDefault >= 1.0f)
+                        if (seqPlayer->volumeDefault >= 1.0f) {
                             seqPlayer->volumeDefault = 1.0f;
+                        }
 
                         switch (seqPlayer->state) {
                             case SEQUENCE_PLAYER_STATE_2:
@@ -2446,10 +2452,11 @@ void sequence_player_process_sequence(struct SequencePlayer *seqPlayer) {
                         seqPlayer->fadeVolume += (f32)(s8) temp / 127.0f;
                         
                         seqPlayer->volumeDefault += (f32)(s8) temp / 127.0f;
-                        if (seqPlayer->volumeDefault > 1.0f)
+                        if (seqPlayer->volumeDefault > 1.0f) {
                             seqPlayer->volumeDefault = 1.0f;
-                        else if (seqPlayer->volumeDefault < 0.0f)
+                        } else if (seqPlayer->volumeDefault < 0.0f) {
                             seqPlayer->volumeDefault = 0.0f;
+                        }
                         break;
 #endif // (VERSION_JP || VERSION_US)
 

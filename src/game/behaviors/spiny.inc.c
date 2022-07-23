@@ -86,7 +86,6 @@ static void spiny_act_walk(void) {
 
                 cur_obj_rotate_yaw_toward(o->oSpinyTargetYaw, 0x80);
             }
-
         } else if (o->oMoveFlags & OBJ_MOVE_HIT_WALL) {
             // Bounce off walls while falling
             o->oMoveAngleYaw = cur_obj_reflect_move_angle_off_wall();
