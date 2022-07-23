@@ -830,15 +830,15 @@ struct EuAudioCmd {
 #if IS_BIG_ENDIAN
         struct {
             u8 op;
-            u8 arg1;
-            u8 arg2;
+            u8 player;
+            u8 seqId; //! is this correct? should it be channel instead?
             u8 arg3;
         } s;
 #else
         struct {
             u8 arg3;
-            u8 arg2;
-            u8 arg1;
+            u8 seqId; //! is this correct? should it be channel instead?
+            u8 player;
             u8 op;
         } s;
 #endif

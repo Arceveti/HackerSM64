@@ -356,7 +356,7 @@ s32 func_sh_802f2f38(struct AudioBankSample *sample, s32 bankId) {
     return 0;
 }
 
-s32 func_sh_802f3024(s32 bankId, s32 instId, s32 arg2) {
+s32 func_sh_802f3024(s32 bankId, s32 instId, s32 drumId) {
     struct Instrument *instr;
     struct Drum *drum;
 
@@ -373,7 +373,7 @@ s32 func_sh_802f3024(s32 bankId, s32 instId, s32 arg2) {
             func_sh_802f2f38(instr->highNotesSound.sample, bankId);
         }
     } else if (instId == 0x7F) {
-        drum = get_drum(bankId, arg2);
+        drum = get_drum(bankId, drumId);
         if (drum == NULL) {
             return -1;
         }
@@ -382,18 +382,15 @@ s32 func_sh_802f3024(s32 bankId, s32 instId, s32 arg2) {
     return 0;
 }
 
-void func_sh_802f30f4(s32 arg0, s32 arg1, s32 arg2, OSMesgQueue *arg3) {
-    if (func_802f3f08(SOUND_POOL_UNK, canonicalize_index(SOUND_POOL_UNK, arg0), arg1, arg2, arg3) == 0) {
-        osSendMesg(arg3, 0, 0);
+void func_sh_802f30f4(s32 arg0, s32 numChunks, s32 arg2, OSMesgQueue *retQueue) {
+    if (func_802f3f08(SOUND_POOL_UNK, canonicalize_index(SOUND_POOL_UNK, arg0), numChunks, arg2, retQueue) == 0) {
+        osSendMesg(retQueue, 0, 0);
     }
 }
 
 void func_sh_802f3158(s32 seqId, s32 numChunks, s32 arg2, OSMesgQueue *retQueue) {
-    s32 val;
-    s32 v;
-
-    val = ((u16 *) gAlBankSets)[canonicalize_index(SOUND_POOL_SEQ, seqId)];
-    v = gAlBankSets[val++];
+    s32 val = ((u16 *) gAlBankSets)[canonicalize_index(SOUND_POOL_SEQ, seqId)];
+    s32 v = gAlBankSets[val++];
 
     while (v > 0) {
         func_802f3f08(SOUND_POOL_BANK, canonicalize_index(SOUND_POOL_BANK, gAlBankSets[val++]), numChunks, arg2, retQueue);
@@ -402,9 +399,7 @@ void func_sh_802f3158(s32 seqId, s32 numChunks, s32 arg2, OSMesgQueue *retQueue)
 }
 
 u8 *func_sh_802f3220(u32 seqId, u32 *a1) {
-    s32 val;
-
-    val = ((u16 *) gAlBankSets)[canonicalize_index(SOUND_POOL_SEQ, seqId)];
+    s32 val = ((u16 *) gAlBankSets)[canonicalize_index(SOUND_POOL_SEQ, seqId)];
     *a1 = gAlBankSets[val++];
     if (*a1 == 0) {
         return NULL;
@@ -430,7 +425,6 @@ void func_sh_802f3288(s32 idx) {
 
             continue;
         }
-
     }
 }
 
@@ -451,7 +445,6 @@ void func_sh_802f3368(s32 bankId) {
         if (persistent->entries[i].id == bankId) {
             persistent->entries[i].id = -1;
         }
-
     }
 
     discard_bank(bankId);
@@ -849,7 +842,7 @@ void *func_802f3f08(s32 poolIdx, s32 idx, s32 numChunks, s32 arg3, OSMesgQueue *
     void *vAddr = get_bank_or_seq_wrapper(poolIdx, idx);
     if (vAddr != NULL) {
         loadStatus = SOUND_LOAD_STATUS_COMPLETE;
-        osSendMesg(retQueue, (OSMesg) (arg3 << 0x18), 0);
+        osSendMesg(retQueue, (OSMesg) (arg3 << 24), 0);
     } else {
         ALSeqFile *f = get_audio_file_header(poolIdx);
         s32 size = f->seqArray[idx].len;

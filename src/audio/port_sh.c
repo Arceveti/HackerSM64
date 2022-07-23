@@ -17,7 +17,7 @@ extern s32 D_SH_80314FC8;
 extern struct SPTask *D_SH_80314FCC;
 extern u8 D_SH_80315098;
 extern u8 D_SH_8031509C;
-extern OSMesgQueue *gShAudioMesgQueuePtr1;
+// extern OSMesgQueue *gShAudioMesgQueuePtr1;
 
 void func_8031D690(s32 playerIndex, s32 numFrames);
 void seq_player_fade_to_zero_volume(s32 player, s32 numFrames);
@@ -36,7 +36,7 @@ struct SPTask *create_next_audio_frame_task(void) {
     s32 writtenCmdsCopy;
 
     gAudioFrameCount++;
-    if (gAudioFrameCount % gAudioBufferParameters.presetUnk4 != 0) {
+    if ((gAudioFrameCount % gAudioBufferParameters.presetUnk4) != 0) {
         if ((gAudioFrameCount % gAudioBufferParameters.presetUnk4) + 1 == gAudioBufferParameters.presetUnk4) {
             return D_SH_80314FCC;
         }
@@ -47,7 +47,7 @@ struct SPTask *create_next_audio_frame_task(void) {
     gAudioTaskIndex ^= 1;
     gCurrAiBufferIndex++;
     gCurrAiBufferIndex %= NUMAIBUFFERS;
-    index = (gCurrAiBufferIndex - 2 + NUMAIBUFFERS) % NUMAIBUFFERS;
+    index = (((gCurrAiBufferIndex - 2) + NUMAIBUFFERS) % NUMAIBUFFERS);
     samplesRemainingInAI = osAiGetLength() / 4;
 
     if (gAudioLoadLockSH < 0x10U) {
@@ -100,7 +100,7 @@ struct SPTask *create_next_audio_frame_task(void) {
         gAiBufferLengths[index] = gAudioBufferParameters.maxAiBufferLength;
     }
 
-    if (osRecvMesg(gShAudioMesgQueuePtr1, (OSMesg *) &sp34, 0) != -1) {
+    if (osRecvMesg(gShAudioMesgQueuePtr1, (OSMesg *) &sp34, 0) != -1) { //! Should this just be a while loop?
         do {
             func_802ad7ec(sp34);
         } while (osRecvMesg(gShAudioMesgQueuePtr1, (OSMesg *) &sp34, 0) != -1);
@@ -153,21 +153,21 @@ void eu_process_audio_cmd(struct EuAudioCmd *cmd) {
 
     switch (cmd->u.s.op) {
         case 0x81:
-            preload_sequence(cmd->u.s.arg2, 3);
+            preload_sequence(cmd->u.s.seqId, 3);
             break;
 
         case 0x82:
         case 0x88:
-            load_sequence(cmd->u.s.arg1, cmd->u.s.arg2, cmd->u.s.arg3);
-            func_8031D690(cmd->u.s.arg1, cmd->u2.as_s32);
+            load_sequence(cmd->u.s.player, cmd->u.s.seqId, cmd->u.s.arg3);
+            func_8031D690(cmd->u.s.player, cmd->u2.as_s32);
             break;
 
         case 0x83:
-            if (gSequencePlayers[cmd->u.s.arg1].enabled) {
+            if (gSequencePlayers[cmd->u.s.player].enabled) {
                 if (cmd->u2.as_s32 == 0) {
-                    sequence_player_disable(&gSequencePlayers[cmd->u.s.arg1]);
+                    sequence_player_disable(&gSequencePlayers[cmd->u.s.player]);
                 } else {
-                    seq_player_fade_to_zero_volume(cmd->u.s.arg1, cmd->u2.as_s32);
+                    seq_player_fade_to_zero_volume(cmd->u.s.player, cmd->u2.as_s32);
                 }
             }
             break;
@@ -205,19 +205,19 @@ void eu_process_audio_cmd(struct EuAudioCmd *cmd) {
             break;
 
         case 0xf3:
-            func_sh_802f3024(cmd->u.s.arg1, cmd->u.s.arg2, cmd->u.s.arg3);
+            func_sh_802f3024(cmd->u.s.player, cmd->u.s.seqId, cmd->u.s.arg3);
             break;
 
         case 0xf4:
-            func_sh_802f30f4(cmd->u.s.arg1, cmd->u.s.arg2, cmd->u.s.arg3, &gUnkQueue1);
+            func_sh_802f30f4(cmd->u.s.player, cmd->u.s.seqId, cmd->u.s.arg3, &gUnkQueue1);
             break;
 
         case 0xf5:
-            func_sh_802f3158(cmd->u.s.arg1, cmd->u.s.arg2, cmd->u.s.arg3, &gUnkQueue1);
+            func_sh_802f3158(cmd->u.s.player, cmd->u.s.seqId, cmd->u.s.arg3, &gUnkQueue1);
             break;
 
         case 0xf6:
-            func_sh_802f3288(cmd->u.s.arg2);
+            func_sh_802f3288(cmd->u.s.seqId);
             break;
     }
 }
@@ -261,27 +261,27 @@ void port_eu_init_queues(void) {
 }
 
 extern struct EuAudioCmd sAudioCmd[0x100];
-void func_802ad6f0(s32 first, s32 *arg1) {
+void sequence_channel_op(s32 bits, s32 *arg) {
     struct EuAudioCmd *cmd = &sAudioCmd[gShCurrSeqChannelCmdIndex & 0xff];
-    cmd->u.first = first;
-    cmd->u2.as_u32 = *arg1;
+    cmd->u.first = bits;
+    cmd->u2.as_u32 = *arg;
     gShCurrSeqChannelCmdIndex++;
     if (gShCurrSeqChannelCmdIndex == gShPrevSeqChannelCmdIndex) {
         gShCurrSeqChannelCmdIndex--;
     }
 }
 
-void func_802ad728(u32 first, f32 arg1) {
-    func_802ad6f0(first, (s32 *) &arg1);
+void sequence_channel_op_f32(u32 bits, f32 arg) {
+    sequence_channel_op(bits, (s32 *) &arg);
 }
 
-void func_802ad74c(u32 first, u32 arg1) {
-    func_802ad6f0(first, (s32 *) &arg1);
+void sequence_channel_op_u32(u32 bits, u32 arg) {
+    sequence_channel_op(bits, (s32 *) &arg);
 }
 
-void func_802ad770(u32 first, s8 arg1) {
-    s32 sp1C = (arg1 << 24);
-    func_802ad6f0(first, &sp1C);
+void sequence_channel_op_s8(u32 bits, s8 arg) {
+    s32 shiftedArg = (arg << 24);
+    sequence_channel_op(bits, &shiftedArg);
 }
 
 char shindouDebugPrint133[] = "AudioSend: %d -> %d (%d)\n";
@@ -291,9 +291,9 @@ void func_sh_802F64C8(void) {
     s32 mesg;
 
     if (((gShCurrSeqChannelCmdIndex - gShPrevSeqChannelCmdIndex + 0x100) & 0xff) > D_SH_8031503C) {
-        D_SH_8031503C = (gShCurrSeqChannelCmdIndex - gShPrevSeqChannelCmdIndex + 0x100) & 0xff;
+        D_SH_8031503C = ((gShCurrSeqChannelCmdIndex - gShPrevSeqChannelCmdIndex + 0x100) & 0xff);
     }
-    mesg = ((gShPrevSeqChannelCmdIndex & 0xff) << 8) | (gShCurrSeqChannelCmdIndex & 0xff);
+    mesg = (((gShPrevSeqChannelCmdIndex & 0xff) << 8) | (gShCurrSeqChannelCmdIndex & 0xff));
     osSendMesg(gShAudioMesgQueuePtr1, (OSMesg)mesg, OS_MESG_NOBLOCK);
     gShPrevSeqChannelCmdIndex = gShCurrSeqChannelCmdIndex;
 }
@@ -334,8 +334,8 @@ void func_802ad7ec(u32 arg0) {
             break;
         } else if ((cmd->u.s.op & 0xf0) == 0xf0) {
             eu_process_audio_cmd(cmd);
-        } else if (cmd->u.s.arg1 < SEQUENCE_PLAYERS) {
-            seqPlayer = &gSequencePlayers[cmd->u.s.arg1];
+        } else if (cmd->u.s.player < SEQUENCE_PLAYERS) {
+            seqPlayer = &gSequencePlayers[cmd->u.s.player];
             if ((cmd->u.s.op & 0x80) != 0) {
                 eu_process_audio_cmd(cmd);
             } else if ((cmd->u.s.op & 0x40) != 0) {
@@ -363,8 +363,8 @@ void func_802ad7ec(u32 arg0) {
                         seqPlayer->seqVariationEu[cmd->u.s.arg3] = cmd->u2.as_s8;
                         break;
                 }
-            } else if (seqPlayer->enabled && cmd->u.s.arg2 < 0x10) {
-                chan = seqPlayer->channels[cmd->u.s.arg2];
+            } else if (seqPlayer->enabled && cmd->u.s.seqId < 0x10) {
+                chan = seqPlayer->channels[cmd->u.s.seqId];
                 if (IS_SEQUENCE_CHANNEL_VALID(chan)) {
                     switch (cmd->u.s.op) {
                         case 1:

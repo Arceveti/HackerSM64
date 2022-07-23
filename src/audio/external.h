@@ -10,6 +10,8 @@
 // bit which may be read by the sequence script.
 #define SEQUENCE_ARGS(priority, seqId) (((priority) << 8) | (seqId))
 
+#define SEQUENCE_CHANNEL_ARGS(op, player, channel, arg) (((op) << 24) | ((player) << 16) | ((channel) << 8) | (arg))
+
 enum SoundModes {
     SOUND_MODE_STEREO,
     SOUND_MODE_HEADSET,

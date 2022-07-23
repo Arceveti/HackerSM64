@@ -79,9 +79,8 @@ struct ReverbSettingsUS gReverbSettings[18] = {
 struct AudioSessionSettings gAudioSessionPresets[1] = {
     { 32000, MAX_SIMULTANEOUS_NOTES, 1, 0x1000, 0x2FFF, 0x7FFF, PERSISTENT_SEQ_MEM, PERSISTENT_BANK_MEM, TEMPORARY_SEQ_MEM, TEMPORARY_BANK_MEM },
 };
-#endif
+
 // gAudioCosineTable[k] = round((2**15 - 1) * cos(pi/2 * k / 127)). Unused.
-#if defined(VERSION_JP) || defined(VERSION_US)
 u16 gAudioCosineTable[128] = {
     0x7FFF, 32764, 32757, 32744, 32727, 32704, 32677, 32644, 32607, 32564, 32517, 32464, 32407,
     32344,  32277, 32205, 32127, 32045, 31958, 31866, 31770, 31668, 31561, 31450, 31334, 31213,
@@ -94,7 +93,7 @@ u16 gAudioCosineTable[128] = {
      9196,   8806,  8415,  8023,  7630,  7235,  6839,  6442,  6044,  5646,  5246,  4845,  4444,
      4042,   3640,  3237,  2833,  2429,  2025,  1620,  1216,   810,   405,     0,
 };
-#endif
+#endif // (VERSION_JP || VERSION_US)
 
 // Transforms a pitch scale factor in -127..127 into a frequency scale factor
 // between -1 and +1 octave.
