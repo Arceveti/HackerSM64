@@ -47,7 +47,7 @@
 // Makes signs and NPCs easier to talk to.
 // #define EASIER_DIALOG_TRIGGER
 
-// Shows an "A" when Mario is able to talk [requires EASIER_DIALOG_TRIGGER].
+// Shows an "A" when Mario is able to talk to a sign or NPC.
 // #define DIALOG_INDICATOR
 
 // Include the English characters that were missing from US segment2
