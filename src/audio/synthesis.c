@@ -910,12 +910,12 @@ u64 *synthesis_process_notes(s16 *aiBuf, s32 bufLen, u64 *cmd)
         resamplingRateFixedPoint = noteSubEu->resamplingRateFixedPoint;
         nParts = noteSubEu->hasTwoAdpcmParts + 1;
         samplesLenFixedPoint = (resamplingRateFixedPoint * tempBufLen * 2) + synthesisState->samplePosFrac;
-        synthesisState->samplePosFrac = samplesLenFixedPoint & 0xFFFF;
+        synthesisState->samplePosFrac = (samplesLenFixedPoint & 0xFFFF);
 
         if (noteSubEu->isSyntheticWave) {
-            cmd = load_wave_samples(cmd, noteSubEu, synthesisState, samplesLenFixedPoint >> 0x10);
+            cmd = load_wave_samples(cmd, noteSubEu, synthesisState, (samplesLenFixedPoint >> 0x10));
             noteSamplesDmemAddrBeforeResampling = (synthesisState->samplePosInt * 2) + DMEM_ADDR_UNCOMPRESSED_NOTE;
-            synthesisState->samplePosInt += samplesLenFixedPoint >> 0x10;
+            synthesisState->samplePosInt += (samplesLenFixedPoint >> 0x10);
         } else {
             // ADPCM note
             audioBookSample = noteSubEu->sound.audioBankSound->sample;
@@ -928,16 +928,14 @@ u64 *synthesis_process_notes(s16 *aiBuf, s32 bufLen, u64 *cmd)
 
     for (noteIndex = 0; noteIndex < gMaxSimultaneousNotes; noteIndex++) {
         note = &gNotes[noteIndex];
+        if (
  #ifdef VERSION_US
-        //! This function requires note->enabled to be volatile, but it breaks other functions like note_enable.
-        //! Casting to a struct with just the volatile bitfield works, but there may be a better way to match.
-        if (((struct vNote *)note)->enabled && !IS_BANK_LOAD_COMPLETE(note->bankId))
- #else // !VERSION_US
-        if (!IS_BANK_LOAD_COMPLETE(note->bankId))
- #endif // !VERSION_US
-        {
+            note->enabled && 
+ #endif
+            !IS_BANK_LOAD_COMPLETE(note->bankId)
+        ) {
             gAudioErrorFlags = (note->bankId << 8) + noteIndex + 0x1000000;
-        } else if (((struct vNote *)note)->enabled) {
+        } else if (note->enabled) {
             flags = 0;
             if (note->needsInit) {
                 flags = A_INIT;
@@ -967,7 +965,7 @@ u64 *synthesis_process_notes(s16 *aiBuf, s32 bufLen, u64 *cmd)
             if (note->sound == NULL) {
                 // A wave synthesis note (not ADPCM)
 
-                cmd = load_wave_samples(cmd, note, samplesLenFixedPoint >> 0x10);
+                cmd = load_wave_samples(cmd, note, (samplesLenFixedPoint >> 0x10));
                 noteSamplesDmemAddrBeforeResampling = DMEM_ADDR_UNCOMPRESSED_NOTE + note->samplePosInt * 2;
                 note->samplePosInt += (samplesLenFixedPoint >> 0x10);
                 flags = 0;
@@ -985,7 +983,7 @@ u64 *synthesis_process_notes(s16 *aiBuf, s32 bufLen, u64 *cmd)
                     s5 = 0;                     // s4
 
                     if (nParts == 1) {
-                        samplesLenAdjusted = samplesLenFixedPoint >> 0x10;
+                        samplesLenAdjusted = (samplesLenFixedPoint >> 0x10);
                     } else if ((samplesLenFixedPoint >> 0x10) & 1) {
                         samplesLenAdjusted = ((samplesLenFixedPoint >> 0x10) & ~1) + (curPart * 2);
                     } else {
@@ -1005,7 +1003,7 @@ u64 *synthesis_process_notes(s16 *aiBuf, s32 bufLen, u64 *cmd)
                     }
 #else
                         nEntries = audioBookSample->book->order * audioBookSample->book->npredictors;
-                        aLoadADPCM(cmd++, nEntries * 16, VIRTUAL_TO_PHYSICAL2(curLoadedBook));
+                        aLoadADPCM(cmd++, (nEntries * 16), VIRTUAL_TO_PHYSICAL2(curLoadedBook));
                     }
 #endif
 
@@ -1017,7 +1015,7 @@ u64 *synthesis_process_notes(s16 *aiBuf, s32 bufLen, u64 *cmd)
                         restart = FALSE;
                         nSamplesToProcess = samplesLenAdjusted - nAdpcmSamplesProcessed;
 #ifdef VERSION_EU
-                        s2 = synthesisState->samplePosInt & 0xf;
+                        s2 = (synthesisState->samplePosInt & 0xf);
                         samplesRemaining = endPos - synthesisState->samplePosInt;
 
                         if (s2 == 0 && !synthesisState->restart)
@@ -1166,7 +1164,7 @@ u64 *synthesis_process_notes(s16 *aiBuf, s32 bufLen, u64 *cmd)
 #else // !VERSION_EU
                             note->samplePosInt = 0;
                             note->finished = TRUE;
-                            ((struct vNote *)note)->enabled = FALSE; //! Why vNote?
+                            note->enabled = FALSE;
                             break;
                         }
 

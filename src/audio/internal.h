@@ -672,12 +672,6 @@ struct Note {
     /*    , 0xB0, 0xB4*/ struct NoteSubEu noteSubEu;
 }; // size = 0xC0, known to be 0xC8 on SH
 #else
-// volatile Note, needed in synthesis_process_notes
-struct vNote {
-    /* U/J, EU  */
-    /*0x00*/ volatile u8 enabled : 1;
-    long long int force_structure_alignment;
-}; // size = 0xC0
 struct Note {
     /* U/J, EU  */
     /*0x00*/ u8 enabled              : 1;
