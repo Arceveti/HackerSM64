@@ -171,8 +171,8 @@ void eu_process_audio_cmd(struct EuAudioCmd *cmd) {
 }
 
 extern OSMesgQueue *OSMesgQueues[];
-extern u8 D_EU_80302010;
-extern u8 D_EU_80302014;
+extern u8 gEuCurrSeqChannelCmdIndex;
+extern u8 gEuPrevSeqChannelCmdIndex;
 extern OSMesg OSMesg0;
 extern OSMesg OSMesg1;
 extern OSMesg OSMesg2;
@@ -204,8 +204,8 @@ void func_8031D690(s32 player, s32 fadeInTime) {
 }
 
 void port_eu_init_queues(void) {
-    D_EU_80302010 = 0;
-    D_EU_80302014 = 0;
+    gEuCurrSeqChannelCmdIndex = 0;
+    gEuPrevSeqChannelCmdIndex = 0;
     osCreateMesgQueue(OSMesgQueues[0], &OSMesg0, 1);
     osCreateMesgQueue(OSMesgQueues[1], &OSMesg1, 4);
     osCreateMesgQueue(OSMesgQueues[2], &OSMesg2, 1);
@@ -213,10 +213,10 @@ void port_eu_init_queues(void) {
 }
 
 void func_802ad6f0(s32 first, s32 *arg1) {
-    struct EuAudioCmd *cmd = &sAudioCmd[D_EU_80302010 & 0xff];
+    struct EuAudioCmd *cmd = &sAudioCmd[gEuCurrSeqChannelCmdIndex & 0xff];
     cmd->u.first = first;
     cmd->u2.as_u32 = *arg1;
-    D_EU_80302010++;
+    gEuCurrSeqChannelCmdIndex++;
 }
 
 void func_802ad728(u32 first, f32 arg1) {
@@ -234,9 +234,9 @@ void func_802ad770(u32 first, s8 arg1) {
 
 void func_802ad7a0(void) {
     osSendMesg(OSMesgQueues[1],
-            (OSMesg)(u32)((D_EU_80302014 & 0xff) << 8 | (D_EU_80302010 & 0xff)),
+            (OSMesg)(u32)((gEuPrevSeqChannelCmdIndex & 0xff) << 8 | (gEuCurrSeqChannelCmdIndex & 0xff)),
             OS_MESG_NOBLOCK);
-    D_EU_80302014 = D_EU_80302010;
+    gEuPrevSeqChannelCmdIndex = gEuCurrSeqChannelCmdIndex;
 }
 
 void func_802ad7ec(u32 arg0) {

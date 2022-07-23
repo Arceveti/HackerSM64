@@ -380,8 +380,8 @@ s32 pad2[2];    // it's not just that the struct is bigger than we think, becaus
 OSMesg OSMesg2; // and none here. wth nintendo
 OSMesg OSMesg3;
 #else // VERSION_SH
-extern OSMesgQueue *D_SH_80350F88;
-extern OSMesgQueue *D_SH_80350FA8;
+extern OSMesgQueue *gShAudioMesgQueuePtr2;
+extern OSMesgQueue *gShAudioMesgQueuePtr3;
 #endif
 
 // some sort of main thread -> sound thread dispatchers
@@ -404,11 +404,11 @@ void func_80320ED8(void);
 void audio_reset_session_eu(s32 presetId) {
     OSMesg mesg;
  #ifdef VERSION_SH
-    osRecvMesg(D_SH_80350FA8, &mesg, OS_MESG_NOBLOCK);
-    osSendMesg(D_SH_80350F88, (OSMesg) presetId, OS_MESG_NOBLOCK);
-    osRecvMesg(D_SH_80350FA8, &mesg, OS_MESG_BLOCK);
+    osRecvMesg(gShAudioMesgQueuePtr3, &mesg, OS_MESG_NOBLOCK);
+    osSendMesg(gShAudioMesgQueuePtr2, (OSMesg) presetId, OS_MESG_NOBLOCK);
+    osRecvMesg(gShAudioMesgQueuePtr3, &mesg, OS_MESG_BLOCK);
     if ((s32) mesg != presetId) {
-        osRecvMesg(D_SH_80350FA8, &mesg, OS_MESG_BLOCK);
+        osRecvMesg(gShAudioMesgQueuePtr3, &mesg, OS_MESG_BLOCK);
     }
 
  #else // !VERSION_SH

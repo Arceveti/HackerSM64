@@ -888,8 +888,8 @@ volatile s32 gAudioLoadLock = AUDIO_LOCK_UNINITIALIZED;
 
 #ifdef VERSION_EU
 u8 bufferDelete2[12] = { 0 };
-u8 D_EU_80302010 = 0;
-u8 D_EU_80302014 = 0;
+u8 gEuCurrSeqChannelCmdIndex = 0;
+u8 gEuPrevSeqChannelCmdIndex = 0;
 
 struct OSMesgQueue *OSMesgQueues[4] = {
     &OSMesgQueue0,
@@ -919,8 +919,8 @@ struct SPTask *gAudioTask;
 struct SPTask gAudioTasks[2];
 
 #if defined(VERSION_EU) || defined(VERSION_SH)
-f32 D_EU_802298D0;
-s32 gRefreshRate;
+f32 D_EU_802298D0; // set to 16.713f in audio_init; ms per refresh?
+s32 gRefreshRate; // set to 60 in audio_init
 #endif
 
 ALIGNED8 s16 *gAiBuffers[NUMAIBUFFERS];
@@ -935,24 +935,24 @@ s32 gAudioErrorFlags;
 #ifdef VERSION_SH
 volatile u32 gAudioLoadLockSH;
 struct EuAudioCmd sAudioCmd[0x100];
-u8 D_SH_80350F18;
-u8 D_SH_80350F19;
+u8 gShCurrSeqChannelCmdIndex;
+u8 gShPrevSeqChannelCmdIndex;
 
-OSMesg D_SH_80350F1C[1];
-OSMesgQueue D_SH_80350F20; // address written to D_SH_80350F38
-OSMesgQueue *D_SH_80350F38;
+OSMesg gShAudioMesg0[1];
+OSMesgQueue gShAudioMesgQueue0; // address written to gShAudioMesgQueuePtr0
+OSMesgQueue *gShAudioMesgQueuePtr0;
 
-OSMesg D_SH_80350F40[4];
-OSMesgQueue D_SH_80350F50; // address written to D_SH_80350F68
-OSMesgQueue *D_SH_80350F68;
+OSMesg gShAudioMesg1[4];
+OSMesgQueue gShAudioMesgQueue1; // address written to gShAudioMesgQueuePtr1
+OSMesgQueue *gShAudioMesgQueuePtr1;
 
-OSMesg D_SH_80350F6C[1];
-OSMesgQueue D_SH_80350F70; // address written to D_SH_80350F88
-OSMesgQueue *D_SH_80350F88;
+OSMesg gShAudioMesg2[1];
+OSMesgQueue gShAudioMesgQueue2; // address written to gShAudioMesgQueuePtr2
+OSMesgQueue *gShAudioMesgQueuePtr2;
 
-OSMesg D_SH_80350F8C[1];
-OSMesgQueue D_SH_80350F90; // address written to D_SH_80350F90
-OSMesgQueue *D_SH_80350FA8;
+OSMesg gShAudioMesg3[1];
+OSMesgQueue gShAudioMesgQueue3; // address written to gShAudioMesgQueuePtr3
+OSMesgQueue *gShAudioMesgQueuePtr3;
 #endif
 
 u64 gAudioGlobalsEndMarker;

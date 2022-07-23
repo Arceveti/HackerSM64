@@ -162,24 +162,24 @@ extern f32 unk_sh_data_1[];
 
 extern volatile u32 gAudioLoadLockSH;
 
-extern u8 D_SH_80350F18;
-extern u8 D_SH_80350F19;
+extern u8 gShCurrSeqChannelCmdIndex;
+extern u8 gShPrevSeqChannelCmdIndex;
 
-extern OSMesg D_SH_80350F1C[1];
-extern OSMesgQueue D_SH_80350F20; // address written to D_SH_80350F38
-extern OSMesgQueue *D_SH_80350F38;
+extern OSMesg gShAudioMesg0[1];
+extern OSMesgQueue gShAudioMesgQueue0; // address written to gShAudioMesgQueuePtr0
+extern OSMesgQueue *gShAudioMesgQueuePtr0;
 
-extern OSMesg D_SH_80350F40[4];
-extern OSMesgQueue D_SH_80350F50; // address written to D_SH_80350F68
-extern OSMesgQueue *D_SH_80350F68;
+extern OSMesg gShAudioMesg1[4];
+extern OSMesgQueue gShAudioMesgQueue1; // address written to gShAudioMesgQueuePtr1
+extern OSMesgQueue *gShAudioMesgQueuePtr1;
 
-extern OSMesg D_SH_80350F6C[1];
-extern OSMesgQueue D_SH_80350F70; // address written to D_SH_80350F88
-extern OSMesgQueue *D_SH_80350F88;
+extern OSMesg gShAudioMesg2[1];
+extern OSMesgQueue gShAudioMesgQueue2; // address written to gShAudioMesgQueuePtr2
+extern OSMesgQueue *gShAudioMesgQueuePtr2;
 
-extern OSMesg D_SH_80350F8C[1];
-extern OSMesgQueue D_SH_80350F90; // address written to D_SH_80350F90
-extern OSMesgQueue *D_SH_80350FA8;
+extern OSMesg gShAudioMesg3[1];
+extern OSMesgQueue gShAudioMesgQueue3; // address written to gShAudioMesgQueuePtr3
+extern OSMesgQueue *gShAudioMesgQueuePtr3;
 #endif
 
 #if defined(VERSION_EU) || defined(VERSION_SH)
