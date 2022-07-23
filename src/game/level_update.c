@@ -507,12 +507,11 @@ void check_instant_warp(void) {
     struct Surface *floor = gMarioState->floor;
 
 #ifdef ENABLE_VANILLA_LEVEL_SPECIFIC_CHECKS
- #ifdef UNLOCK_ALL
-    if (gCurrLevelNum == LEVEL_CASTLE) {
- #else // !UNLOCK_ALL
     if (gCurrLevelNum == LEVEL_CASTLE
-        && save_file_get_total_star_count((gCurrSaveFileNum - 1), COURSE_NUM_TO_INDEX(COURSE_MIN), COURSE_NUM_TO_INDEX(COURSE_MAX)) >= 70) {
- #endif // !UNLOCK_ALL
+ #ifndef UNLOCK_ALL
+     && (save_file_get_total_star_count((gCurrSaveFileNum - 1), COURSE_NUM_TO_INDEX(COURSE_MIN), COURSE_NUM_TO_INDEX(COURSE_MAX)) >= 70)
+ #endif // UNLOCK_ALL
+    ) {
         return;
     }
 #endif // ENABLE_VANILLA_LEVEL_SPECIFIC_CHECKS

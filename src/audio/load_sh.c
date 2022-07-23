@@ -1016,8 +1016,8 @@ void audio_init() {
 
     // Load headers for sounds and sequences
     gSeqFileHeader = (ALSeqFile *) gShindouSequencesHeader;
-    gAlCtlHeader = (ALSeqFile *) gShindouSoundBanksHeader;
-    gAlTbl = (ALSeqFile *) gShindouSampleBanksHeader;
+    gAlCtlHeader   = (ALSeqFile *) gShindouSoundBanksHeader;
+    gAlTbl         = (ALSeqFile *) gShindouSampleBanksHeader;
     gAlBankSets = gBankSetsData;
     gSequenceCount = (s16) gSeqFileHeader->seqCount;
     patch_seq_file(gSeqFileHeader, gMusicData, D_SH_80315EF4);
@@ -1026,10 +1026,10 @@ void audio_init() {
     seqCount = gAlCtlHeader->seqCount;
     gCtlEntries = sound_alloc_uninitialized(&gAudioInitPool, seqCount * sizeof(struct CtlEntry));
     for (i = 0; i < seqCount; i++) {
-        gCtlEntries[i].bankId1 = (u8) ((gAlCtlHeader->seqArray[i].ctl.as_s16.bankAndFf >> 8) & 0xff);
-        gCtlEntries[i].bankId2 = (u8) (gAlCtlHeader->seqArray[i].ctl.as_s16.bankAndFf & 0xff);
+        gCtlEntries[i].bankId1        = (u8) ((gAlCtlHeader->seqArray[i].ctl.as_s16.bankAndFf >> 8) & 0xff);
+        gCtlEntries[i].bankId2        = (u8) ((gAlCtlHeader->seqArray[i].ctl.as_s16.bankAndFf     ) & 0xff);
         gCtlEntries[i].numInstruments = (u8) ((gAlCtlHeader->seqArray[i].ctl.as_s16.numInstrumentsAndDrums >> 8) & 0xff);
-        gCtlEntries[i].numDrums = (u8) (gAlCtlHeader->seqArray[i].ctl.as_s16.numInstrumentsAndDrums & 0xff);
+        gCtlEntries[i].numDrums       = (u8) ((gAlCtlHeader->seqArray[i].ctl.as_s16.numInstrumentsAndDrums     ) & 0xff);
     }
     data = sound_alloc_uninitialized(&gAudioInitPool, D_SH_80315EF0);
     if (data == NULL) {

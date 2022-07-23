@@ -184,17 +184,19 @@ void discard_bank(s32 bankId) {
         struct Note *note = &gNotes[i];
 
 #ifdef VERSION_EU
-        if (note->noteSubEu.bankId == bankId) {
+        if (note->noteSubEu.bankId == bankId)
 #else
-        if (note->bankId == bankId) {
+        if (note->bankId == bankId)
 #endif
+        {
             // (These prints are unclear. Arguments are picked semi-randomly.)
             eu_stubbed_printf_1("Warning:Kill Note  %x \n", i);
 #ifdef VERSION_SH
-            if (note->unkSH34 == NOTE_PRIORITY_DISABLED && note->priority) {
+            if (note->unkSH34 == NOTE_PRIORITY_DISABLED && note->priority)
 #else
-            if (note->priority >= NOTE_PRIORITY_MIN) {
+            if (note->priority >= NOTE_PRIORITY_MIN)
 #endif
+            {
 #ifdef VERSION_EU
                 eu_stubbed_printf_3("Kill Voice %d (ID %d) %d\n", note->waveId,
                         bankId, note->priority);
@@ -370,10 +372,11 @@ void temporary_pools_init(struct PoolSplit *a) {
 #undef SOUND_ALLOC_FUNC
 
 #ifdef VERSION_SH
-void *alloc_bank_or_seq(s32 poolIdx, s32 size, s32 arg3, s32 id) {
+void *alloc_bank_or_seq(s32 poolIdx, s32 size, s32 arg3, s32 id)
 #else
-void *alloc_bank_or_seq(struct SoundMultiPool *loadedPool, s32 arg1, s32 size, s32 arg3, s32 id) {
+void *alloc_bank_or_seq(struct SoundMultiPool *loadedPool, s32 arg1, s32 size, s32 arg3, s32 id)
 #endif
+{
     // arg3 = 0, 1 or 2?
 
 #ifdef VERSION_SH
@@ -693,12 +696,13 @@ size = ALIGN16(size);
  #endif
     loadedPool->persistent.entries[loadedPool->persistent.numEntries].ptr = ret;
 
-    if (ret == NULL) {
+    if (ret == NULL)
 #else // (VERSION_JP || VERSION_US)
     loadedPool->persistent.entries[loadedPool->persistent.numEntries].ptr = soundAlloc(&loadedPool->persistent.pool, (arg1 * size));
 
-    if (loadedPool->persistent.entries[loadedPool->persistent.numEntries].ptr == NULL) {
+    if (loadedPool->persistent.entries[loadedPool->persistent.numEntries].ptr == NULL)
 #endif // (VERSION_JP || VERSION_US)
+    {
         switch (arg3) {
             case 2:
 #ifdef VERSION_SH

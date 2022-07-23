@@ -44,7 +44,7 @@ void bhv_jet_stream_water_ring_init(void) {
 
 void water_ring_check_collection(UNUSED f32 avgScale, struct Object *ringManager) {
 #ifdef FIX_WATER_RINGS
-    if (o->oInteractStatus & INT_STATUS_INTERACTED) {
+    if (o->oInteractStatus & INT_STATUS_INTERACTED)
 #else
     f32 marioDistInFront = water_ring_calc_mario_dist();
 
@@ -56,8 +56,9 @@ void water_ring_check_collection(UNUSED f32 avgScale, struct Object *ringManager
         return;
     }
 
-    if (o->oWaterRingMarioDistInFront * marioDistInFront < 0.0f) {
+    if (o->oWaterRingMarioDistInFront * marioDistInFront < 0.0f)
 #endif
+    {
         struct Object *ringSpawner = o->parentObj;
 
         if (ringSpawner) {

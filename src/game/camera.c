@@ -2919,7 +2919,9 @@ void update_camera(struct Camera *c) {
     start_cutscene(c, get_cutscene_from_mario_status(c));
     gCollisionFlags &= ~COLLISION_FLAG_CAMERA;
 #ifdef PUPPYCAM
-    if (!gPuppyCam.enabled || c->cutscene != CUTSCENE_NONE || gCurrentArea->camera->mode == CAMERA_MODE_INSIDE_CANNON) {
+    if (!gPuppyCam.enabled
+     || c->cutscene != CUTSCENE_NONE
+     || gCurrentArea->camera->mode == CAMERA_MODE_INSIDE_CANNON) {
 #endif
 #ifdef ENABLE_VANILLA_CAM_PROCESSING
     if (gCurrLevelNum != LEVEL_CASTLE) {

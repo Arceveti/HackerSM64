@@ -842,12 +842,11 @@ u64 *synthesis_do_one_audio_update(s16 *aiBuf, s32 bufLen, u64 *cmd, s32 updateI
 
 #ifdef VERSION_EU
 // Processes just one note, not all
-u64 *synthesis_process_note(struct Note *note, struct NoteSubEu *noteSubEu, struct NoteSynthesisState *synthesisState, UNUSED s16 *aiBuf, s32 bufLen, u64 *cmd) {
+u64 *synthesis_process_note(struct Note *note, struct NoteSubEu *noteSubEu, struct NoteSynthesisState *synthesisState, UNUSED s16 *aiBuf, s32 bufLen, u64 *cmd)
 #else
-u64 *synthesis_process_notes(s16 *aiBuf, s32 bufLen, u64 *cmd) {
-    s32 noteIndex;                           // sp174
-    struct Note *note;                       // s7
+u64 *synthesis_process_notes(s16 *aiBuf, s32 bufLen, u64 *cmd)
 #endif
+{
     struct AudioBankSample *audioBookSample; // sp164, sp138
     struct AdpcmLoop *loopInfo;              // sp160, sp134
     s16 *curLoadedBook = NULL;               // sp154, sp130
@@ -920,6 +919,9 @@ u64 *synthesis_process_notes(s16 *aiBuf, s32 bufLen, u64 *cmd) {
             // ADPCM note
             audioBookSample = noteSubEu->sound.audioBankSound->sample;
 #else // !VERSION_EU
+    s32 noteIndex;                           // sp174
+    struct Note *note;                       // s7
+
     s32 t9;
     f32 resamplingRate; // f12
 
@@ -928,10 +930,11 @@ u64 *synthesis_process_notes(s16 *aiBuf, s32 bufLen, u64 *cmd) {
  #ifdef VERSION_US
         //! This function requires note->enabled to be volatile, but it breaks other functions like note_enable.
         //! Casting to a struct with just the volatile bitfield works, but there may be a better way to match.
-        if (((struct vNote *)note)->enabled && !IS_BANK_LOAD_COMPLETE(note->bankId)) {
+        if (((struct vNote *)note)->enabled && !IS_BANK_LOAD_COMPLETE(note->bankId))
  #else // !VERSION_US
-        if (!IS_BANK_LOAD_COMPLETE(note->bankId)) {
+        if (!IS_BANK_LOAD_COMPLETE(note->bankId))
  #endif // !VERSION_US
+        {
             gAudioErrorFlags = (note->bankId << 8) + noteIndex + 0x1000000;
         } else if (((struct vNote *)note)->enabled) {
             flags = 0;
@@ -1016,13 +1019,14 @@ u64 *synthesis_process_notes(s16 *aiBuf, s32 bufLen, u64 *cmd) {
                         s2 = synthesisState->samplePosInt & 0xf;
                         samplesRemaining = endPos - synthesisState->samplePosInt;
 
-                        if (s2 == 0 && !synthesisState->restart) {
+                        if (s2 == 0 && !synthesisState->restart)
 #else
                         s2 = note->samplePosInt & 0xf;
                         samplesRemaining = endPos - note->samplePosInt;
 
-                        if (s2 == 0 && !note->restart) {
+                        if (s2 == 0 && !note->restart)
 #endif
+                        {
                             s2 = 16;
                         }
 
@@ -1191,10 +1195,11 @@ u64 *synthesis_process_notes(s16 *aiBuf, s32 bufLen, u64 *cmd) {
                                     resampledTempLen = samplesLenAdjusted + 4;
                                     noteSamplesDmemAddrBeforeResampling = DMEM_ADDR_RESAMPLED + 4;
 #ifdef VERSION_EU
-                                    if (noteSubEu->finished) {
+                                    if (noteSubEu->finished)
 #else
-                                    if (note->finished) {
+                                    if (note->finished)
 #endif
+                                    {
                                         aClearBuffer(cmd++, DMEM_ADDR_RESAMPLED + resampledTempLen, samplesLenAdjusted + 0x10);
                                     }
                                     break;
@@ -1220,10 +1225,11 @@ u64 *synthesis_process_notes(s16 *aiBuf, s32 bufLen, u64 *cmd) {
                     }
 
 #ifdef VERSION_EU
-                    if (noteSubEu->finished) {
+                    if (noteSubEu->finished)
 #else
-                    if (note->finished) {
+                    if (note->finished)
 #endif
+                    {
                         break;
                     }
                 }

@@ -261,10 +261,11 @@ void init_sample_dma_buffers(UNUSED s32 arg0) {
     sDmaBufSize = DMA_BUF_SIZE_0;
 
 #ifdef VERSION_EU
-    for (i = 0; i < gMaxSimultaneousNotes * 3 * gAudioBufferParameters.presetUnk4; i++) {
+    for (i = 0; i < gMaxSimultaneousNotes * 3 * gAudioBufferParameters.presetUnk4; i++)
 #else
-    for (i = 0; i < gMaxSimultaneousNotes * 3; i++) {
+    for (i = 0; i < gMaxSimultaneousNotes * 3; i++)
 #endif
+    {
         sSampleDmas[gSampleDmaNumListItems].buffer = soundAlloc(&gNotesAndBuffersPool, sDmaBufSize);
         if (sSampleDmas[gSampleDmaNumListItems].buffer == NULL) {
             break;

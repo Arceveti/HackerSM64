@@ -191,15 +191,16 @@ void profiler_print_times() {
     update_rdp_timers();
 
 #ifdef PUPPYPRINT_DEBUG
-    if (fDebug && sPPDebugPage == PUPPYPRINT_PAGE_STANDARD) {
+    if (fDebug && sPPDebugPage == PUPPYPRINT_PAGE_STANDARD)
 #else
     static u8 show_profiler = FALSE;
     if (gPlayer1Controller->buttonPressed & L_TRIG) {
         show_profiler ^= TRUE;
     }
 
-    if (show_profiler) {
+    if (show_profiler)
 #endif
+    {
         for (int i = 0; i < PROFILER_TIME_COUNT; i++) {
             if (i < PROFILER_TIME_TMEM) {
                 microseconds[i] = OS_CYCLES_TO_USEC(all_profiling_data[i].total / PROFILING_BUFFER_SIZE);

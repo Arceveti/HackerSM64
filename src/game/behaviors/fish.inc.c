@@ -26,11 +26,11 @@ static void fish_spawner_act_spawn(void) {
     // Spawn and animate the schoolQuantity of fish if Mario enters render distance
     // or the stage is Secret Aquarium.
     // Fish moves randomly within a range of 700.0f.
-#ifdef ENABLE_VANILLA_LEVEL_SPECIFIC_CHECKS //! TODO: Make this a param
-    if (o->oDistanceToMario < minDistToMario || gCurrLevelNum == LEVEL_SA) {
-#else
-    if (o->oDistanceToMario < minDistToMario) {
+    if (o->oDistanceToMario < minDistToMario
+#ifdef ENABLE_VANILLA_LEVEL_SPECIFIC_CHECKS
+     || gCurrLevelNum == LEVEL_SA //! TODO: Make this a param
 #endif
+    ) {
         struct Object *fishObject;
         for (i = 0; i < schoolQuantity; i++) {
             fishObject = spawn_object(o, model, bhvFish);

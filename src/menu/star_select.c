@@ -234,10 +234,11 @@ void bhv_act_selector_loop(void) {
  * Print the course number selected with the wood rgba16 course texture.
  */
 #if MULTILANG
-void print_course_number(s16 language) {
+void print_course_number(s16 language)
 #else
-void print_course_number(void) {
+void print_course_number(void)
 #endif
+{
     u8 courseNum[4];
 
     create_dl_translation_matrix(MENU_MTX_PUSH, 158.0f, 81.0f, 0.0f);

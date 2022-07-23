@@ -16,11 +16,12 @@ void bhv_collect_star_init(void) {
     s8 starId = GET_BPARAM1(o->oBehParams);
 #ifdef GLOBAL_STAR_IDS
     u8 currentLevelStarFlags = save_file_get_star_flags((gCurrSaveFileNum - 1), COURSE_NUM_TO_INDEX(starId / 7));
-    if (currentLevelStarFlags & (1 << (starId % 7))) {
+    if (currentLevelStarFlags & (1 << (starId % 7)))
 #else
     u8 currentLevelStarFlags = save_file_get_star_flags((gCurrSaveFileNum - 1), COURSE_NUM_TO_INDEX(gCurrCourseNum));
-    if (currentLevelStarFlags & (1 << starId)) {
+    if (currentLevelStarFlags & (1 << starId))
 #endif
+    {
         o->header.gfx.sharedChild = gLoadedGraphNodes[MODEL_TRANSPARENT_STAR];
     } else {
         o->header.gfx.sharedChild = gLoadedGraphNodes[MODEL_STAR];
@@ -46,11 +47,11 @@ void bhv_star_spawn_init(void) {
     o->oForwardVel = o->oStarSpawnDisFromHome / 30.0f;
     o->oStarSpawnVelY = o->oPosY;
 
+    if (o->oBehParams2ndByte == SPAWN_STAR_ARC_CUTSCENE_BP_DEFAULT_STAR
 #ifdef ENABLE_VANILLA_LEVEL_SPECIFIC_CHECKS
-    if (o->oBehParams2ndByte == SPAWN_STAR_ARC_CUTSCENE_BP_DEFAULT_STAR || gCurrCourseNum == COURSE_BBH) {
-#else
-    if (o->oBehParams2ndByte == SPAWN_STAR_ARC_CUTSCENE_BP_DEFAULT_STAR) {
+     || gCurrCourseNum == COURSE_BBH
 #endif
+    ) {
         cutscene_object(CUTSCENE_STAR_SPAWN, o);
     } else {
         cutscene_object(CUTSCENE_RED_COIN_STAR_SPAWN, o);

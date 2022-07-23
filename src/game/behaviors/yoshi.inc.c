@@ -16,12 +16,11 @@ void bhv_yoshi_init(void) {
     o->oBuoyancy = 1.3f;
     o->oInteractionSubtype = INT_SUBTYPE_NPC;
 
-#if defined(ENABLE_VANILLA_LEVEL_SPECIFIC_CHECKS) || defined(UNLOCK_ALL)
-    if (sYoshiDead) {
-#else
     if (sYoshiDead
-        || (save_file_get_total_star_count(gCurrSaveFileNum - 1, COURSE_NUM_TO_INDEX(COURSE_MIN), COURSE_NUM_TO_INDEX(COURSE_MAX)) < 120)) {
+#if !(defined(ENABLE_VANILLA_LEVEL_SPECIFIC_CHECKS) || defined(UNLOCK_ALL))
+     || (save_file_get_total_star_count(gCurrSaveFileNum - 1, COURSE_NUM_TO_INDEX(COURSE_MIN), COURSE_NUM_TO_INDEX(COURSE_MAX)) < 120)
 #endif
+    ) {
         obj_mark_for_deletion(o);
     }
 }
@@ -151,10 +150,11 @@ void yoshi_give_present_loop(void) {
     s32 globalTimer = gGlobalTimer;
 
 #ifdef DISABLE_LIVES
-    if (TRUE) {
+    if (TRUE)
 #else
-    if (gHudDisplay.lives == 100) {
+    if (gHudDisplay.lives == 100)
 #endif
+    {
 #ifdef SAVE_NUM_LIVES
         save_file_set_num_lives(gMarioState->numLives);
 #endif

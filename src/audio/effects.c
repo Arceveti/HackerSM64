@@ -142,10 +142,11 @@ f32 get_portamento_freq_scale(struct Portamento *p) {
     u32 v0 = (u32) p->cur;
 
 #if defined(VERSION_EU) || defined(VERSION_SH)
-    if (v0 > 127) {
+    if (v0 > 127)
 #else
-    if (v0 >= 127) {
+    if (v0 >= 127)
 #endif
+    {
         v0 = 127;
     }
 
@@ -159,7 +160,7 @@ f32 get_portamento_freq_scale(struct Portamento *p) {
 s32 get_vibrato_pitch_change(struct VibratoState *vib) {
 #if defined(VERSION_EU) || defined(VERSION_SH)
     vib->time += (s32) vib->rate;
-    s32 index = (vib->time >> 10) & 0x3F;
+    s32 index = ((vib->time >> 10) & 0x3F);
     return vib->curve[index] >> 8;
 }
 #else

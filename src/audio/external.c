@@ -2299,11 +2299,12 @@ void func_80320ED8(void) {
     }
 
     if (gSequencePlayers[SEQ_PLAYER_ENV].enabled
-        || sBackgroundMusicMaxTargetVolume == TARGET_VOLUME_UNSET || D_EU_80300558 != 0) {
+        || sBackgroundMusicMaxTargetVolume == TARGET_VOLUME_UNSET || D_EU_80300558 != 0)
 #else
     if (gSequencePlayers[SEQ_PLAYER_ENV].enabled
-        || sBackgroundMusicMaxTargetVolume == TARGET_VOLUME_UNSET) {
+        || sBackgroundMusicMaxTargetVolume == TARGET_VOLUME_UNSET)
 #endif
+    {
         return;
     }
 

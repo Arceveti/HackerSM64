@@ -13,10 +13,11 @@ void note_set_resampling_rate(struct Note *note, f32 resamplingRateInput);
 
 #if defined(VERSION_EU) || defined(VERSION_SH)
  #ifdef VERSION_SH
-void note_set_vel_pan_reverb(struct Note *note, struct ReverbInfo *reverbInfo) {
+void note_set_vel_pan_reverb(struct Note *note, struct ReverbInfo *reverbInfo)
  #else // !VERSION_SH == VERSION_EU
-void note_set_vel_pan_reverb(struct Note *note, f32 velocity, u8 pan, u8 reverbVol) {
+void note_set_vel_pan_reverb(struct Note *note, f32 velocity, u8 pan, u8 reverbVol)
  #endif // !VERSION_SH == VERSION_EU
+{
     struct NoteSubEu *sub = &note->noteSubEu;
     f32 volRight, volLeft;
     u8 strongRight;
@@ -435,11 +436,13 @@ void process_notes(void) {
         d:
         if (playbackState->priority != NOTE_PRIORITY_DISABLED) {
             noteSubEu = &note->noteSubEu;
+            if (noteSubEu->finished
  #ifdef VERSION_SH
-            if (playbackState->unkSH34 >= 1 || noteSubEu->finished) {
+             || playbackState->unkSH34 >= 1
  #else
-            if (playbackState->priority == NOTE_PRIORITY_STOPPING || noteSubEu->finished) {
+             || playbackState->priority == NOTE_PRIORITY_STOPPING
  #endif
+            ) {
                 if (playbackState->adsr.state == ADSR_STATE_DISABLED || noteSubEu->finished) {
                     if (playbackState->wantedParentLayer != NO_LAYER) {
                         note_disable(note);
