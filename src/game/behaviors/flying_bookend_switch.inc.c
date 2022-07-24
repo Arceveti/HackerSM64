@@ -274,12 +274,14 @@ void bhv_book_switch_loop(void) {
                     play_sound(SOUND_GENERAL2_RIGHT_ANSWER, gGlobalSoundSource);
                     o->parentObj->oBookSwitchManagerNumCorrectChoices++;
                 } else {
-                    s16 rand01 = random_u16() & 0x1;
+                    s16 rand01 = (random_u16() & 0x1);
                     s16 z = gMarioObject->oPosZ + 1.5f * gMarioStates[0].vel[2];
 
                     play_sound(SOUND_MENU_CAMERA_BUZZ, gGlobalSoundSource);
 
-                    if (z > 0) z = 0;
+                    if (z > 0) {
+                        z = 0;
+                    }
 
                     struct Object *bookendObj = spawn_object_abs_with_rot(o, 0, MODEL_BOOKEND, bhvFlyingBookend,
                                                      0x1FC * rand01 - 0x8CA, 890, z, 0,

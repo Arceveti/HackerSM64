@@ -188,7 +188,7 @@ static s8 *introBackgroundTables[] = {
  */
 Gfx *geo_intro_regular_backdrop(s32 callContext, struct GraphNode *node, UNUSED void *context) {
     struct GraphNodeMore *graphNode = (struct GraphNodeMore *) node;
-    s32 index = graphNode->bgTableID & 0xff; // TODO: word at offset 0x18 of struct GraphNode (always ends up being 0)
+    s32 index = (graphNode->bgTableID & 0xff); // TODO: word at offset 0x18 of struct GraphNode (always ends up being 0)
     s8 *backgroundTable = introBackgroundTables[index];
     Gfx *dl = NULL;
     Gfx *dlIter = NULL;
@@ -424,7 +424,7 @@ Gfx *geo_intro_rumble_pak_graphic(s32 callContext, struct GraphNode *node, UNUSE
         dl = NULL;
     } else if (callContext == GEO_CONTEXT_RENDER) {
         genNode->fnNode.node.drawingLayer = LAYER_OPAQUE;
-        s32 introContext = genNode->parameter & 0xFF;
+        s32 introContext = (genNode->parameter & 0xFF);
         if (introContext == INTRO_CONTEXT_NORMAL) {
             backgroundTileSix = introBackgroundIndexTable[6];
         } else if (introContext == INTRO_CONTEXT_GAME_OVER) {

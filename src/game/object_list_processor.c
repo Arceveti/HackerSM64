@@ -396,12 +396,12 @@ void set_object_respawn_info_bits(struct Object *obj, u8 bits) {
     switch (obj->respawnInfoType) {
         case RESPAWN_INFO_TYPE_NORMAL:
             info32 = (u32 *) obj->respawnInfo;
-            *info32 |= bits << 8;
+            *info32 |= (bits << 8);
             break;
 
         case RESPAWN_INFO_TYPE_MACRO_OBJECT:
             info16 = (u16 *) obj->respawnInfo;
-            *info16 |= bits << 8;
+            *info16 |= (bits << 8);
             break;
     }
 }

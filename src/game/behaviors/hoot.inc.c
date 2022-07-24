@@ -52,7 +52,7 @@ void hoot_free_step(s16 fastOscY, s32 speed) {
     o->oVelZ = coss(yaw) * hSpeed;
 
     o->oPosX += o->oVelX;
-    o->oPosY -= o->oVelY + (coss((s32)(animFrame * (fastOscY == 0 ? 3276.8f : 6553.6f))) * 12.5f); // 50.0f / 4;
+    o->oPosY -= o->oVelY + (coss((s32)(animFrame * ((fastOscY == 0) ? 3276.8f : 6553.6f))) * 12.5f); // 50.0f / 4;
     o->oPosZ += o->oVelZ;
 
     find_floor(o->oPosX, o->oPosY, o->oPosZ, &floor);

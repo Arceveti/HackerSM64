@@ -390,7 +390,7 @@ void bhv_wiggler_update(void) {
             cur_obj_init_animation_with_accel_and_sound(WIGGLER_ANIM_WALK, o->oWigglerWalkAnimSpeed);
             if (o->oWigglerWalkAnimSpeed != 0.0f) {
                 cur_obj_play_sound_at_anim_range(0, 13,
-                              o->oHealth >= 4 ? SOUND_OBJ_WIGGLER_LOW_PITCH : SOUND_OBJ_WIGGLER_HIGH_PITCH);
+                              (o->oHealth >= 4) ? SOUND_OBJ_WIGGLER_LOW_PITCH : SOUND_OBJ_WIGGLER_HIGH_PITCH);
             } else {
                 cur_obj_reverse_animation();
             }

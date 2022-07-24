@@ -94,7 +94,7 @@ void bhv_mr_i_iris_loop(void) {
 }
 
 void mr_i_body_act_spin_death(void) {
-    s16 direction = o->oMrISpinDirection < 0 ? 0x1000 : -0x1000;
+    s16 direction = (o->oMrISpinDirection < 0) ? 0x1000 : -0x1000;
     f32 scaleModifier = o->oBehParams2ndByte ? 2.0f : 1.0f;
 
     f32 spinAmount = (o->oTimer + 1) / 96.0f;
@@ -190,7 +190,7 @@ void mr_i_body_act_looking_at_mario(void) {
     if (!o->oMrISpinAmount) {
         o->oMrISpinAngle = 120;
     }
-    if (o->oMrISpinAmount > (1 << 16)) {
+    if (o->oMrISpinAmount > 0x10000) {
         o->oAction = MR_I_BODY_ACT_SPIN_DEATH;
     }
 
@@ -232,7 +232,7 @@ void mr_i_body_act_idle(void) {
         o->oMoveAnglePitch = 0;
         o->oMrIParticleTimer = 30;
         o->oMrIParticleTimerTarget = random_float() * 20.0f;
-        o->oAngleVelYaw = o->oMrIParticleTimerTarget & 0x1 ? -256 : 256;
+        o->oAngleVelYaw = (o->oMrIParticleTimerTarget & 0x1) ? -256 : 256;
     }
 
     if (angleDiffMoveYawToMario < 1024 && angleDiffMoveYawToMarioFaceYaw > 0x4000) {

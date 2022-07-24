@@ -96,7 +96,7 @@ static void chain_chomp_update_chain_segments(void) {
         struct ChainSegment *segment     = &o->oChainChompSegments[i];
 
         // Apply gravity
-        segment->pos[1] += o->oVelY < 0.0f ? o->oVelY : -20.0f;
+        segment->pos[1] += (o->oVelY < 0.0f) ? o->oVelY : -20.0f;
         if (segment->pos[1] < 0.0f) {
             segment->pos[1] = 0.0f;
         }

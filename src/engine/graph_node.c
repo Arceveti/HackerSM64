@@ -191,8 +191,8 @@ struct GraphNodeCamera *init_graph_node_camera(struct AllocOnlyPool *pool,
         vec3f_copy(graphNode->focus, focus);
         graphNode->fnNode.func = func;
         graphNode->config.mode = mode;
-        graphNode->roll = 0;
-        graphNode->rollScreen = 0;
+        graphNode->roll = 0x0;
+        graphNode->rollScreen = 0x0;
 
         if (func != NULL) {
             func(GEO_CONTEXT_CREATE, &graphNode->fnNode.node, pool);
@@ -464,7 +464,7 @@ struct GraphNodeBackground *init_graph_node_background(struct AllocOnlyPool *poo
     if (graphNode != NULL) {
         init_scene_graph_node_links(&graphNode->fnNode.node, GRAPH_NODE_TYPE_BACKGROUND);
 
-        graphNode->background = (background << 16) | background;
+        graphNode->background = ((background << 16) | background);
         graphNode->fnNode.func = backgroundFunc;
         graphNode->unused = zero; // always 0, unused
 
@@ -677,7 +677,7 @@ void geo_call_global_function_nodes(struct GraphNode *graphNode, s32 callContext
             geo_call_global_function_nodes_helper(graphNode->children, callContext);
         }
 
-        gCurGraphNodeRoot = 0;
+        gCurGraphNodeRoot = NULL;
     }
 }
 
@@ -700,7 +700,7 @@ void geo_obj_init(struct GraphNodeObject *graphNode, void *sharedChild, Vec3f po
     vec3s_copy(graphNode->angle, angle);
 
     graphNode->sharedChild = sharedChild;
-    graphNode->spawnInfo = 0;
+    graphNode->spawnInfo = NULL;
     graphNode->throwMatrix = NULL;
     graphNode->animInfo.curAnim = NULL;
 
@@ -722,7 +722,7 @@ void geo_obj_init_spawninfo(struct GraphNodeObject *graphNode, struct SpawnInfo 
     graphNode->sharedChild = spawn->model;
     graphNode->spawnInfo = spawn;
     graphNode->throwMatrix = NULL;
-    graphNode->animInfo.curAnim = 0;
+    graphNode->animInfo.curAnim = NULL;
 
     graphNode->node.flags |= (GRAPH_RENDER_ACTIVE | GRAPH_RENDER_HAS_ANIMATION);
     graphNode->node.flags &= ~(GRAPH_RENDER_INVISIBLE | GRAPH_RENDER_BILLBOARD);
@@ -755,7 +755,7 @@ void geo_obj_init_animation_accel(struct GraphNodeObject *graphNode, struct Anim
         graphNode->animInfo.animYTrans = 0;
         graphNode->animInfo.animFrameAccelAssist =
             (anim->startFrame << 16) + ((anim->flags & ANIM_FLAG_FORWARD) ? animAccel : -animAccel);
-        graphNode->animInfo.animFrame = graphNode->animInfo.animFrameAccelAssist >> 16;
+        graphNode->animInfo.animFrame = (graphNode->animInfo.animFrameAccelAssist >> 16);
     }
 
     graphNode->animInfo.animAccel = animAccel;
@@ -791,7 +791,7 @@ s32 geo_update_animation_frame(struct AnimInfo *obj, s32 *accelAssist) {
     s32 result;
     struct Animation *anim = obj->curAnim;
 
-    if (obj->animTimer == gAreaUpdateCounter || anim->flags & ANIM_FLAG_NO_ACCEL) {
+    if (obj->animTimer == gAreaUpdateCounter || (anim->flags & ANIM_FLAG_NO_ACCEL)) {
         if (accelAssist != NULL) {
             accelAssist[0] = obj->animFrameAccelAssist;
         }
@@ -803,7 +803,7 @@ s32 geo_update_animation_frame(struct AnimInfo *obj, s32 *accelAssist) {
         if (obj->animAccel != 0) {
             result = obj->animFrameAccelAssist - obj->animAccel;
         } else {
-            result = (obj->animFrame - 1) << 16;
+            result = ((obj->animFrame - 1) << 16);
         }
 
         if (GET_HIGH_S16_OF_32(result) < anim->loopStart) {
@@ -817,7 +817,7 @@ s32 geo_update_animation_frame(struct AnimInfo *obj, s32 *accelAssist) {
         if (obj->animAccel != 0) {
             result = obj->animFrameAccelAssist + obj->animAccel;
         } else {
-            result = (obj->animFrame + 1) << 16;
+            result = ((obj->animFrame + 1) << 16);
         }
 
         if (GET_HIGH_S16_OF_32(result) >= anim->loopEnd) {

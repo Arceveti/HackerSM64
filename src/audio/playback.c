@@ -35,7 +35,7 @@ void note_set_vel_pan_reverb(struct Note *note, f32 velocity, u8 pan, u8 reverbV
  #ifdef VERSION_SH
     note_set_resampling_rate(note, reverbInfo->freqScale);
     velocity = reverbInfo->velocity;
-    pan = reverbInfo->pan & 0x7f;
+    pan = (reverbInfo->pan & 0x7f);
     reverbVol = reverbInfo->reverbVol;
     reverbBits = reverbInfo->reverbBits.s;
  #else // !VERSION_SH == VERSION_EU
@@ -322,8 +322,8 @@ void note_disable(struct Note *note) {
  #endif
 }
 #else // (VERSION_JP || VERSION_US)
-void note_disable2(struct Note *note) {
-    note_disable(note); //! redundant?
+void note_disable2(struct Note *note) { //! redundant?
+    note_disable(note);
 }
 #endif // (VERSION_JP || VERSION_US)
 
@@ -589,7 +589,7 @@ void process_notes(void) {
             if (gAiFrequency != 32006) {
                 frequency *= (32000.0f / (f32) gAiFrequency);
             }
-            frequency = (frequency < cap ? frequency : cap);
+            frequency = ((frequency < cap) ? frequency : cap);
             scale *= 4.3498e-5f; // ~1 / 23000
             velocity = velocity * scale * scale;
             note_set_frequency(note, frequency);

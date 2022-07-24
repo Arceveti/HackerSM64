@@ -97,7 +97,7 @@ struct SPTask *create_next_audio_frame_task(void) {
         func_802ad7ec((u32) sp2C);
     }
 
-    flags = 0;
+    flags = 0x0;
     gAudioCmd = synthesis_execute(gAudioCmd, &writtenCmds, currAiBuffer, gAiBufferLengths[index]);
     gAudioRandom = ((gAudioRandom + gAudioFrameCount) * gAudioFrameCount);
     gAudioRandom = gAudioRandom + writtenCmds / 8;

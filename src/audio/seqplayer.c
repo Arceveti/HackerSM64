@@ -712,11 +712,11 @@ void seq_channel_layer_process_script(struct SequenceChannelLayer *layer) {
             }
 
             // the remaining bits are used for the semitone
-            cmd -= cmd & 0xc0;
+            cmd -= (cmd & 0xc0);
         }
 
         layer->delay = sp3A;
-        layer->duration = layer->noteDuration * sp3A >> 8;
+        layer->duration = ((layer->noteDuration * sp3A) >> 8);
         if ((seqPlayer->muted && (seqChannel->muteBehavior & MUTE_BEHAVIOR_STOP_NOTES))
             || seqChannel->stopSomething2
  #if defined(VERSION_JP) || defined(VERSION_US)

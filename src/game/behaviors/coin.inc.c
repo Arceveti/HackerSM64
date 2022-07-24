@@ -171,7 +171,7 @@ void bhv_coin_formation_spawned_coin_loop(void) {
         }
     } else {
         if (bhv_coin_sparkles_init()) {
-            o->parentObj->oCoinRespawnBits |= (1 << o->oBehParams2ndByte);
+            o->parentObj->oCoinRespawnBits |= BIT(o->oBehParams2ndByte);
         }
         o->oAnimState++;
     }
@@ -182,7 +182,7 @@ void bhv_coin_formation_spawned_coin_loop(void) {
 
 void spawn_coin_in_formation(s32 index, s32 shape) {
     Vec3i pos = { 0, 0, 0 };
-    s32 spawnCoin    = TRUE;
+    s32 spawnCoin = TRUE;
     s32 snapToGround = TRUE;
 
     switch (shape & COIN_FORMATION_BP_SHAPE_MASK) {
@@ -194,19 +194,19 @@ void spawn_coin_in_formation(s32 index, s32 shape) {
             break;
         case COIN_FORMATION_BP_SHAPE_VERTICAL_LINE:
             snapToGround = FALSE;
-            pos[1] = index << 7;
+            pos[1] = (index << 7);
             if (index > 4) {
                 spawnCoin = FALSE;
             }
             break;
         case COIN_FORMATION_BP_SHAPE_HORIZONTAL_RING:
-            pos[0] = sins(index << 13) * COIN_FORMATION_HORIZONTAL_RING_RADIUS;
-            pos[2] = coss(index << 13) * COIN_FORMATION_HORIZONTAL_RING_RADIUS;
+            pos[0] = (sins(index << 13) * COIN_FORMATION_HORIZONTAL_RING_RADIUS);
+            pos[2] = (coss(index << 13) * COIN_FORMATION_HORIZONTAL_RING_RADIUS);
             break;
         case COIN_FORMATION_BP_SHAPE_VERTICAL_RING:
             snapToGround = FALSE;
-            pos[0] = coss(index << 13) * COIN_FORMATION_VERTICAL_RING_RADIUS;
-            pos[1] = sins(index << 13) * COIN_FORMATION_VERTICAL_RING_RADIUS + COIN_FORMATION_VERTICAL_RING_RADIUS;
+            pos[0] = (coss(index << 13) * COIN_FORMATION_VERTICAL_RING_RADIUS);
+            pos[1] = (sins(index << 13) * COIN_FORMATION_VERTICAL_RING_RADIUS) + COIN_FORMATION_VERTICAL_RING_RADIUS;
             break;
         case COIN_FORMATION_BP_SHAPE_ARROW:
             pos[0] = sCoinArrowPositions[index][0];
@@ -237,7 +237,7 @@ void bhv_coin_formation_loop(void) {
         case COIN_FORMATION_ACT_INACTIVE:
             if (o->oDistanceToMario < COIN_FORMATION_DISTANCE) {
                 for (bitIndex = 0; bitIndex < 8; bitIndex++) {
-                    if (!(o->oCoinRespawnBits & (1 << bitIndex))) {
+                    if (!(o->oCoinRespawnBits & BIT(bitIndex))) {
                         spawn_coin_in_formation(bitIndex, o->oBehParams2ndByte);
                     }
                 }

@@ -80,7 +80,7 @@ void bhv_goomba_triplet_spawner_update(void) {
                 0x10000
                 / (((o->oBehParams2ndByte & GOOMBA_BP_TRIPLET_FLAG_MASK) >> 2) + 3);
 
-            for (angle = 0, goombaFlag = 1 << 8; angle < 0xFFFF; angle += dAngle, goombaFlag <<= 1) {
+            for (angle = 0x0, goombaFlag = BIT(8); angle < 0xFFFF; angle += dAngle, goombaFlag <<= 1) {
                 // Only spawn goombas which haven't been killed yet
                 if (!(o->oBehParams & goombaFlag)) {
                     s16 dx = 500.0f * coss(angle);
@@ -142,7 +142,7 @@ static void goomba_begin_jump(void) {
 
     o->oAction = GOOMBA_ACT_JUMP;
     o->oForwardVel = 0.0f;
-    o->oVelY = 50.0f / 3.0f * o->oGoombaScale;
+    o->oVelY = (50.0f / 3.0f) * o->oGoombaScale;
 }
 
 /**
@@ -153,9 +153,9 @@ static void goomba_begin_jump(void) {
 static void mark_goomba_as_dead(void) {
     if (o->parentObj != o) {
         set_object_respawn_info_bits(
-            o->parentObj, (o->oBehParams2ndByte & GOOMBA_BP_TRIPLET_FLAG_MASK) >> 2);
+            o->parentObj, ((o->oBehParams2ndByte & GOOMBA_BP_TRIPLET_FLAG_MASK) >> 2));
 
-        o->parentObj->oBehParams |= (o->oBehParams2ndByte & GOOMBA_BP_TRIPLET_FLAG_MASK) << 6;
+        o->parentObj->oBehParams |= ((o->oBehParams2ndByte & GOOMBA_BP_TRIPLET_FLAG_MASK) << 6);
     }
 }
 

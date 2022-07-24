@@ -138,7 +138,7 @@ static void platform_on_track_mario_not_on_platform(void) {
 void bhv_platform_on_track_init(void) {
     if (!(o->activeFlags & ACTIVE_FLAG_IN_DIFFERENT_ROOM)) {
         s16 pathIndex = (u16)(o->oBehParams >> 16) & PLATFORM_ON_TRACK_BP_MASK_PATH;
-        o->oPlatformOnTrackType = ((u16)(o->oBehParams >> 16) & PLATFORM_ON_TRACK_BP_MASK_TYPE) >> 4;
+        o->oPlatformOnTrackType = (((u16)(o->oBehParams >> 16) & PLATFORM_ON_TRACK_BP_MASK_TYPE) >> 4);
 
         o->oPlatformOnTrackIsNotSkiLift = o->oPlatformOnTrackType - PLATFORM_ON_TRACK_TYPE_SKI_LIFT;
 
@@ -244,7 +244,7 @@ static void platform_on_track_act_move_along_track(void) {
                 obj_forward_vel_approach(10.0f, 0.1f);
             } else {
 #ifdef CONTROLLABLE_PLATFORM_SPEED
-                f32 targetVel = gMarioObject->platform == o
+                f32 targetVel = (gMarioObject->platform == o)
                     ? (o->oDistanceToMario * coss(o->oAngleToMario - o->oMoveAngleYaw)) - 10.0f
                     : 10.0f;
                 targetVel = CLAMP(targetVel, 10.0f, 16.0f);

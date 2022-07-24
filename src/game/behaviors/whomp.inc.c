@@ -65,7 +65,7 @@ void whomp_patrol(void) {
     s16 marioAngle = abs_angle_diff(o->oAngleToMario, o->oMoveAngleYaw);
     f32 distWalked = cur_obj_lateral_dist_to_home();
 #ifdef ENABLE_VANILLA_LEVEL_SPECIFIC_CHECKS // Make this a behavior param?
-    f32 patrolDist = gCurrLevelNum == LEVEL_BITS ? 200.0f : 700.0f;
+    f32 patrolDist = (gCurrLevelNum == LEVEL_BITS) ? 200.0f : 700.0f;
 #else
     f32 patrolDist = 700.0f;
 #endif

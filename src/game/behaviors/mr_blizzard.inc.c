@@ -213,7 +213,7 @@ static void mr_blizzard_act_death(void) {
 
                 cap = spawn_object_relative(0, 5, 105, 0, o, MODEL_MARIOS_CAP, bhvNormalCap);
                 if (cap != NULL) {
-                    cap->oMoveAngleYaw = o->oFaceAngleYaw + (o->oFaceAngleRoll < 0 ? 0x4000 : -0x4000);
+                    cap->oMoveAngleYaw = o->oFaceAngleYaw + ((o->oFaceAngleRoll < 0) ? 0x4000 : -0x4000);
                     cap->oForwardVel = 10.0f;
                 }
 

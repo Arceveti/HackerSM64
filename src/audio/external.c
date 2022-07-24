@@ -648,7 +648,7 @@ struct SPTask *create_next_audio_frame_task(void) {
 
     // For the function to match we have to preserve some arbitrary variable
     // across this function call.
-    flags = 0;
+    flags = 0x0;
     if (sAudioEnabled) {
         gAudioCmd = synthesis_execute(gAudioCmd, &writtenCmds, gCurrAiBuffer, gAiBufferLengths[index]);
         gAudioRandom = ((gAudioRandom + gAudioFrameCount) * gAudioFrameCount);
@@ -1791,9 +1791,9 @@ UNUSED void unused_8031FED0(u8 player, u32 bits, s8 arg2) {
 
     for (i = 0; i < CHANNELS_MAX; i++) {
         if (gSequencePlayers[player].channels[i] != &gSequenceChannelNone) {
-            if ((bits & ((1 << 1) | (1 << 0))) == 0) {
+            if ((bits & (BIT(1) | BIT(0))) == 0) {
                 gSequencePlayers[player].channels[i]->volumeScale = 1.0f;
-            } else if ((bits & (1 << 0)) != 0) {
+            } else if ((bits & BIT(0)) != 0) {
                 gSequencePlayers[player].channels[i]->volumeScale = ((f32) arg2 / 127.0f);
             } else {
                 gSequencePlayers[player].channels[i]->volumeScale = (1.0f - ((f32) arg2 / 127.0f));

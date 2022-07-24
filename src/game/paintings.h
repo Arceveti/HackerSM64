@@ -80,11 +80,11 @@ enum RippleTriggers {
 // Painting->lastFlags, Painting->currFlags, Painting->changedFlags
 enum PaintingRippleFlags {
     // Not rippling.
-    RIPPLE_FLAGS_NONE  = (0 << 0), // 0x00
+    RIPPLE_FLAGS_NONE  = 0x0,
     // Triggers an entry ripple.
-    RIPPLE_FLAG_ENTER  = (1 << 0), // 0x01
+    RIPPLE_FLAG_ENTER  = BIT(0), // 0x01
     // Triggers a passive ripple.
-    RIPPLE_FLAG_RIPPLE = (1 << 1), // 0x02
+    RIPPLE_FLAG_RIPPLE = BIT(1), // 0x02
 };
 
 // Painting->textureType

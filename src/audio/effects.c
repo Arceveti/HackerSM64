@@ -161,7 +161,7 @@ s32 get_vibrato_pitch_change(struct VibratoState *vib) {
 #if defined(VERSION_EU) || defined(VERSION_SH)
     vib->time += (s32) vib->rate;
     s32 index = ((vib->time >> 10) & 0x3F);
-    return vib->curve[index] >> 8;
+    return (vib->curve[index] >> 8);
 }
 #else
     vib->time += vib->rate;

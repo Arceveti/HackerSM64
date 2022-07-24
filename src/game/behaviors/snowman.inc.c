@@ -163,7 +163,7 @@ void bhv_snowmans_head_init(void) {
     o->oFriction = 0.999f;
     o->oBuoyancy = 2.0f;
 
-    if ((starFlags & (1 << behParams)) && gCurrActNum != behParams + 1) {
+    if ((starFlags & BIT(behParams)) && gCurrActNum != behParams + 1) {
         spawn_object_abs_with_rot(o, 0, MODEL_CCM_SNOWMAN_BASE, bhvBigSnowmanWhole, sSnowmanHeadPos[0], sSnowmanHeadPos[1], sSnowmanHeadPos[2], 0, 0, 0);
         vec3f_copy(&o->oPosVec, sSnowmanHeadPos);
         o->oAction = SNOWMANS_HEAD_ACT_NONE;

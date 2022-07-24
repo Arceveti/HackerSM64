@@ -72,9 +72,9 @@ void geo_layout_cmd_branch_and_link(void) {
 
 // GEO_CMD_END: Terminate geo layout
 void geo_layout_cmd_end(void) {
-    gGeoLayoutStackIndex = gGeoLayoutReturnIndex;
-    gGeoLayoutReturnIndex = gGeoLayoutStack[--gGeoLayoutStackIndex] & 0xFFFF;
-    gCurGraphNodeIndex = gGeoLayoutStack[gGeoLayoutStackIndex] >> 16;
+    gGeoLayoutStackIndex = gGeoLayoutReturnIndex - 1;
+    gGeoLayoutReturnIndex = (gGeoLayoutStack[gGeoLayoutStackIndex] & 0xFFFF);
+    gCurGraphNodeIndex = (gGeoLayoutStack[gGeoLayoutStackIndex] >> 16);
     gGeoLayoutCommand = (u8 *) gGeoLayoutStack[--gGeoLayoutStackIndex];
 }
 
@@ -99,13 +99,13 @@ void geo_layout_cmd_return(void) {
 void geo_layout_cmd_open_node(void) {
     gCurGraphNodeList[gCurGraphNodeIndex + 1] = gCurGraphNodeList[gCurGraphNodeIndex];
     gCurGraphNodeIndex++;
-    gGeoLayoutCommand += 0x04 << CMD_SIZE_SHIFT;
+    gGeoLayoutCommand += (0x04 << CMD_SIZE_SHIFT);
 }
 
 // GEO_CMD_CLOSE_NODE: Close node
 void geo_layout_cmd_close_node(void) {
     gCurGraphNodeIndex--;
-    gGeoLayoutCommand += 0x04 << CMD_SIZE_SHIFT;
+    gGeoLayoutCommand += (0x04 << CMD_SIZE_SHIFT);
 }
 
 /*
@@ -121,7 +121,7 @@ void geo_layout_cmd_assign_as_view(void) {
         gGeoViews[index] = gCurGraphNodeList[gCurGraphNodeIndex];
     }
 
-    gGeoLayoutCommand += 0x04 << CMD_SIZE_SHIFT;
+    gGeoLayoutCommand += (0x04 << CMD_SIZE_SHIFT);
 }
 
 /*
@@ -145,7 +145,7 @@ void geo_layout_cmd_update_node_flags(void) {
             break;
     }
 
-    gGeoLayoutCommand += 0x04 << CMD_SIZE_SHIFT;
+    gGeoLayoutCommand += (0x04 << CMD_SIZE_SHIFT);
 }
 
 /*
@@ -184,7 +184,7 @@ void geo_layout_cmd_node_root(void) {
 
     register_scene_graph_node(&graphNode->node);
 
-    gGeoLayoutCommand += 0x0C << CMD_SIZE_SHIFT;
+    gGeoLayoutCommand += (0x0C << CMD_SIZE_SHIFT);
 }
 
 /*
@@ -199,7 +199,7 @@ void geo_layout_cmd_node_ortho_projection(void) {
 
     register_scene_graph_node(&graphNode->node);
 
-    gGeoLayoutCommand += 0x04 << CMD_SIZE_SHIFT;
+    gGeoLayoutCommand += (0x04 << CMD_SIZE_SHIFT);
 }
 
 /*
@@ -220,14 +220,14 @@ void geo_layout_cmd_node_perspective(void) {
     if (cur_geo_cmd_u8(0x01) != 0) {
         // optional asm function
         frustumFunc = (GraphNodeFunc) cur_geo_cmd_ptr(0x08);
-        gGeoLayoutCommand += 4 << CMD_SIZE_SHIFT;
+        gGeoLayoutCommand += (0x04 << CMD_SIZE_SHIFT);
     }
 
     graphNode = init_graph_node_perspective(gGraphNodePool, NULL, (f32) fov, near, far, frustumFunc, 0);
 
     register_scene_graph_node(&graphNode->fnNode.node);
 
-    gGeoLayoutCommand += 0x08 << CMD_SIZE_SHIFT;
+    gGeoLayoutCommand += (0x08 << CMD_SIZE_SHIFT);
 }
 
 /*
@@ -239,7 +239,7 @@ void geo_layout_cmd_node_start(void) {
 
     register_scene_graph_node(&graphNode->node);
 
-    gGeoLayoutCommand += 0x04 << CMD_SIZE_SHIFT;
+    gGeoLayoutCommand += (0x04 << CMD_SIZE_SHIFT);
 }
 
 /*
@@ -251,7 +251,7 @@ void geo_layout_cmd_node_master_list(void) {
 
     register_scene_graph_node(&graphNode->node);
 
-    gGeoLayoutCommand += 0x04 << CMD_SIZE_SHIFT;
+    gGeoLayoutCommand += (0x04 << CMD_SIZE_SHIFT);
 }
 
 /*
@@ -269,7 +269,7 @@ void geo_layout_cmd_node_level_of_detail(void) {
 
     register_scene_graph_node(&graphNode->node);
 
-    gGeoLayoutCommand += 0x08 << CMD_SIZE_SHIFT;
+    gGeoLayoutCommand += (0x08 << CMD_SIZE_SHIFT);
 }
 
 /*
@@ -290,7 +290,7 @@ void geo_layout_cmd_node_switch_case(void) {
 
     register_scene_graph_node(&graphNode->fnNode.node);
 
-    gGeoLayoutCommand += 0x08 << CMD_SIZE_SHIFT;
+    gGeoLayoutCommand += (0x08 << CMD_SIZE_SHIFT);
 }
 
 /*
@@ -320,7 +320,7 @@ void geo_layout_cmd_node_camera(void) {
 
     gGeoViews[0] = &graphNode->fnNode.node;
 
-    gGeoLayoutCommand += 0x14 << CMD_SIZE_SHIFT;
+    gGeoLayoutCommand += (0x14 << CMD_SIZE_SHIFT);
 }
 
 /*
@@ -374,7 +374,7 @@ void geo_layout_cmd_node_translation_rotation(void) {
     if (params & GEO_PARAMS_HAS_DL_BIT) {
         displayList = *(void **) &cmdPos[0];
         drawingLayer = (params & GEO_PARAMS_DRAWING_LAYER_MASK);
-        cmdPos += 2 << CMD_SIZE_SHIFT;
+        cmdPos += (0x02 << CMD_SIZE_SHIFT);
     }
 
     graphNode = init_graph_node_translation_rotation(gGraphNodePool, NULL, drawingLayer, displayList,
@@ -403,14 +403,14 @@ void geo_layout_cmd_node_scale(void) {
     if (params & GEO_PARAMS_HAS_DL_BIT) {
         displayList = cur_geo_cmd_ptr(0x08);
         drawingLayer = (params & GEO_PARAMS_DRAWING_LAYER_MASK);
-        gGeoLayoutCommand += 4 << CMD_SIZE_SHIFT;
+        gGeoLayoutCommand += (0x04 << CMD_SIZE_SHIFT);
     }
 
     graphNode = init_graph_node_scale(gGraphNodePool, NULL, drawingLayer, displayList, scale);
 
     register_scene_graph_node(&graphNode->node);
 
-    gGeoLayoutCommand += 0x08 << CMD_SIZE_SHIFT;
+    gGeoLayoutCommand += (0x08 << CMD_SIZE_SHIFT);
 }
 
 /*
@@ -435,7 +435,7 @@ void geo_layout_cmd_node_animated_part(void) {
 
     register_scene_graph_node(&graphNode->node);
 
-    gGeoLayoutCommand += 0x0C << CMD_SIZE_SHIFT;
+    gGeoLayoutCommand += (0x0C << CMD_SIZE_SHIFT);
 }
 
 /*
@@ -461,7 +461,7 @@ void geo_layout_cmd_node_billboard(void) {
     if (params & GEO_PARAMS_HAS_DL_BIT) {
         displayList = *(void **) &cmdPos[0];
         drawingLayer = (params & GEO_PARAMS_DRAWING_LAYER_MASK);
-        cmdPos += 2 << CMD_SIZE_SHIFT;
+        cmdPos += (0x02 << CMD_SIZE_SHIFT);
     }
 
     graphNode = init_graph_node_billboard(gGraphNodePool, NULL, drawingLayer, displayList, translation);
@@ -485,7 +485,7 @@ void geo_layout_cmd_node_display_list(void) {
 
     register_scene_graph_node(&graphNode->node);
 
-    gGeoLayoutCommand += 0x08 << CMD_SIZE_SHIFT;
+    gGeoLayoutCommand += (0x08 << CMD_SIZE_SHIFT);
 }
 
 /*
@@ -504,7 +504,7 @@ void geo_layout_cmd_node_shadow(void) {
 
     register_scene_graph_node(&graphNode->node);
 
-    gGeoLayoutCommand += 0x08 << CMD_SIZE_SHIFT;
+    gGeoLayoutCommand += (0x08 << CMD_SIZE_SHIFT);
 }
 
 // GEO_CMD_NODE_OBJECT_PARENT: Create scene graph node that manages the group of all object nodes
@@ -513,7 +513,7 @@ void geo_layout_cmd_node_object_parent(void) {
 
     register_scene_graph_node(&graphNode->node);
 
-    gGeoLayoutCommand += 0x04 << CMD_SIZE_SHIFT;
+    gGeoLayoutCommand += (0x04 << CMD_SIZE_SHIFT);
 }
 
 /*
@@ -529,7 +529,7 @@ void geo_layout_cmd_node_generated(void) {
 
     register_scene_graph_node(&graphNode->fnNode.node);
 
-    gGeoLayoutCommand += 0x0C << CMD_SIZE_SHIFT;
+    gGeoLayoutCommand += (0x0C << CMD_SIZE_SHIFT);
 }
 
 /*
@@ -546,7 +546,7 @@ void geo_layout_cmd_node_background(void) {
 
     register_scene_graph_node(&graphNode->fnNode.node);
 
-    gGeoLayoutCommand += 0x08 << CMD_SIZE_SHIFT;
+    gGeoLayoutCommand += (0x08 << CMD_SIZE_SHIFT);
 }
 
 /*
@@ -573,7 +573,7 @@ void geo_layout_cmd_copy_view(void) {
 
     register_scene_graph_node(&graphNode->node);
 
-    gGeoLayoutCommand += 0x04 << CMD_SIZE_SHIFT;
+    gGeoLayoutCommand += (0x04 << CMD_SIZE_SHIFT);
 }
 
 /*
@@ -595,7 +595,7 @@ void geo_layout_cmd_node_held_obj(void) {
 
     register_scene_graph_node(&graphNode->fnNode.node);
 
-    gGeoLayoutCommand += 0x0C << CMD_SIZE_SHIFT;
+    gGeoLayoutCommand += (0x0C << CMD_SIZE_SHIFT);
 }
 
 /*
@@ -606,7 +606,7 @@ void geo_layout_cmd_node_held_obj(void) {
 void geo_layout_cmd_node_culling_radius(void) {
     struct GraphNodeCullingRadius *graphNode = init_graph_node_culling_radius(gGraphNodePool, NULL, cur_geo_cmd_s16(0x02));
     register_scene_graph_node(&graphNode->node);
-    gGeoLayoutCommand += 0x04 << CMD_SIZE_SHIFT;
+    gGeoLayoutCommand += (0x04 << CMD_SIZE_SHIFT);
 }
 
 /*
@@ -623,7 +623,7 @@ void geo_layout_cmd_bone(void) {
     cmdPos = read_vec3s(translation, &cmdPos[2]);
     cmdPos = read_vec3s(rotation, &cmdPos[0]);
     displayList = *(void **) &cmdPos[0];
-    cmdPos += 2 << CMD_SIZE_SHIFT;
+    cmdPos += (0x02 << CMD_SIZE_SHIFT);
 
     graphNode =
         init_graph_node_bone(gGraphNodePool, NULL, drawingLayer, displayList, translation, rotation);
@@ -639,7 +639,7 @@ void geo_layout_cmd_bone(void) {
 void geo_layout_cmd_z_offset(void) {
     struct GraphNodeZOffset *graphNode = init_graph_node_z_offset(gGraphNodePool, NULL, cur_geo_cmd_s16(0x02));
     register_scene_graph_node(&graphNode->node);
-    gGeoLayoutCommand += 0x04 << CMD_SIZE_SHIFT;
+    gGeoLayoutCommand += (0x04 << CMD_SIZE_SHIFT);
 }
 
 typedef void (*GeoLayoutCommandProc)(void);

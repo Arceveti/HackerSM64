@@ -30,13 +30,13 @@ void haunted_chair_act_0(void) {
 
                 if (dAngleToPiano & 0x4000) {
                     o->oHauntedChairFallFromPianoAngle = &o->oFaceAngleRoll;
-                    o->oHauntedChairFallTargetAngle    = dAngleToPiano > 0x0 ? 0x4000 : -0x4000;
+                    o->oHauntedChairFallTargetAngle    = (dAngleToPiano > 0x0) ? 0x4000 : -0x4000;
                 } else {
                     o->oHauntedChairFallFromPianoAngle = &o->oFaceAnglePitch;
-                    o->oHauntedChairFallTargetAngle    = dAngleToPiano < 0x0 ? 0x4000 : -0x4000;
+                    o->oHauntedChairFallTargetAngle    = (dAngleToPiano < 0x0) ? 0x4000 : -0x4000;
                 }
 
-                o->oHauntedChairPitchVel = o->oHauntedChairFallTargetAngle < 0 ? -1500.0f : 1500.0f;
+                o->oHauntedChairPitchVel = (o->oHauntedChairFallTargetAngle < 0) ? -1500.0f : 1500.0f;
             }
         } else {
             oscillate_toward(o->oHauntedChairFallFromPianoAngle, &o->oHauntedChairPitchVel, o->oHauntedChairFallTargetAngle,
@@ -69,8 +69,8 @@ void haunted_chair_act_0(void) {
 
         if (o->oTimer > 30) {
             o->oAction = 1;
-            o->oHauntedChairPitchVel  = 0.0f;
-            o->oHauntedChairRollVel   = 200.0f;
+            o->oHauntedChairPitchVel = 0.0f;
+            o->oHauntedChairRollVel = 200.0f;
             o->oHauntedChairSpinTimer = 40;
         }
     }
@@ -82,7 +82,7 @@ void haunted_chair_act_1(void) {
     cur_obj_update_floor_and_walls();
 
     if (o->oTimer < 70) {
-        o->oVelY = o->oTimer < 50 ? 6.0f : 0.0f;
+        o->oVelY = (o->oTimer < 50) ? 6.0f : 0.0f;
 
         o->oGravity = 0.0f;
 

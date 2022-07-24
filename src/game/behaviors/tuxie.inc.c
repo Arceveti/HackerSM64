@@ -5,7 +5,7 @@ void play_penguin_walking_sound(s32 walk) {
         set_obj_anim_with_accel_and_sound(
             1,
             11,
-            walk == PENGUIN_SOUND_WALK_BABY ? SOUND_OBJ_BABY_PENGUIN_WALK : SOUND_OBJ_BIG_PENGUIN_WALK
+            (walk == PENGUIN_SOUND_WALK_BABY) ? SOUND_OBJ_BABY_PENGUIN_WALK : SOUND_OBJ_BIG_PENGUIN_WALK
         );
     }
 }
@@ -52,7 +52,7 @@ void tuxies_mother_act_receiving_baby(void) {
 
                 if (cur_obj_update_dialog_with_cutscene(MARIO_DIALOG_LOOK_UP,
                         DIALOG_FLAG_TURN_TO_MARIO, CUTSCENE_DIALOG, dialogID)) {
-                    o->oSubAction = dialogID == DIALOG_058
+                    o->oSubAction = (dialogID == DIALOG_058)
                         ? MOTHER_PENGUIN_SUB_ACT_CORRECT_BABY
                         : MOTHER_PENGUIN_SUB_ACT_WRONG_BABY;
                     o->prevObj->oInteractionSubtype |= INT_SUBTYPE_DROP_IMMEDIATELY;
@@ -224,7 +224,7 @@ void small_penguin_act_near_mother(void) {
     struct Object *motherPenguinObj = cur_obj_nearest_object_with_behavior(bhvTuxiesMother);
 
     if (motherPenguinObj != NULL) {
-        o->oForwardVel = o->oDistanceToMario < 1000.0f ? 2.0f : 0.0f;
+        o->oForwardVel = (o->oDistanceToMario < 1000.0f) ? 2.0f : 0.0f;
 
         f32 distToMother = dist_between_objects(o, motherPenguinObj);
         s16 angleToMother = obj_angle_to_object(o, motherPenguinObj);

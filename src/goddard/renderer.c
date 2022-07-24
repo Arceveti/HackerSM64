@@ -76,7 +76,10 @@ struct LightDirVec {
     s32 x, y, z;
 };
 
-enum DynListBankFlag { TABLE_END = -1, STD_LIST_BANK = 3 };
+enum DynListBankFlag {
+    TABLE_END     = -1,
+    STD_LIST_BANK =  3,
+};
 
 struct DynListBankInfo {
     /* 0x00 */ enum DynListBankFlag flag;
@@ -2172,10 +2175,8 @@ void gddl_is_loading_shine_dl(s32 dlLoad) {
 
 /* 250C18 -> 251014; orig name: func_801A2448 */
 void start_view_dl(struct ObjView *view) {
-    f32 ulx;
-    f32 uly;
-    f32 lrx;
-    f32 lry;
+    f32 ulx, uly;
+    f32 lrx, lry;
 
     if (view->upperLeft.x < view->parent->upperLeft.x) {
         ulx = view->parent->upperLeft.x;
@@ -2249,14 +2250,14 @@ void parse_p1_controller(void) {
     gdctrl->stickDeltaX -= gdctrl->stickX;
     gdctrl->stickDeltaY -= gdctrl->stickY;
     // button values (as bools)
-    gdctrl->trgL   = (currInputs->button & L_TRIG) != 0;
-    gdctrl->trgR   = (currInputs->button & R_TRIG) != 0;
-    gdctrl->btnA   = (currInputs->button & A_BUTTON) != 0;
-    gdctrl->btnB   = (currInputs->button & B_BUTTON) != 0;
-    gdctrl->cleft  = (currInputs->button & L_CBUTTONS) != 0;
-    gdctrl->cright = (currInputs->button & R_CBUTTONS) != 0;
-    gdctrl->cup    = (currInputs->button & U_CBUTTONS) != 0;
-    gdctrl->cdown  = (currInputs->button & D_CBUTTONS) != 0;
+    gdctrl->trgL   = ((currInputs->button & L_TRIG    ) != 0);
+    gdctrl->trgR   = ((currInputs->button & R_TRIG    ) != 0);
+    gdctrl->btnA   = ((currInputs->button & A_BUTTON  ) != 0);
+    gdctrl->btnB   = ((currInputs->button & B_BUTTON  ) != 0);
+    gdctrl->cleft  = ((currInputs->button & L_CBUTTONS) != 0);
+    gdctrl->cright = ((currInputs->button & R_CBUTTONS) != 0);
+    gdctrl->cup    = ((currInputs->button & U_CBUTTONS) != 0);
+    gdctrl->cdown  = ((currInputs->button & D_CBUTTONS) != 0);
     // but not these buttons??
     gdctrl->dleft  = (currInputs->button & L_JPAD);
     gdctrl->dright = (currInputs->button & R_JPAD);
@@ -2283,11 +2284,11 @@ void parse_p1_controller(void) {
     }
     gdctrl->currFrame++;
 
-    if (currInputs->button & START_BUTTON && !(prevInputs->button & START_BUTTON)) {
+    if ((currInputs->button & START_BUTTON) && !(prevInputs->button & START_BUTTON)) {
         gdctrl->newStartPress ^= 1;
     }
 
-    if (currInputs->button & Z_TRIG && !(prevInputs->button & Z_TRIG)) {
+    if ((currInputs->button & Z_TRIG) && !(prevInputs->button & Z_TRIG)) {
         sCurrDebugViewIndex++;
     }
 
@@ -2303,7 +2304,7 @@ void parse_p1_controller(void) {
         activate_timing();
     }
 
-    for (i = 0; ((s32) i) < sDebugViewsCount; i++) {
+    for (i = 0; (s32) i < sDebugViewsCount; i++) {
         sDebugViews[i]->flags &= ~VIEW_UPDATE;
     }
 

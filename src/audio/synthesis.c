@@ -894,7 +894,7 @@ u64 *synthesis_process_notes(s16 *aiBuf, s32 bufLen, u64 *cmd)
     if (!note->noteSubEu.enabled) {
         return cmd;
     } else {
-        flags = 0;
+        flags = 0x0;
         tempBufLen = bufLen;
         if (noteSubEu->needsInit) {
             flags = A_INIT;
@@ -936,7 +936,7 @@ u64 *synthesis_process_notes(s16 *aiBuf, s32 bufLen, u64 *cmd)
         ) {
             gAudioErrorFlags = (note->bankId << 8) + noteIndex + 0x1000000;
         } else if (note->enabled) {
-            flags = 0;
+            flags = 0x0;
             if (note->needsInit) {
                 flags = A_INIT;
                 note->samplePosInt = 0;
@@ -968,7 +968,7 @@ u64 *synthesis_process_notes(s16 *aiBuf, s32 bufLen, u64 *cmd)
                 cmd = load_wave_samples(cmd, note, (samplesLenFixedPoint >> 0x10));
                 noteSamplesDmemAddrBeforeResampling = DMEM_ADDR_UNCOMPRESSED_NOTE + note->samplePosInt * 2;
                 note->samplePosInt += (samplesLenFixedPoint >> 0x10);
-                flags = 0;
+                flags = 0x0;
             } else {
                 // ADPCM note
                 audioBookSample = note->sound->sample;
@@ -1143,7 +1143,7 @@ u64 *synthesis_process_notes(s16 *aiBuf, s32 bufLen, u64 *cmd)
                                 }
                                 break;
                         }
-                        flags = 0;
+                        flags = 0x0;
 
                         if (noteFinished) {
                             aClearBuffer(cmd++, DMEM_ADDR_UNCOMPRESSED_NOTE + s5,
@@ -1234,7 +1234,7 @@ u64 *synthesis_process_notes(s16 *aiBuf, s32 bufLen, u64 *cmd)
                 }
             }
 
-            flags = 0;
+            flags = 0x0;
 
 #ifdef VERSION_EU
             if (noteSubEu->needsInit) {
@@ -1305,12 +1305,12 @@ u64 *load_wave_samples(u64 *cmd, struct NoteSubEu *noteSubEu, struct NoteSynthes
     synthesisState->samplePosInt &= 0x3f;
     a3 = 64 - synthesisState->samplePosInt;
     if (a3 < nSamplesToLoad) {
-        repeats = (nSamplesToLoad - a3 + 63) / 64;
+        repeats = ((nSamplesToLoad - a3) + 63) / 64;
         for (i = 0; i < repeats; i++) {
             aDMEMMove(cmd++,
-                      /*dmemin*/ DMEM_ADDR_UNCOMPRESSED_NOTE,
-                      /*dmemout*/ DMEM_ADDR_UNCOMPRESSED_NOTE + (1 + i) * 128,
-                      /*count*/ 128);
+                      /*dmemin */ DMEM_ADDR_UNCOMPRESSED_NOTE,
+                      /*dmemout*/ DMEM_ADDR_UNCOMPRESSED_NOTE + ((1 + i) * 128),
+                      /*count  */ 128);
         }
     }
     return cmd;
@@ -1331,9 +1331,9 @@ u64 *process_envelope(u64 *cmd, struct NoteSubEu *note, struct NoteSynthesisStat
     s32 rampLeft;
     s32 rampRight;
 
-    sourceLeft = synthesisState->curVolLeft;
+    sourceLeft  = synthesisState->curVolLeft;
     sourceRight = synthesisState->curVolRight;
-    targetLeft = (note->targetVolLeft << 5);
+    targetLeft  = (note->targetVolLeft  << 5);
     targetRight = (note->targetVolRight << 5);
     if (targetLeft == 0) {
         targetLeft++;
@@ -1353,7 +1353,7 @@ u64 *load_wave_samples(u64 *cmd, struct Note *note, s32 nSamplesToLoad) {
     note->samplePosInt &= (note->sampleCount - 1);
     a3 = 64 - note->samplePosInt;
     if (a3 < nSamplesToLoad) {
-        for (i = 0; i <= (nSamplesToLoad - a3 + 63) / 64 - 1; i++) {
+        for (i = 0; i <= (((nSamplesToLoad - a3) + 63) / 64) - 1; i++) {
             aDMEMMove(cmd++, /*dmemin*/ DMEM_ADDR_UNCOMPRESSED_NOTE, /*dmemout*/ DMEM_ADDR_UNCOMPRESSED_NOTE + (1 + i) * sizeof(note->synthesisBuffers->samples), /*count*/ sizeof(note->synthesisBuffers->samples));
         }
     }
@@ -1369,11 +1369,11 @@ u64 *final_resample(u64 *cmd, struct Note *note, s32 count, u16 pitch, u16 dmemI
 u64 *process_envelope(u64 *cmd, struct Note *note, s32 nSamples, u16 inBuf, s32 headsetPanSettings,
                       UNUSED u32 flags) {
     struct VolumeChange vol;
-    vol.sourceLeft = note->curVolLeft;
-    vol.sourceRight = note->curVolRight;
-    vol.targetLeft = note->targetVolLeft;
-    vol.targetRight = note->targetVolRight;
-    note->curVolLeft = vol.targetLeft;
+    vol.sourceLeft    = note->curVolLeft;
+    vol.sourceRight   = note->curVolRight;
+    vol.targetLeft    = note->targetVolLeft;
+    vol.targetRight   = note->targetVolRight;
+    note->curVolLeft  = vol.targetLeft;
     note->curVolRight = vol.targetRight;
     return process_envelope_inner(cmd, note, nSamples, inBuf, headsetPanSettings, &vol);
 }
@@ -1443,7 +1443,7 @@ u64 *process_envelope_inner(u64 *cmd, struct Note *note, s32 nSamples, u16 inBuf
         mixerFlags = A_INIT;
 
 #ifdef VERSION_EU
-        rampLeft = gCurrentLeftVolRamping[targetLeft >> 5] * gCurrentRightVolRamping[sourceLeft >> 5];
+        rampLeft  = gCurrentLeftVolRamping[targetLeft  >> 5] * gCurrentRightVolRamping[sourceLeft  >> 5];
         rampRight = gCurrentLeftVolRamping[targetRight >> 5] * gCurrentRightVolRamping[sourceRight >> 5];
 
         // The operation's parameters change meanings depending on flags
@@ -1453,7 +1453,7 @@ u64 *process_envelope_inner(u64 *cmd, struct Note *note, s32 nSamples, u16 inBuf
         aSetVolume32(cmd++, (A_RATE | A_RIGHT), targetRight, rampRight);
         aSetVolume(cmd++, A_AUX, gVolume, 0, note->reverbVol << 8);
 #else
-        rampLeft = get_volume_ramping(vol->sourceLeft, vol->targetLeft, nSamples);
+        rampLeft  = get_volume_ramping(vol->sourceLeft,  vol->targetLeft,  nSamples);
         rampRight = get_volume_ramping(vol->sourceRight, vol->targetRight, nSamples);
 
         // The operation's parameters change meanings depending on flags

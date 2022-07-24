@@ -465,7 +465,7 @@ static void level_cmd_init_mario(void) {
 static void level_cmd_place_object(void) {
     if (
         sCurrAreaIndex != -1
-        && ((CMD_GET(u8, 2) & (1 << (gCurrActNum - 1))) || (CMD_GET(u8, 2) == 0x1F))
+        && ((CMD_GET(u8, 2) & BIT(gCurrActNum - 1)) || (CMD_GET(u8, 2) == 0x1F))
     ) {
         ModelID16 model = CMD_GET(u32, 0x18);
         struct SpawnInfo *spawnInfo = alloc_only_pool_alloc(sLevelPool, sizeof(struct SpawnInfo));
@@ -624,7 +624,7 @@ static void level_cmd_set_blackout(void) {
 }
 
 static void level_cmd_set_gamma(void) {
-    osViSetSpecialFeatures(CMD_GET(u8, 2) == 0 ? OS_VI_GAMMA_OFF : OS_VI_GAMMA_ON);
+    osViSetSpecialFeatures((CMD_GET(u8, 2) == 0) ? OS_VI_GAMMA_OFF : OS_VI_GAMMA_ON);
     sCurrentCmd = CMD_NEXT;
 }
 

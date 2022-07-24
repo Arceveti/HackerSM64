@@ -56,12 +56,12 @@ void bhv_pokey_body_part_update(void) {
             //  spawns, but one of the body parts shifts upward immediately,
             //  so not very interesting
             if (o->oBehParams2ndByte > 1
-                && !(o->parentObj->oPokeyAliveBodyPartFlags & (1 << (o->oBehParams2ndByte - 1)))) {
+                && !(o->parentObj->oPokeyAliveBodyPartFlags & BIT(o->oBehParams2ndByte - 1))) {
                 o->parentObj->oPokeyAliveBodyPartFlags =
-                    o->parentObj->oPokeyAliveBodyPartFlags | 1 << (o->oBehParams2ndByte - 1);
+                    o->parentObj->oPokeyAliveBodyPartFlags | BIT(o->oBehParams2ndByte - 1);
 
                 o->parentObj->oPokeyAliveBodyPartFlags =
-                    o->parentObj->oPokeyAliveBodyPartFlags & ((1 << o->oBehParams2ndByte) ^ ~0);
+                    o->parentObj->oPokeyAliveBodyPartFlags & (BIT(o->oBehParams2ndByte) ^ ~0);
 
                 o->oBehParams2ndByte--;
             }
@@ -110,7 +110,7 @@ void bhv_pokey_body_part_update(void) {
                 }
 
                 o->parentObj->oPokeyAliveBodyPartFlags =
-                    o->parentObj->oPokeyAliveBodyPartFlags & ((1 << o->oBehParams2ndByte) ^ ~0);
+                    o->parentObj->oPokeyAliveBodyPartFlags & (BIT(o->oBehParams2ndByte) ^ ~0);
             } else if (o->parentObj->oPokeyHeadWasKilled) {
                 cur_obj_become_intangible();
 
@@ -199,7 +199,7 @@ static void pokey_act_wander(void) {
 
                     if (bodyPart != NULL) {
                         o->oPokeyAliveBodyPartFlags =
-                            o->oPokeyAliveBodyPartFlags | (1 << o->oPokeyNumAliveBodyParts);
+                            o->oPokeyAliveBodyPartFlags | BIT(o->oPokeyNumAliveBodyParts);
                         o->oPokeyNumAliveBodyParts++;
                         o->oPokeyBottomBodyPartSize = 0.0f;
 

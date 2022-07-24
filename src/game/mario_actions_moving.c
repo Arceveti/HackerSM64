@@ -449,7 +449,7 @@ void update_walking_speed(struct MarioState *m) {
         maxTargetSpeed = 32.0f;
     }
 
-    targetSpeed = m->intendedMag < maxTargetSpeed ? m->intendedMag : maxTargetSpeed;
+    targetSpeed = (m->intendedMag < maxTargetSpeed) ? m->intendedMag : maxTargetSpeed;
 
     if (m->quicksandDepth > 10.0f) {
         targetSpeed *= 6.25f / m->quicksandDepth;
@@ -1235,7 +1235,7 @@ s32 act_riding_shell_ground(struct MarioState *m) {
     }
 
     update_shell_speed(m);
-    set_mario_animation(m, m->actionArg == 0 ? MARIO_ANIM_START_RIDING_SHELL : MARIO_ANIM_RIDING_SHELL);
+    set_mario_animation(m, (m->actionArg == 0) ? MARIO_ANIM_START_RIDING_SHELL : MARIO_ANIM_RIDING_SHELL);
 
     switch (perform_ground_step(m)) {
         case GROUND_STEP_LEFT_GROUND:
@@ -1244,7 +1244,7 @@ s32 act_riding_shell_ground(struct MarioState *m) {
 
         case GROUND_STEP_HIT_WALL:
             mario_stop_riding_object(m);
-            play_sound(m->flags & MARIO_METAL_CAP ? SOUND_ACTION_METAL_BONK : SOUND_ACTION_BONK,
+            play_sound((m->flags & MARIO_METAL_CAP) ? SOUND_ACTION_METAL_BONK : SOUND_ACTION_BONK,
                        m->marioObj->header.gfx.cameraToObject);
             m->particleFlags |= PARTICLE_VERTICAL_STAR;
             set_mario_action(m, ACT_BACKWARD_GROUND_KB, 0);
@@ -1471,10 +1471,8 @@ s32 act_crouch_slide(struct MarioState *m) {
 
     if (m->actionTimer < 30) {
         m->actionTimer++;
-        if (m->input & INPUT_A_PRESSED) {
-            if (m->forwardVel > 10.0f) {
-                return set_jumping_action(m, ACT_LONG_JUMP, 0);
-            }
+        if ((m->input & INPUT_A_PRESSED) && m->forwardVel > 10.0f) {
+            return set_jumping_action(m, ACT_LONG_JUMP, 0);
         }
     }
 
@@ -1536,7 +1534,7 @@ s32 stomach_slide_action(struct MarioState *m, u32 stopAction, u32 airAction, s3
             queue_rumble_data(5, 80);
 #endif
             return drop_and_set_mario_action(
-                m, m->forwardVel >= 0.0f ? ACT_FORWARD_ROLLOUT : ACT_BACKWARD_ROLLOUT, 0);
+                m, (m->forwardVel >= 0.0f) ? ACT_FORWARD_ROLLOUT : ACT_BACKWARD_ROLLOUT, 0);
         }
     } else {
         m->actionTimer++;
@@ -1567,8 +1565,7 @@ s32 act_dive_slide(struct MarioState *m) {
 #if ENABLE_RUMBLE
         queue_rumble_data(5, 80);
 #endif
-        return set_mario_action(m, m->forwardVel > 0.0f ? ACT_FORWARD_ROLLOUT : ACT_BACKWARD_ROLLOUT,
-                                0);
+        return set_mario_action(m, (m->forwardVel > 0.0f) ? ACT_FORWARD_ROLLOUT : ACT_BACKWARD_ROLLOUT, 0);
     }
 
     play_mario_landing_sound_once(m, SOUND_ACTION_TERRAIN_BODY_HIT_GROUND);

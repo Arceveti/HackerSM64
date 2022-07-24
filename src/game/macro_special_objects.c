@@ -17,7 +17,7 @@
  */
 s32 convert_rotation(s16 inRotation) {
     u16 rotation = ((u16)(inRotation & 0xFF) << 8);
-    switch (rotation) {
+    switch (rotation) { //! TODO: What's the purpose of this?
         case 0x3F00: rotation = 0x4000; break;
         case 0x7F00: rotation = 0x8000; break;
         case 0xBF00: rotation = 0xC000; break;
@@ -35,7 +35,7 @@ void spawn_macro_abs_yrot_2params(ModelID32 model, const BehaviorScript *behavio
     if (behavior != NULL) {
         struct Object *newObj =
             spawn_object_abs_with_rot(&gMacroObjectDefaultParent, 0, model, behavior, x, y, z, 0, convert_rotation(ry), 0);
-        newObj->oBehParams = ((u32) params) << 16;
+        newObj->oBehParams = ((u32) params << 16);
     }
 }
 
@@ -48,7 +48,7 @@ void spawn_macro_abs_yrot_param1(ModelID32 model, const BehaviorScript *behavior
     if (behavior != NULL) {
         struct Object *newObj =
             spawn_object_abs_with_rot(&gMacroObjectDefaultParent, 0, model, behavior, x, y, z, 0, convert_rotation(ry), 0);
-        newObj->oBehParams = ((u32) param) << 24;
+        newObj->oBehParams = ((u32) param << 24);
     }
 }
 
@@ -90,7 +90,7 @@ void spawn_macro_objects(s32 areaIndex, MacroObject *macroObjList) {
         }
 
         // Set macro object properties from the list
-        yaw       = ((*macroObjList++ >> 9) & 0x7F) << 1;
+        yaw       = (((*macroObjList++ >> 9) & 0x7F) << 1);
         x         = *macroObjList++;
         y         = *macroObjList++;
         z         = *macroObjList++;

@@ -18,9 +18,9 @@
 #ifdef VANILLA_DEBUG
 
 enum DebugInfoFlags {
-    DEBUG_INFO_NOFLAGS      = (0 << 0),
-    DEBUG_INFO_FLAG_DPRINT  = (1 << 0),
-    DEBUG_INFO_FLAG_LSELECT = (1 << 1),
+    DEBUG_INFO_NOFLAGS      = 0x0,
+    DEBUG_INFO_FLAG_DPRINT  = BIT(0),
+    DEBUG_INFO_FLAG_LSELECT = BIT(1),
     DEBUG_INFO_FLAG_ALL     = 0xFF
 };
 

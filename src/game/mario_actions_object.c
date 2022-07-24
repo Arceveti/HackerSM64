@@ -29,15 +29,18 @@ void mario_update_punch_sequence(struct MarioState *m) {
     s32 animFrame;
 
     if (m->action & ACT_FLAG_MOVING) {
-        endAction = ACT_WALKING, crouchEndAction = ACT_CROUCH_SLIDE;
+        endAction = ACT_WALKING;
+        crouchEndAction = ACT_CROUCH_SLIDE;
     } else {
-        endAction = ACT_IDLE, crouchEndAction = ACT_CROUCHING;
+        endAction = ACT_IDLE;
+        crouchEndAction = ACT_CROUCHING;
     }
 
     switch (m->actionArg) {
         case ACT_ARG_PUNCH_SEQUENCE_YAH:
             play_sound(SOUND_MARIO_PUNCH_YAH, m->marioObj->header.gfx.cameraToObject);
             FALL_THROUGH;
+
         case ACT_ARG_PUNCH_SEQUENCE_FIRST_PUNCH:
             set_mario_animation(m, MARIO_ANIM_FIRST_PUNCH);
             if (is_anim_past_end(m)) {

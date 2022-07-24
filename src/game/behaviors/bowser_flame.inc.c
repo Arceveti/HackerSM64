@@ -42,7 +42,7 @@ s32 bowser_flame_should_despawn(s32 maxTime) {
 void bhv_flame_bowser_init(void) {
     o->oAnimState = (s32)(random_float() * 10.0f);
     o->oMoveAngleYaw = random_u16();
-    o->oVelY = random_float() < 0.2f ? 80.0f : 20.0f;
+    o->oVelY = (random_float() < 0.2f) ? 80.0f : 20.0f;
     o->oForwardVel = 10.0f;
     o->oGravity = -1.0f;
     o->oFlameScale = random_float() + 1.0f;
@@ -57,7 +57,7 @@ void bhv_flame_large_burning_out_init(void) {
 }
 
 void bowser_flame_move(void) {
-    s32 timer = ((o->oFlameSpeedTimerOffset + gGlobalTimer) & 0x3F) << 10;
+    s32 timer = (((o->oFlameSpeedTimerOffset + gGlobalTimer) & 0x3F) << 10);
     o->oPosX += sins(o->oMoveAngleYaw) * sins(timer) * 4.0f;
     o->oPosZ += coss(o->oMoveAngleYaw) * sins(timer) * 4.0f;
 }
@@ -79,7 +79,7 @@ void bhv_flame_bowser_loop(void) {
             if (cur_obj_has_behavior(bhvFlameLargeBurningOut)) {
                 o->oFlameScale = 8.0f;
             } else {
-                o->oFlameScale = random_float() * 2 + 6.0f;
+                o->oFlameScale = (random_float() * 2) + 6.0f;
             }
             o->oForwardVel = 0;
             o->oVelY = 0;
@@ -88,7 +88,7 @@ void bhv_flame_bowser_loop(void) {
     } else {
         cur_obj_become_tangible();
 
-        if (o->oTimer > o->oFlameScale * 10 + 5.0f) {
+        if (o->oTimer > (o->oFlameScale * 10) + 5.0f) {
             o->oFlameScale -= 0.15f;
             if (o->oFlameScale <= 0) {
                 bowser_flame_despawn();

@@ -692,7 +692,7 @@ void init_controllers(void) {
     // Loop over the 4 ports and link the controller structs to the appropriate status and pad.
     for (cont = 0, port = 0; port < 4 && cont < 4; port++) {
         // Is controller plugged in?
-        if (gControllerBits & (1 << port)) {
+        if (gControllerBits & BIT(port)) {
             // The game allows you to have just 1 controller plugged
             // into any port in order to play the game. this was probably
             // so if any of the ports didn't work, you can have controllers

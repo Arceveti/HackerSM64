@@ -1237,7 +1237,7 @@ void func_sh_802f4e50(struct PendingDmaAudioBank *audioBank, s32 audioResetStatu
     if (audioBank->remaining == 0) {
         mesg = (OSMesg) audioBank->encodedInfo;
         temp = *encodedInfo;
-        bankId = (temp >> 8) & 0xFF;
+        bankId = ((temp >> 8) & 0xFF);
         switch ((u8) (temp >> 0x10)) {
             case 0:
                 if (gSeqLoadStatus[bankId] != SOUND_LOAD_STATUS_5) {

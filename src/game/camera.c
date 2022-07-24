@@ -9512,7 +9512,7 @@ void cutscene_door_end(struct Camera *c) {
 #ifdef USE_COURSE_DEFAULT_MODE
     c->mode = c->defMode;
 #else
-    c->mode = c->defMode == CAMERA_MODE_FREE_ROAM ? CAMERA_MODE_FREE_ROAM : CAMERA_MODE_CLOSE;
+    c->mode = (c->defMode == CAMERA_MODE_FREE_ROAM) ? CAMERA_MODE_FREE_ROAM : CAMERA_MODE_CLOSE;
 #endif
 
     c->cutscene = CUTSCENE_NONE;

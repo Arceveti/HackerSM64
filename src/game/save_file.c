@@ -94,7 +94,7 @@ static s32 write_eeprom_data(void *buffer, s32 size) {
 
     if (gEepromProbe != 0) {
         s32 triesLeft = 4;
-        u32 offset = (u32)((u8 *) buffer - (u8 *) &gSaveBuffer) >> 3;
+        u32 offset = ((u32)((u8 *) buffer - (u8 *) &gSaveBuffer) >> 3);
 
         do {
 #if ENABLE_RUMBLE
@@ -234,14 +234,14 @@ static void wipe_main_menu_data(void) {
 }
 
 static s32 get_coin_score_age(s32 fileIndex, s32 courseIndex) {
-    return (gSaveBuffer.menuData.coinScoreAges[fileIndex] >> (2 * courseIndex)) & 0x3;
+    return ((gSaveBuffer.menuData.coinScoreAges[fileIndex] >> (2 * courseIndex)) & 0x3);
 }
 
 static void set_coin_score_age(s32 fileIndex, s32 courseIndex, s32 age) {
     s32 mask = 0x3 << (2 * courseIndex);
 
     gSaveBuffer.menuData.coinScoreAges[fileIndex] &= ~mask;
-    gSaveBuffer.menuData.coinScoreAges[fileIndex] |= age << (2 * courseIndex);
+    gSaveBuffer.menuData.coinScoreAges[fileIndex] |= (age << (2 * courseIndex));
 }
 
 /**
@@ -348,8 +348,8 @@ void save_file_load_all(void) {
 
     for (file = 0; file < NUM_SAVE_FILES; file++) {
         // Verify the save file and create a backup copy if only one of the slots is valid.
-        validSlots  = verify_save_block_signature(&gSaveBuffer.files[file][0], sizeof(gSaveBuffer.files[file][0]), SAVE_FILE_MAGIC);
-        validSlots |= verify_save_block_signature(&gSaveBuffer.files[file][1], sizeof(gSaveBuffer.files[file][1]), SAVE_FILE_MAGIC) << 1;
+        validSlots  =  verify_save_block_signature(&gSaveBuffer.files[file][0], sizeof(gSaveBuffer.files[file][0]), SAVE_FILE_MAGIC);
+        validSlots |= (verify_save_block_signature(&gSaveBuffer.files[file][1], sizeof(gSaveBuffer.files[file][1]), SAVE_FILE_MAGIC) << 1);
         switch (validSlots) {
             case 0: // Neither copy is correct
                 save_file_erase(file);
@@ -422,9 +422,9 @@ void save_file_collect_star_or_key(s16 coinScore, s16 starIndex) {
     s32 courseIndex = COURSE_NUM_TO_INDEX(gCurrCourseNum);
 #ifdef GLOBAL_STAR_IDS
     s32 starByte = COURSE_NUM_TO_INDEX(starIndex / 7);
-    s32 starFlag = 1 << (starIndex % 7);
+    s32 starFlag = BIT(starIndex % 7);
 #else
-    s32 starFlag = 1 << starIndex;
+    s32 starFlag = BIT(starIndex);
 #endif
 
     gLastCompletedCourseNum = courseIndex + 1;
@@ -598,7 +598,7 @@ u32 save_file_get_star_flags(s32 fileIndex, s32 courseIndex) {
     if (courseIndex == COURSE_NUM_TO_INDEX(COURSE_NONE)) {
         starFlags = SAVE_FLAG_TO_STAR_FLAG(gSaveBuffer.files[fileIndex][0].flags);
     } else {
-        starFlags = gSaveBuffer.files[fileIndex][0].courseStars[courseIndex] & 0x7F;
+        starFlags =( gSaveBuffer.files[fileIndex][0].courseStars[courseIndex] & 0x7F);
     }
 
     return starFlags;

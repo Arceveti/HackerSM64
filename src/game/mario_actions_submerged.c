@@ -125,7 +125,7 @@ static void apply_water_current(struct MarioState *m, Vec3f step) {
     s16 pitchToWhirlpool, yawToWhirlpool;
 
     if (m->floor != NULL && m->floor->type == SURFACE_FLOWING_WATER) {
-        s16 currentAngle = m->floor->force << 8;
+        s16 currentAngle = (m->floor->force << 8);
         f32 currentSpeed = sWaterCurrentSpeeds[m->floor->force >> 8];
 
         step[0] += currentSpeed * sins(currentAngle);
@@ -429,8 +429,7 @@ static s32 act_hold_water_action_end(struct MarioState *m) {
     }
 
     common_idle_step(
-        m, m->actionArg == 0 ? MARIO_ANIM_WATER_ACTION_END_WITH_OBJ : MARIO_ANIM_STOP_GRAB_OBJ_WATER,
-        0);
+        m, (m->actionArg == 0) ? MARIO_ANIM_WATER_ACTION_END_WITH_OBJ : MARIO_ANIM_STOP_GRAB_OBJ_WATER, 0);
     if (is_anim_at_end(m)) {
         set_mario_action(m, ACT_HOLD_WATER_IDLE, 0);
     }
@@ -578,7 +577,7 @@ static s32 act_breaststroke(struct MarioState *m) {
     }
 
     if (m->actionTimer == 1) {
-        play_sound(sSwimStrength == MIN_SWIM_STRENGTH ? SOUND_ACTION_SWIM : SOUND_ACTION_SWIM_FAST,
+        play_sound((sSwimStrength == MIN_SWIM_STRENGTH) ? SOUND_ACTION_SWIM : SOUND_ACTION_SWIM_FAST,
                    m->marioObj->header.gfx.cameraToObject);
         reset_bob_variables(m);
     }
@@ -901,7 +900,7 @@ static void common_water_knockback_step(struct MarioState *m, s32 animation, u32
             m->invincTimer = 30;
         }
 
-        set_mario_action(m, m->health >= 0x100 ? endAction : ACT_WATER_DEATH, 0);
+        set_mario_action(m, (m->health >= 0x100) ? endAction : ACT_WATER_DEATH, 0);
     }
 }
 
@@ -927,7 +926,7 @@ static s32 act_water_shocked(struct MarioState *m) {
 
     if (m->actionTimer >= 6) {
         m->invincTimer = 30;
-        set_mario_action(m, m->health < 0x100 ? ACT_WATER_DEATH : ACT_WATER_IDLE, 0);
+        set_mario_action(m, (m->health < 0x100) ? ACT_WATER_DEATH : ACT_WATER_IDLE, 0);
     }
 
     stationary_slow_down(m);
@@ -1401,7 +1400,7 @@ static s32 act_metal_water_falling(struct MarioState *m) {
         m->faceAngle[1] += 0x400 * sins(m->intendedYaw - m->faceAngle[1]);
     }
 
-    set_mario_animation(m, m->actionArg == 0 ? MARIO_ANIM_GENERAL_FALL : MARIO_ANIM_FALL_FROM_WATER);
+    set_mario_animation(m, (m->actionArg == 0) ? MARIO_ANIM_GENERAL_FALL : MARIO_ANIM_FALL_FROM_WATER);
     stationary_slow_down(m);
 
     if (perform_water_step(m) & WATER_STEP_HIT_FLOOR) { // hit floor or cancelled

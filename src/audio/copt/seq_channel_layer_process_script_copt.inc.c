@@ -381,9 +381,9 @@ void seq_channel_layer_process_script(struct SequenceChannelLayer *layer) {
                         usedSemitone = (layer->portamentoTargetNote < cmdSemitone) ? cmdSemitone : layer->portamentoTargetNote;
 
                         if (instrument != NULL) {
-                            sound = (u8) usedSemitone < instrument->normalRangeLo ? &instrument->lowNotesSound
-                                  : (u8) usedSemitone <= instrument->normalRangeHi ?
-                                        &instrument->normalNotesSound : &instrument->highNotesSound;
+                            sound = ((u8) usedSemitone < instrument->normalRangeLo) ? &instrument->lowNotesSound
+                                  : (((u8) usedSemitone <= instrument->normalRangeHi) ?
+                                        &instrument->normalNotesSound : &instrument->highNotesSound);
 
                             sameSound = (sound == (*layer).sound);
                             layer->sound = sound;
@@ -425,9 +425,9 @@ void seq_channel_layer_process_script(struct SequenceChannelLayer *layer) {
                             layer->portamentoTargetNote = cmdSemitone;
                         }
                     } else if (instrument != NULL) {
-                        sound = cmdSemitone < instrument->normalRangeLo ?
-                                         &instrument->lowNotesSound : cmdSemitone <= instrument->normalRangeHi ?
-                                         &instrument->normalNotesSound : &instrument->highNotesSound;
+                        sound = (cmdSemitone < instrument->normalRangeLo) ?
+                                         &instrument->lowNotesSound : ((cmdSemitone <= instrument->normalRangeHi) ?
+                                         &instrument->normalNotesSound : &instrument->highNotesSound);
 
                         sameSound = (sound == (*layer).sound);
                         layer->sound = sound;

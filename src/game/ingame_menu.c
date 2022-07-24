@@ -1638,7 +1638,7 @@ void render_pause_my_score_coins(void) {
 
     if (courseIndex <= COURSE_NUM_TO_INDEX(COURSE_STAGES_MAX)) {
         print_hud_my_score_coins(1, gCurrSaveFileNum - 1, courseIndex, 178, 103);
-        print_hud_my_score_stars(gCurrSaveFileNum - 1, courseIndex, 118, 103);
+        print_hud_my_score_stars(   gCurrSaveFileNum - 1, courseIndex, 118, 103);
     }
 
     gSPDisplayList(gDisplayListHead++, dl_rgba16_text_end);
@@ -1657,9 +1657,9 @@ void render_pause_my_score_coins(void) {
         int_to_str(gCurrCourseNum, strCourseNum);
         print_generic_string(CRS_NUM_X1, 157, strCourseNum);
 
-        u8 *actName = segmented_to_virtual(actNameTbl[COURSE_NUM_TO_INDEX(gCurrCourseNum) * 6 + gDialogCourseActNum - 1]);
+        u8 *actName = segmented_to_virtual(actNameTbl[(COURSE_NUM_TO_INDEX(gCurrCourseNum) * 6) + gDialogCourseActNum - 1]);
 
-        if (starFlags & (1 << (gDialogCourseActNum - 1))) {
+        if (starFlags & BIT(gDialogCourseActNum - 1)) {
             print_generic_string(TXT_STAR_X, 140, textStar);
         } else {
             print_generic_string(TXT_STAR_X, 140, textUnfilledStar);
@@ -1807,7 +1807,7 @@ void render_pause_castle_course_stars(s16 x, s16 y, s16 fileIndex, s16 courseInd
     }
 
     while (hasStar != starCount) {
-        if (starFlags & (1 << nextStar)) {
+        if (starFlags & BIT(nextStar)) {
             str[nextStar * 2] = DIALOG_CHAR_STAR_FILLED;
             hasStar++;
         } else {
@@ -2085,7 +2085,7 @@ void render_course_complete_lvl_info_and_hud_str(void) {
 
     if (gLastCompletedCourseNum <= COURSE_STAGES_MAX) { // Main courses
         print_hud_course_complete_coins(118, 103);
-        play_star_fanfare_and_flash_hud(HUD_FLASH_STARS, (1 << (gLastCompletedStarNum - 1)));
+        play_star_fanfare_and_flash_hud(HUD_FLASH_STARS, BIT(gLastCompletedStarNum - 1));
 
         if (gLastCompletedStarNum == 7) {
             name = segmented_to_virtual(actNameTbl[COURSE_STAGES_MAX * 6 + 1]);
@@ -2129,7 +2129,7 @@ void render_course_complete_lvl_info_and_hud_str(void) {
         name = segmented_to_virtual(actNameTbl[COURSE_STAGES_MAX * 6]);
 
         print_hud_course_complete_coins(118, 103);
-        play_star_fanfare_and_flash_hud(HUD_FLASH_STARS, 1 << (gLastCompletedStarNum - 1));
+        play_star_fanfare_and_flash_hud(HUD_FLASH_STARS, BIT(gLastCompletedStarNum - 1));
     }
 
     // Print star glyph

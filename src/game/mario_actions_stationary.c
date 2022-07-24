@@ -785,7 +785,7 @@ s32 act_shockwave_bounce(struct MarioState *m) {
         return set_mario_action(m, ACT_IDLE, 0);
     }
 
-    s16 bounceTimer = (m->actionTimer % 16) << 12;
+    s16 bounceTimer = ((m->actionTimer % 16) << 12);
     f32 bounceAmt = (f32)(((f32)(6 - m->actionTimer / 8) * 8.0f) + 4.0f);
     mario_set_forward_vel(m, 0);
     vec3_zero(m->vel);
