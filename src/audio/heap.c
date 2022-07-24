@@ -1347,7 +1347,7 @@ void audio_reset_session(void) {
     gMaxAudioCmds = gMaxSimultaneousNotes * 20 * updatesPerFrame + 320;
 #endif // (VERSION_JP || VERSION_US)
 
-#if defined(VERSION_SH)
+#ifdef VERSION_SH
     persistentMem = DOUBLE_SIZE_ON_64_BIT(preset->persistentSeqMem + preset->persistentBankMem + preset->unk18 + preset->unkMem28 + 0x10);
     temporaryMem  = DOUBLE_SIZE_ON_64_BIT(preset->temporarySeqMem  + preset->temporaryBankMem  + preset->unk24 + preset->unkMem2C + 0x10);
 #else

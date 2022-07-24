@@ -799,7 +799,7 @@ void seq_channel_layer_process_script(struct SequenceChannelLayer *layer) {
                         }
 
                         if (instrument != NULL) {
- #if defined(VERSION_EU)
+ #ifdef VERSION_EU
                             sound = instrument_get_audio_bank_sound(instrument, vel);
  #else
                             sound = ((u8) vel < instrument->normalRangeLo) ? &instrument->lowNotesSound

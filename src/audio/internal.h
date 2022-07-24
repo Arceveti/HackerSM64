@@ -565,7 +565,7 @@ struct SequenceChannelLayer {
     /*0x50, 0x4C, 0x50*/ struct SequenceChannel *seqChannel;
     /*0x54, 0x50*/ struct M64ScriptState scriptState;
     /*0x70, 0x6C*/ struct AudioListItem listItem;
-#if defined(VERSION_EU)
+#ifdef VERSION_EU
     u8 pad2[4];
 #endif
 }; // size = 0x80
