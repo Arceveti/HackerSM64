@@ -648,8 +648,8 @@ void read_controller_inputs(s32 threadID) {
         if (controller->controllerData != NULL) {
             controller->rawStickX = controller->controllerData->stick_x;
             controller->rawStickY = controller->controllerData->stick_y;
-            controller->buttonPressed = ~controller->buttonDown & controller->controllerData->button;
-            controller->buttonReleased = ~controller->controllerData->button & controller->buttonDown;
+            controller->buttonPressed = (~controller->buttonDown & controller->controllerData->button);
+            controller->buttonReleased = (~controller->controllerData->button & controller->buttonDown);
             // 0.5x A presses are a good meme
             controller->buttonDown = controller->controllerData->button;
             adjust_analog_stick(controller);
@@ -701,7 +701,8 @@ void init_controllers(void) {
             gControllers[cont].port = port;
 #endif
             gControllers[cont].statusData = &gControllerStatuses[port];
-            gControllers[cont++].controllerData = &gControllerPads[port];
+            gControllers[cont].controllerData = &gControllerPads[port];
+            cont++;
         }
     }
 }
