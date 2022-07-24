@@ -85,7 +85,7 @@ s32 get_credits_str_width(char *str) {
     s32 length = 0;
 
     while ((c = *str++) != 0) {
-        length += (c == ' ' ? 4 : 7);
+        length += ((c == ' ') ? 4 : 7);
     }
 
     return length;
@@ -306,10 +306,11 @@ s32 mario_ready_to_speak(void) {
     u32 actionGroup = gMarioState->action & ACT_GROUP_MASK;
     s32 isReadyToSpeak = FALSE;
 
-    if ((gMarioState->action == ACT_WAITING_FOR_DIALOG || actionGroup == ACT_GROUP_STATIONARY
-         || actionGroup == ACT_GROUP_MOVING)
-        && (!(gMarioState->action & (ACT_FLAG_RIDING_SHELL | ACT_FLAG_INVULNERABLE))
-            && gMarioState->action != ACT_FIRST_PERSON)) {
+    if ((gMarioState->action == ACT_WAITING_FOR_DIALOG
+        || actionGroup == ACT_GROUP_STATIONARY
+        || actionGroup == ACT_GROUP_MOVING)
+     && !(gMarioState->action & (ACT_FLAG_RIDING_SHELL | ACT_FLAG_INVULNERABLE))
+     && gMarioState->action != ACT_FIRST_PERSON) {
         isReadyToSpeak = TRUE;
     }
 
@@ -490,8 +491,8 @@ s32 act_reading_sign(struct MarioState *m) {
             // intentional fallthrough
         case ACT_STATE_READING_SIGN_TURN_TOWARD_SIGN:
             m->faceAngle[1] += marioObj->oMarioReadingSignDYaw  / 11;
-            m->pos[0] += marioObj->oMarioReadingSignDPosX / 11.0f;
-            m->pos[2] += marioObj->oMarioReadingSignDPosZ / 11.0f;
+            m->pos[0]       += marioObj->oMarioReadingSignDPosX / 11.0f;
+            m->pos[2]       += marioObj->oMarioReadingSignDPosZ / 11.0f;
             // create the text box
             if (m->actionTimer++ == 10) {
                 create_dialog_inverted_box(m->usedObj->oBehParams2ndByte);
@@ -620,7 +621,7 @@ void general_star_dance_handler(struct MarioState *m, s32 isInWater) {
 #endif
                 disable_background_sound();
                 //! TODO: Is this check necessary? Both seem to do the exact same thing.
-                if (m->actionArg & 1) {
+                if (m->actionArg & 0x1) {
                     // No exit
                     play_course_clear(obj_has_model(celebStar, MODEL_BOWSER_KEY));
                 } else {
@@ -1800,16 +1801,6 @@ static void intro_cutscene_set_mario_to_idle(struct MarioState *m) {
     stop_and_set_height_to_floor(m);
 }
 
-enum {
-    INTRO_CUTSCENE_HIDE_HUD_AND_MARIO,
-    INTRO_CUTSCENE_PEACH_LAKITU_SCENE,
-    INTRO_CUTSCENE_RAISE_PIPE,
-    INTRO_CUTSCENE_JUMP_OUT_OF_PIPE,
-    INTRO_CUTSCENE_LAND_OUTSIDE_PIPE,
-    INTRO_CUTSCENE_LOWER_PIPE,
-    INTRO_CUTSCENE_SET_MARIO_TO_IDLE
-};
-
 static s32 act_intro_cutscene(struct MarioState *m) {
     switch (m->actionArg) {
         case INTRO_CUTSCENE_HIDE_HUD_AND_MARIO:
@@ -1842,9 +1833,9 @@ static void jumbo_star_cutscene_falling(struct MarioState *m) {
     if (m->actionState == ACT_STATE_JUMBO_STAR_CUTSCENE_FALLING_FALL) {
 #ifdef POWER_STARS_HEAL
         m->healCounter = 31;
-#ifdef BREATH_METER
+ #ifdef BREATH_METER
         m->breathCounter = 31;
-#endif
+ #endif
 #endif
         m->input |= INPUT_A_DOWN;
         m->flags |= (MARIO_WING_CAP | MARIO_CAP_ON_HEAD);
@@ -1961,8 +1952,6 @@ static void jumbo_star_cutscene_flying(struct MarioState *m) {
     }
 }
 
-enum { JUMBO_STAR_CUTSCENE_FALLING, JUMBO_STAR_CUTSCENE_TAKING_OFF, JUMBO_STAR_CUTSCENE_FLYING };
-
 static s32 act_jumbo_star_cutscene(struct MarioState *m) {
     switch (m->actionArg) {
         case JUMBO_STAR_CUTSCENE_FALLING:
@@ -1986,18 +1975,24 @@ void generate_yellow_sparkles(s16 x, s16 y, s16 z, f32 radius) {
     s16 offsetY = radius * sins(sSparkleGenTheta);
     s16 offsetZ = radius * coss(sSparkleGenTheta) * coss(sSparkleGenPhi);
 
-    spawn_object_abs_with_rot(gCurrentObject, 0, MODEL_NONE, bhvSparkleSpawn, x + offsetX, y + offsetY,
-                              z + offsetZ, 0, 0, 0);
+    spawn_object_abs_with_rot(gCurrentObject, 0, MODEL_NONE, bhvSparkleSpawn,
+                              x + offsetX,
+                              y + offsetY,
+                              z + offsetZ,
+                              0, 0, 0);
 
     offsetX = offsetX * 4 / 3;
     offsetY = offsetY * 4 / 3;
     offsetZ = offsetZ * 4 / 3;
 
-    spawn_object_abs_with_rot(gCurrentObject, 0, MODEL_NONE, bhvSparkleSpawn, x - offsetX, y - offsetY,
-                              z - offsetZ, 0, 0, 0);
+    spawn_object_abs_with_rot(gCurrentObject, 0, MODEL_NONE, bhvSparkleSpawn,
+                              x - offsetX,
+                              y - offsetY,
+                              z - offsetZ,
+                              0, 0, 0);
 
     sSparkleGenTheta += 0x3800;
-    sSparkleGenPhi += 0x6000;
+    sSparkleGenPhi   += 0x6000;
 }
 
 // not sure what this does, returns the height of the floor.
@@ -2068,11 +2063,10 @@ static void end_peach_cutscene_summon_jumbo_star(struct MarioState *m) {
     play_sound(SOUND_AIR_PEACH_TWINKLE, sEndJumboStarObj->header.gfx.cameraToObject);
 }
 
-#if defined(VERSION_SH)
-    #define TIMER_FADE_IN_PEACH 276
+#define TIMER_FADE_IN_PEACH 276
+#ifdef VERSION_SH
     #define TIMER_DESCEND_PEACH 400
 #else
-    #define TIMER_FADE_IN_PEACH 276
     #define TIMER_DESCEND_PEACH 355
 #endif
 
@@ -2111,7 +2105,7 @@ static void end_peach_cutscene_spawn_peach(struct MarioState *m) {
         sEndToadAnims[END_TOAD_INDEX_EAST] = TOAD_ANIM_EAST_STANDING;
     }
 
-    if (m->actionTimer >= TIMER_FADE_IN_PEACH) {
+    if (m->actionTimer >= 276) {
         sEndPeachObj->oOpacity = camera_approach_f32_symmetric(sEndPeachObj->oOpacity, 255.0f, 2.0f);
     }
     if (m->actionTimer >= 40) {
@@ -2126,6 +2120,9 @@ static void end_peach_cutscene_spawn_peach(struct MarioState *m) {
         play_sound(SOUND_AIR_PEACH_TWINKLE, sEndPeachObj->header.gfx.cameraToObject);
     }
 }
+
+#undef TIMER_FADE_IN_PEACH
+#undef TIMER_DESCEND_PEACH
 
 #define TIMER_RUN_TO_PEACH 584
 
@@ -2184,23 +2181,9 @@ static void end_peach_cutscene_run_to_peach(struct MarioState *m) {
 }
 
 #ifdef VERSION_SH
-    #define END_PEACH_CUTSCENE_DIALOG_1_TIME_1 110
-    #define END_PEACH_CUTSCENE_DIALOG_1_TIME_2 111
-    #define END_PEACH_CUTSCENE_DIALOG_1_TIME_3 175
-    #define END_PEACH_CUTSCENE_DIALOG_1_TIME_4 258
-    #define END_PEACH_CUTSCENE_DIALOG_1_TIME_5 260
-    #define END_PEACH_CUTSCENE_DIALOG_1_TIME_6 305
-    #define END_PEACH_CUTSCENE_DIALOG_1_TIME_7 320
-    #define END_PEACH_CUTSCENE_DIALOG_1_TIME_8 510
+    #define END_PEACH_CUTSCENE_TIME(t) ((t) + 30)
 #else
-    #define END_PEACH_CUTSCENE_DIALOG_1_TIME_1  80
-    #define END_PEACH_CUTSCENE_DIALOG_1_TIME_2  81
-    #define END_PEACH_CUTSCENE_DIALOG_1_TIME_3 145
-    #define END_PEACH_CUTSCENE_DIALOG_1_TIME_4 228
-    #define END_PEACH_CUTSCENE_DIALOG_1_TIME_5 230
-    #define END_PEACH_CUTSCENE_DIALOG_1_TIME_6 275
-    #define END_PEACH_CUTSCENE_DIALOG_1_TIME_7 290
-    #define END_PEACH_CUTSCENE_DIALOG_1_TIME_8 480
+    #define END_PEACH_CUTSCENE_TIME(t) (t)
 #endif
 
 // dialog 1
@@ -2221,24 +2204,24 @@ static void end_peach_cutscene_dialog_1(struct MarioState *m) {
     }
 
     switch (m->actionTimer) {
-        case END_PEACH_CUTSCENE_DIALOG_1_TIME_1:
+        case END_PEACH_CUTSCENE_TIME(80):
             sEndPeachAnimation = PEACH_ANIM_DIALOG_1_PART_1;
             break;
 
-        case END_PEACH_CUTSCENE_DIALOG_1_TIME_2:
+        case END_PEACH_CUTSCENE_TIME(81):
             sPeachManualBlinkTime = 3;
             break;
 
-        case END_PEACH_CUTSCENE_DIALOG_1_TIME_3:
+        case END_PEACH_CUTSCENE_TIME(145):
             sPeachManualBlinkTime = 2;
             break;
 
-        case END_PEACH_CUTSCENE_DIALOG_1_TIME_4:
+        case END_PEACH_CUTSCENE_TIME(228):
             sPeachManualBlinkTime = 1;
-            sPeachIsBlinking      = 1;
+            sPeachIsBlinking = TRUE;
             break;
 
-        case END_PEACH_CUTSCENE_DIALOG_1_TIME_5:
+        case END_PEACH_CUTSCENE_TIME(230):
             set_cutscene_message(160, 227, 0, 30);
 #ifndef VERSION_JP
             seq_player_lower_volume(SEQ_PLAYER_LEVEL, 60, 40);
@@ -2246,45 +2229,38 @@ static void end_peach_cutscene_dialog_1(struct MarioState *m) {
 #endif
             break;
 
-        case END_PEACH_CUTSCENE_DIALOG_1_TIME_6:
+        case END_PEACH_CUTSCENE_TIME(275):
             sPeachManualBlinkTime = 0;
-            sPeachIsBlinking      = 0;
+            sPeachIsBlinking = FALSE;
             break;
 
-        case END_PEACH_CUTSCENE_DIALOG_1_TIME_7:
+        case END_PEACH_CUTSCENE_TIME(290):
             set_cutscene_message(160, 227, 1, 60);
 #ifndef VERSION_JP
             play_sound(SOUND_PEACH_POWER_OF_THE_STARS, sEndPeachObj->header.gfx.cameraToObject);
 #endif
             break;
 
-        case END_PEACH_CUTSCENE_DIALOG_1_TIME_8:
+        case END_PEACH_CUTSCENE_TIME(480):
             advance_cutscene_step(m);
             break;
     }
 }
 
-#undef END_PEACH_CUTSCENE_DIALOG_1_TIME_1
-#undef END_PEACH_CUTSCENE_DIALOG_1_TIME_2
-#undef END_PEACH_CUTSCENE_DIALOG_1_TIME_3
-#undef END_PEACH_CUTSCENE_DIALOG_1_TIME_4
-#undef END_PEACH_CUTSCENE_DIALOG_1_TIME_5
-#undef END_PEACH_CUTSCENE_DIALOG_1_TIME_6
-#undef END_PEACH_CUTSCENE_DIALOG_1_TIME_7
-#undef END_PEACH_CUTSCENE_DIALOG_1_TIME_8
+#undef END_PEACH_CUTSCENE_TIME
 
-#if defined(VERSION_SH)
-    #define END_PEACH_CUTSCENE_DIALOG_2_TIME_1  39
-    #define END_PEACH_CUTSCENE_DIALOG_2_TIME_2  65
-    #define END_PEACH_CUTSCENE_DIALOG_2_TIME_3 105
-    #define TIMER_SOMETHING_SPECIAL            170
-    #define TIMER_PEACH_KISS                   250
+#ifdef VERSION_SH
+    #define TIMER_THANKS_TO_YOU      39
+    #define TIMER_PEACH_BLINKING     65
+    #define TIMER_THANK_YOU_MARIO   105
+    #define TIMER_SOMETHING_SPECIAL 170
+    #define TIMER_PEACH_KISS        250
 #else
-    #define END_PEACH_CUTSCENE_DIALOG_2_TIME_1  29
-    #define END_PEACH_CUTSCENE_DIALOG_2_TIME_2  45
-    #define END_PEACH_CUTSCENE_DIALOG_2_TIME_3  75
-    #define TIMER_SOMETHING_SPECIAL            130
-    #define TIMER_PEACH_KISS                   200
+    #define TIMER_THANKS_TO_YOU      29
+    #define TIMER_PEACH_BLINKING     45
+    #define TIMER_THANK_YOU_MARIO    75
+    #define TIMER_SOMETHING_SPECIAL 130
+    #define TIMER_PEACH_KISS        200
 #endif
 
 // dialog 2
@@ -2295,18 +2271,18 @@ static void end_peach_cutscene_dialog_2(struct MarioState *m) {
     sEndPeachAnimation = PEACH_ANIM_THANKS_TO_YOU;
 
     switch (m->actionTimer) {
-        case END_PEACH_CUTSCENE_DIALOG_2_TIME_1:
+        case TIMER_THANKS_TO_YOU:
             set_cutscene_message(160, 227, 2, 30);
 #ifndef VERSION_JP
             play_sound(SOUND_PEACH_THANKS_TO_YOU, sEndPeachObj->header.gfx.cameraToObject);
 #endif
             break;
 
-        case END_PEACH_CUTSCENE_DIALOG_2_TIME_2:
+        case TIMER_PEACH_BLINKING:
             sPeachIsBlinking = TRUE;
             break;
 
-        case END_PEACH_CUTSCENE_DIALOG_2_TIME_3:
+        case TIMER_THANK_YOU_MARIO:
             set_cutscene_message(160, 227, 3, 30);
 #ifndef VERSION_JP
             play_sound(SOUND_PEACH_THANK_YOU_MARIO, sEndPeachObj->header.gfx.cameraToObject);
@@ -2326,9 +2302,9 @@ static void end_peach_cutscene_dialog_2(struct MarioState *m) {
     }
 }
 
-#undef END_PEACH_CUTSCENE_DIALOG_2_TIME_1
-#undef END_PEACH_CUTSCENE_DIALOG_2_TIME_2
-#undef END_PEACH_CUTSCENE_DIALOG_2_TIME_3
+#undef TIMER_THANKS_TO_YOU
+#undef TIMER_PEACH_BLINKING
+#undef TIMER_THANK_YOU_MARIO
 #undef TIMER_SOMETHING_SPECIAL
 #undef TIMER_PEACH_KISS
 
@@ -2489,22 +2465,6 @@ static void end_peach_cutscene_fade_out(struct MarioState *m) {
         m->actionState = ACT_STATE_END_PEACH_CUTSCENE_FADE_OUT_END;
     }
 }
-
-enum {
-    END_PEACH_CUTSCENE_MARIO_FALLING,
-    END_PEACH_CUTSCENE_MARIO_LANDING,
-    END_PEACH_CUTSCENE_SUMMON_JUMBO_STAR,
-    END_PEACH_CUTSCENE_SPAWN_PEACH,
-    END_PEACH_CUTSCENE_DESCEND_PEACH,
-    END_PEACH_CUTSCENE_RUN_TO_PEACH,
-    END_PEACH_CUTSCENE_DIALOG_1,
-    END_PEACH_CUTSCENE_DIALOG_2,
-    END_PEACH_CUTSCENE_KISS_FROM_PEACH,
-    END_PEACH_CUTSCENE_STAR_DANCE,
-    END_PEACH_CUTSCENE_DIALOG_3,
-    END_PEACH_CUTSCENE_RUN_TO_CASTLE,
-    END_PEACH_CUTSCENE_FADE_OUT
-};
 
 static s32 act_end_peach_cutscene(struct MarioState *m) {
     switch (m->actionArg) {
