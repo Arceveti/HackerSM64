@@ -3,26 +3,31 @@
 #include "printf.h"
 
 #define ATOI(i, a)                                                                                     \
-    for (i = 0; *a >= '0' && *a <= '9'; a++)                                                           \
-        if (i < 999)                                                                                   \
-            i = *a + i * 10 - '0';
-#define _PROUT(dst, fmt, _size)                                                                        \
-    if (_size > 0) {                                                                                   \
-        dst = prout(dst, fmt, _size);                                                                  \
-        if (dst != 0)                                                                                  \
-            sp78.size += _size;                                                                        \
-        else                                                                                           \
-            return sp78.size;                                                                          \
+    for ((i) = 0; *(a) >= '0' && *(a) <= '9'; (a)++) {                                                 \
+        if ((i) < 999) {                                                                               \
+            (i) = *(a) + ((i) * 10) - '0';                                                             \
+        }                                                                                              \
     }
-#define _PAD(i, m, c, src, extracond)                                                                  \
-    if (extracond && m > 0)                                                                            \
-        for (i = m; i > 0; i -= c) {                                                                   \
-            if ((u32) i > 32)                                                                          \
-                c = 32;                                                                                \
-            else                                                                                       \
-                c = i;                                                                                 \
-            _PROUT(dst, src, c);                                                                       \
-        }
+#define _PROUT(dst, fmt, _size)                                                                        \
+    if ((_size) > 0) {                                                                                 \
+        (dst) = prout((dst), (fmt), (_size));                                                          \
+        if ((dst) != 0) {                                                                              \
+            printfArg.size += (_size);                                                                 \
+        } else {                                                                                       \
+            return printfArg.size;                                                                     \
+        }                                                                                              \
+    }
+#define _PAD(i, m, size, src, extracond)                                                               \
+    if ((extracond) && (m) > 0) {                                                                      \
+        for ((i) = (m); (i) > 0; (i) -= (size)) {                                                      \
+            if ((u32) (i) > 32) {                                                                      \
+                (size) = 32;                                                                           \
+            } else {                                                                                   \
+                (size) = (i);                                                                          \
+            }                                                                                          \
+            _PROUT((dst), (src), (size));                                                              \
+        }                                                                                              \
+    }
 
 const char length_str[] = "hlL";
 const char flags_str[] = " +-#0";
@@ -30,16 +35,16 @@ const u32 flags_arr[] = { FLAGS_SPACE, FLAGS_PLUS, FLAGS_MINUS, FLAGS_HASH, FLAG
 char _spaces[] = "                                ";
 char _zeroes[] = "00000000000000000000000000000000";
 
-static void _Putfld(printf_struct *a0, va_list *args, u8 type, u8 *buf);
+static void _Putfld(printf_struct *printfArg, va_list *args, u8 type, u8 *buff);
 
 s32 _Printf(char *(*prout)(char *, const char *, size_t), char *dst, const char *fmt, va_list args) {
-    printf_struct sp78;
+    printf_struct printfArg;
     const u8 *fmt_ptr;
     u8 c;
     const char *flag_index;
-    u8 sp4c[0x20]; // probably a buffer?
-    s32 sp48, sp44, sp40, sp3c, sp38, sp34, sp30, sp2c, sp28, sp24;
-    sp78.size = 0;
+    u8 buff[0x20];
+    s32 size, i;
+    printfArg.size = 0;
     while (TRUE) {
         fmt_ptr = (u8 *) fmt;
         while ((c = *fmt_ptr) != 0 && c != '%') {
@@ -47,121 +52,122 @@ s32 _Printf(char *(*prout)(char *, const char *, size_t), char *dst, const char 
         }
         _PROUT(dst, fmt, fmt_ptr - (u8 *) fmt);
         if (c == 0) {
-            return sp78.size;
+            return printfArg.size;
         }
         fmt = (char *) ++fmt_ptr;
-        sp78.flags = 0;
+        printfArg.flags = 0;
         for (; (flag_index = strchr(flags_str, *fmt_ptr)) != NULL; fmt_ptr++) {
-            sp78.flags |= flags_arr[flag_index - flags_str];
+            printfArg.flags |= flags_arr[flag_index - flags_str];
         }
         if (*fmt_ptr == '*') {
-            sp78.width = va_arg(args, s32);
-            if (sp78.width < 0) {
-                sp78.width = -sp78.width;
-                sp78.flags |= FLAGS_MINUS;
+            printfArg.width = va_arg(args, s32);
+            if (printfArg.width < 0) {
+                printfArg.width = -printfArg.width;
+                printfArg.flags |= FLAGS_MINUS;
             }
             fmt_ptr++;
         } else {
-            ATOI(sp78.width, fmt_ptr);
+            ATOI(printfArg.width, fmt_ptr);
         }
         if (*fmt_ptr != '.') {
-            sp78.precision = -1;
+            printfArg.precision = -1;
         } else {
             fmt_ptr++;
             if (*fmt_ptr == '*') {
-                sp78.precision = va_arg(args, s32);
+                printfArg.precision = va_arg(args, s32);
                 fmt_ptr++;
             } else {
-                ATOI(sp78.precision, fmt_ptr);
+                ATOI(printfArg.precision, fmt_ptr);
             }
         }
         if (strchr(length_str, *fmt_ptr) != NULL) {
-            sp78.length = *fmt_ptr++;
+            printfArg.length = *fmt_ptr++;
         } else {
-            sp78.length = 0;
+            printfArg.length = 0;
         }
 
-        if (sp78.length == 'l' && *fmt_ptr == 'l') {
-            sp78.length = 'L';
+        if (printfArg.length == 'l' && *fmt_ptr == 'l') {
+            printfArg.length = 'L';
             fmt_ptr++;
         }
-        _Putfld(&sp78, &args, *fmt_ptr, sp4c);
-        sp78.width -= sp78.part1_len + sp78.num_leading_zeros + sp78.part2_len + sp78.num_mid_zeros
-                      + sp78.part3_len + sp78.num_trailing_zeros;
-        _PAD(sp44, sp78.width, sp48, _spaces, !(sp78.flags & FLAGS_MINUS));
-        _PROUT(dst, (char *) sp4c, sp78.part1_len);
-        _PAD(sp3c, sp78.num_leading_zeros, sp40, _zeroes, 1);
-        _PROUT(dst, sp78.buff, sp78.part2_len);
-        _PAD(sp34, sp78.num_mid_zeros, sp38, _zeroes, 1);
-        _PROUT(dst, (char *) (&sp78.buff[sp78.part2_len]), sp78.part3_len)
-        _PAD(sp2c, sp78.num_trailing_zeros, sp30, _zeroes, 1);
-        _PAD(sp24, sp78.width, sp28, _spaces, sp78.flags & FLAGS_MINUS);
+        _Putfld(&printfArg, &args, *fmt_ptr, buff);
+        printfArg.width -= printfArg.part1_len + printfArg.num_leading_zeros
+                         + printfArg.part2_len + printfArg.num_mid_zeros
+                         + printfArg.part3_len + printfArg.num_trailing_zeros;
+        _PAD(i, printfArg.width, size, _spaces, !(printfArg.flags & FLAGS_MINUS));
+        _PROUT(dst, (char *) buff, printfArg.part1_len);
+        _PAD(i, printfArg.num_leading_zeros, size, _zeroes, TRUE);
+        _PROUT(dst, printfArg.buff, printfArg.part2_len);
+        _PAD(i, printfArg.num_mid_zeros, size, _zeroes, TRUE);
+        _PROUT(dst, (char *) (&printfArg.buff[printfArg.part2_len]), printfArg.part3_len)
+        _PAD(i, printfArg.num_trailing_zeros, size, _zeroes, TRUE);
+        _PAD(i, printfArg.width, size, _spaces, (printfArg.flags & FLAGS_MINUS));
         fmt = (char *) fmt_ptr + 1;
     }
 }
 
-static void _Putfld(printf_struct *a0, va_list *args, u8 type, u8 *buff) {
-    a0->part1_len = a0->num_leading_zeros = a0->part2_len = a0->num_mid_zeros = a0->part3_len =
-        a0->num_trailing_zeros = 0;
+static void _Putfld(printf_struct *printfArg, va_list *args, u8 type, u8 *buff) {
+    printfArg->part1_len = printfArg->num_leading_zeros = printfArg->part2_len = printfArg->num_mid_zeros = printfArg->part3_len =
+        printfArg->num_trailing_zeros = 0;
 
     switch (type) {
         case 'c':
-            buff[a0->part1_len++] = va_arg(*args, u32);
+            buff[printfArg->part1_len++] = va_arg(*args, u32);
             break;
 
         case 'd':
         case 'i':
-            if (a0->length == 'l') {
-                a0->value.s64 = va_arg(*args, s32);
-            } else if (a0->length == 'L') {
-                a0->value.s64 = va_arg(*args, s64);
+            if (printfArg->length == 'l') {
+                printfArg->value.s64 = va_arg(*args, s32);
+            } else if (printfArg->length == 'L') {
+                printfArg->value.s64 = va_arg(*args, s64);
             } else {
-                a0->value.s64 = va_arg(*args, s32);
+                printfArg->value.s64 = va_arg(*args, s32);
             }
 
-            if (a0->length == 'h') {
-                a0->value.s64 = (s16) a0->value.s64;
+            if (printfArg->length == 'h') {
+                printfArg->value.s64 = (s16) printfArg->value.s64;
             }
 
-            if (a0->value.s64 < 0) {
-                buff[a0->part1_len++] = '-';
-            } else if (a0->flags & FLAGS_PLUS) {
-                buff[a0->part1_len++] = '+';
-            } else if (a0->flags & FLAGS_SPACE) {
-                buff[a0->part1_len++] = ' ';
+            if (printfArg->value.s64 < 0) {
+                buff[printfArg->part1_len++] = '-';
+            } else if (printfArg->flags & FLAGS_PLUS) {
+                buff[printfArg->part1_len++] = '+';
+            } else if (printfArg->flags & FLAGS_SPACE) {
+                buff[printfArg->part1_len++] = ' ';
             }
 
-            a0->buff = (char *) &buff[a0->part1_len];
+            printfArg->buff = (char *) &buff[printfArg->part1_len];
 
-            _Litob(a0, type);
+            _Litob(printfArg, type);
             break;
 
         case 'x':
         case 'X':
         case 'u':
         case 'o':
-            if (a0->length == 'l') {
-                a0->value.s64 = va_arg(*args, s32);
-            } else if (a0->length == 'L') {
-                a0->value.s64 = va_arg(*args, s64);
+            if (printfArg->length == 'l') {
+                printfArg->value.s64 = va_arg(*args, s32);
+            } else if (printfArg->length == 'L') {
+                printfArg->value.s64 = va_arg(*args, s64);
             } else {
-                a0->value.s64 = va_arg(*args, s32);
+                printfArg->value.s64 = va_arg(*args, s32);
             }
 
-            if (a0->length == 'h') {
-                a0->value.s64 = (u16) a0->value.s64;
-            } else if (a0->length == 0) {
-                a0->value.s64 = (u32) a0->value.s64;
+            if (printfArg->length == 'h') {
+                printfArg->value.s64 = (u16) printfArg->value.s64;
+            } else if (printfArg->length == 0) {
+                printfArg->value.s64 = (u32) printfArg->value.s64;
             }
 
-            if (a0->flags & FLAGS_HASH) {
-                buff[a0->part1_len++] = '0';
+            if (printfArg->flags & FLAGS_HASH) {
+                buff[printfArg->part1_len++] = '0';
                 if (type == 'x' || type == 'X') {
-                    buff[a0->part1_len++] = type;
+                    buff[printfArg->part1_len++] = type;
                 }
             }
-            a0->buff = (char *) &buff[a0->part1_len];
-            _Litob(a0, type);
+            printfArg->buff = (char *) &buff[printfArg->part1_len];
+            _Litob(printfArg, type);
             break;
 
         case 'e':
@@ -170,54 +176,54 @@ static void _Putfld(printf_struct *a0, va_list *args, u8 type, u8 *buff) {
         case 'E':
         case 'G':
             //... okay?
-            a0->value.f64 = a0->length == 'L' ? va_arg(*args, f64) : va_arg(*args, f64);
+            printfArg->value.f64 = (printfArg->length == 'L') ? va_arg(*args, f64) : va_arg(*args, f64);
 
-            if (a0->value.u16 & 0x8000) {
-                buff[a0->part1_len++] = '-';
+            if (printfArg->value.u16 & 0x8000) {
+                buff[printfArg->part1_len++] = '-';
             } else {
-                if (a0->flags & FLAGS_PLUS) {
-                    buff[a0->part1_len++] = '+';
-                } else if (a0->flags & FLAGS_SPACE) {
-                    buff[a0->part1_len++] = ' ';
+                if (printfArg->flags & FLAGS_PLUS) {
+                    buff[printfArg->part1_len++] = '+';
+                } else if (printfArg->flags & FLAGS_SPACE) {
+                    buff[printfArg->part1_len++] = ' ';
                 }
             }
 
-            a0->buff = (char *) &buff[a0->part1_len];
-            _Ldtob(a0, type);
+            printfArg->buff = (char *) &buff[printfArg->part1_len];
+            _Ldtob(printfArg, type);
             break;
 
         case 'n':
-            if (a0->length == 'h') {
-                *(va_arg(*args, u16 *)) = a0->size;
-            } else if (a0->length == 'l') {
-                *va_arg(*args, u32 *) = a0->size;
-            } else if (a0->length == 'L') {
-                *va_arg(*args, u64 *) = a0->size;
+            if (printfArg->length == 'h') {
+                *(va_arg(*args, u16 *)) = printfArg->size;
+            } else if (printfArg->length == 'l') {
+                *va_arg(*args, u32 *) = printfArg->size;
+            } else if (printfArg->length == 'L') {
+                *va_arg(*args, u64 *) = printfArg->size;
             } else {
-                *va_arg(*args, u32 *) = a0->size;
+                *va_arg(*args, u32 *) = printfArg->size;
             }
             break;
 
         case 'p':
-            a0->value.s64 = (intptr_t) va_arg(*args, void *);
-            a0->buff = (char *) &buff[a0->part1_len];
-            _Litob(a0, 'x');
+            printfArg->value.s64 = (intptr_t) va_arg(*args, void *);
+            printfArg->buff = (char *) &buff[printfArg->part1_len];
+            _Litob(printfArg, 'x');
             break;
 
         case 's':
-            a0->buff = va_arg(*args, char *);
-            a0->part2_len = strlen(a0->buff);
-            if (a0->precision >= 0 && a0->part2_len > a0->precision) {
-                a0->part2_len = a0->precision;
+            printfArg->buff = va_arg(*args, char *);
+            printfArg->part2_len = strlen(printfArg->buff);
+            if (printfArg->precision >= 0 && printfArg->part2_len > printfArg->precision) {
+                printfArg->part2_len = printfArg->precision;
             }
             break;
 
         case '%':
-            buff[a0->part1_len++] = '%';
+            buff[printfArg->part1_len++] = '%';
             break;
 
         default:
-            buff[a0->part1_len++] = type;
+            buff[printfArg->part1_len++] = type;
             break;
     }
 }
