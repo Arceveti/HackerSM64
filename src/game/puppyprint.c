@@ -70,8 +70,8 @@ u32 rspTime = 0;
 u32 rdpTime = 0;
 s32 benchMark[NUM_BENCH_ITERATIONS + 2];
 // RAM
-s8  ramViewer = FALSE;
-s32 ramsizeSegment[NUM_TLB_SEGMENTS + 1] = {
+s8 ramViewer = FALSE;
+ssize_t ramsizeSegment[NUM_TLB_SEGMENTS + 1] = {
     0, 0, 0,
     0, 0, 0,
     0, 0, 0,
@@ -84,7 +84,7 @@ s32 ramsizeSegment[NUM_TLB_SEGMENTS + 1] = {
     0, 0, 0,
     0, 0, 0
 };
-s8  audioRamViewer = FALSE;
+s8 audioRamViewer = FALSE;
 s32 mempool;
 
 extern u8 _mainSegmentStart[];
@@ -99,16 +99,16 @@ extern u8 _goddardSegmentStart[];
 extern u8 _goddardSegmentEnd[];
 
 // Here is stored the rom addresses of the global code segments. If you get rid of any, it's best to just write them as NULL.
-u32 ramP[5][2] = {
-    {(u32)_buffersSegmentBssStart,      (u32)_buffersSegmentBssEnd},
-    {(u32)_mainSegmentStart,            (u32)_mainSegmentEnd},
-    {(u32)_engineSegmentStart,          (u32)_engineSegmentEnd},
-    {(u32)_framebuffersSegmentBssStart, (u32)_framebuffersSegmentBssEnd},
-    {(u32)_goddardSegmentStart,         (u32)_goddardSegmentEnd},
+uintptr_t ramP[5][2] = {
+    {(uintptr_t)_buffersSegmentBssStart,      (uintptr_t)_buffersSegmentBssEnd},
+    {(uintptr_t)_mainSegmentStart,            (uintptr_t)_mainSegmentEnd},
+    {(uintptr_t)_engineSegmentStart,          (uintptr_t)_engineSegmentEnd},
+    {(uintptr_t)_framebuffersSegmentBssStart, (uintptr_t)_framebuffersSegmentBssEnd},
+    {(uintptr_t)_goddardSegmentStart,         (uintptr_t)_goddardSegmentEnd},
 };
 
 void puppyprint_calculate_ram_usage(void) {
-    u32 temp[2];
+    uintptr_t temp[2];
     s32 i = 0;
 
     for (i = 0; i < 5; i++) {
@@ -301,8 +301,8 @@ void print_audio_ram_overview(void) {
     s32 i = 0;
     s32 percentage = 0;
     s32 tmpY = y;
-    s32 totalMemory[2] = { 0, 0 };
-    s32 audioPoolSizes[NUM_AUDIO_POOLS][2];
+    ssize_t totalMemory[2] = { 0, 0 };
+    ssize_t audioPoolSizes[NUM_AUDIO_POOLS][2];
     prepare_blank_box();
     render_blank_box(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, 0, 0, 0, 192);
     finish_blank_box();

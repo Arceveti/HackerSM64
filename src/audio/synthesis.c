@@ -1071,7 +1071,7 @@ u64 *synthesis_process_notes(s16 *aiBuf, s32 bufLen, u64 *cmd)
                                 (uintptr_t) (sampleAddr + temp * 9),
                                 t0 * 9, flags, &note->sampleDmaIndex);
 #endif // !VERSION_EU
-                            a3 = (u32)((uintptr_t) v0_2 & 0xf);
+                            a3 = ((uintptr_t) v0_2 & 0xf);
                             aSetBuffer(cmd++, 0, DMEM_ADDR_COMPRESSED_ADPCM_DATA, 0, t0 * 9 + a3);
                             aLoadBuffer(cmd++, VIRTUAL_TO_PHYSICAL2(v0_2 - a3));
                         } else {
