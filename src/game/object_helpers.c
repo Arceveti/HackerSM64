@@ -1621,7 +1621,7 @@ void cur_obj_set_face_angle_to_move_angle(void) {
 }
 
 // removed unused arg: define allows for any number of args
-s32 cur_obj_follow_path_new(void) {
+s32 cur_obj_follow_path(void) {
     if (o->oPathedPrevWaypointFlags == WAYPOINT_FLAGS_NONE) {
         o->oPathedPrevWaypoint = o->oPathedStartWaypoint;
         o->oPathedPrevWaypointFlags = WAYPOINT_FLAGS_INITIALIZED;
