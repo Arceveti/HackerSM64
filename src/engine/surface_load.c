@@ -72,7 +72,7 @@ static struct SurfaceNode *alloc_surface_node(u32 dynamic) {
  */
 static struct Surface *alloc_surface(u32 dynamic) {
     struct Surface **poolEnd = (struct Surface **)(dynamic ? &gDynamicSurfacePoolEnd : &gCurrStaticSurfacePoolEnd);
-    
+
     struct Surface *surface = *poolEnd;
     (*poolEnd)++;
     gSurfacesAllocated++;

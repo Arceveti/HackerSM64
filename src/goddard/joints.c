@@ -36,10 +36,10 @@ static struct GdVec3f D_801BAAE0;
 void set_joint_vecs(struct ObjJoint *j, f32 x, f32 y, f32 z);
 
 /**
- * @brief 
- * 
- * @param self 
- * @return * Controls 
+ * @brief
+ *
+ * @param self
+ * @return * Controls
  */
 void grabbable_joint_update_func(struct ObjJoint *self) {
     Mat4f *attObjMtx;

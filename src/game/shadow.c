@@ -214,7 +214,7 @@ Gfx *create_shadow_below_xyz(Vec3f pos, Vec3f floorNormal, Vec3f scaleVec, s16 s
 
     struct MarioState *m = gMarioState;
 
-    // -- Check for floors -- 
+    // -- Check for floors --
 
     // Attempt to use existing floors before finding a new one.
     if (notHeldObj && isPlayer && m->floor) {

@@ -118,7 +118,7 @@
 // This also removes subframe steps (quarter steps).
 // #define RAYCAST_WALL_COLLISION
 
-/** 
+/**
  * This bug allows mario to move when initiating a dialog,
  * just as long as mario doesn't enter an action that can
  * be interrupted with text

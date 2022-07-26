@@ -1481,7 +1481,7 @@ s32 func_sh_802f573c(s32 audioResetStatus) {
             size = sample->size;
             func_sh_802f4cb4((uintptr_t) sampleAddr, D_SH_8034EC88[D_SH_8034F68C - 1].ramAddr, size, sample->medium,
                              unk, &gUnkQueue2, D_SH_8034EC88[D_SH_8034F68C - 1].encodedInfo);
-            break;   
+            break;
         }
     }
     return TRUE;

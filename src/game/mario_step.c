@@ -474,7 +474,7 @@ struct Surface *check_ledge_grab(struct MarioState *m, struct WallCollisionData 
         ledgePos[0] = nextPos[0] - (nx * MARIO_LEDGE_GRAB_DISTANCE);
         ledgePos[2] = nextPos[2] - (nz * MARIO_LEDGE_GRAB_DISTANCE);
         ledgePos[1] = nextPos[1];
-        
+
         // Check whether the floor under 'ledgePos' can be grabbed.
         if (update_grabbed_floor(nextPos, ledgePos, ledgeFloor)) {
             continue;

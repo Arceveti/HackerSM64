@@ -626,7 +626,7 @@ enum GdAnimations {
     GD_ANIM_SCALE3F_ROT3F_POS3F,   // f32[3][3]
     GD_ANIM_SCALE3S_POS3S_ROT3S,   // s16[9]
     GD_ANIM_SCALE3F_ROT3F_POS3F_2, // f32[3][3]
-    GD_ANIM_STUB,                  
+    GD_ANIM_STUB,
     GD_ANIM_ROT3S,                 // s16[3]
     GD_ANIM_POS3S,                 // s16[3]
     GD_ANIM_ROT3S_POS3S,           // s16[6]

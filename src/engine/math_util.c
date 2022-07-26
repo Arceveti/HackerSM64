@@ -676,8 +676,8 @@ void mtxf_billboard(Mat4 dest, Mat4 mtx, Vec3f position, Vec3f scale, s32 roll) 
         f32 m12 = dest[1][2];
         f32 cosa = coss(roll);
         f32 sina = sins(roll);
-        dest[0][0] =  (cosa * m00) + (sina * m10); 
-        dest[0][1] =  (cosa * m01) + (sina * m11); 
+        dest[0][0] =  (cosa * m00) + (sina * m10);
+        dest[0][1] =  (cosa * m01) + (sina * m11);
         dest[0][2] =  (cosa * m02) + (sina * m12);
         dest[1][0] = -(sina * m00) + (cosa * m10);
         dest[1][1] = -(sina * m01) + (cosa * m11);
@@ -911,8 +911,8 @@ void create_transformation_from_matrices(Mat4 dst, Mat4 a1, Mat4 a2) {
     }
     for (i = 0; i < 4; i++) {
         for (j = 0; j < 3; j++) {
-            dst[i][j] = (a1[i][0] * a2[j][0]) 
-                      + (a1[i][1] * a2[j][1]) 
+            dst[i][j] = (a1[i][0] * a2[j][0])
+                      + (a1[i][1] * a2[j][1])
                       + (a1[i][2] * a2[j][2]);
         }
     }
@@ -1577,7 +1577,7 @@ void find_surface_on_ray_cell(s32 cellX, s32 cellZ, Vec3f orig, Vec3f normalized
         f32 ny = normalized_dir[1];
         s32 rayUp   = (ny >  construct_float(NEAR_ONE));
         s32 rayDown = (ny < -construct_float(NEAR_ONE));
-        
+
         for (s32 i = 0; i < NUM_SPATIAL_PARTITIONS; i++) {
             if ((rayDown && (i == SPATIAL_PARTITION_CEILS ))
              || (rayUp   && (i == SPATIAL_PARTITION_FLOORS))) {

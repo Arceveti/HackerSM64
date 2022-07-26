@@ -1477,7 +1477,7 @@ s32 update_boss_fight_camera(struct Camera *c, Vec3f focus, Vec3f pos) {
 
     focus[1] = (sMarioCamState->pos[1] + secondFocus[1]) / 2.f + 100.f;
     if (heldState == HELD_HELD) {
-        focus[1] += 300.f * sins(abss(gMarioStates[0].angleVel[1]));   
+        focus[1] += 300.f * sins(abss(gMarioStates[0].angleVel[1]));
     }
 
     // Set C-Down distance and pitch.

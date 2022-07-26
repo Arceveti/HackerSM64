@@ -23,7 +23,7 @@ void update_mario_platform(void) {
     if (gMarioObject == NULL || floor == NULL) {
         return;
     }
-    
+
     struct Object *floorObj = floor->object;
 
     if (floor != NULL

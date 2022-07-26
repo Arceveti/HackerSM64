@@ -92,7 +92,7 @@ enum GdDynListCommands {
 
 /**
  * Set the initial position of the current object
- * Supported Objs: joints, particles, nets, vertices, cameras 
+ * Supported Objs: joints, particles, nets, vertices, cameras
  */
 #define SetInitialPosition(x, y, z) \
     { DYNLIST_CMD_SET_INITIAL_POSITION, {0}, {0}, {(x), (y), (z)} }
@@ -218,7 +218,7 @@ enum GdDynListCommands {
     { DYNLIST_CMD_SET_TYPE, {0}, {(void *)(type)}, {0.0, 0.0, 0.0} }
 
 /**
- * Set the current shape's material group to the specified group. 
+ * Set the current shape's material group to the specified group.
  * Supported Objs: shapes
  */
 #define SetMaterialGroup(mtlGrpName) \

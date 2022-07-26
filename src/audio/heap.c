@@ -1302,7 +1302,7 @@ void audio_reset_session(void) {
     } else {
         gMaxSimultaneousNotes = MAX_SIMULTANEOUS_NOTES_EMULATOR;
     }
-    
+
     if (gMaxSimultaneousNotes > MAX_SIMULTANEOUS_NOTES) {
         gMaxSimultaneousNotes = MAX_SIMULTANEOUS_NOTES;
     } else if (gMaxSimultaneousNotes < 0) {
@@ -1331,7 +1331,7 @@ void audio_reset_session(void) {
     } else {
         gMaxSimultaneousNotes = MAX_SIMULTANEOUS_NOTES_EMULATOR;
     }
-    
+
     if (gMaxSimultaneousNotes > MAX_SIMULTANEOUS_NOTES) {
         gMaxSimultaneousNotes = MAX_SIMULTANEOUS_NOTES;
     } else if (gMaxSimultaneousNotes < 0) {

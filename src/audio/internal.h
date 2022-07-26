@@ -26,11 +26,11 @@
 
 enum MuteBehaviors {
     MUTE_BEHAVIOR_NONE        = 0x0,
-    MUTE_BEHAVIOR_0           = (1 << 0), // 0x01 // 
-    MUTE_BEHAVIOR_1           = (1 << 1), // 0x02 // 
-    MUTE_BEHAVIOR_2           = (1 << 2), // 0x04 // 
-    MUTE_BEHAVIOR_3           = (1 << 3), // 0x08 // 
-    MUTE_BEHAVIOR_4           = (1 << 4), // 0x10 // 
+    MUTE_BEHAVIOR_0           = (1 << 0), // 0x01 //
+    MUTE_BEHAVIOR_1           = (1 << 1), // 0x02 //
+    MUTE_BEHAVIOR_2           = (1 << 2), // 0x04 //
+    MUTE_BEHAVIOR_3           = (1 << 3), // 0x08 //
+    MUTE_BEHAVIOR_4           = (1 << 4), // 0x10 //
     MUTE_BEHAVIOR_SOFTEN      = (1 << 5), // 0x20 // lower volume, by default to half
     MUTE_BEHAVIOR_STOP_NOTES  = (1 << 6), // 0x40 // prevent further notes from playing
     MUTE_BEHAVIOR_STOP_SCRIPT = (1 << 7), // 0x80 // stop processing sequence/channel scripts

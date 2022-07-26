@@ -11,7 +11,7 @@ index 5752ab85..a1585533 100644
 +#define REONUCAM
 +
  // Note: Reonucam is available, but because we had no time to test it properly, it's included as a patch rather than being in the code by default.
- // Run this command to apply the patch if you want to use it: 
+ // Run this command to apply the patch if you want to use it:
  // tools/apply_patch.sh enhancements/reonucam.patch
 @@ -70,3 +74,22 @@
  #ifndef FLYING_CAMERA_MODE
@@ -236,7 +236,7 @@ index 819f235c..bdc07159 100644
 +                if (set_cam_angle(0) == CAM_ANGLE_MARIO) {
 +                    s8DirModeBaseYaw = snap_to_45_degrees(s8DirModeBaseYaw);
 +                    set_cam_angle(CAM_ANGLE_LAKITU);
-+                }              
++                }
 +#else
                  if (set_cam_angle(0) == CAM_ANGLE_LAKITU) {
                      set_cam_angle(CAM_ANGLE_MARIO);

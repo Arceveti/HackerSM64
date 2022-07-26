@@ -146,7 +146,7 @@ Bool32 colorRGBA_average_3(ColorRGBA dst, ColorRGBA c1, ColorRGBA c2, ColorRGBA 
         for (s32 i = 0; i < 3; i++) {
             dst[i] = (((c1[i] * c1[3]) + (c2[i] * c2[3]) + (c3[i] * c3[3])) / dst[3]);
         }
-    
+
         return TRUE;
     }
 

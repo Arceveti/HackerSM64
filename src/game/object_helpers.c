@@ -132,7 +132,7 @@ Gfx *geo_switch_area(s32 callContext, struct GraphNode *node, UNUSED void *conte
             findNewFloor = TRUE;
 #elif defined(ENABLE_VANILLA_LEVEL_SPECIFIC_CHECKS)
             // In BBH, check for a floor manually, since there is an intangible floor.
-            if (gCurrLevelNum == LEVEL_BBH) {    
+            if (gCurrLevelNum == LEVEL_BBH) {
                 findNewFloor = TRUE;
             }
 #endif

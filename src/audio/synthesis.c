@@ -920,7 +920,7 @@ u64 *synthesis_process_notes(s16 *aiBuf, s32 bufLen, u64 *cmd)
         note = &gNotes[noteIndex];
         if (
  #ifdef VERSION_US
-            note->enabled && 
+            note->enabled &&
  #endif
             !IS_BANK_LOAD_COMPLETE(note->bankId)
         ) {

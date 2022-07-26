@@ -375,7 +375,7 @@ void *load_segment_decompress(s32 segment, u8 *srcStart, u8 *srcEnd) {
 #ifdef UNCOMPRESSED
     u32 compSize = ALIGN16(srcEnd - srcStart);
     void *dest = main_pool_alloc(compSize, MEMORY_POOL_LEFT);
-    
+
     if (dest != NULL) {
         dma_read(dest, srcStart, srcEnd);
         set_segment_base_addr(segment, dest);

@@ -35,71 +35,71 @@
 #ifdef VISUAL_DEBUG
 
 Vtx debug_box_mesh[32] = {
-	{{{    0,    0, -100}, 0, ST_B( 0, 32), {0x00, 0x00, 0x00, 0xFF}}},
-	{{{   50,  100,  -87}, 0, ST_B( 0, 32), {0x00, 0x00, 0x00, 0xFF}}},
-	{{{   50,    0,  -87}, 0, ST_B( 0, 32), {0x00, 0x00, 0x00, 0xFF}}},
-	{{{    0,  100, -100}, 0, ST_B( 0, 32), {0x00, 0x00, 0x00, 0xFF}}},
-	{{{  -50,    0,  -87}, 0, ST_B( 0, 32), {0x00, 0x00, 0x00, 0xFF}}},
-	{{{  -50,  100,  -87}, 0, ST_B( 0, 32), {0x00, 0x00, 0x00, 0xFF}}},
-	{{{  -87,    0,  -50}, 0, ST_B( 0, 32), {0x00, 0x00, 0x00, 0xFF}}},
-	{{{  -87,  100,  -50}, 0, ST_B( 0, 32), {0x00, 0x00, 0x00, 0xFF}}},
-	{{{ -100,    0,    0}, 0, ST_B( 0, 32), {0x00, 0x00, 0x00, 0xFF}}},
-	{{{ -100,  100,    0}, 0, ST_B( 0, 32), {0x00, 0x00, 0x00, 0xFF}}},
-	{{{  -87,    0,   50}, 0, ST_B( 0, 32), {0x00, 0x00, 0x00, 0xFF}}},
-	{{{  -87,  100,   50}, 0, ST_B( 0, 32), {0x00, 0x00, 0x00, 0xFF}}},
-	{{{  -50,    0,   87}, 0, ST_B( 0, 32), {0x00, 0x00, 0x00, 0xFF}}},
-	{{{  -50,  100,   87}, 0, ST_B( 0, 32), {0x00, 0x00, 0x00, 0xFF}}},
-	{{{    0,    0,  100}, 0, ST_B( 0, 32), {0x00, 0x00, 0x00, 0xFF}}},
-	{{{    0,  100,  100}, 0, ST_B( 0, 32), {0x00, 0x00, 0x00, 0xFF}}},
-	{{{   50,    0,   87}, 0, ST_B( 0, 32), {0x00, 0x00, 0x00, 0xFF}}},
-	{{{   50,  100,   87}, 0, ST_B( 0, 32), {0x00, 0x00, 0x00, 0xFF}}},
-	{{{   87,    0,   50}, 0, ST_B( 0, 32), {0x00, 0x00, 0x00, 0xFF}}},
-	{{{   87,  100,   50}, 0, ST_B( 0, 32), {0x00, 0x00, 0x00, 0xFF}}},
-	{{{  100,    0,    0}, 0, ST_B( 0, 32), {0x00, 0x00, 0x00, 0xFF}}},
-	{{{  100,  100,    0}, 0, ST_B( 0, 32), {0x00, 0x00, 0x00, 0xFF}}},
-	{{{   87,    0,  -50}, 0, ST_B( 0, 32), {0x00, 0x00, 0x00, 0xFF}}},
-	{{{   87,  100,  -50}, 0, ST_B( 0, 32), {0x00, 0x00, 0x00, 0xFF}}},
-	{{{ -100,    0,  100}, 0, ST_B( 0, 32), {0xFF, 0xFF, 0xFF, 0xFF}}},
-	{{{ -100,  100,  100}, 0, ST_B( 0, 32), {0xFF, 0xFF, 0xFF, 0xFF}}},
-	{{{ -100,  100, -100}, 0, ST_B( 0, 32), {0xFF, 0xFF, 0xFF, 0xFF}}},
-	{{{  100,    0,  100}, 0, ST_B( 0, 32), {0xFF, 0xFF, 0xFF, 0xFF}}},
-	{{{ -100,    0, -100}, 0, ST_B( 0, 32), {0xFF, 0xFF, 0xFF, 0xFF}}},
-	{{{  100,  100, -100}, 0, ST_B( 0, 32), {0xFF, 0xFF, 0xFF, 0xFF}}},
-	{{{  100,  100,  100}, 0, ST_B( 0, 32), {0xFF, 0xFF, 0xFF, 0xFF}}},
-	{{{  100,    0, -100}, 0, ST_B( 0, 32), {0xFF, 0xFF, 0xFF, 0xFF}}},
+    {{{    0,    0, -100}, 0, ST_B( 0, 32), {0x00, 0x00, 0x00, 0xFF}}},
+    {{{   50,  100,  -87}, 0, ST_B( 0, 32), {0x00, 0x00, 0x00, 0xFF}}},
+    {{{   50,    0,  -87}, 0, ST_B( 0, 32), {0x00, 0x00, 0x00, 0xFF}}},
+    {{{    0,  100, -100}, 0, ST_B( 0, 32), {0x00, 0x00, 0x00, 0xFF}}},
+    {{{  -50,    0,  -87}, 0, ST_B( 0, 32), {0x00, 0x00, 0x00, 0xFF}}},
+    {{{  -50,  100,  -87}, 0, ST_B( 0, 32), {0x00, 0x00, 0x00, 0xFF}}},
+    {{{  -87,    0,  -50}, 0, ST_B( 0, 32), {0x00, 0x00, 0x00, 0xFF}}},
+    {{{  -87,  100,  -50}, 0, ST_B( 0, 32), {0x00, 0x00, 0x00, 0xFF}}},
+    {{{ -100,    0,    0}, 0, ST_B( 0, 32), {0x00, 0x00, 0x00, 0xFF}}},
+    {{{ -100,  100,    0}, 0, ST_B( 0, 32), {0x00, 0x00, 0x00, 0xFF}}},
+    {{{  -87,    0,   50}, 0, ST_B( 0, 32), {0x00, 0x00, 0x00, 0xFF}}},
+    {{{  -87,  100,   50}, 0, ST_B( 0, 32), {0x00, 0x00, 0x00, 0xFF}}},
+    {{{  -50,    0,   87}, 0, ST_B( 0, 32), {0x00, 0x00, 0x00, 0xFF}}},
+    {{{  -50,  100,   87}, 0, ST_B( 0, 32), {0x00, 0x00, 0x00, 0xFF}}},
+    {{{    0,    0,  100}, 0, ST_B( 0, 32), {0x00, 0x00, 0x00, 0xFF}}},
+    {{{    0,  100,  100}, 0, ST_B( 0, 32), {0x00, 0x00, 0x00, 0xFF}}},
+    {{{   50,    0,   87}, 0, ST_B( 0, 32), {0x00, 0x00, 0x00, 0xFF}}},
+    {{{   50,  100,   87}, 0, ST_B( 0, 32), {0x00, 0x00, 0x00, 0xFF}}},
+    {{{   87,    0,   50}, 0, ST_B( 0, 32), {0x00, 0x00, 0x00, 0xFF}}},
+    {{{   87,  100,   50}, 0, ST_B( 0, 32), {0x00, 0x00, 0x00, 0xFF}}},
+    {{{  100,    0,    0}, 0, ST_B( 0, 32), {0x00, 0x00, 0x00, 0xFF}}},
+    {{{  100,  100,    0}, 0, ST_B( 0, 32), {0x00, 0x00, 0x00, 0xFF}}},
+    {{{   87,    0,  -50}, 0, ST_B( 0, 32), {0x00, 0x00, 0x00, 0xFF}}},
+    {{{   87,  100,  -50}, 0, ST_B( 0, 32), {0x00, 0x00, 0x00, 0xFF}}},
+    {{{ -100,    0,  100}, 0, ST_B( 0, 32), {0xFF, 0xFF, 0xFF, 0xFF}}},
+    {{{ -100,  100,  100}, 0, ST_B( 0, 32), {0xFF, 0xFF, 0xFF, 0xFF}}},
+    {{{ -100,  100, -100}, 0, ST_B( 0, 32), {0xFF, 0xFF, 0xFF, 0xFF}}},
+    {{{  100,    0,  100}, 0, ST_B( 0, 32), {0xFF, 0xFF, 0xFF, 0xFF}}},
+    {{{ -100,    0, -100}, 0, ST_B( 0, 32), {0xFF, 0xFF, 0xFF, 0xFF}}},
+    {{{  100,  100, -100}, 0, ST_B( 0, 32), {0xFF, 0xFF, 0xFF, 0xFF}}},
+    {{{  100,  100,  100}, 0, ST_B( 0, 32), {0xFF, 0xFF, 0xFF, 0xFF}}},
+    {{{  100,    0, -100}, 0, ST_B( 0, 32), {0xFF, 0xFF, 0xFF, 0xFF}}},
 };
 
 Gfx dl_debug_box_verts[] = {
-	gsSPVertex(debug_box_mesh, 32, 0),
-	gsSP2Triangles(24, 25, 26, 0, 27, 25, 24, 0),
-	gsSP2Triangles(28, 27, 24, 0, 24, 26, 28, 0),
-	gsSP2Triangles(28, 26, 29, 0, 29, 26, 25, 0),
-	gsSP2Triangles(29, 25, 30, 0, 27, 30, 25, 0),
-	gsSP2Triangles(31, 30, 27, 0, 28, 31, 27, 0),
-	gsSP2Triangles(28, 29, 31, 0, 31, 29, 30, 0),
-	gsSPEndDisplayList(),
+    gsSPVertex(debug_box_mesh, 32, 0),
+    gsSP2Triangles(24, 25, 26, 0, 27, 25, 24, 0),
+    gsSP2Triangles(28, 27, 24, 0, 24, 26, 28, 0),
+    gsSP2Triangles(28, 26, 29, 0, 29, 26, 25, 0),
+    gsSP2Triangles(29, 25, 30, 0, 27, 30, 25, 0),
+    gsSP2Triangles(31, 30, 27, 0, 28, 31, 27, 0),
+    gsSP2Triangles(28, 29, 31, 0, 31, 29, 30, 0),
+    gsSPEndDisplayList(),
 };
 
 Gfx dl_debug_cylinder_verts[] = {
-	gsSPVertex(debug_box_mesh, 24, 0),
-	gsSP2Triangles( 0,  1,  2, 0x0,  0,  3,  1, 0x0),
-	gsSP2Triangles( 4,  3,  0, 0x0,  4,  5,  3, 0x0),
-	gsSP2Triangles( 6,  5,  4, 0x0,  6,  7,  5, 0x0),
-	gsSP2Triangles( 8,  7,  6, 0x0,  8,  9,  7, 0x0),
-	gsSP2Triangles(10,  9,  8, 0x0, 10, 11,  9, 0x0),
-	gsSP2Triangles(12, 11, 10, 0x0, 12, 13, 11, 0x0),
-	gsSP2Triangles(14, 13, 12, 0x0, 14, 15, 13, 0x0),
-	gsSP2Triangles(16, 15, 14, 0x0, 16, 17, 15, 0x0),
-	gsSP2Triangles(18, 17, 16, 0x0, 18, 19, 17, 0x0),
-	gsSP2Triangles(20, 19, 18, 0x0, 20, 21, 19, 0x0),
-	gsSP2Triangles(22, 21, 20, 0x0, 22, 23, 21, 0x0),
-	gsSP2Triangles( 2, 23, 22, 0x0,  2,  1, 23, 0x0),
-	gsSP2Triangles(23,  1,  3, 0x0, 23,  3,  7, 0x0),
-	gsSP2Triangles( 3,  5,  7, 0x0,  7, 15, 23, 0x0),
-	gsSP2Triangles( 7, 11, 15, 0x0,  7,  9, 11, 0x0),
-	gsSP2Triangles(11, 13, 15, 0x0, 15, 17, 19, 0x0),
-	gsSP2Triangles(15, 19, 23, 0x0, 19, 21, 23, 0x0),
-	gsSPEndDisplayList(),
+    gsSPVertex(debug_box_mesh, 24, 0),
+    gsSP2Triangles( 0,  1,  2, 0x0,  0,  3,  1, 0x0),
+    gsSP2Triangles( 4,  3,  0, 0x0,  4,  5,  3, 0x0),
+    gsSP2Triangles( 6,  5,  4, 0x0,  6,  7,  5, 0x0),
+    gsSP2Triangles( 8,  7,  6, 0x0,  8,  9,  7, 0x0),
+    gsSP2Triangles(10,  9,  8, 0x0, 10, 11,  9, 0x0),
+    gsSP2Triangles(12, 11, 10, 0x0, 12, 13, 11, 0x0),
+    gsSP2Triangles(14, 13, 12, 0x0, 14, 15, 13, 0x0),
+    gsSP2Triangles(16, 15, 14, 0x0, 16, 17, 15, 0x0),
+    gsSP2Triangles(18, 17, 16, 0x0, 18, 19, 17, 0x0),
+    gsSP2Triangles(20, 19, 18, 0x0, 20, 21, 19, 0x0),
+    gsSP2Triangles(22, 21, 20, 0x0, 22, 23, 21, 0x0),
+    gsSP2Triangles( 2, 23, 22, 0x0,  2,  1, 23, 0x0),
+    gsSP2Triangles(23,  1,  3, 0x0, 23,  3,  7, 0x0),
+    gsSP2Triangles( 3,  5,  7, 0x0,  7, 15, 23, 0x0),
+    gsSP2Triangles( 7, 11, 15, 0x0,  7,  9, 11, 0x0),
+    gsSP2Triangles(11, 13, 15, 0x0, 15, 17, 19, 0x0),
+    gsSP2Triangles(15, 19, 23, 0x0, 19, 21, 23, 0x0),
+    gsSPEndDisplayList(),
 };
 
 u8 gVisualHitboxView  = FALSE;
@@ -483,14 +483,14 @@ static void render_box(int index) {
     guRotateF(mtxFloat, angle_to_degrees(box->yaw), 0, 1.0f, 0);
 
     // Apply scale to column vectors of matrix
-    for (int i = 0; i < 3; i++) {
-        for (int j = 0; j < 3; j++) {
+    for (s32 i = 0; i < 3; i++) {
+        for (s32 j = 0; j < 3; j++) {
             mtxFloat[i][j] *= box->bounds[j] * 0.01f;
         }
     }
 
     // Copy translation into matrix
-    for (int i = 0; i < 3; i++) {
+    for (s32 i = 0; i < 3; i++) {
         mtxFloat[3][i] = box->center[i];
     }
 
@@ -498,7 +498,7 @@ static void render_box(int index) {
     mtxf_to_mtx(mtx, mtxFloat);
 
     Gfx* dlHead = gDisplayListHead;
-    
+
     // Load the calculated matrix
     gSPMatrix(dlHead++, mtx, G_MTX_MODELVIEW | G_MTX_LOAD | G_MTX_NOPUSH);
 

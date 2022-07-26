@@ -121,7 +121,7 @@ void exclamation_box_act_scaling(void) {
 void exclamation_box_spawn_contents(struct ExclamationBoxContents *contentsList, u8 boxType) {
     struct ExclamationBoxContents *contents = &contentsList[boxType];
     struct Object *contentsObj = NULL;
-    
+
     contentsObj = spawn_object(o, contents->model, contents->behavior);
     contentsObj->oVelY = 20.0f;
     contentsObj->oForwardVel = 3.0f;
