@@ -177,7 +177,7 @@ struct AdsrEnvelope gDefaultEnvelope[] = {
     { BSWAP16(     1000), BSWAP16(32000) }, // stay there for 4.16 seconds
     { BSWAP16(ADSR_HANG),              0 }  // then continue staying there
 };
-#endif
+#endif // !VERSION_SH
 
 #ifdef VERSION_EU
 struct NoteSubEu gZeroNoteSub = { 0 };
@@ -337,7 +337,7 @@ s16 gEuUnknownWave7[256] = {
 };
 s16 *gWaveSamples[6] = { sSawtoothWaves, sTriangleWaves, sSineWaves, sSquareWaves, sEuUnknownWave6, gEuUnknownWave7 };
 
-#else
+#else // (VERSION_US || VERSION_JP)
 // !VERSION_EU
 
 s16 sSineWave[0x40] = {
@@ -380,10 +380,10 @@ s16 *gWaveSamples[4] = {
     sSineWave,
     sSquareWave
 };
-#endif
+#endif // (VERSION_US || VERSION_JP)
 
 #ifdef VERSION_SH
-s32 unk_sh_data_0[2] = {0, 0};
+// s32 unk_sh_data_0[2] = {0, 0};
 f32 gPitchBendFrequencyScale[256] = {
     0.5f,      0.5f,      0.502736f, 0.505488f, 0.508254f, 0.511036f, 0.513833f, 0.516645f, 0.519472f,
     0.522315f, 0.525174f, 0.528048f, 0.530938f, 0.533843f, 0.536765f, 0.539702f, 0.542656f, 0.545626f,

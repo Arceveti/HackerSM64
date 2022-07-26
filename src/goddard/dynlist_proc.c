@@ -449,7 +449,7 @@ void d_add_net_with_subgroup(UNUSED s32 a0, DynObjName name) {
     d_set_obj_draw_flag(OBJ_INVISIBLE);
     // this creates a string to append to the names of the objs created after this
     sprintf(sDynNetNameSuffix, "c%d", ++sDynNetCount);
-    d_set_type(4);
+    d_set_type(NET_TYPE_DYNAMIC_BONES);
     stash_name_suffix();
     d_set_name_suffix(sDynNetNameSuffix);
     d_start_group(name);
@@ -480,8 +480,6 @@ void d_end_net_with_subgroup(DynObjName name) {
  * @param name Name for created `ObjJoint`
  */
 void d_attach_joint_to_net(UNUSED s32 arg0, DynObjName name) {
-    UNUSED struct DynObjInfo *curInfo = sDynListCurInfo;
-
     d_makeobj(D_JOINT, name);
     d_set_type(3);
     d_set_shapeptrptr(NULL);

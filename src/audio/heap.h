@@ -23,7 +23,7 @@ enum SoundPoolIndex {
 #endif
 
 #define IS_BANK_LOAD_COMPLETE(bankId) (gBankLoadStatus[bankId] >= SOUND_LOAD_STATUS_COMPLETE)
-#define IS_SEQ_LOAD_COMPLETE(seqId) (gSeqLoadStatus[seqId] >= SOUND_LOAD_STATUS_COMPLETE)
+#define IS_SEQ_LOAD_COMPLETE(seqId)     (gSeqLoadStatus[seqId] >= SOUND_LOAD_STATUS_COMPLETE)
 
 struct SoundAllocPool {
     u8 *start;

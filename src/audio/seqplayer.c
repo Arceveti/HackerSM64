@@ -746,9 +746,9 @@ void seq_channel_layer_process_script(struct SequenceChannelLayer *layer) {
                         // this goto looks a bit like a function return...
                         layer->stopSomething = TRUE;
                         goto skip;
+                    } else {
+                        cmd--;
                     }
-
-                    cmd--;
                 }
 
                 drum = gCtlEntries[seqChannel->bankId].drums[cmd];
@@ -886,8 +886,7 @@ void seq_channel_layer_process_script(struct SequenceChannelLayer *layer) {
         return;
     }
 
-    if (
-        !layer->continuousNotes
+    if (!layer->continuousNotes
      || (layer->note == NULL)
      || (layer->status == SOUND_LOAD_STATUS_NOT_LOADED)
      || !sameSound
@@ -2156,8 +2155,10 @@ void sequence_player_process_sequence(struct SequencePlayer *seqPlayer) {
                 ((struct AudioBank *) (gCtlEntries[seqPlayer->loadingBankId].instruments - 1))->drums;
             gBankLoadStatus[seqPlayer->loadingBankId] = SOUND_LOAD_STATUS_COMPLETE;
         } else {
-            audio_dma_partial_copy_async(&seqPlayer->bankDmaCurrDevAddr, &seqPlayer->bankDmaCurrMemAddr,
-                                         &seqPlayer->bankDmaRemaining, &seqPlayer->bankDmaMesgQueue,
+            audio_dma_partial_copy_async(&seqPlayer->bankDmaCurrDevAddr,
+                                         &seqPlayer->bankDmaCurrMemAddr,
+                                         &seqPlayer->bankDmaRemaining,
+                                         &seqPlayer->bankDmaMesgQueue,
                                          &seqPlayer->bankDmaIoMesg);
         }
  #else // !VERSION_EU
@@ -2169,15 +2170,17 @@ void sequence_player_process_sequence(struct SequencePlayer *seqPlayer) {
             patch_audio_bank(seqPlayer->loadingBank, gAlTbl->seqArray[seqPlayer->loadingBankId].offset,
                              seqPlayer->loadingBankNumInstruments, seqPlayer->loadingBankNumDrums);
             gCtlEntries[seqPlayer->loadingBankId].numInstruments = seqPlayer->loadingBankNumInstruments;
-            gCtlEntries[seqPlayer->loadingBankId].numDrums = seqPlayer->loadingBankNumDrums;
-            gCtlEntries[seqPlayer->loadingBankId].instruments = seqPlayer->loadingBank->instruments;
-            gCtlEntries[seqPlayer->loadingBankId].drums = seqPlayer->loadingBank->drums;
+            gCtlEntries[seqPlayer->loadingBankId].numDrums       = seqPlayer->loadingBankNumDrums;
+            gCtlEntries[seqPlayer->loadingBankId].instruments    = seqPlayer->loadingBank->instruments;
+            gCtlEntries[seqPlayer->loadingBankId].drums          = seqPlayer->loadingBank->drums;
             gBankLoadStatus[seqPlayer->loadingBankId] = SOUND_LOAD_STATUS_COMPLETE;
         } else {
             osCreateMesgQueue(&seqPlayer->bankDmaMesgQueue, &seqPlayer->bankDmaMesg, 1);
             seqPlayer->bankDmaMesg = NULL;
-            audio_dma_partial_copy_async(&seqPlayer->bankDmaCurrDevAddr, &seqPlayer->bankDmaCurrMemAddr,
-                                         &seqPlayer->bankDmaRemaining, &seqPlayer->bankDmaMesgQueue,
+            audio_dma_partial_copy_async(&seqPlayer->bankDmaCurrDevAddr,
+                                         &seqPlayer->bankDmaCurrMemAddr,
+                                         &seqPlayer->bankDmaRemaining,
+                                         &seqPlayer->bankDmaMesgQueue,
                                          &seqPlayer->bankDmaIoMesg);
         }
  #endif // !VERSION_EU
@@ -2506,7 +2509,7 @@ void sequence_player_process_sequence(struct SequencePlayer *seqPlayer) {
 #if defined(VERSION_EU) || defined(VERSION_SH)
                         value &= m64_read_u8(state);
 #else
-                        value = m64_read_u8(state) & value;
+                        value = (m64_read_u8(state) & value);
 #endif
                         break;
 

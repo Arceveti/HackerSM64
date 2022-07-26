@@ -575,22 +575,12 @@ u32 get_missing_bank(u32 seqId, s32 *nonNullCount, s32 *nullCount) {
 
     *nullCount = 0;
     *nonNullCount = 0;
-#ifdef VERSION_EU
     offset = ((u16 *) gAlBankSets)[seqId];
     for (i = gAlBankSets[offset++], ret = 0; i != 0; i--) {
         bankId = gAlBankSets[offset++];
 
         if (IS_BANK_LOAD_COMPLETE(bankId)) {
             temp = get_bank_or_seq(&gBankLoadedPool, 2, bankId);
-#else
-    offset = ((u16 *) gAlBankSets)[seqId] + 1;
-    for (i = gAlBankSets[offset - 1], ret = 0; i != 0; i--) {
-        offset++;
-        bankId = gAlBankSets[offset - 1];
-
-        if (IS_BANK_LOAD_COMPLETE(bankId)) {
-            temp = get_bank_or_seq(&gBankLoadedPool, 2, gAlBankSets[offset - 1]);
-#endif
         } else {
             temp = NULL;
         }
@@ -612,21 +602,11 @@ struct AudioBank *load_banks_immediate(s32 seqId, u8 *outDefaultBank) {
     u8 i;
 
     u16 offset = ((u16 *) gAlBankSets)[seqId];
-#ifdef VERSION_EU
     for (i = gAlBankSets[offset++]; i != 0; i--) {
         bankId = gAlBankSets[offset++];
 
         if (IS_BANK_LOAD_COMPLETE(bankId)) {
             ret = get_bank_or_seq(&gBankLoadedPool, 2, bankId);
-#else
-    offset++;
-    for (i = gAlBankSets[offset - 1]; i != 0; i--) {
-        offset++;
-        bankId = gAlBankSets[offset - 1];
-
-        if (IS_BANK_LOAD_COMPLETE(bankId)) {
-            ret = get_bank_or_seq(&gBankLoadedPool, 2, gAlBankSets[offset - 1]);
-#endif
         } else {
             ret = NULL;
         }

@@ -1427,12 +1427,9 @@ void print_peach_letter_message(void) {
 
     dlHead = gDisplayListHead;
 
-#ifdef VERSION_JP
-    gSPDisplayList(dlHead++, dl_ia_text_end);
-    gDPSetEnvColor(dlHead++, 255, 255, 255, 255);
-#else
     gDPSetEnvColor(dlHead++, 255, 255, 255, 255);
     gSPDisplayList(dlHead++, dl_ia_text_end);
+#ifndef VERSION_JP
     gDPSetEnvColor(dlHead++, 200, 80, 120, gCutsceneMsgFade);
     gSPDisplayList(dlHead++, castle_grounds_seg7_us_dl_0700F2E8);
 #endif
@@ -1570,7 +1567,7 @@ void render_pause_red_coins(void) {
     s8 x;
 
     for (x = 0; x < gRedCoinsCollected; x++) {
-        print_animated_red_coin(GFX_DIMENSIONS_FROM_RIGHT_EDGE(30) - x * 20, 16);
+        print_animated_red_coin(GFX_DIMENSIONS_FROM_RIGHT_EDGE(30) - (x * 20), 16);
     }
 }
 

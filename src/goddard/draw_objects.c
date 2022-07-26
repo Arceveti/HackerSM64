@@ -627,8 +627,8 @@ UNUSED void Unknown80179ACC(struct GdObj *obj) {
  * @note Not called
  */
 UNUSED void func_80179B64(struct ObjGroup *group) {
-    apply_to_obj_types_in_group(OBJ_TYPE_LABELS | OBJ_TYPE_GADGETS | OBJ_TYPE_CAMERAS | OBJ_TYPE_NETS
-                                    | OBJ_TYPE_JOINTS | OBJ_TYPE_BONES,
+    apply_to_obj_types_in_group((OBJ_TYPE_LABELS | OBJ_TYPE_GADGETS | OBJ_TYPE_CAMERAS | OBJ_TYPE_NETS
+                                    | OBJ_TYPE_JOINTS | OBJ_TYPE_BONES),
                                 (applyproc_t) Unknown80179ACC, group);
 }
 
@@ -640,7 +640,7 @@ void world_pos_to_screen_coords(struct GdVec3f *pos, struct ObjCamera *cam, stru
     }
 
     pos->x *= 256.0f / -pos->z;
-    pos->y *= 256.0f / pos->z;
+    pos->y *= 256.0f /  pos->z;
     pos->x += view->lowerRight.x / 2.0f;
     pos->y += view->lowerRight.y / 2.0f;
 }

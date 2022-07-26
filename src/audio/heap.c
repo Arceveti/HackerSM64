@@ -391,6 +391,7 @@ void *alloc_bank_or_seq(struct SoundMultiPool *loadedPool, s32 arg1, s32 size, s
     u32 nullID = -1;
     u8 *table = NULL;
 #ifdef VERSION_SH
+    u8 out = FALSE;
     s32 i;
 #else
     u8 isSound = FALSE;
@@ -545,7 +546,7 @@ size = ALIGN16(size);
                         }
                         if (i == SEQUENCE_PLAYERS) {
                             tp->nextSide = 0;
-                            goto out;
+                            out = TRUE;
                         }
                     }
                     if (secondVal == SOUND_LOAD_STATUS_COMPLETE) {
@@ -556,7 +557,7 @@ size = ALIGN16(size);
                         }
                         if (i == SEQUENCE_PLAYERS) {
                             tp->nextSide = 1;
-                            goto out;
+                            out = TRUE;
                         }
                     }
                 } else if (poolIdx == SOUND_POOL_BANK) {
@@ -568,7 +569,7 @@ size = ALIGN16(size);
                         }
                         if (i == gMaxSimultaneousNotes) {
                             tp->nextSide = 0;
-                            goto out;
+                            out = TRUE;
                         }
                     }
                     if (secondVal == SOUND_LOAD_STATUS_COMPLETE) {
@@ -579,7 +580,7 @@ size = ALIGN16(size);
                         }
                         if (i == gMaxSimultaneousNotes) {
                             tp->nextSide = 1;
-                            goto out;
+                            out = TRUE;
                         }
                     }
                 }
@@ -587,23 +588,24 @@ size = ALIGN16(size);
                     if (firstVal == SOUND_LOAD_STATUS_IN_PROGRESS) {
                         if (secondVal != SOUND_LOAD_STATUS_IN_PROGRESS) {
                             tp->nextSide = 1;
-                            goto out;
+                            out = TRUE;
                         }
                     } else {
-                        goto out;
+                        out = TRUE;
                     }
                 } else {
                     if (secondVal == SOUND_LOAD_STATUS_IN_PROGRESS) {
                         if (firstVal != SOUND_LOAD_STATUS_IN_PROGRESS) {
                             tp->nextSide = 0;
-                            goto out;
+                            out = TRUE;
                         }
                     } else {
-                        goto out;
+                        out = TRUE;
                     }
                 }
-                return NULL;
-                out:;
+                if (!out) {
+                    return NULL;
+                }
  #endif // !VERSION_EU == VERSION_SH
             }
         }
@@ -1586,7 +1588,9 @@ void func_sh_802f2158(struct UnkEntry *entry) {
     for (idx = 0; idx < seqCount; idx++) {
         bankId1 = gCtlEntries[idx].bankId1;
         bankId2 = gCtlEntries[idx].bankId2;
-        if ((bankId1 != 0xff && entry->bankId == bankId1) || (bankId2 != 0xff && entry->bankId == bankId2) || entry->bankId == 0) {
+        if ((bankId1 != 0xff && entry->bankId == bankId1)
+         || (bankId2 != 0xff && entry->bankId == bankId2)
+         || entry->bankId == 0) {
             if (get_bank_or_seq(SOUND_POOL_BANK, 2, idx) != NULL) {
                 if (IS_BANK_LOAD_COMPLETE(idx)) {
                     for (instId = 0; instId < gCtlEntries[idx].numInstruments; instId++) {
@@ -1652,7 +1656,9 @@ void func_sh_802f23ec(void) {
     for (idx = 0; idx < seqCount; idx++) {
         bankId1 = gCtlEntries[idx].bankId1;
         bankId2 = gCtlEntries[idx].bankId2;
-        if ((bankId1 != 0xffu && entry->bankId == bankId1) || (bankId2 != 0xff && entry->bankId == bankId2) || entry->bankId == 0) {
+        if ((bankId1 != 0xffu && entry->bankId == bankId1)
+         || (bankId2 != 0xff  && entry->bankId == bankId2)
+         || entry->bankId == 0) {
             if (get_bank_or_seq(SOUND_POOL_BANK, 3, idx) != NULL) {
                 if (IS_BANK_LOAD_COMPLETE(idx)) {
                     for (i = 0; i < gUnkPool2.numEntries; i++) {

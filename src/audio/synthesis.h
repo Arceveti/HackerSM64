@@ -149,6 +149,12 @@ void clear_better_reverb_buffers(void);
 void set_better_reverb_buffers(void);
 #endif
 
+enum PanLeftRight {
+    PAN_NONE,
+    PAN_RIGHT,
+    PAN_LEFT,
+};
+
 u64 *synthesis_execute(u64 *cmdBuf, s32 *writtenCmds, s16 *aiBuf, s32 bufLen);
 #if defined(VERSION_JP) || defined(VERSION_US)
 void note_init_volume(struct Note *note);

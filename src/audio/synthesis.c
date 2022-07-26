@@ -155,13 +155,6 @@ static s32 **delayBufsL;
 static s32 **delayBufsR;
 #endif // BETTER_REVERB
 
-struct VolumeChange {
-    u16 sourceLeft;
-    u16 sourceRight;
-    u16 targetLeft;
-    u16 targetRight;
-};
-
 u64 *synthesis_do_one_audio_update(s16 *aiBuf, s32 bufLen, u64 *cmd, s32 updateIndex);
 #ifdef VERSION_EU
 u64 *synthesis_process_note(struct Note *note, struct NoteSubEu *noteSubEu, struct NoteSynthesisState *synthesisState, s16 *aiBuf, s32 bufLen, u64 *cmd);
@@ -176,10 +169,7 @@ u8 sAudioSynthesisPad[0x10];
 u64 *synthesis_process_notes(s16 *aiBuf, s32 bufLen, u64 *cmd);
 u64 *load_wave_samples(u64 *cmd, struct Note *note, s32 nSamplesToLoad);
 u64 *final_resample(u64 *cmd, struct Note *note, s32 count, u16 pitch, u16 dmemIn, u32 flags);
-u64 *process_envelope(u64 *cmd, struct Note *note, s32 nSamples, u16 inBuf, s32 headsetPanSettings,
-                      u32 flags);
-u64 *process_envelope_inner(u64 *cmd, struct Note *note, s32 nSamples, u16 inBuf,
-                            s32 headsetPanSettings, struct VolumeChange *vol);
+u64 *process_envelope(u64 *cmd, struct Note *note, s32 nSamples, u16 inBuf, s32 headsetPanSettings, u32 flags);
 u64 *note_apply_headset_pan_effects(u64 *cmd, struct Note *note, s32 bufLen, s32 flags, s32 leftRight);
 
 struct SynthesisReverb gSynthesisReverb;
@@ -208,8 +198,9 @@ static void reverb_samples(s16 *outSampleL, s16 *outSampleR, s32 inSampleL, s32 
 
         if (j == 2) {
             j = -1;
-            outTmpL += ((historySampleL * reverbMultsL[k  ]) >> 8);
-            outTmpR += ((historySampleR * reverbMultsR[k++]) >> 8);
+            outTmpL += ((historySampleL * reverbMultsL[k]) >> 8);
+            outTmpR += ((historySampleR * reverbMultsR[k]) >> 8);
+            k++;
             *curDelaySampleL = tmpCarryoverL;
             *curDelaySampleR = tmpCarryoverR;
             if (i != reverbFilterCount) {
@@ -381,7 +372,7 @@ void synthesis_load_note_subs_eu(s32 updateIndex) {
 
     for (i = 0; i < gMaxSimultaneousNotes; i++) {
         src = &gNotes[i].noteSubEu;
-        dest = &gNoteSubsEu[gMaxSimultaneousNotes * updateIndex + i];
+        dest = &gNoteSubsEu[(gMaxSimultaneousNotes * updateIndex) + i];
         if (src->enabled) {
             *dest = *src;
             src->needsInit = FALSE;
@@ -522,20 +513,19 @@ u64 *synthesis_do_one_audio_update(s16 *aiBuf, s32 bufLen, u64 *cmd, s32 updateI
     struct NoteSubEu *noteSubEu;
     u8 noteIndices[56];
     s32 temp;
-    s32 i;
-    s16 j;
+    s32 i, j;
     s16 notePos = 0;
 
     if (gNumSynthesisReverbs == 0) {
         for (i = 0; i < gMaxSimultaneousNotes; i++) {
-            if (gNoteSubsEu[gMaxSimultaneousNotes * updateIndex + i].enabled) {
+            if (gNoteSubsEu[(gMaxSimultaneousNotes * updateIndex) + i].enabled) {
                 noteIndices[notePos++] = i;
             }
         }
     } else {
         for (j = 0; j < gNumSynthesisReverbs; j++) {
             for (i = 0; i < gMaxSimultaneousNotes; i++) {
-                noteSubEu = &gNoteSubsEu[gMaxSimultaneousNotes * updateIndex + i];
+                noteSubEu = &gNoteSubsEu[(gMaxSimultaneousNotes * updateIndex) + i];
                 if (noteSubEu->enabled && j == noteSubEu->reverbIndex) {
                     noteIndices[notePos++] = i;
                 }
@@ -543,7 +533,7 @@ u64 *synthesis_do_one_audio_update(s16 *aiBuf, s32 bufLen, u64 *cmd, s32 updateI
         }
 
         for (i = 0; i < gMaxSimultaneousNotes; i++) {
-            noteSubEu = &gNoteSubsEu[gMaxSimultaneousNotes * updateIndex + i];
+            noteSubEu = &gNoteSubsEu[(gMaxSimultaneousNotes * updateIndex) + i];
             if (noteSubEu->enabled && noteSubEu->reverbIndex >= gNumSynthesisReverbs) {
                 noteIndices[notePos++] = i;
             }
@@ -814,9 +804,9 @@ u64 *synthesis_do_one_audio_update(s16 *aiBuf, s32 bufLen, u64 *cmd, s32 updateI
                 // Ring buffer wrapped
                 aSetLoadBufferPair(cmd++, ra, 0);
             }
-            aSetBuffer(cmd++, 0, t4 + DMEM_ADDR_WET_LEFT_CH, DMEM_ADDR_LEFT_CH, bufLen << 1);
+            aSetBuffer(cmd++, 0, t4 + DMEM_ADDR_WET_LEFT_CH, DMEM_ADDR_LEFT_CH, (bufLen << 1));
             aResample(cmd++, gSynthesisReverb.resampleFlags, (u16) gSynthesisReverb.resampleRate, VIRTUAL_TO_PHYSICAL2(gSynthesisReverb.resampleStateLeft));
-            aSetBuffer(cmd++, 0, t4 + DMEM_ADDR_WET_RIGHT_CH, DMEM_ADDR_RIGHT_CH, bufLen << 1);
+            aSetBuffer(cmd++, 0, t4 + DMEM_ADDR_WET_RIGHT_CH, DMEM_ADDR_RIGHT_CH, (bufLen << 1));
             aResample(cmd++, gSynthesisReverb.resampleFlags, (u16) gSynthesisReverb.resampleRate, VIRTUAL_TO_PHYSICAL2(gSynthesisReverb.resampleStateRight));
             aSetBuffer(cmd++, 0, 0, 0, DEFAULT_LEN_2CH);
             aMix(cmd++, 0, /*gain*/ 0x8000 + gSynthesisReverb.reverbGain, /*in*/ DMEM_ADDR_LEFT_CH, /*out*/ DMEM_ADDR_LEFT_CH);
@@ -959,14 +949,14 @@ u64 *synthesis_process_notes(s16 *aiBuf, s32 bufLen, u64 *cmd)
             }
 
             resamplingRateFixedPoint = (u16)(s32)(resamplingRate * 32768.0f);
-            samplesLenFixedPoint = note->samplePosFrac + (resamplingRateFixedPoint * bufLen) * 2;
+            samplesLenFixedPoint = note->samplePosFrac + ((resamplingRateFixedPoint * bufLen) * 2);
             note->samplePosFrac = (samplesLenFixedPoint & 0xFFFF); // 16-bit store, can't reuse
 
             if (note->sound == NULL) {
                 // A wave synthesis note (not ADPCM)
 
                 cmd = load_wave_samples(cmd, note, (samplesLenFixedPoint >> 0x10));
-                noteSamplesDmemAddrBeforeResampling = DMEM_ADDR_UNCOMPRESSED_NOTE + note->samplePosInt * 2;
+                noteSamplesDmemAddrBeforeResampling = DMEM_ADDR_UNCOMPRESSED_NOTE + (note->samplePosInt * 2);
                 note->samplePosInt += (samplesLenFixedPoint >> 0x10);
                 flags = 0x0;
             } else {
@@ -984,8 +974,8 @@ u64 *synthesis_process_notes(s16 *aiBuf, s32 bufLen, u64 *cmd)
 
                     if (nParts == 1) {
                         samplesLenAdjusted = (samplesLenFixedPoint >> 0x10);
-                    } else if ((samplesLenFixedPoint >> 0x10) & 1) {
-                        samplesLenAdjusted = ((samplesLenFixedPoint >> 0x10) & ~1) + (curPart * 2);
+                    } else if ((samplesLenFixedPoint >> 0x10) & 0x1) {
+                        samplesLenAdjusted = ((samplesLenFixedPoint >> 0x10) & ~0x1) + (curPart * 2);
                     } else {
                         samplesLenAdjusted = (samplesLenFixedPoint >> 0x10);
                     }
@@ -1059,20 +1049,20 @@ u64 *synthesis_process_notes(s16 *aiBuf, s32 bufLen, u64 *cmd)
 #ifdef VERSION_EU
                             temp = (synthesisState->samplePosInt - s2 + 0x10) / 16;
                             if (audioBookSample->loaded == 0x81) {
-                                v0_2 = sampleAddr + temp * 9;
+                                v0_2 = sampleAddr + (temp * 9);
                             } else {
                                 v0_2 = dma_sample_data(
-                                    (uintptr_t) (sampleAddr + temp * 9),
-                                    t0 * 9, flags, &synthesisState->sampleDmaIndex);
+                                    (uintptr_t) (sampleAddr + (temp * 9)),
+                                    (t0 * 9), flags, &synthesisState->sampleDmaIndex);
                             }
 #else // !VERSION_EU
                             temp = (note->samplePosInt - s2 + 0x10) / 16;
                             v0_2 = dma_sample_data(
-                                (uintptr_t) (sampleAddr + temp * 9),
-                                t0 * 9, flags, &note->sampleDmaIndex);
+                                (uintptr_t) (sampleAddr + (temp * 9)),
+                                (t0 * 9), flags, &note->sampleDmaIndex);
 #endif // !VERSION_EU
                             a3 = ((uintptr_t) v0_2 & 0xf);
-                            aSetBuffer(cmd++, 0, DMEM_ADDR_COMPRESSED_ADPCM_DATA, 0, t0 * 9 + a3);
+                            aSetBuffer(cmd++, 0, DMEM_ADDR_COMPRESSED_ADPCM_DATA, 0, (t0 * 9) + a3);
                             aLoadBuffer(cmd++, VIRTUAL_TO_PHYSICAL2(v0_2 - a3));
                         } else {
                             s0 = 0;
@@ -1090,14 +1080,14 @@ u64 *synthesis_process_notes(s16 *aiBuf, s32 bufLen, u64 *cmd)
 
                         if (nAdpcmSamplesProcessed == 0) {
                             aSetBuffer(cmd++, 0, DMEM_ADDR_COMPRESSED_ADPCM_DATA + a3,
-                                       DMEM_ADDR_UNCOMPRESSED_NOTE, s0 * 2);
+                                       DMEM_ADDR_UNCOMPRESSED_NOTE, (s0 * 2));
                             aADPCMdec(cmd++, flags,
                                       VIRTUAL_TO_PHYSICAL2(synthesisState->synthesisBuffers->adpcmdecState));
                             sp130 = s2 * 2;
                         } else {
                             s5Aligned = ALIGN(s5, 32);
                             aSetBuffer(cmd++, 0, DMEM_ADDR_COMPRESSED_ADPCM_DATA + a3,
-                                       DMEM_ADDR_UNCOMPRESSED_NOTE + s5Aligned, s0 * 2);
+                                       DMEM_ADDR_UNCOMPRESSED_NOTE + s5Aligned, (s0 * 2));
                             aADPCMdec(cmd++, flags,
                                       VIRTUAL_TO_PHYSICAL2(synthesisState->synthesisBuffers->adpcmdecState));
                             aDMEMMove(cmd++, DMEM_ADDR_UNCOMPRESSED_NOTE + s5Aligned + (s2 * 2),
@@ -1113,11 +1103,11 @@ u64 *synthesis_process_notes(s16 *aiBuf, s32 bufLen, u64 *cmd)
                         nSamplesInThisIteration = s0 + s6 - s3;
 
                         if (nAdpcmSamplesProcessed == 0) {
-                            aSetBuffer(cmd++, 0, DMEM_ADDR_COMPRESSED_ADPCM_DATA + a3, DMEM_ADDR_UNCOMPRESSED_NOTE, s0 * 2);
+                            aSetBuffer(cmd++, 0, DMEM_ADDR_COMPRESSED_ADPCM_DATA + a3, DMEM_ADDR_UNCOMPRESSED_NOTE, (s0 * 2));
                             aADPCMdec(cmd++, flags, VIRTUAL_TO_PHYSICAL2(note->synthesisBuffers->adpcmdecState));
                             sp130 = s2 * 2;
                         } else {
-                            aSetBuffer(cmd++, 0, DMEM_ADDR_COMPRESSED_ADPCM_DATA + a3, DMEM_ADDR_UNCOMPRESSED_NOTE + ALIGN(s5, 32), s0 * 2);
+                            aSetBuffer(cmd++, 0, DMEM_ADDR_COMPRESSED_ADPCM_DATA + a3, DMEM_ADDR_UNCOMPRESSED_NOTE + ALIGN(s5, 32), (s0 * 2));
                             aADPCMdec(cmd++, flags, VIRTUAL_TO_PHYSICAL2(note->synthesisBuffers->adpcmdecState));
                             aDMEMMove(cmd++, DMEM_ADDR_UNCOMPRESSED_NOTE + ALIGN(s5, 32) + (s2 * 2), DMEM_ADDR_UNCOMPRESSED_NOTE + s5, (nSamplesInThisIteration) * 2);
                         }
@@ -1128,16 +1118,16 @@ u64 *synthesis_process_notes(s16 *aiBuf, s32 bufLen, u64 *cmd)
                         switch (flags) {
                             case A_INIT: // = 1
                                 sp130 = 0;
-                                s5 = s0 * 2 + s5;
+                                s5 = (s0 * 2) + s5;
                                 break;
 
                             case A_LOOP: // = 2
-                                s5 = nSamplesInThisIteration * 2 + s5;
+                                s5 = (nSamplesInThisIteration * 2) + s5;
                                 break;
 
                             default:
                                 if (s5 != 0) {
-                                    s5 = nSamplesInThisIteration * 2 + s5;
+                                    s5 = (nSamplesInThisIteration * 2) + s5;
                                 } else {
                                     s5 = (s2 + nSamplesInThisIteration) * 2;
                                 }
@@ -1242,43 +1232,43 @@ u64 *synthesis_process_notes(s16 *aiBuf, s32 bufLen, u64 *cmd)
                 noteSubEu->needsInit = FALSE;
             }
 
-            cmd = final_resample(cmd, synthesisState, bufLen * 2, resamplingRateFixedPoint,
+            cmd = final_resample(cmd, synthesisState, (bufLen * 2), resamplingRateFixedPoint,
                                  noteSamplesDmemAddrBeforeResampling, flags);
 
             if (noteSubEu->headsetPanRight != 0 || synthesisState->prevHeadsetPanRight != 0) {
-                leftRight = 1;
+                leftRight = PAN_RIGHT;
             } else if (noteSubEu->headsetPanLeft != 0 || synthesisState->prevHeadsetPanLeft != 0) {
-                leftRight = 2;
+                leftRight = PAN_LEFT;
 #else // !VERSION_EU
             if (note->needsInit) {
                 flags = A_INIT;
                 note->needsInit = FALSE;
             }
 
-            cmd = final_resample(cmd, note, bufLen * 2, resamplingRateFixedPoint,
+            cmd = final_resample(cmd, note, (bufLen * 2), resamplingRateFixedPoint,
                                  noteSamplesDmemAddrBeforeResampling, flags);
 
             if (note->headsetPanRight != 0 || note->prevHeadsetPanRight != 0) {
-                leftRight = 1;
+                leftRight = PAN_RIGHT;
             } else if (note->headsetPanLeft != 0 || note->prevHeadsetPanLeft != 0) {
-                leftRight = 2;
+                leftRight = PAN_LEFT;
 #endif // !VERSION_EU
             } else {
-                leftRight = 0;
+                leftRight = PAN_NONE;
             }
 
 #ifdef VERSION_EU
             cmd = process_envelope(cmd, noteSubEu, synthesisState, bufLen, 0, leftRight, flags);
 
             if (noteSubEu->usesHeadsetPanEffects) {
-                cmd = note_apply_headset_pan_effects(cmd, noteSubEu, synthesisState, bufLen * 2, flags, leftRight);
+                cmd = note_apply_headset_pan_effects(cmd, noteSubEu, synthesisState, (bufLen * 2), flags, leftRight);
             }
         }
 #else // !VERSION_EU
             cmd = process_envelope(cmd, note, bufLen, 0, leftRight, flags);
 
             if (note->usesHeadsetPanEffects) {
-                cmd = note_apply_headset_pan_effects(cmd, note, bufLen * 2, flags, leftRight);
+                cmd = note_apply_headset_pan_effects(cmd, note, (bufLen * 2), flags, leftRight);
             }
         }
     }
@@ -1315,21 +1305,49 @@ u64 *load_wave_samples(u64 *cmd, struct NoteSubEu *noteSubEu, struct NoteSynthes
     }
     return cmd;
 }
+#else
+u64 *load_wave_samples(u64 *cmd, struct Note *note, s32 nSamplesToLoad) {
+    s32 a3;
+    s32 repeats;
+    s32 i;
+    aSetBuffer(cmd++, /*flags*/ 0, /*dmemin*/ DMEM_ADDR_UNCOMPRESSED_NOTE, /*dmemout*/ 0,
+               /*count*/ sizeof(note->synthesisBuffers->samples));
+    aLoadBuffer(cmd++, VIRTUAL_TO_PHYSICAL2(note->synthesisBuffers->samples));
+    note->samplePosInt &= (note->sampleCount - 1);
+    a3 = 64 - note->samplePosInt;
+    if (a3 < nSamplesToLoad) {
+        repeats = ((nSamplesToLoad - a3) + 63) / 64;
+        for (i = 0; i < repeats; i++) {
+            aDMEMMove(cmd++,
+                      /*dmemin */ DMEM_ADDR_UNCOMPRESSED_NOTE,
+                      /*dmemout*/ DMEM_ADDR_UNCOMPRESSED_NOTE + (1 + i) * sizeof(note->synthesisBuffers->samples),
+                      /*count  */ sizeof(note->synthesisBuffers->samples));
+        }
+    }
+    return cmd;
+}
+#endif
 
+#ifdef VERSION_EU
 u64 *final_resample(u64 *cmd, struct NoteSynthesisState *synthesisState, s32 count, u16 pitch, u16 dmemIn, u32 flags) {
     aSetBuffer(cmd++, /*flags*/ 0, dmemIn, /*dmemout*/ DMEM_ADDR_TEMP, count);
     aResample(cmd++, flags, pitch, VIRTUAL_TO_PHYSICAL2(synthesisState->synthesisBuffers->finalResampleState));
     return cmd;
 }
+#else
+u64 *final_resample(u64 *cmd, struct Note *note, s32 count, u16 pitch, u16 dmemIn, u32 flags) {
+    aSetBuffer(cmd++, /*flags*/ 0, dmemIn, /*dmemout*/ DMEM_ADDR_TEMP, count);
+    aResample(cmd++, flags, pitch, VIRTUAL_TO_PHYSICAL2(note->synthesisBuffers->finalResampleState));
+    return cmd;
+}
+#endif
 
+#ifdef VERSION_EU
 u64 *process_envelope(u64 *cmd, struct NoteSubEu *note, struct NoteSynthesisState *synthesisState, s32 nSamples, u16 inBuf, s32 headsetPanSettings, UNUSED u32 flags) {
-    u16 sourceRight;
-    u16 sourceLeft;
-    u16 targetLeft;
-    u16 targetRight;
+    u16 sourceLeft, sourceRight;
+    u16 targetLeft, targetRight;
     s32 mixerFlags;
-    s32 rampLeft;
-    s32 rampRight;
+    s32 rampLeft, rampRight;
 
     sourceLeft  = synthesisState->curVolLeft;
     sourceRight = synthesisState->curVolRight;
@@ -1344,42 +1362,16 @@ u64 *process_envelope(u64 *cmd, struct NoteSubEu *note, struct NoteSynthesisStat
     synthesisState->curVolLeft = targetLeft;
     synthesisState->curVolRight = targetRight;
 #else // !VERSION_EU
-u64 *load_wave_samples(u64 *cmd, struct Note *note, s32 nSamplesToLoad) {
-    s32 a3;
-    s32 i;
-    aSetBuffer(cmd++, /*flags*/ 0, /*dmemin*/ DMEM_ADDR_UNCOMPRESSED_NOTE, /*dmemout*/ 0,
-               /*count*/ sizeof(note->synthesisBuffers->samples));
-    aLoadBuffer(cmd++, VIRTUAL_TO_PHYSICAL2(note->synthesisBuffers->samples));
-    note->samplePosInt &= (note->sampleCount - 1);
-    a3 = 64 - note->samplePosInt;
-    if (a3 < nSamplesToLoad) {
-        for (i = 0; i <= (((nSamplesToLoad - a3) + 63) / 64) - 1; i++) {
-            aDMEMMove(cmd++, /*dmemin*/ DMEM_ADDR_UNCOMPRESSED_NOTE, /*dmemout*/ DMEM_ADDR_UNCOMPRESSED_NOTE + (1 + i) * sizeof(note->synthesisBuffers->samples), /*count*/ sizeof(note->synthesisBuffers->samples));
-        }
-    }
-    return cmd;
-}
 
-u64 *final_resample(u64 *cmd, struct Note *note, s32 count, u16 pitch, u16 dmemIn, u32 flags) {
-    aSetBuffer(cmd++, /*flags*/ 0, dmemIn, /*dmemout*/ DMEM_ADDR_TEMP, count);
-    aResample(cmd++, flags, pitch, VIRTUAL_TO_PHYSICAL2(note->synthesisBuffers->finalResampleState));
-    return cmd;
-}
-
-u64 *process_envelope(u64 *cmd, struct Note *note, s32 nSamples, u16 inBuf, s32 headsetPanSettings,
-                      UNUSED u32 flags) {
-    struct VolumeChange vol;
-    vol.sourceLeft    = note->curVolLeft;
-    vol.sourceRight   = note->curVolRight;
-    vol.targetLeft    = note->targetVolLeft;
-    vol.targetRight   = note->targetVolRight;
-    note->curVolLeft  = vol.targetLeft;
-    note->curVolRight = vol.targetRight;
-    return process_envelope_inner(cmd, note, nSamples, inBuf, headsetPanSettings, &vol);
-}
-
-u64 *process_envelope_inner(u64 *cmd, struct Note *note, s32 nSamples, u16 inBuf,
-                            s32 headsetPanSettings, struct VolumeChange *vol) {
+u64 *process_envelope(u64 *cmd, struct Note *note, s32 nSamples, u16 inBuf, s32 headsetPanSettings, UNUSED u32 flags) {
+    u16 sourceLeft, sourceRight;
+    u16 targetLeft, targetRight;
+    sourceLeft        = note->curVolLeft;
+    sourceRight       = note->curVolRight;
+    targetLeft        = note->targetVolLeft;
+    targetRight       = note->targetVolRight;
+    note->curVolLeft  = targetLeft;
+    note->curVolRight = targetRight;
     u8 mixerFlags;
     s32 rampLeft, rampRight;
 #endif // !VERSION_EU
@@ -1393,17 +1385,17 @@ u64 *process_envelope_inner(u64 *cmd, struct Note *note, s32 nSamples, u16 inBuf
 
         switch (headsetPanSettings) {
             case 1:
-                aSetBuffer(cmd++, 0, inBuf, DMEM_ADDR_NOTE_PAN_TEMP, nSamples * 2);
+                aSetBuffer(cmd++, 0, inBuf, DMEM_ADDR_NOTE_PAN_TEMP, (nSamples * 2));
                 aSetBuffer(cmd++, A_AUX, DMEM_ADDR_RIGHT_CH, DMEM_ADDR_WET_LEFT_CH,
                            DMEM_ADDR_WET_RIGHT_CH);
                 break;
             case 2:
-                aSetBuffer(cmd++, 0, inBuf, DMEM_ADDR_LEFT_CH, nSamples * 2);
+                aSetBuffer(cmd++, 0, inBuf, DMEM_ADDR_LEFT_CH, (nSamples * 2));
                 aSetBuffer(cmd++, A_AUX, DMEM_ADDR_NOTE_PAN_TEMP, DMEM_ADDR_WET_LEFT_CH,
                            DMEM_ADDR_WET_RIGHT_CH);
                 break;
             default:
-                aSetBuffer(cmd++, 0, inBuf, DMEM_ADDR_LEFT_CH, nSamples * 2);
+                aSetBuffer(cmd++, 0, inBuf, DMEM_ADDR_LEFT_CH, (nSamples * 2));
                 aSetBuffer(cmd++, A_AUX, DMEM_ADDR_RIGHT_CH, DMEM_ADDR_WET_LEFT_CH,
                            DMEM_ADDR_WET_RIGHT_CH);
                 break;
@@ -1414,30 +1406,23 @@ u64 *process_envelope_inner(u64 *cmd, struct Note *note, s32 nSamples, u16 inBuf
         // mixed into a temporary buffer and then subtracted from the normal buffer.
         if (note->stereoStrongRight) {
             aClearBuffer(cmd++, DMEM_ADDR_STEREO_STRONG_TEMP_DRY, DEFAULT_LEN_2CH);
-            aSetBuffer(cmd++, 0, inBuf, DMEM_ADDR_STEREO_STRONG_TEMP_DRY, nSamples * 2);
+            aSetBuffer(cmd++, 0, inBuf, DMEM_ADDR_STEREO_STRONG_TEMP_DRY, (nSamples * 2));
             aSetBuffer(cmd++, A_AUX, DMEM_ADDR_RIGHT_CH, DMEM_ADDR_STEREO_STRONG_TEMP_WET,
                        DMEM_ADDR_WET_RIGHT_CH);
         } else if (note->stereoStrongLeft) {
             aClearBuffer(cmd++, DMEM_ADDR_STEREO_STRONG_TEMP_DRY, DEFAULT_LEN_2CH);
-            aSetBuffer(cmd++, 0, inBuf, DMEM_ADDR_LEFT_CH, nSamples * 2);
+            aSetBuffer(cmd++, 0, inBuf, DMEM_ADDR_LEFT_CH, (nSamples * 2));
             aSetBuffer(cmd++, A_AUX, DMEM_ADDR_STEREO_STRONG_TEMP_DRY, DMEM_ADDR_WET_LEFT_CH,
                        DMEM_ADDR_STEREO_STRONG_TEMP_WET);
         } else {
-            aSetBuffer(cmd++, 0, inBuf, DMEM_ADDR_LEFT_CH, nSamples * 2);
+            aSetBuffer(cmd++, 0, inBuf, DMEM_ADDR_LEFT_CH, (nSamples * 2));
             aSetBuffer(cmd++, A_AUX, DMEM_ADDR_RIGHT_CH, DMEM_ADDR_WET_LEFT_CH, DMEM_ADDR_WET_RIGHT_CH);
         }
     }
 
-#ifdef VERSION_EU
     if (targetLeft == sourceLeft
      && targetRight == sourceRight
-     && !note->envMixerNeedsInit)
-#else
-    if (vol->targetLeft == vol->sourceLeft
-     && vol->targetRight == vol->sourceRight
-     && !note->envMixerNeedsInit)
-#endif
-    {
+     && !note->envMixerNeedsInit) {
         mixerFlags = A_CONTINUE;
     } else {
         mixerFlags = A_INIT;
@@ -1445,22 +1430,19 @@ u64 *process_envelope_inner(u64 *cmd, struct Note *note, s32 nSamples, u16 inBuf
 #ifdef VERSION_EU
         rampLeft  = gCurrentLeftVolRamping[targetLeft  >> 5] * gCurrentRightVolRamping[sourceLeft  >> 5];
         rampRight = gCurrentLeftVolRamping[targetRight >> 5] * gCurrentRightVolRamping[sourceRight >> 5];
-
+#else
+        rampLeft  = get_volume_ramping(sourceLeft,  targetLeft,  nSamples);
+        rampRight = get_volume_ramping(sourceRight, targetRight, nSamples);
+#endif
         // The operation's parameters change meanings depending on flags
         aSetVolume(cmd++, (A_VOL | A_LEFT), sourceLeft, 0, 0);
         aSetVolume(cmd++, (A_VOL | A_RIGHT), sourceRight, 0, 0);
         aSetVolume32(cmd++, (A_RATE | A_LEFT), targetLeft, rampLeft);
         aSetVolume32(cmd++, (A_RATE | A_RIGHT), targetRight, rampRight);
-        aSetVolume(cmd++, A_AUX, gVolume, 0, note->reverbVol << 8);
-#else
-        rampLeft  = get_volume_ramping(vol->sourceLeft,  vol->targetLeft,  nSamples);
-        rampRight = get_volume_ramping(vol->sourceRight, vol->targetRight, nSamples);
 
-        // The operation's parameters change meanings depending on flags
-        aSetVolume(cmd++, (A_VOL | A_LEFT), vol->sourceLeft, 0, 0);
-        aSetVolume(cmd++, (A_VOL | A_RIGHT), vol->sourceRight, 0, 0);
-        aSetVolume32(cmd++, (A_RATE | A_LEFT), vol->targetLeft, rampLeft);
-        aSetVolume32(cmd++, (A_RATE | A_RIGHT), vol->targetRight, rampRight);
+#ifdef VERSION_EU
+        aSetVolume(cmd++, A_AUX, gVolume, 0, (note->reverbVol << 8));
+#else
         aSetVolume(cmd++, A_AUX, gVolume, 0, note->reverbVolShifted);
 #endif
     }
@@ -1475,12 +1457,12 @@ u64 *process_envelope_inner(u64 *cmd, struct Note *note, s32 nSamples, u16 inBuf
                   VIRTUAL_TO_PHYSICAL2(note->synthesisBuffers->mixEnvelopeState));
 #endif
         if (note->stereoStrongRight) {
-            aSetBuffer(cmd++, 0, 0, 0, nSamples * 2);
+            aSetBuffer(cmd++, 0, 0, 0, (nSamples * 2));
             // 0x8000 is -100%, so subtract sound instead of adding...
             aMix(cmd++, 0, /*gain*/ 0x8000, /*in*/ DMEM_ADDR_STEREO_STRONG_TEMP_DRY, /*out*/ DMEM_ADDR_LEFT_CH);
             aMix(cmd++, 0, /*gain*/ 0x8000, /*in*/ DMEM_ADDR_STEREO_STRONG_TEMP_WET, /*out*/ DMEM_ADDR_WET_LEFT_CH);
         } else if (note->stereoStrongLeft) {
-            aSetBuffer(cmd++, 0, 0, 0, nSamples * 2);
+            aSetBuffer(cmd++, 0, 0, 0, (nSamples * 2));
             aMix(cmd++, 0, /*gain*/ 0x8000, /*in*/ DMEM_ADDR_STEREO_STRONG_TEMP_DRY, /*out*/ DMEM_ADDR_RIGHT_CH);
             aMix(cmd++, 0, /*gain*/ 0x8000, /*in*/ DMEM_ADDR_STEREO_STRONG_TEMP_WET, /*out*/ DMEM_ADDR_WET_RIGHT_CH);
         }
@@ -1491,11 +1473,11 @@ u64 *process_envelope_inner(u64 *cmd, struct Note *note, s32 nSamples, u16 inBuf
         aEnvMixer(cmd++, mixerFlags, VIRTUAL_TO_PHYSICAL2(note->synthesisBuffers->mixEnvelopeState));
 #endif
         if (note->stereoStrongRight) {
-            aSetBuffer(cmd++, 0, 0, 0, nSamples * 2);
+            aSetBuffer(cmd++, 0, 0, 0, (nSamples * 2));
             aMix(cmd++, 0, /*gain*/ 0x8000, /*in*/ DMEM_ADDR_STEREO_STRONG_TEMP_DRY,
                  /*out*/ DMEM_ADDR_LEFT_CH);
         } else if (note->stereoStrongLeft) {
-            aSetBuffer(cmd++, 0, 0, 0, nSamples * 2);
+            aSetBuffer(cmd++, 0, 0, 0, (nSamples * 2));
             aMix(cmd++, 0, /*gain*/ 0x8000, /*in*/ DMEM_ADDR_STEREO_STRONG_TEMP_DRY,
                  /*out*/ DMEM_ADDR_RIGHT_CH);
         }
@@ -1516,7 +1498,7 @@ u64 *note_apply_headset_pan_effects(u64 *cmd, struct Note *note, s32 bufLen, s32
     u16 pitch;
 
     switch (leftRight) {
-        case 1:
+        case PAN_RIGHT:
             dest = DMEM_ADDR_LEFT_CH;
 #ifdef VERSION_EU
             panShift = noteSubEu->headsetPanRight;
@@ -1527,7 +1509,7 @@ u64 *note_apply_headset_pan_effects(u64 *cmd, struct Note *note, s32 bufLen, s32
             prevPanShift = note->prevHeadsetPanRight;
             note->prevHeadsetPanRight = panShift;
             break;
-        case 2:
+        case PAN_LEFT:
             dest = DMEM_ADDR_RIGHT_CH;
 #ifdef VERSION_EU
             panShift = noteSubEu->headsetPanLeft;
@@ -1620,7 +1602,7 @@ void note_set_vel_pan_reverb(struct Note *note, f32 velocity, f32 pan, u8 reverb
         } else {
             smallPanIndex = 9;
         }
-        note->headsetPanLeft  = gHeadsetPanQuantization[smallPanIndex];
+        note->headsetPanLeft  = gHeadsetPanQuantization[    smallPanIndex];
         note->headsetPanRight = gHeadsetPanQuantization[9 - smallPanIndex];
         note->stereoStrongRight = FALSE;
         note->stereoStrongLeft  = FALSE;
@@ -1646,7 +1628,7 @@ void note_set_vel_pan_reverb(struct Note *note, f32 velocity, f32 pan, u8 reverb
         volLeft  = 0.707f;
         volRight = 0.707f;
     } else {
-        volLeft = gDefaultPanVolume[panIndex];
+        volLeft  = gDefaultPanVolume[      panIndex];
         volRight = gDefaultPanVolume[127 - panIndex];
     }
 

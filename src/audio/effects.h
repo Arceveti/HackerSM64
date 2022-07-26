@@ -19,9 +19,9 @@ enum ADSRStates {
 };
 
 enum ADSRActions {
-    ADSR_ACTION_RELEASE = (1 << 4), // 0x10
-    ADSR_ACTION_DECAY   = (1 << 5), // 0x20
-    ADSR_ACTION_HANG    = (1 << 6), // 0x40
+    ADSR_ACTION_RELEASE = BIT(4), // 0x10
+    ADSR_ACTION_DECAY   = BIT(5), // 0x20
+    ADSR_ACTION_HANG    = BIT(6), // 0x40
 };
 
 enum ADSRDelays {
