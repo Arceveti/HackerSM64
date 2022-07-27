@@ -367,29 +367,29 @@ void geo_process_master_list_sub(struct GraphNodeMasterList *node) {
         gSPClearGeometryMode(dlHead++, G_ZBUFFER);
     }
 
-    gDisplayListHead = dlHead;
-
 #ifdef OBJECTS_REJ
  #if defined(F3DEX_GBI_2) && defined(VISUAL_DEBUG)
     if (gVisualHitboxView) {
         render_debug_boxes(DEBUG_UCODE_REJ);
     }
  #endif
-    switch_ucode(gDisplayListHead, GRAPH_NODE_UCODE_DEFAULT);
+    switch_ucode(dlHead, GRAPH_NODE_UCODE_DEFAULT);
 #endif
 
 #ifdef VISUAL_DEBUG
     if (gVisualHitboxView) {
         render_debug_boxes(DEBUG_UCODE_DEFAULT | DEBUG_BOX_CLEAR);
-        // Load the world scale identity matrix
-        gSPMatrix(gDisplayListHead++, &identityMatrixWorldScale, G_MTX_MODELVIEW | G_MTX_LOAD | G_MTX_NOPUSH);
     }
+    // Load the world scale identity matrix
+    gSPMatrix(dlHead++, &identityMatrixWorldScale, (G_MTX_MODELVIEW | G_MTX_LOAD | G_MTX_NOPUSH));
     if (gVisualSurfaceView) {
         // Renders twice, once as decal and once as non-decal.
         visual_surface_loop(FALSE);
         visual_surface_loop(TRUE);
     }
 #endif
+
+    gDisplayListHead = dlHead;
 }
 
 /**
