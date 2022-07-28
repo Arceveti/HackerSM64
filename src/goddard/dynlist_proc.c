@@ -813,18 +813,6 @@ void d_attachto_dynid(s32 flag, DynObjName name) {
 }
 
 /**
- * Helper function to copy bytes. Where's memcpy when you need it?
- */
-void copy_bytes(u8 *src, u8 *dst, s32 num) {
-    if (num == 0) {
-        return;
-    }
-    while (num--) {
-        *dst++ = *src++;
-    }
-}
-
-/**
  * Allocate the animation data for `animator` onto the goddard heap.
  * Animation data of type `::GD_ANIM_SCALE3S_POS3S_ROT3S` is converted to a `AnimMtxVec` struct,
  * rather than solely byted copied like the other types.
@@ -935,7 +923,7 @@ void alloc_animdata(struct ObjAnimator *animator) {
                 }
                 curAnimSrc->type = GD_ANIM_MTX4x4F_SCALE3F;
             } else {
-                copy_bytes(curAnimSrc->data, allocSpace, curAnimSrc->count * datasize);
+                bcopy(curAnimSrc->data, allocSpace, (curAnimSrc->count * datasize));
             }
         }
 

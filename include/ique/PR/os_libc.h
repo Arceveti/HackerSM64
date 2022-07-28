@@ -81,9 +81,9 @@ extern "C" {
 /* byte string operations */
 
 #ifdef TARGET_N64
-	extern void     bcopy(const void *, void *, int);
-	extern int      bcmp(const void *, const void *, int);
-	extern void     bzero(void *, int);
+	extern void     bcopy(const void *__src, void *__dst, size_t __n);
+	extern int      bcmp(const void *__s1, const void *__s2, size_t __n);
+	extern void     bzero(void *__s, size_t __n);
 #endif
 
 /* Printf */
