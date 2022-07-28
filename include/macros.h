@@ -25,13 +25,6 @@
 #define UNUSED
 #endif
 
-// Fall through a switch case
-#ifdef __GNUC__
-#define FALL_THROUGH __attribute__((fallthrough))
-#else
-#define FALL_THROUGH
-#endif
-
 // Avoid undefined behaviour for non-returning functions
 #ifdef __GNUC__
 #define NORETURN __attribute__((noreturn))
@@ -46,6 +39,13 @@
 #define ALWAYS_INLINE inline
 #endif
 
+// Fall through a switch case
+#ifdef __GNUC__
+#define FALL_THROUGH __attribute__((fallthrough))
+#else
+#define FALL_THROUGH
+#endif
+
 // Use Os when compiling the function
 #ifdef __GNUC__
 #define OPTIMIZE_OS inline __attribute__((optimize("Os")))
@@ -58,13 +58,6 @@
 #define OPTIMIZE_OFAST inline __attribute__((optimize("Ofast")))
 #else
 #define OPTIMIZE_OFAST inline
-#endif
-
-// Static assertions
-#ifdef __GNUC__
-#define STATIC_ASSERT(cond, msg) _Static_assert(cond, msg)
-#else
-#define STATIC_ASSERT(cond, msg) typedef char GLUE2(static_assertion_failed, __LINE__)[(cond) ? 1 : -1]
 #endif
 
 // Align to 8-byte boundary (for DMA requirements)
@@ -93,6 +86,13 @@
 #define ALIGNED64 __attribute__((aligned(64)))
 #else
 #define ALIGNED64
+#endif
+
+// Static assertions
+#ifdef __GNUC__
+#define STATIC_ASSERT(cond, msg) _Static_assert(cond, msg)
+#else
+#define STATIC_ASSERT(cond, msg) typedef char GLUE2(static_assertion_failed, __LINE__)[(cond) ? 1 : -1]
 #endif
 
 // round up to the next multiple.
