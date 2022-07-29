@@ -386,10 +386,10 @@ void set_vblank_handler(s32 index, struct VblankHandler *handler, OSMesgQueue *q
     handler->msg = msg;
 
     switch (index) {
-        case 1:
+        case 1: // sound_init
             gVblankHandler1 = handler;
             break;
-        case 2:
+        case 2: // game_init
             gVblankHandler2 = handler;
             break;
         case 3:
