@@ -286,7 +286,7 @@ static void level_cmd_load_mario_head(void) {
     if (addr != NULL) {
         gdm_init(addr, DOUBLE_SIZE_ON_64_BIT(0xE1000));
         gd_add_to_heap(gZBuffer, sizeof(gZBuffer)); // 0x25800
-        gd_add_to_heap(gFramebuffer0, 3 * sizeof(gFramebuffer0)); // 0x70800
+        gd_add_to_heap(gFramebuffers[0], (3 * sizeof(gFramebuffers[0]))); // 0x70800
         gdm_setup();
         gdm_maketestdl(CMD_GET(s16, 2));
     }
@@ -301,8 +301,8 @@ static void level_cmd_load_yay0_texture(void) {
 
 static void level_cmd_change_area_skybox(void) {
     u8 areaCheck = CMD_GET(s16, 2);
-    gAreaSkyboxStart[areaCheck-1] = CMD_GET(void *, 4);
-    gAreaSkyboxEnd[areaCheck-1] = CMD_GET(void *, 8);
+    gAreaSkyboxStart[areaCheck - 1] = CMD_GET(void *, 4);
+    gAreaSkyboxEnd[areaCheck - 1] = CMD_GET(void *, 8);
     sCurrentCmd = CMD_NEXT;
 }
 
@@ -328,7 +328,9 @@ void unmap_tlbs(void) {
     s32 i;
     for (i = 0; i < NUM_TLB_SEGMENTS; i++) {
         if (gTlbSegments[i]) {
-            if (i != SEGMENT_GROUP0_GEO && i != SEGMENT_COMMON1_GEO && i != SEGMENT_BEHAVIOR_DATA) {
+            if (i != SEGMENT_GROUP0_GEO
+             && i != SEGMENT_COMMON1_GEO
+             && i != SEGMENT_BEHAVIOR_DATA) {
                 while (gTlbSegments[i] > 0) {
                     osUnmapTLB(gTlbEntries);
                     gTlbSegments[i]--;
@@ -356,8 +358,7 @@ static void level_cmd_clear_level(void) {
 
 static void level_cmd_alloc_level_pool(void) {
     if (sLevelPool == NULL) {
-        sLevelPool = alloc_only_pool_init(main_pool_available() - sizeof(struct AllocOnlyPool),
-                                          MEMORY_POOL_LEFT);
+        sLevelPool = alloc_only_pool_init((main_pool_available() - sizeof(struct AllocOnlyPool)), MEMORY_POOL_LEFT);
     }
 
     sCurrentCmd = CMD_NEXT;
@@ -518,7 +519,7 @@ static void level_cmd_create_instant_warp(void) {
     if (sCurrAreaIndex != -1) {
         if (gAreas[sCurrAreaIndex].instantWarps == NULL) {
             gAreas[sCurrAreaIndex].instantWarps =
-                alloc_only_pool_alloc(sLevelPool, INSTANT_WARP_INDEX_STOP * sizeof(struct InstantWarp));
+                alloc_only_pool_alloc(sLevelPool, (INSTANT_WARP_INDEX_STOP * sizeof(struct InstantWarp)));
 
             for (i = INSTANT_WARP_INDEX_START; i < INSTANT_WARP_INDEX_STOP; i++) {
                 gAreas[sCurrAreaIndex].instantWarps[i].id = 0;
@@ -553,7 +554,7 @@ static void level_cmd_create_painting_warp_node(void) {
     if (sCurrAreaIndex != -1) {
         if (gAreas[sCurrAreaIndex].paintingWarpNodes == NULL) {
             gAreas[sCurrAreaIndex].paintingWarpNodes =
-                alloc_only_pool_alloc(sLevelPool, NUM_PAINTING_WARP_NODES * sizeof(struct WarpNode));
+                alloc_only_pool_alloc(sLevelPool, (NUM_PAINTING_WARP_NODES * sizeof(struct WarpNode)));
 
             for (i = 0; i < NUM_PAINTING_WARP_NODES; i++) {
                 gAreas[sCurrAreaIndex].paintingWarpNodes[i].id = 0;
@@ -624,7 +625,7 @@ static void level_cmd_set_blackout(void) {
 }
 
 static void level_cmd_set_gamma(void) {
-    osViSetSpecialFeatures((CMD_GET(u8, 2) == 0) ? OS_VI_GAMMA_OFF : OS_VI_GAMMA_ON);
+    osViSetSpecialFeatures(CMD_GET(u8, 2) ? OS_VI_GAMMA_ON : OS_VI_GAMMA_OFF);
     sCurrentCmd = CMD_NEXT;
 }
 
@@ -742,43 +743,19 @@ static void level_cmd_fadeout_music(void) {
     sCurrentCmd = CMD_NEXT;
 }
 
+static s16 *sLevelCmdVarPtrs[VAR_COUNT] = {
+    &gCurrSaveFileNum,
+    &gCurrCourseNum,
+    &gCurrActNum,
+    &gCurrLevelNum,
+    &gCurrAreaIndex,
+};
+
 static void level_cmd_get_or_set_var(void) {
     if (CMD_GET(u8, 2) == OP_SET) {
-        switch (CMD_GET(u8, 3)) {
-            case VAR_CURR_SAVE_FILE_NUM:
-                gCurrSaveFileNum = sRegister;
-                break;
-            case VAR_CURR_COURSE_NUM:
-                gCurrCourseNum = sRegister;
-                break;
-            case VAR_CURR_ACT_NUM:
-                gCurrActNum = sRegister;
-                break;
-            case VAR_CURR_LEVEL_NUM:
-                gCurrLevelNum = sRegister;
-                break;
-            case VAR_CURR_AREA_INDEX:
-                gCurrAreaIndex = sRegister;
-                break;
-        }
+        *(sLevelCmdVarPtrs[CMD_GET(u8, 3)]) = sRegister;
     } else {
-        switch (CMD_GET(u8, 3)) {
-            case VAR_CURR_SAVE_FILE_NUM:
-                sRegister = gCurrSaveFileNum;
-                break;
-            case VAR_CURR_COURSE_NUM:
-                sRegister = gCurrCourseNum;
-                break;
-            case VAR_CURR_ACT_NUM:
-                sRegister = gCurrActNum;
-                break;
-            case VAR_CURR_LEVEL_NUM:
-                sRegister = gCurrLevelNum;
-                break;
-            case VAR_CURR_AREA_INDEX:
-                sRegister = gCurrAreaIndex;
-                break;
-        }
+        sRegister = *(sLevelCmdVarPtrs[CMD_GET(u8, 3)]);
     }
 
     sCurrentCmd = CMD_NEXT;

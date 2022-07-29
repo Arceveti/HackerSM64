@@ -106,7 +106,8 @@ enum LevelCommandVar {
     VAR_CURR_COURSE_NUM,
     VAR_CURR_ACT_NUM,
     VAR_CURR_LEVEL_NUM,
-    VAR_CURR_AREA_INDEX
+    VAR_CURR_AREA_INDEX,
+    VAR_COUNT
 };
 
 enum WarpCheckpointFlags {
