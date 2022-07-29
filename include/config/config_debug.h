@@ -59,10 +59,13 @@
 // #define DEBUG_FORCE_CRASH_ON_BOOT
 
 // Forces a crash when the player presses L in-game.
-// #define DEBUG_FORCE_CRASH_ON_L
+#define DEBUG_FORCE_CRASH_ON_L
 
 // Enables the DEBUG_ASSERT macro.
 #define ENABLE_DEBUG_ASSERTS
+
+// Includes function map data in the ROM.
+#define INCLUDE_DEBUG_MAP
 
 // Includes an image which displays when the crash screen crashes.
 // REQUIRES 'make clean'.
