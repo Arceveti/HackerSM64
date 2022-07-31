@@ -5,6 +5,7 @@
 #include "macros.h"
 #include "farcall.h"
 #include "color_presets.h"
+#include "engine/math_util.h"
 
 //! TODO:
 // Toggle showing function names (like stack trace)
@@ -175,10 +176,9 @@ static const InsnTemplate insn_db[] = {
     // {{.i={0b000000,       0,       0,       0, 0b00000, 0b010111}}, PARAM_DTS, "DSRAV"  },
 
     // Multiply
-    // move hi
+    // move hi/lo
     {{.i={0b000000, 0b00000, 0b00000,       0, 0b00000, 0b010000}}, PARAM_D,   "MFHI"   },
     {{.i={0b000000,       0, 0b00000, 0b00000, 0b00000, 0b010001}}, PARAM_S,   "MTHI"   },
-    // move lo
     {{.i={0b000000, 0b00000, 0b00000,       0, 0b00000, 0b010010}}, PARAM_D,   "MFLO"   },
     {{.i={0b000000,       0, 0b00000, 0b00000, 0b00000, 0b010011}}, PARAM_S,   "MTLO"   },
     // mult
@@ -337,19 +337,39 @@ const char conditions[][5] = {
 static char fmt_to_char(InsnData insn) {
     u16 fmt = insn.i.rs;
     char ret = 'X';
+
     switch (fmt) {
         case 16: ret = 'S'; break;
         case 17: ret = 'D'; break;
         case 20: ret = 'W'; break;
         case 21: ret = 'L'; break;
     }
+
     return ret;
 }
 
-char *insn_disasm(InsnData insn, uintptr_t addr, u32 isPC) {
+s32 is_branch(InsnData insn) {
+    for (s32 i = 0; i < ARRAY_COUNT(insn_db); i++) {
+        if ((insn.d & insn_masks[insn_db[i].paramType].d) == insn_db[i].i.d) {
+            switch (insn_db[i].paramType) {
+                case PARAM_SO:
+                case PARAM_STO:
+                case PARAM_B:
+                case PARAM_BC1:
+                    return insn.i.immediate;
+            }
+            break;
+        }
+    }
+
+    return 0;
+}
+
+char *insn_disasm(InsnData insn, u32 isPC) {
     char *strp = &insn_as_string[0];
     s32 successful_print = FALSE;
     uintptr_t target;
+    s16 branchOffset;
     char *fname = NULL;
     char insn_name[10];
 
@@ -499,28 +519,28 @@ char *insn_disasm(InsnData insn, uintptr_t addr, u32 isPC) {
                     );
                     break;
                 case PARAM_SO:
-                    target = INSN_OFFSET(addr, (1 + insn.i.immediate));
-                    strp += sprintf(strp, "@%08X%-6s @%08X%s, @%08X0x%04X",
+                    branchOffset = (1 + insn.i.immediate);
+                    strp += sprintf(strp, "@%08X%-6s @%08X%s, @%08X%s0x%04X",
                         COLOR_RGBA32_CRASH_DISASM_INST,   insn_db[i].name,
                         COLOR_RGBA32_CRASH_DISASM_REG,    registerMaps[insn.i.rs],
-                        COLOR_RGBA32_CRASH_FUNCTION_NAME, target
+                        COLOR_RGBA32_CRASH_FUNCTION_NAME, ((branchOffset < 0) ? "-" : ""), ABS(branchOffset)
                     );
                     break;
                 case PARAM_STO:
-                    target = INSN_OFFSET(addr, (1 + insn.i.immediate));
-                    strp += sprintf(strp, "@%08X%-6s @%08X%s, %s, @%08X0x%04X",
+                    branchOffset = (1 + insn.i.immediate);
+                    strp += sprintf(strp, "@%08X%-6s @%08X%s, %s, @%08X%s0x%04X",
                         COLOR_RGBA32_CRASH_DISASM_INST,   insn_db[i].name,
                         COLOR_RGBA32_CRASH_DISASM_REG,    registerMaps[insn.i.rs],
                                                           registerMaps[insn.i.rt],
-                        COLOR_RGBA32_CRASH_FUNCTION_NAME, target
+                        COLOR_RGBA32_CRASH_FUNCTION_NAME, ((branchOffset < 0) ? "-" : ""), ABS(branchOffset)
                     );
                     break;
                 case PARAM_B:
                 case PARAM_BC1:
-                    target = INSN_OFFSET(addr, (1 + insn.i.immediate));
-                    strp += sprintf(strp, "@%08X%-6s @%08X0x%08X",
+                    branchOffset = (1 + insn.i.immediate);
+                    strp += sprintf(strp, "@%08X%-6s @%08X%s0x%04X",
                         COLOR_RGBA32_CRASH_DISASM_INST,   insn_db[i].name,
-                        COLOR_RGBA32_CRASH_FUNCTION_NAME, target
+                        COLOR_RGBA32_CRASH_FUNCTION_NAME, ((branchOffset < 0) ? "-" : ""), ABS(branchOffset)
                     );
                     break;
                 case PARAM_J:
