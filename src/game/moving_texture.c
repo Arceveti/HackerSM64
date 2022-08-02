@@ -102,10 +102,10 @@ struct MovtexObject {
     /// Assumes the animated vertices are buffered and correct texture is set
     Gfx *triDl;
     // if the list does not have per-vertex colors, all vertices have these colors
-    u8 r;      /// red
-    u8 g;      /// green
-    u8 b;      /// blue
-    u8 a;      /// alpha
+    Color r; /// red
+    Color g; /// green
+    Color b; /// blue
+    Alpha a; /// alpha
     s32 layer; /// the drawing layer for this mesh
 };
 
@@ -117,7 +117,7 @@ s16 gMovtexCounterPrev = 0;
 enum MovtexVtxColors {
     MOVTEX_VTX_COLOR_DEFAULT, // no tint (white vertex colors)
     MOVTEX_VTX_COLOR_YELLOW,  // used for Hazy Maze Cave toxic haze
-    MOVTEX_VTX_COLOR_RED      // used for Shifting Sand Land around the Tox box maze
+    MOVTEX_VTX_COLOR_RED,     // used for Shifting Sand Land around the Tox box maze
 };
 
 s8 gMovtexVtxColor = MOVTEX_VTX_COLOR_DEFAULT;

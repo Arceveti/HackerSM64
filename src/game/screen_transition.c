@@ -46,11 +46,11 @@ u32 set_transition_color_fade_alpha(s8 fadeType, s8 fadeTimer, u8 transTime) {
     return time;
 }
 
-Vtx *vertex_transition_color(struct WarpTransitionData *transData, u8 alpha) {
+Vtx *vertex_transition_color(struct WarpTransitionData *transData, Alpha alpha) {
     Vtx *verts = alloc_display_list(4 * sizeof(*verts));
-    u8 r = transData->red;
-    u8 g = transData->green;
-    u8 b = transData->blue;
+    Color r = transData->red;
+    Color g = transData->green;
+    Color b = transData->blue;
 
     if (verts != NULL) {
         make_vertex(verts, 0, GFX_DIMENSIONS_FROM_LEFT_EDGE(0),              0, -1, 0, 0, r, g, b, alpha);
@@ -61,7 +61,7 @@ Vtx *vertex_transition_color(struct WarpTransitionData *transData, u8 alpha) {
     return verts;
 }
 
-s32 dl_transition_color(s8 fadeTimer, u8 transTime, struct WarpTransitionData *transData, u8 alpha) {
+s32 dl_transition_color(s8 fadeTimer, u8 transTime, struct WarpTransitionData *transData, Alpha alpha) {
     Vtx *verts = vertex_transition_color(transData, alpha);
 
     if (verts != NULL) {
@@ -80,13 +80,13 @@ s32 dl_transition_color(s8 fadeTimer, u8 transTime, struct WarpTransitionData *t
 }
 
 s32 render_fade_transition_from_color(s8 fadeTimer, u8 transTime, struct WarpTransitionData *transData) {
-    u8 alpha = set_transition_color_fade_alpha(COLOR_TRANS_FADE_FROM_COLOR, fadeTimer, transTime);
+    Alpha alpha = set_transition_color_fade_alpha(COLOR_TRANS_FADE_FROM_COLOR, fadeTimer, transTime);
 
     return dl_transition_color(fadeTimer, transTime, transData, alpha);
 }
 
 s32 render_fade_transition_into_color(s8 fadeTimer, u8 transTime, struct WarpTransitionData *transData) {
-    u8 alpha = set_transition_color_fade_alpha(COLOR_TRANS_FADE_INTO_COLOR, fadeTimer, transTime);
+    Alpha alpha = set_transition_color_fade_alpha(COLOR_TRANS_FADE_INTO_COLOR, fadeTimer, transTime);
 
     return dl_transition_color(fadeTimer, transTime, transData, alpha);
 }
@@ -132,9 +132,9 @@ s32 center_tex_transition_y(struct WarpTransitionData *transData, f32 texTransTi
 
 void make_tex_transition_vertex(Vtx *verts, s32 n, s8 fadeTimer, struct WarpTransitionData *transData, s16 centerTransX, s16 centerTransY,
                    s16 texRadius1, s16 texRadius2, s16 tx, s16 ty) {
-    u8 r = transData->red;
-    u8 g = transData->green;
-    u8 b = transData->blue;
+    Color r = transData->red;
+    Color g = transData->green;
+    Color b = transData->blue;
     u16 zeroTimer = sTransitionTextureFadeCount[fadeTimer];
     f32 centerX = (texRadius1 * coss(zeroTimer)) - (texRadius2 * sins(zeroTimer)) + centerTransX;
     f32 centerY = (texRadius1 * sins(zeroTimer)) + (texRadius2 * coss(zeroTimer)) + centerTransY;

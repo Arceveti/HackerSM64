@@ -377,7 +377,7 @@ void play_transition(s16 transType, s16 time, Color red, Color green, Color blue
  * transition type, time in frames, and the RGB color that will fill the screen.
  * The transition will play only after a number of frames specified by 'delay'
  */
-void play_transition_after_delay(s16 transType, s16 time, u8 red, u8 green, u8 blue, s16 delay) {
+void play_transition_after_delay(s16 transType, s16 time, Color red, Color green, Color blue, s16 delay) {
     gWarpTransDelay = delay; // Number of frames to delay playing the transition.
     play_transition(transType, time, red, green, blue);
 }

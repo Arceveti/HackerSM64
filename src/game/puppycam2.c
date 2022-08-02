@@ -277,22 +277,22 @@ static void puppycam_process_cutscene(void) {
 
 /// MENU
 
-static void puppycam_display_box(s32 x1, s32 y1, s32 x2, s32 y2, u8 r, u8 g, u8 b, u8 a) {
+static void puppycam_display_box(s32 x1, s32 y1, s32 x2, s32 y2, Color r, Color g, Color b, Alpha a) {
     Gfx* dlHead = gDisplayListHead;
 
     gDPSetCombineMode(dlHead++, G_CC_ENVIRONMENT, G_CC_ENVIRONMENT);
-    gDPSetCycleType(  dlHead++, G_CYC_1CYCLE);
+    gDPSetCycleType(dlHead++, G_CYC_1CYCLE);
     if (a != 255) {
         gDPSetRenderMode(dlHead++, G_RM_XLU_SURF, G_RM_XLU_SURF2);
     } else {
         gDPSetRenderMode(dlHead++, G_RM_OPA_SURF, G_RM_OPA_SURF);
     }
-    gDPSetEnvColor(   dlHead++, r, g, b, a);
-    gDPFillRectangle( dlHead++, x1, y1, x2, y2);
-    gDPPipeSync(      dlHead++);
-    gDPSetEnvColor(   dlHead++, 255, 255, 255, 255);
-    gDPSetCycleType(  dlHead++, G_CYC_1CYCLE);
-    gSPDisplayList(   dlHead++, dl_hud_img_end);
+    gDPSetEnvColor(dlHead++, r, g, b, a);
+    gDPFillRectangle(dlHead++, x1, y1, x2, y2);
+    gDPPipeSync(dlHead++);
+    gDPSetEnvColor(dlHead++, 255, 255, 255, 255);
+    gDPSetCycleType(dlHead++, G_CYC_1CYCLE);
+    gSPDisplayList(dlHead++, dl_hud_img_end);
 
     gDisplayListHead = dlHead;
 }

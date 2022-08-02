@@ -21,8 +21,8 @@ struct ObjectWarpNode {
 };
 
 // From Surface 0x1B to 0x1E
-#define INSTANT_WARP_INDEX_START  0x00 // Equal and greater than Surface 0x1B
-#define INSTANT_WARP_INDEX_STOP   0x04 // Less than Surface 0x1F
+#define INSTANT_WARP_INDEX_START 0x00 // Equal and greater than Surface 0x1B
+#define INSTANT_WARP_INDEX_STOP  0x04 // Less than Surface 0x1F
 
 struct InstantWarp {
     /*0x00*/ u8 id; // 0 = 0x1B / 1 = 0x1C / 2 = 0x1D / 3 = 0x1E
@@ -56,7 +56,7 @@ struct Whirlpool {
 
 enum AreaFlags {
     AREA_FLAG_UNLOAD,
-    AREA_FLAG_LOAD
+    AREA_FLAG_LOAD,
 };
 
 struct Area {
@@ -81,9 +81,9 @@ struct Area {
 
 // All the transition data to be used in screen_transition.c
 struct WarpTransitionData {
-    /*0x00*/ u8 red;
-    /*0x01*/ u8 green;
-    /*0x02*/ u8 blue;
+    /*0x00*/ Color red;
+    /*0x01*/ Color green;
+    /*0x02*/ Color blue;
 
     /*0x04*/ s16 startTexRadius;
     /*0x06*/ s16 endTexRadius;
@@ -97,7 +97,7 @@ struct WarpTransitionData {
 
 enum WarpTransitionFadeDirections {
     WARP_TRANSITION_FADE_FROM,
-    WARP_TRANSITION_FADE_INTO
+    WARP_TRANSITION_FADE_INTO,
 };
 
 enum WarpTransitionTypes {
@@ -107,7 +107,7 @@ enum WarpTransitionTypes {
     WARP_TRANSITION_TYPES_LARGE = 0x0E,
     WARP_TRANSITION_TYPE_MARIO  = 0x10,
     WARP_TRANSITION_TYPE_BOWSER = 0x12,
-    WARP_TRANSITION_TYPES_MASK  = 0x1E
+    WARP_TRANSITION_TYPES_MASK  = 0x1E,
 };
 
 enum WarpTransitions {
@@ -145,17 +145,17 @@ enum MenuOption {
     MENU_OPT_1,
     MENU_OPT_2,
     MENU_OPT_3,
-    MENU_OPT_DEFAULT = MENU_OPT_1,
+    MENU_OPT_DEFAULT            = MENU_OPT_1,
 
     // Course Pause Menu
-    MENU_OPT_CONTINUE = MENU_OPT_1,
-    MENU_OPT_EXIT_COURSE = MENU_OPT_2,
-    MENU_OPT_CAMERA_ANGLE_R = MENU_OPT_3,
+    MENU_OPT_CONTINUE           = MENU_OPT_1,
+    MENU_OPT_EXIT_COURSE        = MENU_OPT_2,
+    MENU_OPT_CAMERA_ANGLE_R     = MENU_OPT_3,
 
     // Save Menu
-    MENU_OPT_SAVE_AND_CONTINUE = MENU_OPT_1,
-    MENU_OPT_SAVE_AND_QUIT = MENU_OPT_2,
-    MENU_OPT_CONTINUE_DONT_SAVE = MENU_OPT_3
+    MENU_OPT_SAVE_AND_CONTINUE  = MENU_OPT_1,
+    MENU_OPT_SAVE_AND_QUIT      = MENU_OPT_2,
+    MENU_OPT_CONTINUE_DONT_SAVE = MENU_OPT_3,
 };
 
 extern struct GraphNode **gLoadedGraphNodes;
@@ -179,7 +179,7 @@ extern s16 gCurrSaveFileNum;
 extern s16 gCurrLevelNum;
 
 
-void override_viewport_and_clip(Vp *a, Vp *b, u8 c, u8 d, u8 e);
+void override_viewport_and_clip(Vp *vpOverride, Vp *vpClip, Color red, Color green, Color blue);
 void print_intro_text(void);
 u32 get_mario_spawn_type(struct Object *obj);
 struct ObjectWarpNode *area_get_warp_node(u8 id);
@@ -191,8 +191,8 @@ void load_mario_area(void);
 void unload_mario_area(void);
 void change_area(s32 index);
 void area_update_objects(void);
-void play_transition(s16 transType, s16 time, u8 red, u8 green, u8 blue);
-void play_transition_after_delay(s16 transType, s16 time, u8 red, u8 green, u8 blue, s16 delay);
+void play_transition(s16 transType, s16 time, Color red, Color green, Color blue);
+void play_transition_after_delay(s16 transType, s16 time, Color red, Color green, Color blue, s16 delay);
 void render_game(void);
 
 #endif // AREA_H

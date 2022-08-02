@@ -1448,16 +1448,14 @@ void gd_draw_border_rect(f32 ulx, f32 uly, f32 lrx, f32 lry) {
 
 /* 24CAC8 -> 24CDB4; orig name: func_8019E2F8 */
 void gd_dl_set_fill(struct GdColour *colour) {
-    u8 r, g, b;
-
-    r = colour->r * 255.0f;
-    g = colour->g * 255.0f;
-    b = colour->b * 255.0f;
+    Color r = colour->r * 255.0f;
+    Color g = colour->g * 255.0f;
+    Color b = colour->b * 255.0f;
 
     gDPPipeSync(next_gfx());
     gDPSetCycleType(next_gfx(), G_CYC_FILL);
     gDPSetRenderMode(next_gfx(), G_RM_OPA_SURF, G_RM_OPA_SURF2);
-    gDPSetFillColor(next_gfx(), GPACK_RGBA5551(r, g, b, 1) << 16 | GPACK_RGBA5551(r, g, b, 1));
+    gDPSetFillColor(next_gfx(), ((GPACK_RGBA5551(r, g, b, 1) << 16) | GPACK_RGBA5551(r, g, b, 1)));
 }
 
 /* 24CDB4 -> 24CE10; orig name: func_8019E5E4 */
@@ -1504,8 +1502,8 @@ void pop_gddl_stash(void) {
 
 /* 24D084 -> 24D1D4 */
 s32 gd_startdisplist(s32 memarea) {
-    D_801BB018 = 0;
-    D_801BB01C = 1;
+    D_801BB018 = FALSE;
+    D_801BB01C = TRUE;
 
     switch (memarea) {
         case 7:  // Create new display list as a child of sStaticDl
@@ -1767,9 +1765,9 @@ void check_tri_display(s32 vtxcount) {
     if (vtxcount != 3) {
         fatal_printf("cant display no tris\n");
     }
-    if (D_801BB018 != 0 || D_801BB01C != 0) {
-        ;
-    }
+    // if (D_801BB018 || D_801BB01C) {
+    //     ;
+    // }
 }
 
 /**
@@ -1819,7 +1817,7 @@ void func_8019FEF0(void) {
         gd_dl_flush_vertices();
         func_801A0038();
     }
-    D_801BB018 = 0;
+    D_801BB018 = FALSE;
 }
 
 /**
