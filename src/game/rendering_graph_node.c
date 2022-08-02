@@ -481,7 +481,7 @@ void geo_process_master_list(struct GraphNodeMasterList *node) {
 void geo_process_ortho_projection(struct GraphNodeOrthoProjection *node) {
     if (node->node.children != NULL) {
         Mtx *mtx = alloc_display_list(sizeof(*mtx));
-        f32 scale = node->scale * construct_float(0.5f);
+        f32 scale = node->scale * 0.5f;
         f32 left   = (gCurGraphNodeRoot->x - gCurGraphNodeRoot->width ) * scale;
         f32 right  = (gCurGraphNodeRoot->x + gCurGraphNodeRoot->width ) * scale;
         f32 top    = (gCurGraphNodeRoot->y - gCurGraphNodeRoot->height) * scale;
@@ -489,7 +489,7 @@ void geo_process_ortho_projection(struct GraphNodeOrthoProjection *node) {
 
         Gfx* dlHead = gDisplayListHead;
 
-        guOrtho(mtx, left, right, bottom, top, construct_float(-2.0f), construct_float(2.0f), construct_float(1.0f));
+        guOrtho(mtx, left, right, bottom, top, -2.0f, 2.0f, 1.0f);
         gSPPerspNormalize(dlHead++, 0xFFFF);
         gSPMatrix(dlHead++, VIRTUAL_TO_PHYSICAL(mtx), (G_MTX_PROJECTION | G_MTX_LOAD | G_MTX_NOPUSH));
 
@@ -511,12 +511,12 @@ void geo_process_perspective(struct GraphNodePerspective *node) {
         Mtx *mtx = alloc_display_list(sizeof(*mtx));
 #ifdef WIDE
         if (gConfig.widescreen && gCurrLevelNum != 0x01){
-            sAspectRatio = construct_float(16.0f / 9.0f); // 1.775f
+            sAspectRatio = (16.0f / 9.0f); // 1.775f
         } else {
-            sAspectRatio = construct_float(4.0f / 3.0f); // 1.33333f
+            sAspectRatio = (4.0f / 3.0f); // 1.33333f
         }
 #else
-        sAspectRatio = construct_float(4.0f / 3.0f); // 1.33333f
+        sAspectRatio = (4.0f / 3.0f); // 1.33333f
 #endif
 
         Gfx* dlHead = gDisplayListHead;
@@ -714,7 +714,7 @@ void geo_process_billboard(struct GraphNodeBillboard *node) {
     } else if (gCurGraphNodeObject != NULL) {
         vec3f_copy(scale, gCurGraphNodeObject->scale);
     } else {
-        vec3_same(scale, construct_float(1.0f));
+        vec3_same(scale, 1.0f);
     }
 
     mtxf_billboard(gMatStack[gMatStackIndex + 1], gMatStack[gMatStackIndex], translation, scale, gCurGraphNodeCamera->roll);
@@ -932,7 +932,7 @@ void geo_set_animation_globals(struct AnimInfo *node, s32 hasAnimation) {
     gCurrAnimData = segmented_to_virtual((void *) anim->values);
 
     if (anim->animYTransDivisor == 0) {
-        gCurrAnimTranslationMultiplier = construct_float(1.0f);
+        gCurrAnimTranslationMultiplier = 1.0f;
     } else {
         gCurrAnimTranslationMultiplier = (f32) node->animYTrans / (f32) anim->animYTransDivisor;
     }
@@ -964,7 +964,7 @@ void geo_process_shadow(struct GraphNodeShadow *node) {
 
         if (shifted) {
             struct GraphNode *geo = node->node.children;
-            f32 objScale = construct_float(1.0f);
+            f32 objScale = 1.0f;
             if (geo != NULL && geo->type == GRAPH_NODE_TYPE_SCALE) {
                 objScale = ((struct GraphNodeScale *) geo)->scale;
             }
@@ -1072,7 +1072,7 @@ s32 obj_is_in_view(struct GraphNodeObject *node) {
     }
 
     // half of the fov in in-game angle units instead of degrees
-    s16 halfFov = (degrees_to_angle(((gCurGraphNodeCamFrustum->fov * sAspectRatio) * construct_float(0.5f)) + construct_float(1.0f)) + construct_float(0.5f));
+    s16 halfFov = (degrees_to_angle(((gCurGraphNodeCamFrustum->fov * sAspectRatio) * 0.5f) + 1.0f) + 0.5f);
 
     f32 hScreenEdge = -node->cameraToObject[2] * tans(halfFov);
     // -node->cameraToObject[2] is the depth, which gets multiplied by tan(halfFov)

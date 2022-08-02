@@ -139,14 +139,14 @@ ColorRGB sSkyboxColors[] = {
 s32 calculate_skybox_scaled_x(s8 player, f32 fov) {
     f32 yaw = sSkyBoxInfo[player].yaw;
 
-    f32 yawScaled = SCREEN_WIDTH * yaw / degrees_to_angle(fov);
+    f32 yawScaled = ((SCREEN_WIDTH * yaw) / degrees_to_angle(fov));
     // Round the scaled yaw. Since yaw is a u16, it doesn't need to check for < 0
-    s32 scaledX = yawScaled + construct_float(0.5f);
+    s32 scaledX = yawScaled + 0.5f;
 
     if (scaledX > SKYBOX_WIDTH) {
-        scaledX -= scaledX / SKYBOX_WIDTH * SKYBOX_WIDTH;
+        scaledX -= (scaledX / SKYBOX_WIDTH * SKYBOX_WIDTH);
     }
-    return SKYBOX_WIDTH - scaledX;
+    return (SKYBOX_WIDTH - scaledX);
 }
 
 /**
@@ -160,12 +160,12 @@ s32 calculate_skybox_scaled_y(s8 player, UNUSED f32 fov) {
     f32 pitchInDegrees = angle_to_degrees(sSkyBoxInfo[player].pitch);
 
     // Scale by 360 / fov
-    f32 degreesToScale = pitchInDegrees * construct_float(360.0f / 90.0f);
+    f32 degreesToScale = pitchInDegrees * (360.0f / 90.0f);
     s32 roundedY = roundf(degreesToScale);
 
     // Since pitch can be negative, and the tile grid starts 1 octant above the camera's focus, add
     // 5 octants to the y position
-    s32 scaledY = roundedY + (5 * SKYBOX_SIZE) * SKYBOX_TILE_HEIGHT;
+    s32 scaledY = roundedY + ((5 * SKYBOX_SIZE) * SKYBOX_TILE_HEIGHT);
 
     return CLAMP(scaledY, SCREEN_HEIGHT, SKYBOX_HEIGHT);
 }
@@ -193,10 +193,10 @@ Vtx *make_skybox_rect(s32 tileIndex, s8 colorIndex) {
     s16 y = SKYBOX_HEIGHT - (tileIndex / SKYBOX_COLS * SKYBOX_TILE_HEIGHT);
 
     if (verts != NULL) {
-        make_vertex(verts, 0, x,                     y,                      -1,       0,       0, sSkyboxColors[colorIndex][0], sSkyboxColors[colorIndex][1], sSkyboxColors[colorIndex][2], 255);
-        make_vertex(verts, 1, x,                     y - SKYBOX_TILE_HEIGHT, -1,       0, 31 << 5, sSkyboxColors[colorIndex][0], sSkyboxColors[colorIndex][1], sSkyboxColors[colorIndex][2], 255);
-        make_vertex(verts, 2, x + SKYBOX_TILE_WIDTH, y - SKYBOX_TILE_HEIGHT, -1, 31 << 5, 31 << 5, sSkyboxColors[colorIndex][0], sSkyboxColors[colorIndex][1], sSkyboxColors[colorIndex][2], 255);
-        make_vertex(verts, 3, x + SKYBOX_TILE_WIDTH, y,                      -1, 31 << 5,       0, sSkyboxColors[colorIndex][0], sSkyboxColors[colorIndex][1], sSkyboxColors[colorIndex][2], 255);
+        make_vertex(verts, 0, x,                     y,                      -1,         0,         0, sSkyboxColors[colorIndex][0], sSkyboxColors[colorIndex][1], sSkyboxColors[colorIndex][2], 255);
+        make_vertex(verts, 1, x,                     y - SKYBOX_TILE_HEIGHT, -1,         0, (31 << 5), sSkyboxColors[colorIndex][0], sSkyboxColors[colorIndex][1], sSkyboxColors[colorIndex][2], 255);
+        make_vertex(verts, 2, x + SKYBOX_TILE_WIDTH, y - SKYBOX_TILE_HEIGHT, -1, (31 << 5), (31 << 5), sSkyboxColors[colorIndex][0], sSkyboxColors[colorIndex][1], sSkyboxColors[colorIndex][2], 255);
+        make_vertex(verts, 3, x + SKYBOX_TILE_WIDTH, y,                      -1, (31 << 5),         0, sSkyboxColors[colorIndex][0], sSkyboxColors[colorIndex][1], sSkyboxColors[colorIndex][2], 255);
     }
     return verts;
 }
@@ -232,7 +232,7 @@ void *create_skybox_ortho_matrix(s8 player) {
     Mtx *mtx = alloc_display_list(sizeof(*mtx));
 
 #ifdef WIDESCREEN
-    f32 half_width = construct_float(4.0f / 3.0f) / GFX_DIMENSIONS_ASPECT_RATIO * SCREEN_CENTER_X;
+    f32 half_width = ((4.0f / 3.0f) / GFX_DIMENSIONS_ASPECT_RATIO) * SCREEN_CENTER_X;
     f32 center = (sSkyBoxInfo[player].scaledX + SCREEN_CENTER_X);
     if (half_width < SCREEN_CENTER_X) {
         // A wider screen than 4:3
@@ -242,7 +242,7 @@ void *create_skybox_ortho_matrix(s8 player) {
 #endif
 
     if (mtx != NULL) {
-        guOrtho(mtx, left, right, bottom, top, 0.0f, construct_float(3.0f), construct_float(1.0f));
+        guOrtho(mtx, left, right, bottom, top, 0.0f, 3.0f, 1.0f);
     }
 
     return mtx;

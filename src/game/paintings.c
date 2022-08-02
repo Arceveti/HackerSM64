@@ -557,7 +557,7 @@ Gfx *painting_model_view_transform(struct Painting *painting) {
         scale,
         (painting->sizeX / PAINTING_SIZE),
         (painting->sizeY / PAINTING_SIZE),
-        construct_float(1.0f)
+        1.0f
     );
     gSPMatrix(gfx++, scale, (G_MTX_MODELVIEW | G_MTX_MUL | G_MTX_PUSH));
 
@@ -874,8 +874,8 @@ void bhv_painting_init(void) {
 
     // The center of the painting with a z offset since paintings are usually between floor triangles laterally.
     Vec3f distPos = {
-        (o->oPaintingPtr->sizeX * construct_float(0.5f)),
-        (o->oPaintingPtr->sizeY * construct_float(0.5f)),
+        (o->oPaintingPtr->sizeX * 0.5f),
+        (o->oPaintingPtr->sizeY * 0.5f),
         PAINTING_WOBBLE_DEPTH
     };
 

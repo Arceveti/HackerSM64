@@ -32,15 +32,14 @@ static ShadowRectangle sShadowRectangles[2] = {
  * initial size of the shadow and the current distance.
  */
 f32 scale_shadow_with_distance(f32 initial, f32 distFromFloor) {
-    f32 half = construct_float(0.5f);
-    f32 dist = construct_float(600.0f);
+    const f32 dist = 600.0f;
 
     if (distFromFloor <= 0.0f) {
         return initial;
     } else if (distFromFloor >= dist) {
-        return initial * half;
+        return (initial * 0.5f);
     } else {
-        return initial * (construct_float(1.0f) - ((distFromFloor * half) / dist));
+        return (initial * (1.0f - ((distFromFloor * 0.5f) / dist)));
     }
 }
 
@@ -48,7 +47,7 @@ f32 scale_shadow_with_distance(f32 initial, f32 distFromFloor) {
  * Dim a shadow when its parent object is further from the ground.
  */
 s32 dim_shadow_with_distance(u8 solidity, f32 distFromFloor) {
-    f32 dist = construct_float(600.0f);
+    const f32 dist = 600.0f;
 
     if (solidity < 121) {
         return solidity;
@@ -193,8 +192,6 @@ static void add_shadow_to_display_list(Gfx *displayListHead, s8 shadowType, Alph
  * Return a pointer to the display list representing the shadow.
  */
 Gfx *create_shadow_below_xyz(Vec3f pos, Vec3f floorNormal, Vec3f scaleVec, s16 shadowScale, u8 solidity, s8 shadowType, s8 shifted, s8 *isDecal) {
-    const f32 floorLowerLimitMisc = construct_float(FLOOR_LOWER_LIMIT_MISC);
-
     struct Object *obj = gCurGraphNodeObjectNode;
 
     // Check if the object exists.
@@ -205,7 +202,7 @@ Gfx *create_shadow_below_xyz(Vec3f pos, Vec3f floorNormal, Vec3f scaleVec, s16 s
     // The floor underneath the object.
     struct Surface *floor = NULL;
     // The y-position of the floor (or water or lava) underneath the object.
-    f32 floorHeight = floorLowerLimitMisc;
+    f32 floorHeight = FLOOR_LOWER_LIMIT_MISC;
     f32 x = pos[0];
     f32 y = pos[1];
     f32 z = pos[2];
@@ -251,7 +248,7 @@ Gfx *create_shadow_below_xyz(Vec3f pos, Vec3f floorNormal, Vec3f scaleVec, s16 s
     // Whether the floor is an environment box rather than an actual surface.
     s32 isEnvBox = FALSE;
 
-    if (waterLevel > floorLowerLimitMisc
+    if (waterLevel > FLOOR_LOWER_LIMIT_MISC
         && y >= waterLevel
         && floorHeight <= waterLevel) {
         // Skip shifting the shadow height later, since the find_water_level_and_floor call above uses the already shifted position.
@@ -299,7 +296,7 @@ Gfx *create_shadow_below_xyz(Vec3f pos, Vec3f floorNormal, Vec3f scaleVec, s16 s
     if (isEnvBox) {
         // Assume the floor is flat.
         nx = 0.0f;
-        ny = construct_float(1.0f);
+        ny = 1.0f;
         nz = 0.0f;
     } else {
         // Read the floor's normals.
@@ -321,7 +318,7 @@ Gfx *create_shadow_below_xyz(Vec3f pos, Vec3f floorNormal, Vec3f scaleVec, s16 s
     // -- Height checks --
 
     // No shadow if the floor is lower than expected possible,
-    if (floorHeight < floorLowerLimitMisc) {
+    if (floorHeight < FLOOR_LOWER_LIMIT_MISC) {
         return NULL;
     }
 

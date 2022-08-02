@@ -256,7 +256,7 @@ void calc_new_obj_vel_and_pos_y(struct Surface *objFloor, f32 objFloorY, f32 obj
         objVelX += floor_nX * vel;
         objVelZ += floor_nZ * vel;
 
-        f32 min = construct_float(NEAR_ZERO);
+        f32 min = NEAR_ZERO;
 
         if (objVelX < min && objVelX > -min) objVelX = 0;
         if (objVelZ < min && objVelZ > -min) objVelZ = 0;
@@ -310,7 +310,7 @@ void calc_new_obj_vel_and_pos_y_underwater(struct Surface *objFloor, f32 floorY,
         objVelZ += floor_nZ * velm;
     }
 
-    f32 min = construct_float(NEAR_ZERO);
+    f32 min = NEAR_ZERO;
 
     if (objVelX < min && objVelX > -min) objVelX = 0;
     if (objVelZ < min && objVelZ > -min) objVelZ = 0;

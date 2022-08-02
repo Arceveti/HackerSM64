@@ -64,7 +64,7 @@ extern f32 gSineTable[];
 #define coss(x) gCosineTable[(u16) (x) >> 4]
 #define tans(x) (sins(x) / coss(x))
 #define cots(x) (coss(x) / sins(x))
-#define atans(x) gArctanTable[(s32)((((x) * 1024) + construct_float(0.5f)))] // is this correct? used for atan2_lookup
+#define atans(x) gArctanTable[(s32)((((x) * 1024) + 0.5f))] // is this correct? used for atan2_lookup
 
 #define RAD_PER_DEG (M_PI / 180.0f)
 #define DEG_PER_RAD (180.0f / M_PI)
@@ -570,7 +570,7 @@ ALWAYS_INLINE void swl(void* addr, s32 val, const int offset) {
 // On console, (x != 0) still returns true for denormalized floats,
 // which will count as a division by zero when divided and crash.
 // For console compatibility, use this check instead when avoiding a division by zero.
-#define FLT_IS_NONZERO(x) (absf(x) > construct_float(NEAR_ZERO))
+#define FLT_IS_NONZERO(x) (absf(x) > NEAR_ZERO)
 
 // RNG
 u32 random_u16(void);
