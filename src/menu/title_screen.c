@@ -100,14 +100,14 @@ s32 intro_level_select(void) {
      || gPlayer1Controller->rawStickX < -60
      || gPlayer1Controller->buttonDown & (D_CBUTTONS | D_JPAD | L_CBUTTONS | L_JPAD)
     ) {
-        index++;
+        index = 1;
     }
 
     if (gPlayer1Controller->rawStickY > 60
      || gPlayer1Controller->rawStickX > 60
      || gPlayer1Controller->buttonDown & (U_CBUTTONS | U_JPAD | R_CBUTTONS | R_JPAD)
     ) {
-        index += 2;
+        index = 2;
     }
 
     if (((index ^ gLevelSelectHoldKeyIndex) & index) == 2) {

@@ -141,10 +141,10 @@ void create_dl_identity_matrix(void) {
     }
 
 #ifndef GBI_FLOATS
-    matrix->m[0][0] = 0x00010000;    matrix->m[1][0] = 0x00000000;    matrix->m[2][0] = 0x00000000;    matrix->m[3][0] = 0x00000000;
-    matrix->m[0][1] = 0x00000000;    matrix->m[1][1] = 0x00010000;    matrix->m[2][1] = 0x00000000;    matrix->m[3][1] = 0x00000000;
-    matrix->m[0][2] = 0x00000001;    matrix->m[1][2] = 0x00000000;    matrix->m[2][2] = 0x00000000;    matrix->m[3][2] = 0x00000000;
-    matrix->m[0][3] = 0x00000000;    matrix->m[1][3] = 0x00000001;    matrix->m[2][3] = 0x00000000;    matrix->m[3][3] = 0x00000000;
+    matrix->m[0][0] = 0x00010000; matrix->m[1][0] = 0x00000000; matrix->m[2][0] = 0x00000000; matrix->m[3][0] = 0x00000000;
+    matrix->m[0][1] = 0x00000000; matrix->m[1][1] = 0x00010000; matrix->m[2][1] = 0x00000000; matrix->m[3][1] = 0x00000000;
+    matrix->m[0][2] = 0x00000001; matrix->m[1][2] = 0x00000000; matrix->m[2][2] = 0x00000000; matrix->m[3][2] = 0x00000000;
+    matrix->m[0][3] = 0x00000000; matrix->m[1][3] = 0x00000001; matrix->m[2][3] = 0x00000000; matrix->m[3][3] = 0x00000000;
 #else
     guMtxIdent(matrix);
 #endif
@@ -240,7 +240,7 @@ static u8 *alloc_ia8_text_from_i1(u16 *in, s16 width, s16 height) {
     }
 
     for (inPos = 0; inPos < (width * height) / 16; inPos++) {
-        bitMask = 0x8000;
+        bitMask = BIT(15);
 
         while (bitMask != 0) {
             if (in[inPos] & bitMask) {
@@ -340,7 +340,10 @@ struct MultiTextEntry {
 #define TEXT_THE_RAW ASCII_TO_DIALOG('t'), ASCII_TO_DIALOG('h'), ASCII_TO_DIALOG('e'), 0x00
 #define TEXT_YOU_RAW ASCII_TO_DIALOG('y'), ASCII_TO_DIALOG('o'), ASCII_TO_DIALOG('u'), 0x00
 
-enum MultiStringIDs { STRING_THE, STRING_YOU };
+enum MultiStringIDs {
+    STRING_THE,
+    STRING_YOU,
+};
 
 /*
  * Place the multi-text string according to the ID passed. (US, EU)
@@ -601,11 +604,11 @@ void handle_menu_scrolling(s8 scrollDirection, s8 *currentIndex, s8 minIndex, s8
     u8 index = 0;
 
     if (scrollDirection == MENU_SCROLL_VERTICAL) {
-        if ((gPlayer1Controller->rawStickY >  60) || (gPlayer1Controller->buttonDown & (U_CBUTTONS | U_JPAD))) index++;
-        if ((gPlayer1Controller->rawStickY < -60) || (gPlayer1Controller->buttonDown & (D_CBUTTONS | D_JPAD))) index += 2;
+        if ((gPlayer1Controller->rawStickY >  60) || (gPlayer1Controller->buttonDown & (U_CBUTTONS | U_JPAD))) index = 1;
+        if ((gPlayer1Controller->rawStickY < -60) || (gPlayer1Controller->buttonDown & (D_CBUTTONS | D_JPAD))) index = 2;
     } else if (scrollDirection == MENU_SCROLL_HORIZONTAL) {
-        if ((gPlayer1Controller->rawStickX >  60) || (gPlayer1Controller->buttonDown & (R_CBUTTONS | R_JPAD))) index += 2;
-        if ((gPlayer1Controller->rawStickX < -60) || (gPlayer1Controller->buttonDown & (L_CBUTTONS | L_JPAD))) index++;
+        if ((gPlayer1Controller->rawStickX >  60) || (gPlayer1Controller->buttonDown & (R_CBUTTONS | R_JPAD))) index = 2;
+        if ((gPlayer1Controller->rawStickX < -60) || (gPlayer1Controller->buttonDown & (L_CBUTTONS | L_JPAD))) index = 1;
     }
 
     if (((index ^ gMenuHoldKeyIndex) & index) == 2) {
@@ -630,7 +633,7 @@ void handle_menu_scrolling(s8 scrollDirection, s8 *currentIndex, s8 minIndex, s8
         gMenuHoldKeyIndex = index;
     }
 
-    if ((index & 3) == 0) {
+    if ((index & 0x3) == 0) {
         gMenuHoldKeyTimer = 0;
     }
 }
@@ -928,7 +931,7 @@ void handle_dialog_text_and_pages(s8 colorMode, struct DialogEntry *dialog, s8 l
         create_dl_translation_matrix(MENU_MTX_NOPUSH, 0, (f32) gDialogScrollOffsetY, 0);
     }
 
-    create_dl_translation_matrix(MENU_MTX_PUSH, X_VAL3, 2 - lineNum * Y_VAL3, 0);
+    create_dl_translation_matrix(MENU_MTX_PUSH, X_VAL3, 2 - (lineNum * Y_VAL3), 0);
 
     while (pageState == DIALOG_PAGE_STATE_NONE) {
         if (customColor == 1) {
@@ -1156,12 +1159,12 @@ u8 *gEndCutsceneStringsEn[] = {
     NULL
 };
 
-u16 gCutsceneMsgFade        =  0;
-s16 gCutsceneMsgIndex       = -1;
-s16 gCutsceneMsgDuration    = -1;
-s16 gCutsceneMsgTimer       =  0;
-s8  gDialogCameraAngleIndex = CAM_SELECTION_MARIO;
-s8  gDialogCourseActNum     =  1;
+u16 gCutsceneMsgFade = 0;
+s16 gCutsceneMsgIndex = -1;
+s16 gCutsceneMsgDuration = -1;
+s16 gCutsceneMsgTimer = 0;
+s8 gDialogCameraAngleIndex = CAM_SELECTION_MARIO;
+s8 gDialogCourseActNum = 1;
 
 #define DIAG_VAL1  16
 #define DIAG_VAL3 132 // US & EU
@@ -1634,8 +1637,8 @@ void render_pause_my_score_coins(void) {
     gDPSetEnvColor(gDisplayListHead++, 255, 255, 255, gDialogTextAlpha);
 
     if (courseIndex <= COURSE_NUM_TO_INDEX(COURSE_STAGES_MAX)) {
-        print_hud_my_score_coins(1, gCurrSaveFileNum - 1, courseIndex, 178, 103);
-        print_hud_my_score_stars(   gCurrSaveFileNum - 1, courseIndex, 118, 103);
+        print_hud_my_score_coins(TRUE, gCurrSaveFileNum - 1, courseIndex, 178, 103);
+        print_hud_my_score_stars(      gCurrSaveFileNum - 1, courseIndex, 118, 103);
     }
 
     gSPDisplayList(gDisplayListHead++, dl_rgba16_text_end);
@@ -2149,8 +2152,7 @@ void render_course_complete_lvl_info_and_hud_str(void) {
     gSPDisplayList(gDisplayListHead++, dl_ia_text_end);
 }
 
-#define X_VAL9 x
-#define TXT_SAVEOPTIONS_X x + 12
+#define TXT_SAVEOPTIONS_X 12
 #define TXT_SAVECONT_Y 0
 #define TXT_SAVEQUIT_Y 20
 #define TXT_CONTNOSAVE_Y 40
@@ -2165,13 +2167,13 @@ void render_save_confirmation(s16 x, s16 y, s8 *index, s16 yPos) {
     gSPDisplayList(gDisplayListHead++, dl_ia_text_begin);
     gDPSetEnvColor(gDisplayListHead++, 255, 255, 255, gDialogTextAlpha);
 
-    print_generic_string(TXT_SAVEOPTIONS_X, y + TXT_SAVECONT_Y, LANGUAGE_ARRAY(textSaveAndContinue));
-    print_generic_string(TXT_SAVEOPTIONS_X, y - TXT_SAVEQUIT_Y, LANGUAGE_ARRAY(textSaveAndQuit));
-    print_generic_string(TXT_SAVEOPTIONS_X, y - TXT_CONTNOSAVE_Y, LANGUAGE_ARRAY(textContinueWithoutSave));
+    print_generic_string(x + TXT_SAVEOPTIONS_X, y + TXT_SAVECONT_Y,   LANGUAGE_ARRAY(textSaveAndContinue));
+    print_generic_string(x + TXT_SAVEOPTIONS_X, y - TXT_SAVEQUIT_Y,   LANGUAGE_ARRAY(textSaveAndQuit));
+    print_generic_string(x + TXT_SAVEOPTIONS_X, y - TXT_CONTNOSAVE_Y, LANGUAGE_ARRAY(textContinueWithoutSave));
 
     gSPDisplayList(gDisplayListHead++, dl_ia_text_end);
 
-    create_dl_translation_matrix(MENU_MTX_PUSH, X_VAL9, y - ((*index - 1) * yPos), 0);
+    create_dl_translation_matrix(MENU_MTX_PUSH, x, y - ((*index - 1) * yPos), 0);
 
     gDPSetEnvColor(gDisplayListHead++, 255, 255, 255, gDialogTextAlpha);
     gSPDisplayList(gDisplayListHead++, dl_draw_triangle);
