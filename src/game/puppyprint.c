@@ -1069,10 +1069,7 @@ void render_multi_image(Texture *image, s32 x, s32 y, s32 width, s32 height, UNU
 
     num = 2;
     // Find the width mask
-    while (TRUE) {
-        if ((s32) num == imW) {
-            break;
-        }
+    while ((s32) num != imW) {
         num *= 2;
         maskW++;
         if (maskW == 9) {
@@ -1082,10 +1079,7 @@ void render_multi_image(Texture *image, s32 x, s32 y, s32 width, s32 height, UNU
     }
     num = 2;
     // Find the height mask
-    while (TRUE) {
-        if ((s32) num == imH) {
-            break;
-        }
+    while ((s32) num == imH) {
         num *= 2;
         maskH++;
         if (maskH == 9) {

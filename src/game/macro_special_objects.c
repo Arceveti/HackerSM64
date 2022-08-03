@@ -78,11 +78,7 @@ void spawn_macro_objects(s32 areaIndex, MacroObject *macroObjList) {
     gMacroObjectDefaultParent.header.gfx.areaIndex = areaIndex;
     gMacroObjectDefaultParent.header.gfx.activeAreaIndex = areaIndex;
 
-    while (TRUE) {
-        if (*macroObjList == -1) { // An encountered value of -1 means the list has ended.
-            break;
-        }
-
+    while (*macroObjList != -1) { // An encountered value of -1 means the list has ended.
         presetID = (*macroObjList & 0x1FF) - 31; // Preset identifier for MacroObjectPresets array.
 
         if (presetID < 0) {
@@ -156,10 +152,7 @@ void spawn_special_objects(s32 areaIndex, TerrainData **specialObjList) {
         pos[2]   = *(*specialObjList)++;
 
         offset = 0;
-        while (TRUE) {
-            if (SpecialObjectPresets[offset].preset_id == presetID) {
-                break;
-            }
+        while (SpecialObjectPresets[offset].preset_id != presetID) {
             offset++;
         }
 
@@ -211,10 +204,7 @@ u32 get_special_objects_size(MacroObject *data) {
         data += 3;
         offset = 0;
 
-        while (TRUE) {
-            if (SpecialObjectPresets[offset].preset_id == presetID) {
-                break;
-            }
+        while (SpecialObjectPresets[offset].preset_id != presetID) {
             offset++;
         }
 
@@ -238,6 +228,6 @@ u32 get_special_objects_size(MacroObject *data) {
         }
     }
 
-    return data - startPos;
+    return (data - startPos);
 }
 #endif
