@@ -41,9 +41,10 @@ extern u8 _goddardSegmentStart[];
 extern u8 _goddardSegmentTextEnd[];
 
 s32 is_in_code_segment(uintptr_t addr) {
-    return (IS_IN_SEGMENT(addr, main)
+    return (((addr & 0x80000000) != 0)
+        && (IS_IN_SEGMENT(addr, main)
          || IS_IN_SEGMENT(addr, engine)
-         || IS_IN_SEGMENT(addr, goddard));
+         || IS_IN_SEGMENT(addr, goddard)));
 }
 
 char *parse_map(uintptr_t *addr) {
