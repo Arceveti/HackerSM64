@@ -5,7 +5,9 @@
  * EXTENDED BOUNDS CONFIG *
  **************************/
 
-// -- General Config --
+/************************
+ * -- GENERAL CONFIG --
+ ************************/
 
 /**
  * The distance the level boundary is from the origin.
@@ -29,7 +31,9 @@
 // -- Don't touch the stuff past this point unless you know what you're doing! --
 
 
-// -- Precomputed constants --
+/*******************************
+ * -- PRECOMPUTED CONSTANTS --
+ *******************************/
 
 /**
  * World scale value. This allows you to scale down geometry by the given amount,
@@ -47,7 +51,9 @@
 #define CELL_SIZE ((LEVEL_BOUNDARY_MAX * 2) / NUM_CELLS)
 
 
-// -- Memory pool sizes (UNUSED) --
+/************************************
+ * -- MEMORY POOL SIZES (UNUSED) --
+ ************************************/
 
 /**
  *  If you see "SURFACE POOL FULL" or "SURFACE NODE POOL FULL" in game, you should increase
