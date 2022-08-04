@@ -635,9 +635,6 @@ void set_camera_height(struct Camera *c, f32 goalHeight) {
     f32 marioFloorHeight, marioCeilHeight, camFloorHeight;
     f32 baseOff = MARIO_EYE_HEIGHT;
     f32 camCeilHeight = find_ceil(c->pos[0], gLakituState.goalPos[1] - 50.f, c->pos[2], &surface);
-#ifdef FAST_VERTICAL_CAMERA_MOVEMENT
-    f32 approachRate = 20.0f;
-#endif
 
     if (sMarioCamState->action & ACT_FLAG_HANGING) {
         marioCeilHeight = sMarioGeometry.currCeilHeight;
@@ -666,17 +663,16 @@ void set_camera_height(struct Camera *c, f32 goalHeight) {
             c->pos[1] = goalHeight;
         }
         // Warp camera to goalHeight if further than 1000 and Mario is stuck in the ground
-        if (sMarioCamState->action == ACT_BUTT_STUCK_IN_GROUND ||
-            sMarioCamState->action == ACT_HEAD_STUCK_IN_GROUND ||
-            sMarioCamState->action == ACT_FEET_STUCK_IN_GROUND) {
+        if (sMarioCamState->action == ACT_BUTT_STUCK_IN_GROUND
+         || sMarioCamState->action == ACT_HEAD_STUCK_IN_GROUND
+         || sMarioCamState->action == ACT_FEET_STUCK_IN_GROUND) {
             if (absf(c->pos[1] - goalHeight) > 1000.0f) {
                 c->pos[1] = goalHeight;
             }
         }
 
 #ifdef FAST_VERTICAL_CAMERA_MOVEMENT
-        approachRate += absf(c->pos[1] - goalHeight) / 20;
-        approach_camera_height(c, goalHeight, approachRate);
+        approach_camera_height(c, goalHeight, (20.0f + (absf(c->pos[1] - goalHeight) / 20)));
 #else
         approach_camera_height(c, goalHeight, 20.f);
 #endif

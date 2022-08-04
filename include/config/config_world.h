@@ -56,9 +56,9 @@
  ************************************/
 
 /**
- *  If you see "SURFACE POOL FULL" or "SURFACE NODE POOL FULL" in game, you should increase
- *  SURFACE_POOL_SIZE or SURFACE_NODE_POOL_SIZE, respectively, or reduce the amount of
- *  collision surfaces in your level.
+ * If you see "SURFACE POOL FULL" or "SURFACE NODE POOL FULL" in game, you should increase
+ * SURFACE_POOL_SIZE or SURFACE_NODE_POOL_SIZE, respectively, or reduce the amount of
+ * collision surfaces in your level.
  */
 
 /**

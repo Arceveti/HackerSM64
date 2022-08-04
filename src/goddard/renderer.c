@@ -2147,7 +2147,7 @@ void Unknown801A1E70(void) {
     gd_dl_set_z_buffer_area();
     gDPSetColorImage(next_gfx(), G_IM_FMT_RGBA, G_IM_SIZ_16b, sActiveView->parent->lowerRight.x,
                      GD_LOWER_24(sActiveView->parent->zbuf));
-    gDPSetFillColor(next_gfx(), GPACK_ZDZ(G_MAXFBZ, 0) << 16 | GPACK_ZDZ(G_MAXFBZ, 0));
+    gDPSetFillColor(next_gfx(), ((GPACK_ZDZ(G_MAXFBZ, 0) << 16) | GPACK_ZDZ(G_MAXFBZ, 0)));
     gDPFillRectangle(next_gfx(), (u32)(sActiveView->upperLeft.x), (u32)(sActiveView->upperLeft.y),
                      (u32)(sActiveView->upperLeft.x + sActiveView->lowerRight.x - 1.0f),
                      (u32)(sActiveView->upperLeft.y + sActiveView->lowerRight.y - 1.0f));

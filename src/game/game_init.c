@@ -170,8 +170,7 @@ void init_z_buffer(s32 resetZB) {
         return;
     }
 
-    gDPSetFillColor(dlHead++,
-                    GPACK_ZDZ(G_MAXFBZ, 0) << 16 | GPACK_ZDZ(G_MAXFBZ, 0));
+    gDPSetFillColor(dlHead++, ((GPACK_ZDZ(G_MAXFBZ, 0) << 16) | GPACK_ZDZ(G_MAXFBZ, 0)));
 
     gDPFillRectangle(dlHead++, 0, gBorderHeight, SCREEN_WIDTH - 1,
                      SCREEN_HEIGHT - 1 - gBorderHeight);
