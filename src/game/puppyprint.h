@@ -66,7 +66,7 @@ extern s32 mempool;
 extern u8 benchOption;
 
 // General
-extern s32 benchMark[NUM_BENCH_ITERATIONS + 2];
+extern OSTime benchMark[NUM_BENCH_ITERATIONS + 2];
 
 extern void puppyprint_profiler_process(void);
 extern void puppyprint_render_profiler(void);

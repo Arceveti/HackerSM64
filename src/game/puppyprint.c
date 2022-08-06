@@ -68,7 +68,7 @@ s32 benchmarkProgramTimer = 0;
 // General
 u32 rspTime = 0;
 u32 rdpTime = 0;
-s32 benchMark[NUM_BENCH_ITERATIONS + 2];
+OSTime benchMark[NUM_BENCH_ITERATIONS + 2];
 // RAM
 s8 ramViewer = FALSE;
 ssize_t ramsizeSegment[NUM_TLB_SEGMENTS + 1] = {

@@ -100,17 +100,17 @@ s32 intro_level_select(void) {
      || gPlayer1Controller->rawStickX < -60
      || gPlayer1Controller->buttonDown & (D_CBUTTONS | D_JPAD | L_CBUTTONS | L_JPAD)
     ) {
-        index = 1;
+        index |= 0b01;
     }
 
     if (gPlayer1Controller->rawStickY > 60
      || gPlayer1Controller->rawStickX > 60
      || gPlayer1Controller->buttonDown & (U_CBUTTONS | U_JPAD | R_CBUTTONS | R_JPAD)
     ) {
-        index = 2;
+        index = 0b10;
     }
 
-    if (((index ^ gLevelSelectHoldKeyIndex) & index) == 2) {
+    if (((index ^ gLevelSelectHoldKeyIndex) & index) == 0b10) {
         if (gCurrLevelNum > LEVEL_MAX) {
             gCurrLevelNum = LEVEL_MIN;
         } else if (gPlayer1Controller->buttonDown & B_BUTTON) {
@@ -122,7 +122,7 @@ s32 intro_level_select(void) {
         }
     }
 
-    if (((index ^ gLevelSelectHoldKeyIndex) & index) == 1) {
+    if (((index ^ gLevelSelectHoldKeyIndex) & index) == 0b01) {
         if (gCurrLevelNum < LEVEL_MIN) {
             // Same applies to here as above
             gCurrLevelNum = LEVEL_MAX;
@@ -137,13 +137,13 @@ s32 intro_level_select(void) {
 
     if (gLevelSelectHoldKeyTimer == 10) {
         gLevelSelectHoldKeyTimer = 8;
-        gLevelSelectHoldKeyIndex = 0;
+        gLevelSelectHoldKeyIndex = 0b00;
     } else {
         gLevelSelectHoldKeyTimer++;
         gLevelSelectHoldKeyIndex = index;
     }
 
-    if ((index & 0x3) == 0) {
+    if (index == 0) {
         gLevelSelectHoldKeyTimer = 0;
     }
 
