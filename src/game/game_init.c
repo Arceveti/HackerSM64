@@ -262,7 +262,7 @@ void draw_screen_borders(void) {
     gDPSetRenderMode(dlHead++, G_RM_OPA_SURF, G_RM_OPA_SURF2);
     gDPSetCycleType(dlHead++, G_CYC_FILL);
 
-    gDPSetFillColor(dlHead++, GPACK_RGBA5551(0, 0, 0, 0) << 16 | GPACK_RGBA5551(0, 0, 0, 0));
+    gDPSetFillColor(dlHead++, ((GPACK_RGBA5551(0, 0, 0, 0) << 16) | GPACK_RGBA5551(0, 0, 0, 0)));
 
     if (gBorderHeight) {
         gDPFillRectangle(dlHead++, GFX_DIMENSIONS_RECT_FROM_LEFT_EDGE(0), 0,

@@ -361,18 +361,18 @@ void init_mario_after_warp(void) {
 
         if (sWarpDest.levelNum == LEVEL_CASTLE
          && sWarpDest.areaIdx == 1
-         && (sWarpDest.nodeId == 31
-          || sWarpDest.nodeId == 32)
+         && (sWarpDest.nodeId == WARP_CASTLE_INSIDE_1_1F
+          || sWarpDest.nodeId == WARP_CASTLE_INSIDE_1_FROM_SECRET_WARP)
         ) {
             play_sound(SOUND_MENU_MARIO_CASTLE_WARP, gGlobalSoundSource);
         }
 
         if (sWarpDest.levelNum == LEVEL_CASTLE_GROUNDS
          && sWarpDest.areaIdx == 1
-         && (sWarpDest.nodeId == 7
-          || sWarpDest.nodeId == 10
-          || sWarpDest.nodeId == 20
-          || sWarpDest.nodeId == 30)) {
+         && (sWarpDest.nodeId == WARP_CASTLE_GROUNDS_FROM_VCUTM_WARP
+          || sWarpDest.nodeId == WARP_CASTLE_GROUNDS_MAIN_ENTRY
+          || sWarpDest.nodeId == WARP_CASTLE_GROUNDS_FROM_COTMC
+          || sWarpDest.nodeId == WARP_CASTLE_GROUNDS_FROM_DDD_DOOR)) {
             play_sound(SOUND_MENU_MARIO_CASTLE_WARP, gGlobalSoundSource);
         }
 #endif
@@ -491,8 +491,8 @@ void check_instant_warp(void) {
     }
 }
 
-s16 music_unchanged_through_warp(s16 arg) {
-    struct ObjectWarpNode *warpNode = area_get_warp_node(arg);
+s16 music_unchanged_through_warp(s16 id) {
+    struct ObjectWarpNode *warpNode = area_get_warp_node(id);
     s16 levelNum = (warpNode->node.destLevel & WARP_DEST_LEVEL_NUM_MASK);
 
     s16 destArea = warpNode->node.destArea;
