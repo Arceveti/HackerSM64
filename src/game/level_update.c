@@ -499,7 +499,7 @@ s16 music_unchanged_through_warp(s16 id) {
     s16 unchanged = TRUE;
     s16 currBgMusic;
 
-#ifndef DISABLE_LEVEL_SPECIFIC_CHECKS
+#ifdef ENABLE_VANILLA_LEVEL_SPECIFIC_CHECKS
     if (levelNum == LEVEL_BOB
      && levelNum == gCurrLevelNum
      && destArea == gCurrAreaIndex) {
@@ -520,7 +520,7 @@ s16 music_unchanged_through_warp(s16 id) {
         if (get_current_background_music() != destParam2) {
             unchanged = FALSE;
         }
-#ifndef DISABLE_LEVEL_SPECIFIC_CHECKS
+#ifdef ENABLE_VANILLA_LEVEL_SPECIFIC_CHECKS
     }
 #endif
     return unchanged;
