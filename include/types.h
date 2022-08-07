@@ -10,16 +10,9 @@
 
 #define BIT(i)                          (1 << (i))
 #define BITMASK(size)                   ((BIT(size)) - 1)
-#define SHIFTED_BITMASK(size, shift)    (BITMASK(size) << shift)
+#define SHIFTED_BITMASK(size, shift)    (BITMASK(size) << (shift))
 
-// #define COND_BIT(cond, dst, flag) { (dst) &= ~(flag); if (cond) (dst) |= (flag); }
-#define COND_BIT(cond, dst, flag) { \
-    if ((cond)) {                   \
-        (dst) |=  (flag);           \
-    } else {                        \
-        (dst) &= ~(flag);           \
-    }                               \
-}
+#define COND_BIT(cond, dst, flag) { (dst) = (((dst) & ~(flag)) | ((flag) >> (!(cond) * ~0ULL))); }
 
 struct Config {
     f32 audioFrequency;
