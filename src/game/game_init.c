@@ -199,7 +199,7 @@ void select_framebuffer(void) {
  * Clear the framebuffer and fill it with a 32-bit color.
  * Information about the color argument: https://jrra.zone/n64/doc/n64man/gdp/gDPSetFillColor.htm
  */
-void clear_framebuffer(s32 color) {
+void clear_framebuffer(RGBA16FILL color) {
     Gfx *dlHead = gDisplayListHead;
 
     gDPPipeSync(dlHead++);
@@ -222,7 +222,7 @@ void clear_framebuffer(s32 color) {
 /**
  * Resets the viewport, readying it for the final image.
  */
-void clear_viewport(Vp *viewport, s32 color) {
+void clear_viewport(Vp *viewport, RGBA16FILL color) {
     s16 vpUlx = (viewport->vp.vtrans[0] - viewport->vp.vscale[0]) / 4 + 1;
     s16 vpUly = (viewport->vp.vtrans[1] - viewport->vp.vscale[1]) / 4 + 1;
     s16 vpLrx = (viewport->vp.vtrans[0] + viewport->vp.vscale[0]) / 4 - 2;

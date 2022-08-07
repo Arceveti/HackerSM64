@@ -489,7 +489,9 @@ void puppycam_init(void) {
 
     gPuppyCam.intendedFlags = PUPPYCAM_BEHAVIOUR_DEFAULT;
 #ifndef DISABLE_LEVEL_SPECIFIC_CHECKS
-    if (gCurrLevelNum == LEVEL_PSS || (gCurrLevelNum == LEVEL_TTM && gCurrAreaIndex == 2) || (gCurrLevelNum == LEVEL_CCM && gCurrAreaIndex == 2)) {
+    if (gCurrLevelNum == LEVEL_PSS
+     || (gCurrLevelNum == LEVEL_TTM && gCurrAreaIndex == 2)
+     || (gCurrLevelNum == LEVEL_CCM && gCurrAreaIndex == 2)) {
         gPuppyCam.intendedFlags |= PUPPYCAM_BEHAVIOUR_SLIDE_CORRECTION;
     }
 #endif

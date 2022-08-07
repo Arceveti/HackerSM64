@@ -95,10 +95,7 @@ const char *gNoControllerMsg[] = {
 #endif
 
 void override_viewport_and_clip(Vp *vpOverride, Vp *vpClip, Color red, Color green, Color blue) {
-    RGBA16 color = (((red   >> 3) << IDX_RGBA16_R)
-                  | ((green >> 3) << IDX_RGBA16_G)
-                  | ((blue  >> 3) << IDX_RGBA16_B)
-                  | MSK_RGBA16_A);
+    RGBA16 color = RGBA_TO_RGBA16(red, green, blue, 0xFF);
 
     gFBSetColor = ((color << 16) | color);
     gViewportOverride = vpOverride;
@@ -106,12 +103,9 @@ void override_viewport_and_clip(Vp *vpOverride, Vp *vpClip, Color red, Color gre
 }
 
 void set_warp_transition_rgb(Color red, Color green, Color blue) {
-    RGBA16 warpTransitionRGBA16 = (((red   >> 3) << IDX_RGBA16_R)
-                                 | ((green >> 3) << IDX_RGBA16_G)
-                                 | ((blue  >> 3) << IDX_RGBA16_B)
-                                 | MSK_RGBA16_A);
+    RGBA16 color = RGBA_TO_RGBA16(red, green, blue, 0xFF);
 
-    gWarpTransFBSetColor = ((warpTransitionRGBA16 << 16) | warpTransitionRGBA16);
+    gWarpTransFBSetColor = ((color << 16) | color);
     gWarpTransRed   = red;
     gWarpTransGreen = green;
     gWarpTransBlue  = blue;
