@@ -491,19 +491,18 @@ void check_instant_warp(void) {
     }
 }
 
-s16 music_unchanged_through_warp(s16 id) {
+s32 music_unchanged_through_warp(s16 id) {
     struct ObjectWarpNode *warpNode = area_get_warp_node(id);
     s16 levelNum = (warpNode->node.destLevel & WARP_DEST_LEVEL_NUM_MASK);
 
     s16 destArea = warpNode->node.destArea;
-    s16 unchanged = TRUE;
-    s16 currBgMusic;
+    s32 unchanged = TRUE;
 
 #ifdef ENABLE_VANILLA_LEVEL_SPECIFIC_CHECKS
     if (levelNum == LEVEL_BOB
      && levelNum == gCurrLevelNum
      && destArea == gCurrAreaIndex) {
-        currBgMusic = get_current_background_music();
+        s16 currBgMusic = get_current_background_music();
         if (currBgMusic == SEQUENCE_ARGS(4, SEQ_EVENT_POWERUP | SEQ_VARIATION)
          || currBgMusic == SEQUENCE_ARGS(4, SEQ_EVENT_POWERUP)) {
             unchanged = FALSE;
