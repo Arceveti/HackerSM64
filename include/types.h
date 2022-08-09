@@ -15,7 +15,7 @@
 // Signed shift (inverts shift direction if the shift amount is negative).
 #define SSHIFTL(src, shift)             (((shift) < 0) ? ((src) >> -(shift)) : ((src) << (shift)))
 #define SSHIFTR(src, shift)             (((shift) < 0) ? ((src) << -(shift)) : ((src) >> (shift)))
-
+//! TODO: ((cond) ? ((dst) | (flag)) : ((dst) & ~(flag)))
 #define COND_BIT(cond, dst, flag) { (dst) = (((dst) & ~(flag)) | ((flag) >> (!(cond) * ~0ULL))); }
 
 struct Config {
