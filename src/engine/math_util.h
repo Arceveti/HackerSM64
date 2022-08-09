@@ -5,10 +5,12 @@
 
 #include "types.h"
 
+
 #define NEAR_ZERO   __FLT_EPSILON__
 #define NEAR_ONE    (1.0f - __FLT_EPSILON__)
 
 #define FLOAT_ONE   0x3F800000
+
 
 extern Mat4 identityMtx;
 extern Vec3f gVec3fZero;
@@ -570,7 +572,7 @@ ALWAYS_INLINE void swl(void* addr, s32 val, const int offset) {
 // On console, (x != 0) still returns true for denormalized floats,
 // which will count as a division by zero when divided and crash.
 // For console compatibility, use this check instead when avoiding a division by zero.
-#define FLT_IS_NONZERO(x) (absf(x) > NEAR_ZERO)
+#define FLT_IS_NONZERO(x) (*(int *)&(x) & 0x7F800000)
 
 // RNG
 u32 random_u16(void);
