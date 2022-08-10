@@ -59,7 +59,7 @@ extern Vec3s gVec3sOne;
  * exploits array sizes for range analysis-based optimizations as well).
  * Thus, for non-IDO compilers we use the standard-compliant version.
  */
-extern f32 gSineTable[];
+extern const f32 gSineTable[];
 #define gCosineTable (gSineTable + 0x400)
 
 #define sins(x) gSineTable[  (u16) (x) >> 4]
