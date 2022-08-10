@@ -1422,8 +1422,7 @@ const Gfx skeeter_seg6_dl_06004618[] = {
 const Gfx skeeter_seg6_dl_06004648[] = {
     gsSPClearGeometryMode(G_LIGHTING | G_CULL_BACK | G_SHADING_SMOOTH),
     gsSPVertex(skeeter_seg6_vertex_06001B70, 4, 0),
-    gsSP1Triangle( 0,  1,  2, 0x0),
-    gsSP1Triangle( 0,  2,  3, 0x0),
+    gsSP2Triangles( 0,  1,  2, 0x0,  0,  2,  3, 0x0),
     gsSPSetGeometryMode(G_LIGHTING | G_CULL_BACK | G_SHADING_SMOOTH),
     gsSPEndDisplayList(),
 };

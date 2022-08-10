@@ -169,8 +169,7 @@ void render_power_meter_health_segment(s16 numHealthWedges) {
                        (*healthLUT)[numHealthWedges - 1]);
     gDPLoadSync(dlHead++);
     gDPLoadBlock(dlHead++, G_TX_LOADTILE, 0, 0, 32 * 32 - 1, CALC_DXT(32, G_IM_SIZ_16b_BYTES));
-    gSP1Triangle(dlHead++, 0, 1, 2, 0);
-    gSP1Triangle(dlHead++, 0, 2, 3, 0);
+    gSP2Triangles(dlHead++,  0,  1,  2, 0x0,  0,  2,  3, 0x0);
 
     gDisplayListHead = dlHead;
 }
@@ -325,8 +324,7 @@ void render_breath_meter_segment(s16 numBreathWedges) {
                        (*breathLUT)[numBreathWedges - 1]);
     gDPLoadSync(dlHead++);
     gDPLoadBlock(dlHead++, G_TX_LOADTILE, 0, 0, 32 * 32 - 1, CALC_DXT(32, G_IM_SIZ_16b_BYTES));
-    gSP1Triangle(dlHead++, 0, 1, 2, 0);
-    gSP1Triangle(dlHead++, 0, 2, 3, 0);
+    gSP2Triangles(dlHead++,  0,  1,  2, 0x0,  0,  2,  3, 0x0);
 
     gDisplayListHead = dlHead;
 }

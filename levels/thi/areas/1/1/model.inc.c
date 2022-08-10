@@ -1402,8 +1402,7 @@ static const Gfx thi_seg7_dl_070051E8[] = {
 // 0x07005240 - 0x07005260
 static const Gfx thi_seg7_dl_07005240[] = {
     gsSPVertex(thi_seg7_vertex_070040F0, 4, 0),
-    gsSP1Triangle( 0,  1,  2, 0x0),
-    gsSP1Triangle( 0,  3,  1, 0x0),
+    gsSP2Triangles( 0,  1,  2, 0x0,  0,  3,  1, 0x0),
     gsSPEndDisplayList(),
 };
 

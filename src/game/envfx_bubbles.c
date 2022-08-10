@@ -429,8 +429,18 @@ Gfx *envfx_update_bubble_particles(s32 mode, UNUSED Vec3s marioPos, Vec3s camFro
     Vec3s vertex2;
     Vec3s vertex3;
 
-    Gfx *gfxStart = alloc_display_list(((sBubbleParticleMaxCount / 5) * 10 + sBubbleParticleMaxCount + 3)
-                                       * sizeof(Gfx));
+    u32 gfxCmds = (
+        /*gSPDisplayList*/ 1 +
+        (sBubbleParticleMaxCount * (
+            /*gDPPipeSync*/ 1 +
+            /*gSP2Triangles*/ 1 +
+            /*gSP2Triangles*/ 1 +
+            /*gSP1Triangle*/ 1
+        )) +
+        /*gSPDisplayList*/ 1 +
+        /*gSPEndDisplayList*/ 1
+    );
+    Gfx *gfxStart = alloc_display_list(gfxCmds * sizeof(Gfx));
     if (gfxStart == NULL) {
         return NULL;
     }
@@ -447,11 +457,9 @@ Gfx *envfx_update_bubble_particles(s32 mode, UNUSED Vec3s marioPos, Vec3s camFro
         gDPPipeSync(sGfxCursor++);
         envfx_set_bubble_texture(mode, i);
         append_particle_vertex_buffer(sGfxCursor++, i, vertex1, vertex2, vertex3, (Vtx *) &gBubbleTempVtx);
-        gSP1Triangle(sGfxCursor++,  0,  1,  2, 0x0);
-        gSP1Triangle(sGfxCursor++,  3,  4,  5, 0x0);
-        gSP1Triangle(sGfxCursor++,  6,  7,  8, 0x0);
-        gSP1Triangle(sGfxCursor++,  9, 10, 11, 0x0);
-        gSP1Triangle(sGfxCursor++, 12, 13, 14, 0x0);
+        gSP2Triangles(sGfxCursor++,  0,  1,  2, 0x0,  3,  4,  5, 0x0);
+        gSP2Triangles(sGfxCursor++,  6,  7,  8, 0x0,  9, 10, 11, 0x0);
+        gSP1Triangle( sGfxCursor++, 12, 13, 14, 0x0);
     }
 
     gSPDisplayList(sGfxCursor++, &envfx_dl_end);

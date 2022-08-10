@@ -339,7 +339,17 @@ Gfx *envfx_update_snow(s32 snowMode, Vec3s marioPos, Vec3s camFrom, Vec3s camTo)
     Vec3s vertex2 = { -5, -5,  0 };
     Vec3s vertex3 = {  5,  5,  0 };
 
-    Gfx *gfxStart = (Gfx *) alloc_display_list((sSnowParticleCount * 6 + 3) * sizeof(Gfx));
+    u32 gfxCmds = (
+        /*gSPDisplayList*/ 1 +
+        (sSnowParticleCount * (
+            /*gSP2Triangles*/ 1 +
+            /*gSP2Triangles*/ 1 +
+            /*gSP1Triangle*/ 1
+        )) +
+        /*gSPDisplayList*/ 1 +
+        /*gSPEndDisplayList*/ 1
+    );
+    Gfx *gfxStart = (Gfx *) alloc_display_list(gfxCmds * sizeof(Gfx));
     Gfx *gfx = gfxStart;
 
     if (gfxStart == NULL) {
@@ -398,11 +408,9 @@ Gfx *envfx_update_snow(s32 snowMode, Vec3s marioPos, Vec3s camFrom, Vec3s camTo)
     for (i = 0; i < sSnowParticleCount; i += 5) {
         append_particle_vertex_buffer(gfx++, i, (s16 *) &vertex1, (s16 *) &vertex2, (s16 *) &vertex3, (Vtx *) &gSnowTempVtx);
 
-        gSP1Triangle(gfx++,  0,  1,  2, 0x0);
-        gSP1Triangle(gfx++,  3,  4,  5, 0x0);
-        gSP1Triangle(gfx++,  6,  7,  8, 0x0);
-        gSP1Triangle(gfx++,  9, 10, 11, 0x0);
-        gSP1Triangle(gfx++, 12, 13, 14, 0x0);
+        gSP2Triangles(gfx++,  0,  1,  2, 0x0,  3,  4,  5, 0x0);
+        gSP2Triangles(gfx++,  6,  7,  8, 0x0,  9, 10, 11, 0x0);
+        gSP1Triangle( gfx++, 12, 13, 14, 0x0);
     }
 
     gSPDisplayList(gfx++, &envfx_dl_end);
