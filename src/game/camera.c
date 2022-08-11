@@ -2012,7 +2012,7 @@ s32 update_default_camera(struct Camera *c) {
         if (closeToMario && avoidStatus != AVOID_STATUS_NONE) {
             yawVel = 0;
         }
-        if (yawVel != 0 && get_dialog_id() == DIALOG_NONE) {
+        if (yawVel != 0 && gDialogID == DIALOG_NONE) {
             camera_approach_s16_symmetric_bool(&yaw, yawGoal, yawVel);
         }
     }
@@ -7435,7 +7435,7 @@ void bowser_fight_intro_dialog(UNUSED struct Camera *c) {
 void cutscene_bowser_arena_dialog(struct Camera *c) {
     cutscene_event(bowser_fight_intro_dialog, c, 0, 0);
 
-    if (get_dialog_id() == DIALOG_NONE) {
+    if (gDialogID == DIALOG_NONE) {
         gCutsceneTimer = CUTSCENE_LOOP;
     }
 }
@@ -8230,7 +8230,7 @@ void cutscene_dialog(struct Camera *c) {
         sCutsceneDialogResponse = gDialogResponse;
     }
 
-    if ((get_dialog_id() == DIALOG_NONE) && (sCutsceneVars[8].angle[0] != 0)) {
+    if ((gDialogID == DIALOG_NONE) && (sCutsceneVars[8].angle[0] != 0)) {
         if (c->cutscene != CUTSCENE_RACE_DIALOG) {
             sCutsceneDialogResponse = DIALOG_RESPONSE_NOT_DEFINED;
         }
@@ -8295,7 +8295,7 @@ void cutscene_read_message(struct Camera *c) {
     switch (sCutsceneVars[0].angle[0]) {
         // Do nothing until message is gone.
         case 0:
-            if (get_dialog_id() != DIALOG_NONE) {
+            if (gDialogID != DIALOG_NONE) {
                 sCutsceneVars[0].angle[0]++;
                 set_time_stop_flags(TIME_STOP_ENABLED | TIME_STOP_DIALOG);
             }
@@ -8307,7 +8307,7 @@ void cutscene_read_message(struct Camera *c) {
 
             // This could cause softlocks. If a message starts one frame after another one closes, the
             // cutscene will never end.
-            if (get_dialog_id() == DIALOG_NONE) {
+            if (gDialogID == DIALOG_NONE) {
                 gCutsceneTimer = CUTSCENE_LOOP;
                 retrieve_info_star(c);
                 transition_next_state(c, 15);
@@ -8639,7 +8639,7 @@ void cutscene_cap_switch_press(struct Camera *c) {
         sCutsceneVars[4].angle[0] = gDialogResponse;
     }
 
-    if ((get_dialog_id() == DIALOG_NONE) && (sCutsceneVars[4].angle[0] != 0)) {
+    if ((gDialogID == DIALOG_NONE) && (sCutsceneVars[4].angle[0] != 0)) {
         sCutsceneDialogResponse = sCutsceneVars[4].angle[0];
         if (sCutsceneVars[4].angle[0] == 1) {
             cap_switch_save(gCutsceneFocus->oBehParams2ndByte);
@@ -8772,7 +8772,7 @@ void cutscene_intro_peach_start_to_pipe_spline(struct Camera *c) {
  * Loop the cutscene until Mario exits the dialog.
  */
 void cutscene_intro_peach_dialog(struct Camera *c) {
-    if (get_dialog_id() == DIALOG_NONE) {
+    if (gDialogID == DIALOG_NONE) {
         vec3f_copy(gLakituState.goalPos, c->pos);
         vec3f_copy(gLakituState.goalFocus, c->focus);
         sStatusFlags |= (CAM_FLAG_SMOOTH_MOVEMENT | CAM_FLAG_UNUSED_CUTSCENE_ACTIVE);
@@ -8879,7 +8879,7 @@ void cutscene_intro_peach_letter(struct Camera *c) {
     cutscene_event(play_sound_peach_reading_letter,           c, 83, 83);
 #endif
 
-    if ((gCutsceneTimer > 120) && (get_dialog_id() == DIALOG_NONE)) {
+    if ((gCutsceneTimer > 120) && (gDialogID == DIALOG_NONE)) {
         // Start the next scene
         gCutsceneTimer = CUTSCENE_LOOP;
     }

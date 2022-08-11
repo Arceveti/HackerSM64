@@ -443,7 +443,7 @@ s32 act_reading_automatic_dialog(struct MarioState *m) {
         }
         // wait until dialog is done
         else if (m->actionState == 10) {
-            if (get_dialog_id() >= 0) {
+            if (gDialogID >= 0) {
                 m->actionState--;
             }
         }

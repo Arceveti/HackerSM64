@@ -739,10 +739,6 @@ void int_to_str(s32 num, u8 *dst) {
     dst[pos] = DIALOG_CHAR_TERMINATOR;
 }
 
-s32 get_dialog_id(void) {
-    return gDialogID;
-}
-
 void create_dialog_box(s16 dialog) {
     if (gDialogID == DIALOG_NONE) {
         gDialogID = dialog;

@@ -2090,7 +2090,7 @@ s32 cur_obj_update_dialog(s32 actionArg, s32 dialogFlags, s32 dialogID, UNUSED s
                     cur_obj_end_dialog(dialogFlags, gDialogResponse);
                 }
             } else if (dialogFlags & DIALOG_FLAG_TEXT_DEFAULT) {
-                if (get_dialog_id() == DIALOG_NONE) {
+                if (gDialogID == DIALOG_NONE) {
                     cur_obj_end_dialog(dialogFlags, DIALOG_RESPONSE_NOT_DEFINED);
                 }
             } else {

@@ -175,7 +175,7 @@ u32 level_control_timer(s32 timerOp) {
 
 u32 pressed_pause(void) {
     return (!(gMarioState->action & ACT_FLAG_INTANGIBLE)
-        && (get_dialog_id() < 0)
+        && (gDialogID < 0)
         && !gWarpTransition.isActive
         && sDelayedWarpOp == WARP_OP_NONE
         && (gPlayer1Controller->buttonPressed & START_BUTTON));
