@@ -433,7 +433,13 @@ Gfx *movtex_gen_from_quad(s16 y, struct MovtexQuad *quad) {
 Gfx *movtex_gen_from_quad_array(s16 y, void *quadArrSegmented) {
     Movtex *quadArr = segmented_to_virtual(quadArrSegmented);
     Movtex numLists = quadArr[0];
-    Gfx *gfxHead = alloc_display_list((numLists + 1) * sizeof(*gfxHead));
+    u32 gfxCmds = (
+        (numLists * (
+            /*gSPDisplayList    */ 1
+        )) +
+        /*gSPEndDisplayList */ 1
+    );
+    Gfx *gfxHead = alloc_display_list(gfxCmds * sizeof(*gfxHead));
     Gfx *gfx = gfxHead;
     Gfx *subList;
     s32 i;
@@ -564,11 +570,7 @@ Movtex *get_quad_collection_from_id(s32 id) {
 void movtex_change_texture_format(s32 quadCollectionId, Gfx **gfx) {
     switch (quadCollectionId) {
         case HMC_MOVTEX_TOXIC_MAZE_MIST:
-            gSPDisplayList((*gfx)++, dl_waterbox_ia16_begin);
-            break;
         case SSL_MOVTEX_TOXBOX_QUICKSAND_MIST:
-            gSPDisplayList((*gfx)++, dl_waterbox_ia16_begin);
-            break;
         case JRB_MOVTEX_INITIAL_MIST:
             gSPDisplayList((*gfx)++, dl_waterbox_ia16_begin);
             break;
@@ -600,7 +602,15 @@ Gfx *geo_movtex_draw_water_regions(s32 callContext, struct GraphNode *node, UNUS
             return NULL;
         }
         numWaterBoxes = gEnvironmentRegions[0];
-        gfxHead = alloc_display_list((numWaterBoxes + 3) * sizeof(*gfxHead));
+        u32 gfxCmds = (
+            /*gSPDisplayList    */ 1 +
+            (numWaterBoxes * (
+                /*gSPDisplayList    */ 1
+            )) +
+            /*gSPDisplayList    */ 1 +
+            /*gSPEndDisplayList */ 1
+        );
+        gfxHead = alloc_display_list(gfxCmds * sizeof(*gfxHead));
         if (gfxHead == NULL) {
             return NULL;
         } else {
@@ -637,8 +647,9 @@ Gfx *geo_movtex_draw_water_regions(s32 callContext, struct GraphNode *node, UNUS
             waterId = gEnvironmentRegions[(i * 6) + 1];
             waterY  = gEnvironmentRegions[(i * 6) + 6];
             subList = movtex_gen_quads_id(waterId, waterY, quadCollection);
-            if (subList != NULL)
+            if (subList != NULL) {
                 gSPDisplayList(gfx++, VIRTUAL_TO_PHYSICAL(subList));
+            }
         }
         gSPDisplayList(gfx++, dl_waterbox_end);
         gSPEndDisplayList(gfx);

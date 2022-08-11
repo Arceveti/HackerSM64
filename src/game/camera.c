@@ -680,8 +680,9 @@ void set_camera_height(struct Camera *c, f32 goalHeight) {
         if (camCeilHeight != CELL_HEIGHT_LIMIT) {
             camCeilHeight -= baseOff;
             if ((c->pos[1] > camCeilHeight && sMarioGeometry.currFloorHeight + baseOff < camCeilHeight)
-                || (sMarioGeometry.currCeilHeight != CELL_HEIGHT_LIMIT
-                    && sMarioGeometry.currCeilHeight > camCeilHeight && c->pos[1] > camCeilHeight)) {
+             || (sMarioGeometry.currCeilHeight != CELL_HEIGHT_LIMIT
+              && sMarioGeometry.currCeilHeight > camCeilHeight
+              && c->pos[1] > camCeilHeight)) {
                 c->pos[1] = camCeilHeight;
             }
         }

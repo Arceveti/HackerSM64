@@ -125,7 +125,7 @@ void bhv_coin_loop(void) {
     if (o->oMoveFlags & OBJ_MOVE_LANDED) {
 #ifdef COIN_LAVA_FLICKER
         if ((o->oMoveFlags & OBJ_MOVE_ABOVE_DEATH_BARRIER)
-        || ((o->oMoveFlags & OBJ_MOVE_ABOVE_LAVA) && cur_obj_wait_then_blink(0, 20))) {
+         || ((o->oMoveFlags & OBJ_MOVE_ABOVE_LAVA) && cur_obj_wait_then_blink(0, 20))) {
             obj_mark_for_deletion(o);
         }
 #else

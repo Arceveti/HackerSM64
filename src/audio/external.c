@@ -1415,8 +1415,7 @@ static void update_game_sound(void) {
                                     == (SOUND_MOVING_FLYING & SOUNDARGS_MASK_SOUNDID)) {
 #if defined(VERSION_EU) || defined(VERSION_SH)
                                     sequence_channel_op_f32(SEQUENCE_CHANNEL_ARGS(0x04, SEQ_PLAYER_SFX, channelIndex, 0),
-                                        get_sound_freq_scale(bank, soundIndex)
-                                            + ((f32) sSoundMovingSpeed[bank] / 80.0f));
+                                        get_sound_freq_scale(bank, soundIndex) + ((f32) sSoundMovingSpeed[bank] / 80.0f));
 #else
                                     value = get_sound_freq_scale(bank, soundIndex);
                                     gSequencePlayers[SEQ_PLAYER_SFX].channels[channelIndex]->freqScale =
@@ -1425,8 +1424,7 @@ static void update_game_sound(void) {
                                 } else {
 #if defined(VERSION_EU) || defined(VERSION_SH)
                                     sequence_channel_op_f32(SEQUENCE_CHANNEL_ARGS(0x04, SEQ_PLAYER_SFX, channelIndex, 0),
-                                        get_sound_freq_scale(bank, soundIndex)
-                                            + ((f32) sSoundMovingSpeed[bank] / 400.0f));
+                                        get_sound_freq_scale(bank, soundIndex) + ((f32) sSoundMovingSpeed[bank] / 400.0f));
 #else
                                     value = get_sound_freq_scale(bank, soundIndex);
                                     gSequencePlayers[SEQ_PLAYER_SFX].channels[channelIndex]->freqScale =

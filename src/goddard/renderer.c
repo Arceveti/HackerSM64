@@ -2811,8 +2811,9 @@ void Unknown801A4B04(void) {
 
 /* 2533DC -> 253728; orig name: func_801A4C0C */
 void update_cursor(void) {
-    if (sHandView == NULL)
+    if (sHandView == NULL) {
         return;
+    }
 
     if (gGdCtrl.currFrame - gGdCtrl.dragStartFrame < 300) {
         sHandView->flags |= VIEW_UPDATE;

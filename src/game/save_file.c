@@ -181,6 +181,7 @@ static u16 calc_checksum(u8 *data, s32 size) {
     while (size-- > 2) {
         chksum += *data++;
     }
+
     return chksum;
 }
 
@@ -193,10 +194,8 @@ static s32 verify_save_block_signature(void *buffer, s32 size, u16 magic) {
     if (sig->magic != magic) {
         return FALSE;
     }
-    if (sig->chksum != calc_checksum(buffer, size)) {
-        return FALSE;
-    }
-    return TRUE;
+
+    return (sig->chksum == calc_checksum(buffer, size));
 }
 
 /**
@@ -225,20 +224,20 @@ static void wipe_main_menu_data(void) {
     bzero(&gSaveBuffer.menuData, sizeof(gSaveBuffer.menuData));
 
     // Set score ages for all courses to 3, 2, 1, and 0, respectively.
-    gSaveBuffer.menuData.coinScoreAges[0] = 0x3FFFFFFF;
-    gSaveBuffer.menuData.coinScoreAges[1] = 0x2AAAAAAA;
-    gSaveBuffer.menuData.coinScoreAges[2] = 0x15555555;
+    gSaveBuffer.menuData.coinScoreAges[0] = 0b00111111111111111111111111111111; // 0x3FFFFFFF
+    gSaveBuffer.menuData.coinScoreAges[1] = 0b00101010101010101010101010101010; // 0x2AAAAAAA
+    gSaveBuffer.menuData.coinScoreAges[2] = 0b00010101010101010101010101010101; // 0x15555555
 
     gMainMenuDataModified = TRUE;
     save_main_menu_data();
 }
 
 static s32 get_coin_score_age(s32 fileIndex, s32 courseIndex) {
-    return ((gSaveBuffer.menuData.coinScoreAges[fileIndex] >> (2 * courseIndex)) & 0x3);
+    return ((gSaveBuffer.menuData.coinScoreAges[fileIndex] >> (2 * courseIndex)) & BITMASK(2));
 }
 
 static void set_coin_score_age(s32 fileIndex, s32 courseIndex, s32 age) {
-    s32 mask = 0x3 << (2 * courseIndex);
+    s32 mask = (BITMASK(2) << (2 * courseIndex));
 
     gSaveBuffer.menuData.coinScoreAges[fileIndex] &= ~mask;
     gSaveBuffer.menuData.coinScoreAges[fileIndex] |= (age << (2 * courseIndex));
@@ -280,7 +279,7 @@ static void touch_high_score_ages(s32 fileIndex) {
  * Copy save file data from one backup slot to the other slot.
  */
 static void restore_save_file_data(s32 fileIndex, s32 srcSlot) {
-    s32 destSlot = srcSlot ^ 1;
+    s32 destSlot = (srcSlot ^ 1);
 
     // Compute checksum on source data
     add_save_block_signature(&gSaveBuffer.files[fileIndex][srcSlot],
@@ -343,21 +342,22 @@ void save_file_load_all(void) {
 
     // Verify the main menu data and wipe it if invalid.
     validSlots = verify_save_block_signature(&gSaveBuffer.menuData, sizeof(gSaveBuffer.menuData), MENU_DATA_MAGIC);
-    if (!validSlots)
+    if (!validSlots) {
         wipe_main_menu_data();
+    }
 
     for (file = 0; file < NUM_SAVE_FILES; file++) {
         // Verify the save file and create a backup copy if only one of the slots is valid.
         validSlots  =  verify_save_block_signature(&gSaveBuffer.files[file][0], sizeof(gSaveBuffer.files[file][0]), SAVE_FILE_MAGIC);
         validSlots |= (verify_save_block_signature(&gSaveBuffer.files[file][1], sizeof(gSaveBuffer.files[file][1]), SAVE_FILE_MAGIC) << 1);
         switch (validSlots) {
-            case 0: // Neither copy is correct
+            case 0b00: // Neither copy is correct
                 save_file_erase(file);
                 break;
-            case 1: // Slot 0 is correct and slot 1 is incorrect
+            case 0b01: // Slot 0 is correct and slot 1 is incorrect
                 restore_save_file_data(file, 0);
                 break;
-            case 2: // Slot 1 is correct and slot 0 is incorrect
+            case 0b10: // Slot 1 is correct and slot 0 is incorrect
                 restore_save_file_data(file, 1);
                 break;
         }
@@ -500,14 +500,15 @@ u32 save_file_get_max_coin_score(s32 courseIndex) {
             s32 coinScore = save_file_get_course_coin_score(fileIndex, courseIndex);
             s32 scoreAge = get_coin_score_age(fileIndex, courseIndex);
 
-            if (coinScore > maxCoinScore || (coinScore == maxCoinScore && scoreAge > maxScoreAge)) {
+            if (coinScore > maxCoinScore
+             || (coinScore == maxCoinScore && scoreAge > maxScoreAge)) {
                 maxCoinScore = coinScore;
                 maxScoreAge = scoreAge;
                 maxScoreFileNum = fileIndex + 1;
             }
         }
     }
-    return (maxScoreFileNum << 16) + MAX(maxCoinScore, 0);
+    return ((maxScoreFileNum << 16) + MAX(maxCoinScore, 0));
 }
 
 #ifdef COMPLETE_SAVE_FILE
@@ -518,7 +519,7 @@ s32 save_file_get_course_star_count(UNUSED s32 fileIndex, UNUSED s32 courseIndex
 s32 save_file_get_course_star_count(s32 fileIndex, s32 courseIndex) {
     s32 i;
     s32 count = 0;
-    u8 flag = 1;
+    u8 flag = 0x1;
     u8 starFlags = save_file_get_star_flags(fileIndex, courseIndex);
 
     for (i = 0; i < 7; i++, flag <<= 1) {
@@ -667,8 +668,9 @@ s32 save_file_get_cap_pos(Vec3s capPos) {
     struct SaveFile *saveFile = &gSaveBuffer.files[gCurrSaveFileNum - 1][0];
     s32 flags = save_file_get_flags();
 
-    if (saveFile->capLevel == gCurrLevelNum && saveFile->capArea == gCurrAreaIndex
-        && (flags & SAVE_FLAG_CAP_ON_GROUND)) {
+    if (saveFile->capLevel == gCurrLevelNum
+     && saveFile->capArea == gCurrAreaIndex
+     && (flags & SAVE_FLAG_CAP_ON_GROUND)) {
 #ifdef SAVE_NUM_LIVES
         vec3_zero(capPos);
 #else
@@ -777,8 +779,9 @@ s32 check_warp_checkpoint(struct WarpNode *warpNode) {
     s16 currCourseNum = gLevelToCourseNumTable[(warpNode->destLevel & WARP_DEST_LEVEL_NUM_MASK) - 1];
 
     // gSavedCourseNum is only used in this function.
-    if (gWarpCheckpoint.courseNum != COURSE_NONE && gSavedCourseNum == currCourseNum
-        && gWarpCheckpoint.actNum == gCurrActNum) {
+    if (gWarpCheckpoint.courseNum != COURSE_NONE
+     && gSavedCourseNum == currCourseNum
+     && gWarpCheckpoint.actNum == gCurrActNum) {
         warpNode->destLevel = gWarpCheckpoint.levelID;
         warpNode->destArea = gWarpCheckpoint.areaNum;
         warpNode->destNode = gWarpCheckpoint.warpNode;

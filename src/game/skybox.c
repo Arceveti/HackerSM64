@@ -261,7 +261,7 @@ Gfx *init_skybox_display_list(s8 player, s8 background, s8 colorIndex) {
         /*gSPDisplayList    */ 1 +
         /*gSPEndDisplayList */ 1
     );
-    void *skybox = alloc_display_list(gfxCmds * sizeof(Gfx) * sqr(SKYBOX_SIZE));
+    void *skybox = alloc_display_list(gfxCmds * sizeof(Gfx) * sqr(SKYBOX_SIZE)); //! is the sqr(SKYBOX_SIZE) necessary?
     Gfx *dlist = skybox;
 
     if (skybox == NULL) {

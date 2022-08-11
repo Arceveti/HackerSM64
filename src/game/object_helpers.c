@@ -2226,15 +2226,8 @@ void cur_obj_align_gfx_with_floor(void) {
 }
 
 UNUSED s32 mario_is_within_rectangle(s16 minX, s16 maxX, s16 minZ, s16 maxZ) {
-    if (gMarioObject->oPosX < minX || maxX < gMarioObject->oPosX) {
-        return FALSE;
-    }
-
-    if (gMarioObject->oPosZ < minZ || maxZ < gMarioObject->oPosZ) {
-        return FALSE;
-    }
-
-    return TRUE;
+    return !(gMarioObject->oPosX < minX || maxX < gMarioObject->oPosX
+          || gMarioObject->oPosZ < minZ || maxZ < gMarioObject->oPosZ);
 }
 
 void cur_obj_shake_screen(s32 shake) {
@@ -2246,8 +2239,7 @@ s32 obj_attack_collided_from_other_object(struct Object *obj) {
         struct Object *other = obj->collidedObjs[0];
 
         if (other != gMarioObject) {
-            other->oInteractStatus |= INT_STATUS_TOUCHED_MARIO | INT_STATUS_WAS_ATTACKED | INT_STATUS_INTERACTED
-                                      | INT_STATUS_TOUCHED_BOB_OMB;
+            other->oInteractStatus |= (INT_STATUS_TOUCHED_MARIO | INT_STATUS_WAS_ATTACKED | INT_STATUS_INTERACTED | INT_STATUS_TOUCHED_BOB_OMB);
             return TRUE;
         }
     }
@@ -2259,7 +2251,7 @@ s32 cur_obj_was_attacked_or_ground_pounded(void) {
     s32 attacked = FALSE;
 
     if ((o->oInteractStatus & INT_STATUS_INTERACTED)
-        && (o->oInteractStatus & INT_STATUS_WAS_ATTACKED)) {
+     && (o->oInteractStatus & INT_STATUS_WAS_ATTACKED)) {
         attacked = TRUE;
     }
 
@@ -2323,7 +2315,7 @@ void cur_obj_unused_play_footstep_sound(s32 animFrame1, s32 animFrame2, s32 soun
 }
 
 void enable_time_stop_including_mario(void) {
-    gTimeStopState |= TIME_STOP_ENABLED | TIME_STOP_MARIO_AND_DOORS;
+    gTimeStopState |= (TIME_STOP_ENABLED | TIME_STOP_MARIO_AND_DOORS);
     o->activeFlags |= ACTIVE_FLAG_INITIATED_TIME_STOP;
 }
 

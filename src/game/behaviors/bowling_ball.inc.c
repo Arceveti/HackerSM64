@@ -185,12 +185,11 @@ void bhv_generic_bowling_ball_spawner_loop(void) {
         return;
     }
 
-    if ((o->oTimer & o->oBBallSpawnerPeriodMinus1) == 0) { /* Modulus */
-        if (is_point_within_radius_of_mario(o->oPosX, o->oPosY, o->oPosZ, o->oBBallSpawnerMaxSpawnDist)
-            && (s32)(random_float() * o->oBBallSpawnerSpawnOdds) == 0) {
-            struct Object *bowlingBall = spawn_object(o, MODEL_BOWLING_BALL, bhvBowlingBall);
-            bowlingBall->oBehParams2ndByte = o->oBehParams2ndByte;
-        }
+    if (((o->oTimer & o->oBBallSpawnerPeriodMinus1) == 0) /* Modulus */
+     && is_point_within_radius_of_mario(o->oPosX, o->oPosY, o->oPosZ, o->oBBallSpawnerMaxSpawnDist)
+     && ((s32)(random_float() * o->oBBallSpawnerSpawnOdds) == 0)) {
+        struct Object *bowlingBall = spawn_object(o, MODEL_BOWLING_BALL, bhvBowlingBall);
+        bowlingBall->oBehParams2ndByte = o->oBehParams2ndByte;
     }
 }
 
@@ -204,12 +203,11 @@ void bhv_thi_bowling_ball_spawner_loop(void) {
         return;
     }
 
-    if ((o->oTimer % 64) == 0) {
-        if (is_point_within_radius_of_mario(o->oPosX, o->oPosY, o->oPosZ, 12000)
-            && (s32)(random_float() * 1.5f) == 0) {
-            struct Object *bowlingBall = spawn_object(o, MODEL_BOWLING_BALL, bhvBowlingBall);
-            bowlingBall->oBehParams2ndByte = o->oBehParams2ndByte;
-        }
+    if (((o->oTimer % 64) == 0)
+     && is_point_within_radius_of_mario(o->oPosX, o->oPosY, o->oPosZ, 12000)
+     && (s32)(random_float() * 1.5f) == 0) {
+        struct Object *bowlingBall = spawn_object(o, MODEL_BOWLING_BALL, bhvBowlingBall);
+        bowlingBall->oBehParams2ndByte = o->oBehParams2ndByte;
     }
 }
 
@@ -222,7 +220,9 @@ void bhv_bob_pit_bowling_ball_init(void) {
 void bhv_bob_pit_bowling_ball_loop(void) {
     object_step();
 
-    if ((o->oFloor != NULL) && (o->oFloor->normal.x == 0) && (o->oFloor->normal.z == 0)) {
+    if ((o->oFloor != NULL)
+     && (o->oFloor->normal.x == 0)
+     && (o->oFloor->normal.z == 0)) {
         o->oForwardVel = 28.0f;
     }
     bowling_ball_set_hitbox();

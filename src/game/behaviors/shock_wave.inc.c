@@ -36,7 +36,7 @@ void bhv_bowser_shock_wave_loop(void) {
         f32 distMax2 = o->oBowserShockWaveScale * sBowserShockwaveHitPoints[3];
         // If Mario is in between distMin and distMax values, shock him
         if ((distMin1 < o->oDistanceToMario && o->oDistanceToMario < distMax1)
-            || (distMin2 < o->oDistanceToMario && o->oDistanceToMario < distMax2)) {
+         || (distMin2 < o->oDistanceToMario && o->oDistanceToMario < distMax2)) {
             gMarioObject->oInteractStatus |= INT_STATUS_MARIO_SHOCKWAVE;
         }
     }

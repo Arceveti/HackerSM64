@@ -353,8 +353,9 @@ void cur_obj_enable_light(void) {
 
 void cur_obj_disable_light(void) {
     gCurrentObject->oFlags &= ~OBJ_FLAG_EMIT_LIGHT;
-    if (gPuppyLights[gCurrentObject->oLightID] && gCurrentObject->oLightID != 0xFFFF)
+    if (gPuppyLights[gCurrentObject->oLightID] && gCurrentObject->oLightID != 0xFFFF) {
         gPuppyLights[gCurrentObject->oLightID]->flags |= PUPPYLIGHT_DELETE;
+    }
 }
 
 void obj_enable_light(struct Object *obj) {
