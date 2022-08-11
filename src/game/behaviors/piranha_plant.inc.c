@@ -313,7 +313,7 @@ void bhv_piranha_plant_loop(void) {
 #ifdef ENABLE_VANILLA_LEVEL_SPECIFIC_CHECKS
     // In WF, hide all Piranha Plants once high enough up.
     if (gCurrLevelNum == LEVEL_WF) {
-        COND_BIT((gMarioObject->oPosY > 3400.0f), o->header.gfx.node.flags, GRAPH_RENDER_INVISIBLE);
+        o->header.gfx.node.flags = COND_BIT(o->header.gfx.node.flags, GRAPH_RENDER_INVISIBLE, (gMarioObject->oPosY > 3400.0f));
     }
 
 #endif

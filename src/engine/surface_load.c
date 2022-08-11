@@ -725,7 +725,7 @@ void load_object_collision_model(void) {
             load_object_surfaces(&collisionData, vertexData, obj, TRUE);
         }
     }
-    COND_BIT((marioDist < drawDist), obj->header.gfx.node.flags, GRAPH_RENDER_ACTIVE);
+    obj->header.gfx.node.flags = COND_BIT(obj->header.gfx.node.flags, GRAPH_RENDER_ACTIVE, (marioDist < drawDist));
 
     obj->oCollisionDistance = colDist;
     obj->oDrawingDistance = drawDist;

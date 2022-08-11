@@ -466,10 +466,10 @@ s32 is_point_close_to_object(struct Object *obj, f32 x, f32 y, f32 z, s32 dist) 
  * Sets an object as visible if within a certain distance of Mario's graphical position.
  */
 void set_object_visibility(struct Object *obj, s32 dist) {
-    COND_BIT(
-        !is_point_within_radius_of_mario(obj->oPosX, obj->oPosY, obj->oPosZ, dist),
+    obj->header.gfx.node.flags = COND_BIT(
         obj->header.gfx.node.flags,
-        GRAPH_RENDER_INVISIBLE
+        GRAPH_RENDER_INVISIBLE,
+        !is_point_within_radius_of_mario(obj->oPosX, obj->oPosY, obj->oPosZ, dist)
     );
 }
 
@@ -570,7 +570,7 @@ s32 obj_flicker_and_disappear(struct Object *obj, s16 lifeSpan) {
     }
 
     if (obj->oTimer < lifeSpan + 40) {
-        COND_BIT((obj->oTimer & 0x1), obj->header.gfx.node.flags, GRAPH_RENDER_INVISIBLE);
+        obj->header.gfx.node.flags = COND_BIT(obj->header.gfx.node.flags, GRAPH_RENDER_INVISIBLE, (obj->oTimer & 0x1));
     } else {
         obj_mark_for_deletion(obj);
         return TRUE;

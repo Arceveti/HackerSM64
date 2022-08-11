@@ -526,7 +526,7 @@ Gfx *geo_switch_mario_cap_on_off(s32 callContext, struct GraphNode *node, UNUSED
         switchCase->selectedCase = (bodyState->capState & MARIO_HAS_DEFAULT_CAP_OFF);
         while (next != node) {
             if (next->type == GRAPH_NODE_TYPE_TRANSLATION_ROTATION) {
-                COND_BIT((bodyState->capState & MARIO_HAS_WING_CAP_ON), next->flags, GRAPH_RENDER_ACTIVE);
+                next->flags = COND_BIT(next->flags, GRAPH_RENDER_ACTIVE, (bodyState->capState & MARIO_HAS_WING_CAP_ON));
             }
             next = next->next;
         }

@@ -822,7 +822,7 @@ void update_hud_values(void) {
 #ifdef BREATH_METER
         s16 numBreathWedges = ((gMarioState->breath > 0) ? (gMarioState->breath >> 8) : 0);
 #endif
-        COND_BIT((gCurrCourseNum >= COURSE_MIN), gHudDisplay.flags, HUD_DISPLAY_FLAG_COIN_COUNT);
+        gHudDisplay.flags = COND_BIT(gHudDisplay.flags, HUD_DISPLAY_FLAG_COIN_COUNT, (gCurrCourseNum >= COURSE_MIN));
 
         if (gHudDisplay.coins < gMarioState->numCoins) {
             if (gGlobalTimer & 1) {
@@ -866,10 +866,10 @@ void update_hud_values(void) {
         }
         gHudDisplay.wedges = numHealthWedges;
 
-        COND_BIT((gMarioState->hurtCounter > 0), gHudDisplay.flags, HUD_DISPLAY_FLAG_EMPHASIZE_POWER);
+        gHudDisplay.flags = COND_BIT(gHudDisplay.flags, HUD_DISPLAY_FLAG_EMPHASIZE_POWER, (gMarioState->hurtCounter > 0));
 #ifdef BREATH_METER
         gHudDisplay.breath = numBreathWedges;
-        COND_BIT((gMarioState->breath > 0), gHudDisplay.flags, HUD_DISPLAY_FLAG_BREATH_METER);
+        gHudDisplay.flags = COND_BIT(gHudDisplay.flags, HUD_DISPLAY_FLAG_BREATH_METER, (gMarioState->breath > 0));
 #endif
     }
 }

@@ -122,5 +122,5 @@ void bhv_door_rendering_loop(void) {
         || gDoorAdjacentRooms[gMarioCurrentRoom][1] == o->oDoorForwardRoom
         || gDoorAdjacentRooms[gMarioCurrentRoom][1] == o->oDoorBackwardRoom
     );
-    COND_BIT(o->oDoorIsRendering, o->header.gfx.node.flags, GRAPH_RENDER_ACTIVE);
+    o->header.gfx.node.flags = COND_BIT(o->header.gfx.node.flags, GRAPH_RENDER_ACTIVE, o->oDoorIsRendering);
 }

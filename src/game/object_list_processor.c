@@ -634,7 +634,7 @@ void update_objects(void) {
 
     // If time stop was enabled this frame, activate it now so that it will
     // take effect next frame
-    COND_BIT((gTimeStopState & TIME_STOP_ENABLED), gTimeStopState, TIME_STOP_ACTIVE);
+    gTimeStopState = COND_BIT(gTimeStopState, TIME_STOP_ACTIVE, (gTimeStopState & TIME_STOP_ENABLED));
 
     gPrevFrameObjectCount = gObjectCounter;
 

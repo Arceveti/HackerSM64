@@ -1155,7 +1155,7 @@ void cur_obj_move_y(f32 gravity, f32 bounciness, f32 buoyancy) {
             }
         }
     }
-    COND_BIT((!(o->oMoveFlags & (OBJ_MOVE_MASK_ON_GROUND | OBJ_MOVE_AT_WATER_SURFACE | OBJ_MOVE_UNDERWATER_OFF_GROUND))), o->oMoveFlags, OBJ_MOVE_IN_AIR);
+    o->oMoveFlags = COND_BIT(o->oMoveFlags, OBJ_MOVE_IN_AIR, (!(o->oMoveFlags & (OBJ_MOVE_MASK_ON_GROUND | OBJ_MOVE_AT_WATER_SURFACE | OBJ_MOVE_UNDERWATER_OFF_GROUND))));
 }
 
 static s32 clear_move_flag(u32 *bitSet, s32 flag) {

@@ -1717,7 +1717,7 @@ s32 mode_behind_mario(struct Camera *c) {
     }
     approach_camera_height(c, newPos[1], 50.f);
     waterHeight = find_water_level(c->pos[0], c->pos[1], c->pos[2]) + 100.f;
-    COND_BIT(c->pos[1] <= waterHeight, gCameraMovementFlags, CAM_MOVE_SUBMERGED);
+    gCameraMovementFlags = COND_BIT(gCameraMovementFlags, CAM_MOVE_SUBMERGED, (c->pos[1] <= waterHeight));
 
     resolve_geometry_collisions(c->pos);
     // Prevent camera getting too far away

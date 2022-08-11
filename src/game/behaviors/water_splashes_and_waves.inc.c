@@ -81,7 +81,7 @@ void bhv_water_droplet_loop(void) {
     f32 waterLevel = find_water_level(o->oPosX, o->oPosY, o->oPosZ);
 
     if (o->oTimer == 0) {
-        COND_BIT(!cur_obj_has_model(MODEL_FISH), o->header.gfx.node.flags, GRAPH_RENDER_BILLBOARD);
+        o->header.gfx.node.flags = COND_BIT(o->header.gfx.node.flags, GRAPH_RENDER_BILLBOARD, !cur_obj_has_model(MODEL_FISH));
         o->oFaceAngleYaw = random_u16();
     }
     // Apply gravity
