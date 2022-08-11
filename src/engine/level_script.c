@@ -597,7 +597,7 @@ static void level_cmd_create_whirlpool(void) {
     struct Whirlpool *whirlpool;
     s32 index = CMD_GET(u8, 2);
     s32 beatBowser2 =
-        (save_file_get_flags() & (SAVE_FLAG_HAVE_KEY_2 | SAVE_FLAG_UNLOCKED_UPSTAIRS_DOOR)) != 0;
+        ((save_file_get_flags() & (SAVE_FLAG_HAVE_KEY_2 | SAVE_FLAG_UNLOCKED_UPSTAIRS_DOOR)) != 0);
 
     if ((CMD_GET(u8, 3) == WHIRLPOOL_COND_ALWAYS)
      || (CMD_GET(u8, 3) == WHIRLPOOL_COND_BOWSER2_NOT_BEATEN   && !beatBowser2)
@@ -804,8 +804,8 @@ static void level_cmd_puppyvolume(void) {
 
 static void level_cmd_puppylight_environment(void) {
 #ifdef PUPPYLIGHTS
-    Lights1 temp = gdSPDefLights1(CMD_GET(u8, 2), CMD_GET(u8, 3), CMD_GET(u8, 4),
-                                  CMD_GET(u8, 5), CMD_GET(u8, 6), CMD_GET(u8, 7),
+    Lights1 temp = gdSPDefLights1(CMD_GET(u8, 2), CMD_GET(u8, 3), CMD_GET(u8,  4),
+                                  CMD_GET(u8, 5), CMD_GET(u8, 6), CMD_GET(u8,  7),
                                   CMD_GET(u8, 8), CMD_GET(u8, 9), CMD_GET(u8, 10));
 
     memcpy(&gLevelLight, &temp, sizeof(Lights1));

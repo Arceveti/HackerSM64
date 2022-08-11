@@ -185,8 +185,7 @@ static void add_shadow_to_display_list(Gfx *displayListHead, s8 shadowType, Alph
     gSPEndDisplayList(displayListHead);
 }
 
-//! TODO:
-//      - Breakout create_shadow_below_xyz into multiple functions
+//! TODO: Split create_shadow_below_xyz into multiple functions
 /**
  * Create a shadow at the absolute position given, with the given parameters.
  * Return a pointer to the display list representing the shadow.

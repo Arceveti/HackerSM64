@@ -254,12 +254,12 @@ s32 find_wall_collisions(struct WallCollisionData *colData) {
     s32 radius = colData->radius;
 
     // World (level) consists of a 16x16 grid. Find where the collision is on the grid (round toward -inf)
-    s32 cellX, cellZ;
     s32 minCellX = get_cell_coord(x - radius);
     s32 maxCellX = get_cell_coord(x + radius);
     s32 minCellZ = get_cell_coord(z - radius);
     s32 maxCellZ = get_cell_coord(z + radius);
 
+    s32 cellX, cellZ;
     for (cellZ = minCellZ; cellZ <= maxCellZ; cellZ++) {
         for (cellX = minCellX; cellX <= maxCellX; cellX++) {
             if (!(gCollisionFlags & COLLISION_FLAG_EXCLUDE_DYNAMIC)) {
@@ -352,7 +352,7 @@ void raycast_collision_walls(Vec3f pos, Vec3f intendedPos, f32 yOffset) {
  *                     CEILINGS                   *
  **************************************************/
 
-void add_ceil_margin(s32 *x, s32 *z, Vec3s target1, Vec3s target2, f32 margin) {
+static void add_ceil_margin(s32 *x, s32 *z, Vec3s target1, Vec3s target2, f32 margin) {
     f32 dx = ((target1[0] - *x) + (target2[0] - *x));
     f32 dz = ((target1[2] - *z) + (target2[2] - *z));
     f32 invDenom = (sqr(dx) + sqr(dz));
