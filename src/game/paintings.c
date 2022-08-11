@@ -461,7 +461,7 @@ void painting_average_vertex_normals(const PaintingData *neighborTris, PaintingD
         vec3_div_val(n, neighbors);
         f32 nlen = vec3_sumsq(n);
 
-        if (FLT_IS_NONZERO(nlen)) {
+        if (F32_IS_NONZERO(nlen)) {
             nlen = (127.0f / sqrtf(nlen));
             vec3_prod_val(sPaintingMesh[i].norm, n, nlen);
         } else {

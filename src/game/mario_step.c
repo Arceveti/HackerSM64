@@ -74,7 +74,7 @@ void transfer_bully_speed(struct BullyCollisionData *obj1, struct BullyCollision
     f32 projectedV1 = (( rx * obj1->velX) + (rz * obj1->velZ));
     f32 projectedV2 = ((-rx * obj2->velX) - (rz * obj2->velZ));
 
-    if (FLT_IS_NONZERO(rzx)) {
+    if (F32_IS_NONZERO(rzx)) {
         rzx = 1.0f / rzx;
         projectedV1 *= rzx;
         projectedV2 *= rzx;

@@ -572,8 +572,7 @@ ALWAYS_INLINE void swl(void* addr, s32 val, const int offset) {
 // On console, (x != 0) still returns true for denormalized floats,
 // which will count as a division by zero when divided and crash.
 // For console compatibility, use this check instead when avoiding a division by zero.
-//! TODO: rename 'FLT_IS_NONZERO' to 'F32_IS_NONZERO'
-#define FLT_IS_NONZERO(x) ((*(int*)&(x)) & (BITMASK( 8) << 23))
+#define F32_IS_NONZERO(x) ((*(int*)&(x)) & (BITMASK( 8) << 23))
 #define F64_IS_NONZERO(x) ((*(int*)&(x)) & (BITMASK(11) << 52))
 
 // RNG
