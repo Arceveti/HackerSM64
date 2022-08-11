@@ -207,11 +207,8 @@ Vtx *make_skybox_rect(s32 tileIndex, s8 colorIndex) {
  * world space so that the tiles will rotate with the camera.
  */
 void draw_skybox_tile_grid(Gfx **dlist, s8 background, s8 player, s8 colorIndex) {
-    s32 row;
-    s32 col;
-
-    for (row = 0; row < (3 * SKYBOX_SIZE); row++) {
-        for (col = 0; col < (3 * SKYBOX_SIZE); col++) {
+    for (s32 row = 0; row < (3 * SKYBOX_SIZE); row++) {
+        for (s32 col = 0; col < (3 * SKYBOX_SIZE); col++) {
             s32 tileIndex = sSkyBoxInfo[player].upperLeftTile + (row * SKYBOX_COLS) + col;
             const Texture *const texture =
                 (*(SkyboxTexture *) segmented_to_virtual(sSkyboxTextures[background]))[tileIndex];
@@ -252,8 +249,19 @@ void *create_skybox_ortho_matrix(s8 player) {
  * Creates the skybox's display list, then draws the 3x3 grid of tiles.
  */
 Gfx *init_skybox_display_list(s8 player, s8 background, s8 colorIndex) {
-    s32 dlCommandCount = 5 + (3 * 3) * 7; // 5 for the start and end, plus 9 skybox tiles
-    void *skybox = alloc_display_list(dlCommandCount * sizeof(Gfx) * sqr(SKYBOX_SIZE));
+    u32 gfxCmds = (
+        /*gSPDisplayList    */ 1 +
+        /*gSPMatrix         */ 1 +
+        /*gSPDisplayList    */ 1 +
+        (sqr(3 * SKYBOX_SIZE) * (
+            /*gLoadBlockTexture */ 5 +
+            /*gSPVertex         */ 1 +
+            /*gSPDisplayList    */ 1
+        )) +
+        /*gSPDisplayList    */ 1 +
+        /*gSPEndDisplayList */ 1
+    );
+    void *skybox = alloc_display_list(gfxCmds * sizeof(Gfx) * sqr(SKYBOX_SIZE));
     Gfx *dlist = skybox;
 
     if (skybox == NULL) {
@@ -262,7 +270,7 @@ Gfx *init_skybox_display_list(s8 player, s8 background, s8 colorIndex) {
         Mtx *ortho = create_skybox_ortho_matrix(player);
 
         gSPDisplayList(dlist++, dl_skybox_begin);
-        gSPMatrix(dlist++, VIRTUAL_TO_PHYSICAL(ortho), G_MTX_PROJECTION | G_MTX_MUL | G_MTX_NOPUSH);
+        gSPMatrix(dlist++, VIRTUAL_TO_PHYSICAL(ortho), (G_MTX_PROJECTION | G_MTX_MUL | G_MTX_NOPUSH));
         gSPDisplayList(dlist++, dl_skybox_tile_tex_settings);
         draw_skybox_tile_grid(&dlist, background, player, colorIndex);
         gSPDisplayList(dlist++, dl_skybox_end);

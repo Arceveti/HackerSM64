@@ -245,12 +245,29 @@ s32 render_screen_transition(s8 fadeTimer, s8 transType, u8 transTime, struct Wa
 
 Gfx *render_cannon_circle_base(void) {
 #ifdef WIDESCREEN
-    Vtx *verts = alloc_display_list( 8 * sizeof(*verts));
-    Gfx *dlist = alloc_display_list(20 * sizeof(*dlist));
+    Vtx *verts = alloc_display_list(8 * sizeof(*verts));
 #else
-    Vtx *verts = alloc_display_list( 4 * sizeof(*verts));
-    Gfx *dlist = alloc_display_list(16 * sizeof(*dlist));
+    Vtx *verts = alloc_display_list(4 * sizeof(*verts));
 #endif
+    u32 gfxCmds = (
+        /*gSPDisplayList        */ 1 +
+        /*gDPSetCombineMode     */ 1 +
+        /*gDPSetTextureFilter   */ 1 +
+        /*gDPLoadTextureBlock   */ 7 +
+        /*gSPTexture            */ 1 +
+        /*gSPVertex             */ 1 +
+        /*gSPDisplayList        */ 1 +
+        /*gSPTexture            */ 1 +
+#ifdef WIDESCREEN
+        /*gDPSetCombineMode     */ 1 +
+        /*gSPVertex             */ 1 +
+        /*gSP2Triangles         */ 1 +
+        /*gSP2Triangles         */ 1 +
+#endif
+        /*gSPDisplayList        */ 1 +
+        /*gSPEndDisplayList     */ 1
+    );
+    Gfx *dlist = alloc_display_list(gfxCmds * sizeof(*dlist));
     Gfx *g = dlist;
 
     if (verts != NULL && dlist != NULL) {

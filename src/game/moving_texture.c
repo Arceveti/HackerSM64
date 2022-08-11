@@ -367,12 +367,24 @@ Gfx *movtex_gen_from_quad(s16 y, struct MovtexQuad *quad) {
     Vtx *verts = alloc_display_list(4 * sizeof(*verts));
     Gfx *gfxHead;
     Gfx *gfx;
+    u32 gfxCmds;
 
     if (textureId == gMovetexLastTextureId) {
-        gfxHead = alloc_display_list(3 * sizeof(*gfxHead));
+        gfxCmds = (
+            /*gSPVertex         */ 1 +
+            /*gSPDisplayList    */ 1 +
+            /*gSPEndDisplayList */ 1
+        );
     } else {
-        gfxHead = alloc_display_list(8 * sizeof(*gfxHead));
+        gfxCmds = (
+            /*gLoadBlockTexture */ 5 +
+            /*gSPVertex         */ 1 +
+            /*gSPDisplayList    */ 1 +
+            /*gSPEndDisplayList */ 1
+        );
     }
+
+    gfxHead = alloc_display_list(gfxCmds * sizeof(*gfxHead));
 
     if (gfxHead == NULL || verts == NULL) {
         return NULL;
@@ -731,7 +743,15 @@ void movtex_write_vertex_index(Vtx *verts, s32 index, Movtex *movtexVerts, struc
  */
 Gfx *movtex_gen_list(Movtex *movtexVerts, struct MovtexObject *movtexList, s8 attrLayout) {
     Vtx *verts = alloc_display_list(movtexList->vtx_count * sizeof(*verts));
-    Gfx *gfxHead = alloc_display_list(11 * sizeof(*gfxHead));
+    u32 gfxCmds = (
+        /*gSPDisplayList    */ 1 +
+        /*gLoadBlockTexture */ 5 +
+        /*gSPVertex         */ 1 +
+        /*gSPDisplayList    */ 1 +
+        /*gSPDisplayList    */ 1 +
+        /*gSPEndDisplayList */ 1
+    );
+    Gfx *gfxHead = alloc_display_list(gfxCmds * sizeof(*gfxHead));
     Gfx *gfx = gfxHead;
     s32 i;
 

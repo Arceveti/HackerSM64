@@ -304,14 +304,24 @@ void bhv_unlock_door_star_loop(void) {
 static Gfx *make_gfx_mario_alpha(struct GraphNodeGenerated *node, s16 alpha) {
     Gfx *gfx;
     Gfx *gfxHead = NULL;
+    u32 gfxCmds = 0;
 
     if (alpha == 255) {
         node->fnNode.node.drawingLayer = LAYER_OPAQUE;
-        gfxHead = alloc_display_list(2 * sizeof(*gfxHead));
+        gfxCmds = (
+            /*gDPSetEnvColor    */ 1 +
+            /*gSPEndDisplayList */ 1
+        );
+        gfxHead = alloc_display_list(gfxCmds * sizeof(*gfxHead));
         gfx = gfxHead;
     } else {
         node->fnNode.node.drawingLayer = LAYER_TRANSPARENT;
-        gfxHead = alloc_display_list(3 * sizeof(*gfxHead));
+        gfxCmds = (
+            /*gDPSetAlphaCompare*/ 1 +
+            /*gDPSetEnvColor    */ 1 +
+            /*gSPEndDisplayList */ 1
+        );
+        gfxHead = alloc_display_list(gfxCmds * sizeof(*gfxHead));
         gfx = gfxHead;
         if (gMarioState->flags & MARIO_VANISH_CAP) {
             gDPSetAlphaCompare(gfx++, G_AC_DITHER);
@@ -631,7 +641,12 @@ Gfx *geo_mirror_mario_backface_culling(s32 callContext, struct GraphNode *node, 
     Gfx *gfx = NULL;
 
     if (callContext == GEO_CONTEXT_RENDER && gCurGraphNodeObject == &gMirrorMario) {
-        gfx = alloc_display_list(3 * sizeof(*gfx));
+        u32 gfxCmds = (
+            /*gSPClearGeometryMode  */ 1 +
+            /*gSPSetGeometryMode    */ 1 +
+            /*gSPEndDisplayList     */ 1
+        );
+        gfx = alloc_display_list(gfxCmds * sizeof(*gfx));
 
         if (asGenerated->parameter == 0) {
             gSPClearGeometryMode(&gfx[0], G_CULL_BACK);

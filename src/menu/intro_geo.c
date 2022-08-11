@@ -51,7 +51,13 @@ Gfx *geo_intro_super_mario_64_logo(s32 callContext, struct GraphNode *node, UNUS
         f32 *scaleTable2 = segmented_to_virtual(intro_seg7_table_scale_2);
         graphNode->drawingLayer = LAYER_OPAQUE;
         Mtx *scaleMat = alloc_display_list(sizeof(*scaleMat));
-        dl = alloc_display_list(4 * sizeof(*dl));
+        u32 gfxCmds = (
+            /*gSPMatrix         */ 1 +
+            /*gSPDisplayList    */ 1 +
+            /*gSPPopMatrix      */ 1 +
+            /*gSPEndDisplayList */ 1
+        );
+        dl = alloc_display_list(gfxCmds * sizeof(*dl));
         dlIter = dl;
         Vec3f scale;
 
@@ -71,7 +77,7 @@ Gfx *geo_intro_super_mario_64_logo(s32 callContext, struct GraphNode *node, UNUS
         }
         guScale(scaleMat, scale[0], scale[1], scale[2]);
 
-        gSPMatrix(dlIter++, scaleMat, G_MTX_MODELVIEW | G_MTX_MUL | G_MTX_PUSH);
+        gSPMatrix(dlIter++, scaleMat, (G_MTX_MODELVIEW | G_MTX_MUL | G_MTX_PUSH));
         gSPDisplayList(dlIter++, &intro_seg7_dl_main_logo);  // draw model
         gSPPopMatrix(dlIter++, G_MTX_MODELVIEW);
         gSPEndDisplayList(dlIter);
@@ -92,7 +98,14 @@ Gfx *geo_intro_tm_copyright(s32 callContext, struct GraphNode *node, UNUSED void
     if (callContext != GEO_CONTEXT_RENDER) { // reset
         sTmCopyrightAlpha = 0;
     } else if (callContext == GEO_CONTEXT_RENDER) { // draw
-        dl = alloc_display_list(5 * sizeof(*dl));
+        u32 gfxCmds = (
+            /*gSPDisplayList    */ 1 +
+            /*gDPSetEnvColor    */ 1 +
+            /*gDPSetRenderMode  */ 1 +
+            /*gSPDisplayList    */ 1 +
+            /*gSPEndDisplayList */ 1
+        );
+        dl = alloc_display_list(gfxCmds * sizeof(*dl));
         dlIter = dl;
         gSPDisplayList(dlIter++, dl_proj_mtx_fullscreen);
         gDPSetEnvColor(dlIter++, 255, 255, 255, sTmCopyrightAlpha);
@@ -126,14 +139,14 @@ static const Gfx *introBackgroundDlRows[] = {
 };
 
 // intro screen background texture X offsets
-static float xCoords[] = {
+static const float xCoords[] = {
     0, 80, 160, 240,
     0, 80, 160, 240,
     0, 80, 160, 240,
 };
 
 // intro screen background texture Y offsets
-static float yCoords[] = {
+static const float yCoords[] = {
     160, 160, 160, 160,
      80,  80,  80,  80,
       0,   0,   0,   0,
@@ -151,17 +164,27 @@ static const Texture *const *textureTables[] = {
  * @param index            which tile to render (value from 0 to 11)
  * @param backgroundTable  array describing which image to use for each tile (0 denotes a "Super Mario 64" image, and 1 denotes a "Game Over" image)
  */
-static Gfx *intro_backdrop_one_image(s32 index, s8 *backgroundTable) {
+static Gfx *intro_backdrop_one_image(s32 index, const s8 *backgroundTable) {
     Mtx *mtx = alloc_display_list(sizeof(*mtx));
-    Gfx *displayList = alloc_display_list(36 * sizeof(*displayList));
+    u32 gfxCmds = (
+        /*gSPMatrix             */ 1 +
+        /*gSPDisplayList        */ 1 +
+        (4 * (
+            /*gDPLoadTextureBlock   */ 7 +
+            /*gSPDisplayList        */ 1
+        )) +
+        /*gSPPopMatrix          */ 1 +
+        /*gSPEndDisplayList     */ 1
+    );
+    Gfx *displayList = alloc_display_list(gfxCmds * sizeof(*displayList));
     Gfx *displayListIter = displayList;
     const Texture *const *vIntroBgTable = segmented_to_virtual(textureTables[backgroundTable[index]]);
     s32 i;
 
     guTranslate(mtx, xCoords[index], yCoords[index], 0.0f);
-    gSPMatrix(displayListIter++, mtx, G_MTX_MODELVIEW | G_MTX_LOAD | G_MTX_PUSH);
+    gSPMatrix(displayListIter++, mtx, (G_MTX_MODELVIEW | G_MTX_LOAD | G_MTX_PUSH));
     gSPDisplayList(displayListIter++, &title_screen_bg_dl_0A000118);
-    for (i = 0; i < 4; ++i) {
+    for (i = 0; i < 4; i++) {
         gDPLoadTextureBlock(displayListIter++, vIntroBgTable[i], G_IM_FMT_RGBA, G_IM_SIZ_16b, 80, 20, 0,
                             G_TX_CLAMP, G_TX_CLAMP, 7, 6, G_TX_NOLOD, G_TX_NOLOD)
         gSPDisplayList(displayListIter++, introBackgroundDlRows[i]);
@@ -171,7 +194,7 @@ static Gfx *intro_backdrop_one_image(s32 index, s8 *backgroundTable) {
     return displayList;
 }
 
-static s8 introBackgroundIndexTable[] = {
+static const s8 introBackgroundIndexTable[] = {
     INTRO_BACKGROUND_SUPER_MARIO, INTRO_BACKGROUND_SUPER_MARIO, INTRO_BACKGROUND_SUPER_MARIO,
     INTRO_BACKGROUND_SUPER_MARIO, INTRO_BACKGROUND_SUPER_MARIO, INTRO_BACKGROUND_SUPER_MARIO,
     INTRO_BACKGROUND_SUPER_MARIO, INTRO_BACKGROUND_SUPER_MARIO, INTRO_BACKGROUND_SUPER_MARIO,
@@ -179,7 +202,7 @@ static s8 introBackgroundIndexTable[] = {
 };
 
 // only one table of indexes listed
-static s8 *introBackgroundTables[] = {
+static const s8 *introBackgroundTables[] = {
     introBackgroundIndexTable
 };
 
@@ -189,18 +212,27 @@ static s8 *introBackgroundTables[] = {
 Gfx *geo_intro_regular_backdrop(s32 callContext, struct GraphNode *node, UNUSED void *context) {
     struct GraphNodeMore *graphNode = (struct GraphNodeMore *) node;
     s32 index = (graphNode->bgTableID & 0xff); // TODO: word at offset 0x18 of struct GraphNode (always ends up being 0)
-    s8 *backgroundTable = introBackgroundTables[index];
+    const s8 *backgroundTable = introBackgroundTables[index];
     Gfx *dl = NULL;
     Gfx *dlIter = NULL;
     s32 i;
 
     if (callContext == GEO_CONTEXT_RENDER) { // draw
-        dl = alloc_display_list(16 * sizeof(*dl));
+        u32 gfxCmds = (
+            /*gSPDisplayList    */ 1 +
+            /*gSPDisplayList    */ 1 +
+            (12 * (
+                /*gSPDisplayList    */ 1
+            )) +
+            /*gSPDisplayList    */ 1 +
+            /*gSPEndDisplayList */ 1
+        );
+        dl = alloc_display_list(gfxCmds * sizeof(*dl));
         dlIter = dl;
         graphNode->node.drawingLayer = LAYER_OPAQUE;
         gSPDisplayList(dlIter++, &dl_proj_mtx_fullscreen);
         gSPDisplayList(dlIter++, &title_screen_bg_dl_start);
-        for (i = 0; i < 12; ++i) {
+        for (i = 0; i < 12; i++) {
             gSPDisplayList(dlIter++, intro_backdrop_one_image(i, backgroundTable));
         }
         gSPDisplayList(dlIter++, &title_screen_bg_dl_end);
@@ -217,7 +249,7 @@ static s8 gameOverBackgroundTable[] = {
 };
 
 // order of tiles that are flipped from "Game Over" to "Super Mario 64"
-static s8 flipOrder[] = {
+static const s8 flipOrder[] = {
     0, 1, 2, 3, 7, 11, 10, 9, 8, 4, 5, 6
 };
 
@@ -233,11 +265,20 @@ Gfx *geo_intro_gameover_backdrop(s32 callContext, struct GraphNode *node, UNUSED
     if (callContext != GEO_CONTEXT_RENDER) { // reset
         sGameOverFrameCounter = 0;
         sGameOverTableIndex = -2;
-        for (i = 0; i < ARRAY_COUNT(gameOverBackgroundTable); ++i) {
+        for (i = 0; i < ARRAY_COUNT(gameOverBackgroundTable); i++) {
             gameOverBackgroundTable[i] = INTRO_BACKGROUND_GAME_OVER;
         }
     } else { // draw
-        dl = alloc_display_list(16 * sizeof(*dl));
+        u32 gfxCmds = (
+            /*gSPDisplayList    */ 1 +
+            /*gSPDisplayList    */ 1 +
+            (ARRAY_COUNT(gameOverBackgroundTable) * (
+                /*gSPDisplayList    */ 1
+            )) +
+            /*gSPDisplayList    */ 1 +
+            /*gSPEndDisplayList */ 1
+        );
+        dl = alloc_display_list(gfxCmds * sizeof(*dl));
         dlIter = dl;
         if (sGameOverTableIndex == -2) {
             if (sGameOverFrameCounter == 180) {
@@ -282,7 +323,7 @@ s8 sFaceVisible[] = {
     1, 1, 1, 1, 1, 1, 1, 1,
 };
 
-s8 sFaceToggleOrder[] = {
+static const s8 sFaceToggleOrder[] = {
      0,  1,  2,  3,  4,  5,  6,  7,
     15, 23, 31, 39, 47, 46, 45, 44,
     43, 42, 41, 40, 32, 24, 16,  8,
@@ -314,7 +355,16 @@ void intro_gen_face_texrect(Gfx **dlIter) {
 Gfx *intro_draw_face(RGBA16 *image, s32 imageW, s32 imageH) {
     Gfx *dlIter;
 
-    Gfx *dl = alloc_display_list(130 * sizeof(Gfx));
+    u32 gfxCmds = (
+        /*gSPDisplayList        */ 1 +
+        /*gDPLoadTextureBlock   */ 7 +
+        (((6 * 8) - 8) * (
+            /*gSPTextureRectangle   */ 3
+        )) +
+        /*gSPDisplayList        */ 1 +
+        /*gSPEndDisplayList     */ 1
+    );
+    Gfx *dl = alloc_display_list(gfxCmds * sizeof(Gfx));
 
     if (dl == NULL) {
         return dl;
@@ -431,7 +481,11 @@ Gfx *geo_intro_rumble_pak_graphic(s32 callContext, struct GraphNode *node, UNUSE
             backgroundTileSix = gameOverBackgroundTable[6];
         }
         if (backgroundTileSix == INTRO_BACKGROUND_SUPER_MARIO) {
-            dl = alloc_display_list(3 * sizeof(*dl));
+            u32 gfxCmds = (
+                /*gSPDisplayList    */ 1 +
+                /*gSPEndDisplayList */ 1
+            );
+            dl = alloc_display_list(gfxCmds * sizeof(*dl));
             if (dl != NULL) {
                 dlIter = dl;
                 gSPDisplayList(dlIter++, &title_screen_bg_dl_rumble_pak);

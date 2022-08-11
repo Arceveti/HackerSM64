@@ -319,10 +319,10 @@ void visual_surface_display(Vtx *verts, s32 iteration) {
     gDisplayListHead = dlHead;
 }
 
-s32 iterate_surface_count(s32 x, s32 z) {
+u32 iterate_surface_count(s32 x, s32 z) {
     struct SurfaceNode *node;
     s32 i = 0;
-    s32 j = 0;
+    u32 nodes = 0;
     TerrainData *p = gEnvironmentRegions;
     s32 numRegions;
 
@@ -347,15 +347,15 @@ s32 iterate_surface_count(s32 x, s32 z) {
 
         while (node != NULL) {
             node = node->next;
-            j++;
+            nodes++;
         }
     }
     if (p != NULL) {
         numRegions = *p++;
-        j += (numRegions * 6);
+        nodes += (numRegions * 6);
     }
 
-    return j;
+    return nodes;
 }
 
 void visual_surface_loop(s32 isDecal) {
@@ -364,7 +364,9 @@ void visual_surface_loop(s32 isDecal) {
      || !gMarioState->marioObj) {
         return;
     }
-    Vtx *verts = alloc_display_list((iterate_surface_count(gMarioState->pos[0], gMarioState->pos[2]) * 3) * sizeof(Vtx));
+
+    u32 nodes = iterate_surface_count(gMarioState->pos[0], gMarioState->pos[2]);
+    Vtx *verts = alloc_display_list((nodes * 3) * sizeof(Vtx));
 
     gVisualSurfaceCount = 0;
     gVisualOffset = 0;

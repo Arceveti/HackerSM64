@@ -344,7 +344,13 @@ Gfx *create_shadow_below_xyz(Vec3f pos, Vec3f floorNormal, Vec3f scaleVec, s16 s
 
     // -- Set up gfx --
 
-    Gfx *displayList = alloc_display_list(4 * sizeof(Gfx));
+    u32 gfxCmds = (
+        /*gSPDisplayList    */ 1 +
+        /*gDPSetEnvColor    */ 1 +
+        /*gSPDisplayList    */ 1 +
+        /*gSPEndDisplayList */ 1
+    );
+    Gfx *displayList = alloc_display_list(gfxCmds * sizeof(Gfx));
 
     if (displayList == NULL) {
         return NULL;

@@ -1869,9 +1869,13 @@ Gfx *geo_bits_bowser_coloring(s32 callContext, struct GraphNode *node, UNUSED s3
         }
 
         // Set layers if object is transparent or not
-        graphNode->fnNode.node.drawingLayer = (obj->oOpacity == 255) ? LAYER_OPAQUE : LAYER_TRANSPARENT;
+        graphNode->fnNode.node.drawingLayer = ((obj->oOpacity == 255) ? LAYER_OPAQUE : LAYER_TRANSPARENT);
 
-        Gfx *gfx = gfxHead = alloc_display_list(2 * sizeof(Gfx));
+        u32 gfxCmds = (
+            /*gSPClearGeometryMode  */ 1 +
+            /*gSPEndDisplayList     */ 1
+        );
+        Gfx *gfx = gfxHead = alloc_display_list(gfxCmds * sizeof(Gfx));
 
         // If TRUE, clear lighting to give rainbow color
         if (obj->oBowserRainbowLight) {

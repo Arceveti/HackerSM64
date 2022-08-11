@@ -75,7 +75,11 @@ Gfx *geo_exec_inside_castle_light(s32 callContext, struct GraphNode *node, UNUSE
     if (callContext == GEO_CONTEXT_RENDER) {
         s32 flags = save_file_get_flags();
         if (gHudDisplay.stars >= NUM_STARS_REQUIRED_FOR_WING_CAP_LIGHT && !(flags & SAVE_FLAG_HAVE_WING_CAP)) {
-            displayList = alloc_display_list(2 * sizeof(*displayList));
+            u32 gfxCmds = (
+                /*gSPDisplayList    */ 1 +
+                /*gSPEndDisplayList */ 1
+            );
+            displayList = alloc_display_list(gfxCmds * sizeof(*displayList));
 
             if (displayList == NULL) {
                 return NULL;
@@ -130,7 +134,16 @@ Gfx *geo_exec_flying_carpet_create(s32 callContext, struct GraphNode *node, UNUS
 
     if (callContext == GEO_CONTEXT_RENDER) {
         verts = alloc_display_list(NUM_FLYING_CARPET_VERTICES * sizeof(*verts));
-        displayList = alloc_display_list(7 * sizeof(*displayList));
+        u32 gfxCmds = (
+            /*gSPDisplayList    */ 1 +
+            /*gSPVertex         */ 1 +
+            /*gSPDisplayList    */ 1 +
+            /*gSPVertex         */ 1 +
+            /*gSPDisplayList    */ 1 +
+            /*gSPDisplayList    */ 1 +
+            /*gSPEndDisplayList */ 1
+        );
+        displayList = alloc_display_list(gfxCmds * sizeof(*displayList));
         displayListHead = displayList;
 
         if (verts == NULL || displayList == NULL) {
@@ -143,9 +156,9 @@ Gfx *geo_exec_flying_carpet_create(s32 callContext, struct GraphNode *node, UNUS
             row = n / 3;
             col = n % 3;
 
-            x = vertexData[n * 4 + 0];
-            y = round_float(sins(sFlyingCarpetRippleTimer + (row << 12) + (col << 14)) * 20.0f);
-            z = vertexData[n * 4 + 1];
+            x  = vertexData[n * 4 + 0];
+            y  = round_float(sins(sFlyingCarpetRippleTimer + (row << 12) + (col << 14)) * 20.0f);
+            z  = vertexData[n * 4 + 1];
             tx = vertexData[n * 4 + 2];
             ty = vertexData[n * 4 + 3];
 
@@ -187,20 +200,22 @@ Gfx *geo_exec_cake_end_screen(s32 callContext, struct GraphNode *node, UNUSED Ma
     Gfx *displayListHead = NULL;
 
     if (callContext == GEO_CONTEXT_RENDER) {
-        displayList = alloc_display_list(3 * sizeof(*displayList));
+        u32 gfxCmds = (
+            /*gSPDisplayList    */ 1 +
+            /*gSPDisplayList    */ 1 +
+            /*gSPEndDisplayList */ 1
+        );
+        displayList = alloc_display_list(gfxCmds * sizeof(*displayList));
         displayListHead = displayList;
 
         generatedNode->fnNode.node.drawingLayer = LAYER_OPAQUE;
+
 #if MULTILANG
         gSPDisplayList(displayListHead++, dl_cake_end_screen);
-#else
-        gSPDisplayList(displayListHead++, dl_proj_mtx_fullscreen);
-#endif
-#if MULTILANG
-#ifdef EU_CUSTOM_CAKE_FIX
-    gSPDisplayList(displayListHead++, dl_cake_end_screen_eu_fix);
-#else
-    switch (eu_get_language()) {
+ #ifdef EU_CUSTOM_CAKE_FIX
+        gSPDisplayList(displayListHead++, dl_cake_end_screen_eu_fix);
+ #else
+        switch (eu_get_language()) {
             case LANGUAGE_ENGLISH:
                 gSPDisplayList(displayListHead++, dl_cake_end_screen_eu_english);
                 break;
@@ -211,10 +226,11 @@ Gfx *geo_exec_cake_end_screen(s32 callContext, struct GraphNode *node, UNUSED Ma
                 gSPDisplayList(displayListHead++, dl_cake_end_screen_eu_german );
                 break;
         }
-#endif
-#else
+ #endif
+#else // !MULTILANG
+        gSPDisplayList(displayListHead++, dl_proj_mtx_fullscreen);
         gSPDisplayList(displayListHead++, dl_cake_end_screen);
-#endif
+#endif // !MULTILANG
         gSPEndDisplayList(displayListHead);
     }
 
