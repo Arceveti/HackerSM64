@@ -1537,7 +1537,7 @@ static void seq_player_play_sequence(u8 player, u8 seqId, u16 fadeInTime) {
     u8 i;
 
     if (player == SEQ_PLAYER_LEVEL) {
-        sCurrentBackgroundMusicSeqId = (seqId & SEQ_BASE_ID); //! rename seqId arg?
+        sCurrentBackgroundMusicSeqId = (seqId & SEQ_MASK_ID); //! rename seqId arg?
         sBackgroundMusicForDynamics = SEQUENCE_NONE;
         sCurrentMusicDynamic = 0xff;
         sMusicDynamicDelay = 2;
@@ -1548,8 +1548,8 @@ static void seq_player_play_sequence(u8 player, u8 seqId, u16 fadeInTime) {
     }
 
 #if defined(VERSION_EU) || defined(VERSION_SH)
-    sequence_channel_op_s8(SEQUENCE_CHANNEL_ARGS(0x46, player, 0, 0), (seqId & SEQ_VARIATION));
-    sequence_channel_op_u32(SEQUENCE_CHANNEL_ARGS(0x82, player, (seqId & SEQ_BASE_ID), 0), fadeInTime);
+    sequence_channel_op_s8(SEQUENCE_CHANNEL_ARGS(0x46, player, 0, 0), (seqId & SEQ_FLAG_VARIATION));
+    sequence_channel_op_u32(SEQUENCE_CHANNEL_ARGS(0x82, player, (seqId & SEQ_MASK_ID), 0), fadeInTime);
 
     if (player == SEQ_PLAYER_LEVEL) {
         targetVolume = begin_background_music_fade(0);
@@ -1559,8 +1559,8 @@ static void seq_player_play_sequence(u8 player, u8 seqId, u16 fadeInTime) {
     }
 #else
 
-    gSequencePlayers[player].seqVariation = (seqId & SEQ_VARIATION);
-    load_sequence(player, (seqId & SEQ_BASE_ID), 0);
+    gSequencePlayers[player].seqVariation = (seqId & SEQ_FLAG_VARIATION);
+    load_sequence(player, (seqId & SEQ_MASK_ID), 0);
 
     if (player == SEQ_PLAYER_LEVEL) {
         targetVolume = begin_background_music_fade(0);

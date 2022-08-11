@@ -26,14 +26,14 @@
 
 enum MuteBehaviors {
     MUTE_BEHAVIOR_NONE        = 0x0,
-    MUTE_BEHAVIOR_0           = (1 << 0), // 0x01 //
-    MUTE_BEHAVIOR_1           = (1 << 1), // 0x02 //
-    MUTE_BEHAVIOR_2           = (1 << 2), // 0x04 //
-    MUTE_BEHAVIOR_3           = (1 << 3), // 0x08 //
-    MUTE_BEHAVIOR_4           = (1 << 4), // 0x10 //
-    MUTE_BEHAVIOR_SOFTEN      = (1 << 5), // 0x20 // lower volume, by default to half
-    MUTE_BEHAVIOR_STOP_NOTES  = (1 << 6), // 0x40 // prevent further notes from playing
-    MUTE_BEHAVIOR_STOP_SCRIPT = (1 << 7), // 0x80 // stop processing sequence/channel scripts
+    MUTE_BEHAVIOR_0           = BIT(0), // 0x01 //
+    MUTE_BEHAVIOR_1           = BIT(1), // 0x02 //
+    MUTE_BEHAVIOR_2           = BIT(2), // 0x04 //
+    MUTE_BEHAVIOR_3           = BIT(3), // 0x08 //
+    MUTE_BEHAVIOR_4           = BIT(4), // 0x10 //
+    MUTE_BEHAVIOR_SOFTEN      = BIT(5), // 0x20 // lower volume, by default to half
+    MUTE_BEHAVIOR_STOP_NOTES  = BIT(6), // 0x40 // prevent further notes from playing
+    MUTE_BEHAVIOR_STOP_SCRIPT = BIT(7), // 0x80 // stop processing sequence/channel scripts
 };
 
 enum SequencePlayerStates {
@@ -61,11 +61,6 @@ enum Codecs {
 };
 
 #define TEMPO_SCALE TATUMS_PER_BEAT
-
-// Convert u8 or u16 to f32. On JP, this uses a u32->f32 conversion,
-// resulting in more bloated codegen, while on US it goes through s32.
-// Since u8 and u16 fit losslessly in both, behavior is the same.
-#define FLOAT_CAST(x) (f32) (s32) (x)
 
 #if defined(ISVPRINT) || defined(UNF)
 #define stubbed_printf osSyncPrintf
@@ -189,11 +184,11 @@ struct AdpcmBook {
 
 struct AudioBankSample {
 #ifdef VERSION_SH
-    /* 0x00 */ u32 codec : 4;
-    /* 0x00 */ u32 medium : 2;
-    /* 0x00 */ u32 bit1 : 1;
-    /* 0x00 */ u32 isPatched : 1;
-    /* 0x01 */ u32 size : 24;
+    /* 0x00 */ u32 codec     :  4;
+    /* 0x00 */ u32 medium    :  2;
+    /* 0x00 */ u32 bit1      :  1;
+    /* 0x00 */ u32 isPatched :  1;
+    /* 0x01 */ u32 size      : 24;
 #else
     u8 unused;
     u8 loaded;
@@ -376,9 +371,9 @@ struct ReverbBitsData {
     /* 0x00 */ u8 bit1 : 1;
     /* 0x00 */ u8 bit2 : 1;
     /* 0x00 */ u8 usesHeadsetPanEffects : 1;
-    /* 0x00 */ u8 stereoHeadsetEffects : 2;
+    /* 0x00 */ u8 stereoHeadsetEffects  : 2;
     /* 0x00 */ u8 strongRight : 1;
-    /* 0x00 */ u8 strongLeft : 1;
+    /* 0x00 */ u8 strongLeft  : 1;
 };
 
 union ReverbBits {

@@ -1236,9 +1236,9 @@ s32 seq_channel_layer_process_script_part4(struct SequenceChannelLayer *layer, s
                 if (PORTAMENTO_IS_SPECIAL(layer->portamento)) {
                     portamento->speed = 32512.0f * (f32) seqPlayer->tempo
                                         / ((f32) layer->delay * (f32) gTempoInternalToExternal
-                                            * FLOAT_CAST(layer->portamentoTime));
+                                            * (f32) (s32)(layer->portamentoTime));
                 } else {
-                    portamento->speed = 127.0f / FLOAT_CAST(layer->portamentoTime);
+                    portamento->speed = 127.0f / (f32) (s32)(layer->portamentoTime);
                 }
                 portamento->cur = 0.0f;
                 layer->freqScale = freqScale;
@@ -2424,7 +2424,7 @@ void sequence_player_process_sequence(struct SequencePlayer *seqPlayer) {
 #else // (VERSION_JP || VERSION_US)
                     case seq_setvol: // seq_setvol
                         cmd = m64_read_u8(state);
-                        seqPlayer->volumeDefault = FLOAT_CAST(cmd) / 127.0f;
+                        seqPlayer->volumeDefault = cmd / 127.0f;
                         if (seqPlayer->volumeDefault >= 1.0f) {
                             seqPlayer->volumeDefault = 1.0f;
                         }
@@ -2432,7 +2432,7 @@ void sequence_player_process_sequence(struct SequencePlayer *seqPlayer) {
                         switch (seqPlayer->state) {
                             case SEQUENCE_PLAYER_STATE_2:
                                 if (seqPlayer->fadeRemainingFrames != 0) {
-                                    f32 targetVolume = FLOAT_CAST(cmd) / 127.0f;
+                                    f32 targetVolume = cmd / 127.0f;
                                     seqPlayer->fadeVelocity = (targetVolume - seqPlayer->fadeVolume)
                                                               / (f32) seqPlayer->fadeRemainingFrames;
                                     break;
@@ -2441,20 +2441,20 @@ void sequence_player_process_sequence(struct SequencePlayer *seqPlayer) {
                                 FALL_THROUGH;
 
                             case SEQUENCE_PLAYER_STATE_0:
-                                seqPlayer->fadeVolume = FLOAT_CAST(cmd) / 127.0f;
+                                seqPlayer->fadeVolume = cmd / 127.0f;
                                 break;
                             case SEQUENCE_PLAYER_STATE_FADE_OUT:
                             case SEQUENCE_PLAYER_STATE_4:
-                                seqPlayer->volume = FLOAT_CAST(cmd) / 127.0f;
+                                seqPlayer->volume = cmd / 127.0f;
                                 break;
                         }
                         break;
 
                     case seq_changevol: // seq_changevol
                         temp = m64_read_u8(state);
-                        seqPlayer->fadeVolume += (f32)(s8) temp / 127.0f;
+                        seqPlayer->fadeVolume += (s8) temp / 127.0f;
 
-                        seqPlayer->volumeDefault += (f32)(s8) temp / 127.0f;
+                        seqPlayer->volumeDefault += (s8) temp / 127.0f;
                         if (seqPlayer->volumeDefault > 1.0f) {
                             seqPlayer->volumeDefault = 1.0f;
                         } else if (seqPlayer->volumeDefault < 0.0f) {
@@ -2475,7 +2475,7 @@ void sequence_player_process_sequence(struct SequencePlayer *seqPlayer) {
 
                     case seq_setmutescale: // seq_setmutescale
                         temp = m64_read_u8(state);
-                        seqPlayer->muteVolumeScale = (f32)(s8) temp / 127.0f;
+                        seqPlayer->muteVolumeScale = (s8) temp / 127.0f;
                         break;
 
                     case seq_mute: // seq_mute

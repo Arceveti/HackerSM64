@@ -50,10 +50,8 @@ struct SPTask *create_next_audio_frame_task(void) {
     index = (((gCurrAiBufferIndex - 2) + NUMAIBUFFERS) % NUMAIBUFFERS);
     samplesRemainingInAI = osAiGetLength() / 4;
 
-    if (gAudioLoadLockSH < 0x10U) {
-        if (gAiBufferLengths[index] != 0) {
-            osAiSetNextBuffer(gAiBuffers[index], gAiBufferLengths[index] * 4);
-        }
+    if (gAudioLoadLockSH < 0x10U && gAiBufferLengths[index] != 0) {
+        osAiSetNextBuffer(gAiBuffers[index], gAiBufferLengths[index] * 4);
     }
 
     // oldDmaCount = gCurrAudioFrameDmaCount;
@@ -433,10 +431,7 @@ UNUSED s32 func_sh_802f6900(void) {
 
     s32 ret = osRecvMesg(gShAudioMesgQueuePtr3, (OSMesg *) &sp18, 0);
 
-    if (ret == -1) {
-        return FALSE;
-    }
-    return sp18 == gAudioResetPresetIdToLoad;
+    return (ret != -1 && sp18 == gAudioResetPresetIdToLoad);
 }
 
 void func_sh_802f6958(OSMesg mesg) {

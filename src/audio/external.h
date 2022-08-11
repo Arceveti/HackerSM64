@@ -6,7 +6,7 @@
 #include "types.h"
 
 // Sequence arguments, passed to seq_player_play_sequence. seqId may be bit-OR'ed with
-// SEQ_VARIATION; this will load the same sequence, but set a variation
+// SEQ_FLAG_VARIATION; this will load the same sequence, but set a variation
 // bit which may be read by the sequence script.
 #define SEQUENCE_ARGS(priority, seqId) (((priority) << 8) | (seqId))
 

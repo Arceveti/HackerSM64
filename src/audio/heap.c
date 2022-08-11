@@ -329,8 +329,8 @@ void puppyprint_get_allocated_pools(s32 *audioPoolList) {
 
 void session_pools_init(struct PoolSplit *a) {
     gAudioSessionPool.cur = gAudioSessionPool.start;
-    sound_alloc_pool_init(&gNotesAndBuffersPool, SOUND_ALLOC_FUNC(&gAudioSessionPool, a->wantSeq        ), a->wantSeq        );
-    sound_alloc_pool_init(&gSeqAndBankPool,      SOUND_ALLOC_FUNC(&gAudioSessionPool, a->wantCustom     ), a->wantCustom     );
+    sound_alloc_pool_init(&gNotesAndBuffersPool, SOUND_ALLOC_FUNC(&gAudioSessionPool, a->wantSeq   ), a->wantSeq   );
+    sound_alloc_pool_init(&gSeqAndBankPool,      SOUND_ALLOC_FUNC(&gAudioSessionPool, a->wantCustom), a->wantCustom);
 #ifdef BETTER_REVERB
     sound_alloc_pool_init(&gBetterReverbPool,    SOUND_ALLOC_FUNC(&gAudioSessionPool, BETTER_REVERB_SIZE), BETTER_REVERB_SIZE);
 #endif
@@ -447,8 +447,8 @@ size = ALIGN16(size);
             isSound = TRUE;
         }
 
-        firstVal  = (tp->entries[0].id == (s8)nullID ? SOUND_LOAD_STATUS_NOT_LOADED : table[tp->entries[0].id]);
-        secondVal = (tp->entries[1].id == (s8)nullID ? SOUND_LOAD_STATUS_NOT_LOADED : table[tp->entries[1].id]);
+        firstVal  = ((tp->entries[0].id == (s8)nullID) ? SOUND_LOAD_STATUS_NOT_LOADED : table[tp->entries[0].id]);
+        secondVal = ((tp->entries[1].id == (s8)nullID) ? SOUND_LOAD_STATUS_NOT_LOADED : table[tp->entries[1].id]);
 #endif
 
 #if defined(VERSION_JP) || defined(VERSION_US)

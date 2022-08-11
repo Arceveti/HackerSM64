@@ -733,7 +733,7 @@ void audio_init() {
 
 #if defined(VERSION_JP) || defined(VERSION_US)
     s32 lim2 = gAudioHeapSize;
-    for (i = 0; i <= lim2 / 8 - 1; i++) {
+    for (i = 0; i < lim2 / 8; i++) {
         ((u64 *) gAudioHeap)[i] = 0;
     }
 

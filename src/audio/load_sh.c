@@ -699,9 +699,8 @@ void patch_audio_bank(s32 bankId, struct AudioBank *mem, struct PatchStruct *pat
     void *patched;
     struct Drum *drum;
 
-#define BASE_OFFSET(x, base) (void *)((uintptr_t) (x) + (uintptr_t) base)
-#define PATCH(x, base) (patched = BASE_OFFSET(x, base))
-#define PATCH_MEM(x) x = PATCH(x, mem)
+#define BASE_OFFSET(x, base) (void *)((uintptr_t) (x) + (uintptr_t) (base))
+#define PATCH(x, base) (patched = BASE_OFFSET((x), (base)))
 
     s32 numDrums = gCtlEntries[bankId].numDrums;
     s32 numInstruments = gCtlEntries[bankId].numInstruments;
@@ -751,7 +750,6 @@ void patch_audio_bank(s32 bankId, struct AudioBank *mem, struct PatchStruct *pat
     }
     gCtlEntries[bankId].drums       = mem->drums;
     gCtlEntries[bankId].instruments = mem->instruments;
-#undef PATCH_MEM
 #undef PATCH
 #undef BASE_OFFSET
 }
@@ -882,7 +880,7 @@ void *func_802f3f08(s32 poolIdx, s32 idx, s32 numChunks, s32 arg3, OSMesgQueue *
                 break;
         }
 
-        func_sh_802f4cb4(devAddr, vAddr, size, medium, numChunks, retQueue, (arg3 << 0x18) | (poolIdx << 0x10) | (idx << 8) | loadStatus);
+        func_sh_802f4cb4(devAddr, vAddr, size, medium, numChunks, retQueue, ((arg3 << 0x18) | (poolIdx << 0x10) | (idx << 8) | loadStatus));
         loadStatus = SOUND_LOAD_STATUS_IN_PROGRESS;
     }
 
@@ -970,7 +968,7 @@ void audio_init() {
     eu_stubbed_printf_1("AudioHeap is %x\n", gAudioHeapSize);
 
     for (i = 0; i < NUMAIBUFFERS; i++) {
-        gAiBufferLengths[i] = 0xa0;
+        gAiBufferLengths[i] = 0xA0;
     }
 
     gAudioFrameCount = 0;
@@ -1013,14 +1011,14 @@ void audio_init() {
     gAlTbl         = (ALSeqFile *) gShindouSampleBanksHeader;
     gAlBankSets = gBankSetsData;
     gSequenceCount = (s16) gSeqFileHeader->seqCount;
-    patch_seq_file(gSeqFileHeader, gMusicData, D_SH_80315EF4);
-    patch_seq_file(gAlCtlHeader, gSoundDataADSR, D_SH_80315EF8);
-    patch_seq_file(gAlTbl, gSoundDataRaw, D_SH_80315EFC);
+    patch_seq_file(gSeqFileHeader, gMusicData,     D_SH_80315EF4);
+    patch_seq_file(gAlCtlHeader,   gSoundDataADSR, D_SH_80315EF8);
+    patch_seq_file(gAlTbl,         gSoundDataRaw,  D_SH_80315EFC);
     seqCount = gAlCtlHeader->seqCount;
     gCtlEntries = sound_alloc_uninitialized(&gAudioInitPool, seqCount * sizeof(struct CtlEntry));
     for (i = 0; i < seqCount; i++) {
-        gCtlEntries[i].bankId1        = (u8) ((gAlCtlHeader->seqArray[i].ctl.as_s16.bankAndFf >> 8) & 0xff);
-        gCtlEntries[i].bankId2        = (u8) ((gAlCtlHeader->seqArray[i].ctl.as_s16.bankAndFf     ) & 0xff);
+        gCtlEntries[i].bankId1        = (u8) ((gAlCtlHeader->seqArray[i].ctl.as_s16.bankAndFf              >> 8) & 0xff);
+        gCtlEntries[i].bankId2        = (u8) ((gAlCtlHeader->seqArray[i].ctl.as_s16.bankAndFf                  ) & 0xff);
         gCtlEntries[i].numInstruments = (u8) ((gAlCtlHeader->seqArray[i].ctl.as_s16.numInstrumentsAndDrums >> 8) & 0xff);
         gCtlEntries[i].numDrums       = (u8) ((gAlCtlHeader->seqArray[i].ctl.as_s16.numInstrumentsAndDrums     ) & 0xff);
     }

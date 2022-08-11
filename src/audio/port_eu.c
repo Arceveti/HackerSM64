@@ -55,7 +55,7 @@ struct SPTask *create_next_audio_frame_task(void) {
     gAudioTaskIndex ^= 1;
     gCurrAiBufferIndex++;
     gCurrAiBufferIndex %= NUMAIBUFFERS;
-    index = (gCurrAiBufferIndex - 2 + NUMAIBUFFERS) % NUMAIBUFFERS;
+    index = ((gCurrAiBufferIndex - 2 + NUMAIBUFFERS) % NUMAIBUFFERS);
     samplesRemainingInAI = osAiGetLength() / 4;
 
     if (gAiBufferLengths[index] != 0) {

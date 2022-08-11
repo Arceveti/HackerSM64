@@ -415,9 +415,9 @@ void seq_channel_layer_process_script(struct SequenceChannelLayer *layer) {
                         if (PORTAMENTO_IS_SPECIAL((*layer).portamento)) {
                             portamento->speed = 32512.0f * (f32)(*seqPlayer).tempo
                                                 / ((f32)(*layer).delay * (f32) gTempoInternalToExternal
-                                                   * FLOAT_CAST((*layer).portamentoTime));
+                                                   * (*layer).portamentoTime);
                         } else {
-                            portamento->speed = 127.0f / FLOAT_CAST((*layer).portamentoTime);
+                            portamento->speed = 127.0f / (*layer).portamentoTime;
                         }
                         portamento->cur = 0.0f;
                         layer->freqScale = freqScale;
