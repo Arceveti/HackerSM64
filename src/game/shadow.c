@@ -22,7 +22,7 @@
 /**
  * An array consisting of all the hardcoded rectangle shadows in the game.
  */
-static ShadowRectangle sShadowRectangles[2] = {
+static const ShadowRectangle sShadowRectangles[2] = {
     { 7.2f, 4.6f, TRUE }, // Spindel
     { 4.0f, 3.6f, TRUE }, // Whomp
 };
@@ -31,7 +31,7 @@ static ShadowRectangle sShadowRectangles[2] = {
  * Shrink a shadow when its parent object is further from the floor, given the
  * initial size of the shadow and the current distance.
  */
-f32 scale_shadow_with_distance(f32 initial, f32 distFromFloor) {
+static f32 scale_shadow_with_distance(f32 initial, f32 distFromFloor) {
     const f32 dist = 600.0f;
 
     if (distFromFloor <= 0.0f) {
@@ -46,7 +46,7 @@ f32 scale_shadow_with_distance(f32 initial, f32 distFromFloor) {
 /**
  * Dim a shadow when its parent object is further from the ground.
  */
-s32 dim_shadow_with_distance(u8 solidity, f32 distFromFloor) {
+static s32 dim_shadow_with_distance(u8 solidity, f32 distFromFloor) {
     const f32 dist = 600.0f;
 
     if (solidity < 121) {
@@ -64,7 +64,7 @@ s32 dim_shadow_with_distance(u8 solidity, f32 distFromFloor) {
  * Linearly interpolate a shadow's solidity between zero and finalSolidity
  * depending on curr's relation to start and end.
  */
-s32 linearly_interpolate_positive(Alpha finalSolidity, s16 curr, s16 start, s16 end) {
+static s32 linearly_interpolate_positive(Alpha finalSolidity, s16 curr, s16 start, s16 end) {
     if (curr < start) {
         return 0;
     } else if (end < curr) {
@@ -78,7 +78,7 @@ s32 linearly_interpolate_positive(Alpha finalSolidity, s16 curr, s16 start, s16 
  * Linearly interpolate a shadow's solidity between initialSolidity and zero
  * depending on curr's relation to start and end.
  */
-s32 linearly_interpolate_negative(Alpha initialSolidity, s16 curr, s16 start, s16 end) {
+static s32 linearly_interpolate_negative(Alpha initialSolidity, s16 curr, s16 start, s16 end) {
     if (curr < start) {
         return initialSolidity;
     } else if (curr > end) {
@@ -176,16 +176,29 @@ s32 correct_lava_shadow_height(f32 *floorHeight) {
  * shadowType 0 uses a circle texture, the rest use a square texture.
  * Uses environment alpha for shadow solidity.
  */
-static void add_shadow_to_display_list(Gfx *displayListHead, s8 shadowType, Alpha solidity) {
+static Gfx *shadow_display_list(s8 shadowType, Alpha solidity) {
+    u32 gfxCmds = (
+        /*gSPDisplayList    */ 1 +
+        /*gDPSetEnvColor    */ 1 +
+        /*gSPDisplayList    */ 1 +
+        /*gSPEndDisplayList */ 1
+    );
+    Gfx *gfxHead = alloc_display_list(gfxCmds * sizeof(Gfx));
+    if (gfxHead == NULL) {
+        return NULL;
+    }
+    Gfx *gfx = gfxHead;
     Gfx *dl_shadow = (shadowType == SHADOW_CIRCLE) ? dl_shadow_circle : dl_shadow_square;
 
-    gSPDisplayList(displayListHead++, dl_shadow);
-    gDPSetEnvColor(displayListHead++, 255, 255, 255, solidity);
-    gSPDisplayList(displayListHead++, dl_shadow_end);
-    gSPEndDisplayList(displayListHead);
+    gSPDisplayList(gfx++, dl_shadow);
+    gDPSetEnvColor(gfx++, 255, 255, 255, solidity);
+    gSPDisplayList(gfx++, dl_shadow_end);
+    gSPEndDisplayList(gfx);
+
+    return gfxHead;
 }
 
-//! TODO: Split create_shadow_below_xyz into multiple functions
+//! TODO: Split create_shadow_below_xyz into multiple functions/
 /**
  * Create a shadow at the absolute position given, with the given parameters.
  * Return a pointer to the display list representing the shadow.
@@ -341,28 +354,12 @@ Gfx *create_shadow_below_xyz(Vec3f pos, Vec3f floorNormal, Vec3f scaleVec, s16 s
         return NULL;
     }
 
-    // -- Set up gfx --
-
-    u32 gfxCmds = (
-        /*gSPDisplayList    */ 1 +
-        /*gDPSetEnvColor    */ 1 +
-        /*gSPDisplayList    */ 1 +
-        /*gSPEndDisplayList */ 1
-    );
-    Gfx *displayList = alloc_display_list(gfxCmds * sizeof(Gfx));
-
-    if (displayList == NULL) {
-        return NULL;
-    }
-
-    // Generate the shadow display list with type and solidity.
-    add_shadow_to_display_list(displayList, shadowType, solidity);
-
     // Move the shadow position to the floor height.
     pos[1] = floorHeight;
 
     // Set the floor normals in the shadow struct.
     vec3f_set(floorNormal, nx, ny, nz);
 
-    return displayList;
+    // Generate the shadow display list with type and solidity.
+    return shadow_display_list(shadowType, solidity);
 }

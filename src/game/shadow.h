@@ -70,12 +70,12 @@ enum ShadowSolidity {
  */
 typedef struct {
     /* X scale of the rectangle. */
-    f32 scaleX;
+    /*0x00*/ f32 scaleX;
     /* Z scale of the rectangle. */
-    f32 scaleZ;
+    /*0x04*/ f32 scaleZ;
     /* Flag for if this shadow be smaller when its object is further away. */
-    u8 scaleWithDistance : 1;
-} ShadowRectangle;
+    /*0x08*/ u8 scaleWithDistance : 1;
+} ShadowRectangle; /*0x0C*/
 
 /**
  * Given the (x, y, z) location of an object, create a shadow below that object
