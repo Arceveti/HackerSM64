@@ -10,6 +10,7 @@
 #include "config.h"
 
 extern const LevelScript level_main_scripts_entry[];
+
 const LevelScript level_script_entry[] = {
     INIT_LEVEL(),
     SLEEP(/*frames*/ 2),

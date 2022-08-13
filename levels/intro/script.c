@@ -158,7 +158,7 @@ const LevelScript level_intro_entry_level_select[] = {
     JUMP(script_intro_main_level_entry_stop_music),
 };
 
-// These should be static, but C doesn't allow non-sized forward declarations of static arrays
+//! These should be static, but C doesn't allow non-sized forward declarations of static arrays
 
 const LevelScript script_intro_file_select[] = {
     STOP_MUSIC(/*fadeOutTime*/ 0x00BE),

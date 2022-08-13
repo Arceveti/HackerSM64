@@ -514,8 +514,10 @@ UNUSED static void record_demo(void) {
 
     // Rrecord the distinct input and timer so long as they are unique.
     // If the timer hits 0xFF, reset the timer for the next demo input.
-    if (gRecordedDemoInput.timer == 0xFF || buttonMask != gRecordedDemoInput.buttonMask
-        || rawStickX != gRecordedDemoInput.rawStickX || rawStickY != gRecordedDemoInput.rawStickY) {
+    if (gRecordedDemoInput.timer == 0xFF
+     || buttonMask != gRecordedDemoInput.buttonMask
+     || rawStickX != gRecordedDemoInput.rawStickX
+     || rawStickY != gRecordedDemoInput.rawStickY) {
         gRecordedDemoInput.timer = 0;
         gRecordedDemoInput.buttonMask = buttonMask;
         gRecordedDemoInput.rawStickX = rawStickX;
@@ -568,7 +570,7 @@ void run_demo_inputs(void) {
             // match the correct input mask. We then add this to the masked
             // lower 4 bits to get the correct button mask.
             gControllers[0].controllerData->button =
-                ((gCurrDemoInput->buttonMask & 0xF0) << 8) + ((gCurrDemoInput->buttonMask & 0xF));
+                ((gCurrDemoInput->buttonMask & (BITMASK(4) << 4)) << 8) | ((gCurrDemoInput->buttonMask & BITMASK(4)));
 
             // If start was pushed, put it into the demo sequence being input to end the demo.
             gControllers[0].controllerData->button |= startPushed;

@@ -692,7 +692,7 @@ s32 level_trigger_warp(struct MarioState *m, s32 warpOp) {
                 play_sound(SOUND_MENU_STAR_SOUND, gGlobalSoundSource);
                 break;
 
-            case WARP_OP_SPIN_SHRINK: // bbh enter
+            case WARP_OP_SPIN_SHRINK: // enter bbh
                 sDelayedWarpTimer = 30;
                 sSourceWarpNodeId = GET_BPARAM2(m->usedObj->oBehParams);
                 play_transition(WARP_TRANSITION_FADE_INTO_COLOR, sDelayedWarpTimer, 0xFF, 0xFF, 0xFF);

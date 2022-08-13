@@ -2781,6 +2781,7 @@ void update_lakitu(struct Camera *c) {
  */
 void update_mario_geometry_info(struct PlayerGeometry *pg) {
     struct MarioState *marioState = &gMarioStates[0];
+    struct Surface *surf = NULL;
 
     // Stores previous geometry information.
     pg->prevFloorHeight = pg->currFloorHeight;
@@ -2790,18 +2791,20 @@ void update_mario_geometry_info(struct PlayerGeometry *pg) {
     pg->prevFloorType   = pg->currFloorType;
     pg->prevCeilType    = pg->currCeilType;
 
-    pg->currFloor = marioState->floor;
+    surf = marioState->floor;
+    pg->currFloor = surf;
     pg->currFloorHeight = marioState->floorHeight;
-    if (pg->currFloorHeight != FLOOR_LOWER_LIMIT) {
-        pg->currFloorType = marioState->floor->type;
+    if (pg->currFloorHeight != FLOOR_LOWER_LIMIT && surf) {
+        pg->currFloorType = surf->type;
     } else {
         pg->currFloorType = SURFACE_DEFAULT;
     }
 
-    pg->currCeil = marioState->ceil;
+    surf = marioState->ceil;
+    pg->currCeil = surf;
     pg->currCeilHeight = marioState->ceilHeight;
-    if (pg->currCeilHeight != CELL_HEIGHT_LIMIT) {
-        pg->currCeilType = marioState->ceil->type;
+    if (pg->currCeilHeight != CELL_HEIGHT_LIMIT && surf) {
+        pg->currCeilType = surf->type;
     } else {
         pg->currCeilType = SURFACE_DEFAULT;
     }
