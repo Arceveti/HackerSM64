@@ -91,7 +91,7 @@
 /**
  * Forces a crash when the player presses L in-game.
  */
-#define DEBUG_FORCE_CRASH_ON_L
+// #define DEBUG_FORCE_CRASH_ON_L
 
 /**
  * Enables the DEBUG_ASSERT macro.
