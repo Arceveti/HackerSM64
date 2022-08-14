@@ -349,17 +349,18 @@
 #define /*0x0F4*/ oBowserPuzzleCompletionFlags OBJECT_FIELD_S32(0x1B)
 
 /* Bowser Puzzle Piece */
-#define /*0x0FC*/ O_BOWSER_PUZZLE_PIECE_OFFSET_INDEX         0x1D
-#define /*0x0FC*/ O_BOWSER_PUZZLE_PIECE_OFFSET_X_INDEX       (O_BOWSER_PUZZLE_PIECE_OFFSET_INDEX + 0) // 0x1D
-#define /*0x100*/ O_BOWSER_PUZZLE_PIECE_OFFSET_Y_INDEX       (O_BOWSER_PUZZLE_PIECE_OFFSET_INDEX + 1) // 0x1E
-#define /*0x104*/ O_BOWSER_PUZZLE_PIECE_OFFSET_Z_INDEX       (O_BOWSER_PUZZLE_PIECE_OFFSET_INDEX + 2) // 0x1F
+#define /*0x0FC*/ O_BOWSER_PUZZLE_PIECE_OFFSET_INDEX         0x1B
+#define /*0x0FC*/ O_BOWSER_PUZZLE_PIECE_OFFSET_X_INDEX       (O_BOWSER_PUZZLE_PIECE_OFFSET_INDEX + 0) // 0x1B
+#define /*0x100*/ O_BOWSER_PUZZLE_PIECE_OFFSET_Y_INDEX       (O_BOWSER_PUZZLE_PIECE_OFFSET_INDEX + 1) // 0x1C
+#define /*0x104*/ O_BOWSER_PUZZLE_PIECE_OFFSET_Z_INDEX       (O_BOWSER_PUZZLE_PIECE_OFFSET_INDEX + 2) // 0x1D
 #define /*0x0FC*/ oBowserPuzzlePieceOffsetVec                OBJECT_FIELD_F32(O_BOWSER_PUZZLE_PIECE_OFFSET_INDEX)
 #define /*0x0FC*/ oBowserPuzzlePieceOffsetX                  OBJECT_FIELD_F32(O_BOWSER_PUZZLE_PIECE_OFFSET_X_INDEX)
 #define /*0x100*/ oBowserPuzzlePieceOffsetY                  OBJECT_FIELD_F32(O_BOWSER_PUZZLE_PIECE_OFFSET_Y_INDEX)
 #define /*0x104*/ oBowserPuzzlePieceOffsetZ                  OBJECT_FIELD_F32(O_BOWSER_PUZZLE_PIECE_OFFSET_Z_INDEX)
+#define /*0x10C*/ oBowserPuzzlePieceId                       OBJECT_FIELD_S32(0x1E)
+#define /*0x10C*/ oBowserPuzzlePieceActionIndex              OBJECT_FIELD_S32(0x1F)
 #define /*0x108*/ oBowserPuzzlePieceContinuePerformingAction OBJECT_FIELD_S32(0x20)
-#define /*0x10C*/ oBowserPuzzlePieceActionList               OBJECT_FIELD_VPTR(0x21)
-#define /*0x110*/ oBowserPuzzlePieceNextAction               OBJECT_FIELD_VPTR(0x22)
+#define /*0x108*/ oBowserPuzzlePieceIsReversing              OBJECT_FIELD_S32(0x21)
 
 /* Bubba */
 #define /*0x0F4*/ oBubbaMovePitch                  OBJECT_FIELD_F32(0x1B)
