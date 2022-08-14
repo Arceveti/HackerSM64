@@ -165,6 +165,16 @@
 #define WIGGLER_NUM_SEGMENTS     4
 
 
+/***************************
+ * -- WF BREAKABLE WALL --
+ ***************************/
+
+/**
+ * Makes the breakable wall in WF spawn its star instead of the star existing in the level from the start.
+ */
+// #define WF_BREAKABLE_WALL_SPAWNS_STAR
+
+
 /******************
  * -- JRB MIST --
  ******************/
