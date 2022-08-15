@@ -33,7 +33,7 @@ void bhv_blue_fish_movement_loop(void) {
             // Set forward velocity and progress oAction to BLUE_FISH_ACT_TURN.
             o->oForwardVel = o->oBlueFishRandomVel + 3.0f;
             if (o->oTimer >= o->oBlueFishRandomTime + 60) {
-                o->oAction++;
+                o->oAction++; // BLUE_FISH_ACT_TURN
             }
 
             // Set pitch velocity
@@ -52,7 +52,7 @@ void bhv_blue_fish_movement_loop(void) {
             cur_obj_init_animation_with_accel_and_sound(BLUE_FISH_ANIM_DEFAULT, 2.0f);
             o->oMoveAngleYaw = (s32)(o->oBlueFishRandomAngle + o->oMoveAngleYaw);
             if (o->oTimer == 15) {
-                o->oAction++;
+                o->oAction++; // BLUE_FISH_ACT_ASCEND
             }
             break;
 
@@ -62,7 +62,7 @@ void bhv_blue_fish_movement_loop(void) {
 
             // Progresses oAction to BLUE_FISH_ACT_TURN_BACK after elapsed time.
             if (o->oTimer >= o->oBlueFishRandomTime + 60) {
-                o->oAction++;
+                o->oAction++; // BLUE_FISH_ACT_TURN_BACK
             }
 
             // Adjusts pitch angle. Direction relies on time not passed.
@@ -105,9 +105,10 @@ void bhv_tank_fish_group_loop(void) {
 
     switch (o->oAction) {
         case BLUE_FISH_ACT_SPAWN:
+            //! TODO: vanilla checks ifdef
             if (gMarioCurrentRoom == 15 || gMarioCurrentRoom == 7) {
                 // spawns fifteen fish and moves them within 200.0f
-                for (i = 0; i < 15; i++) {
+                for (i = 0; i < 15; i++) { //! TODO: Make this a param
                     fish = spawn_object_relative(0, 300, 0, -200, o, MODEL_FISH, bhvBlueFish);
                     obj_translate_xyz_random(fish, 200.0f);
                 }
@@ -118,8 +119,9 @@ void bhv_tank_fish_group_loop(void) {
             break;
 
         // Sets next oAction phase if Mario is not in rooms fifteen and seven.
-        case BLUE_FISH_ACT_ROOM:
-            if (gMarioCurrentRoom != 15 && gMarioCurrentRoom != 7) {
+        case BLUE_FISH_ACT_ROOM: //! TODO: Vanilla checks ifdef
+            if (gMarioCurrentRoom != 15
+             && gMarioCurrentRoom !=  7) {
                 o->oAction++;
             }
             break;

@@ -31,7 +31,7 @@ void bhv_beta_trampoline_spring_loop(void) {
     // must be replaced with 150 (the height of the trampoline).
     yDisplacement = o->oPosY - o->oHomeY;
     if (yDisplacement >= 0) {
-        yScale = yDisplacement / 150.0f + 1.0f;
+        yScale = 1.0f + (yDisplacement / 150.0f);
     } else {
         // Otherwise (if the trampoline is compressed),
         // scale by 1 - (the displacement)/500.
@@ -39,7 +39,7 @@ void bhv_beta_trampoline_spring_loop(void) {
         // must be replaced with 150 (the height of the trampoline),
         // as with the above code.
         yDisplacement = -yDisplacement;
-        yScale = 1.0f - yDisplacement / 150.0f;
+        yScale = 1.0f - (yDisplacement / 150.0f);
     }
 
     // Scale the spring

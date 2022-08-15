@@ -1289,7 +1289,7 @@ void cur_obj_set_pos_to_home_and_stop(void) {
 
 void cur_obj_shake_y(f32 amount) {
     //! Technically could cause a bit of drift, but not much
-    if ((o->oTimer & 0x1) == 0) {
+    if ((o->oTimer & (2 - 1)) == 0) {
         o->oPosY += amount;
     } else {
         o->oPosY -= amount;
@@ -1378,7 +1378,7 @@ UNUSED s32 cur_obj_advance_looping_anim(void) {
         animFrame++;
     }
 
-    return (animFrame << 16) / loopEnd;
+    return ((animFrame << 16) / loopEnd);
 }
 
 static s32 cur_obj_detect_steep_floor(s16 steepAngleDegrees) {
@@ -1561,9 +1561,9 @@ s32 cur_obj_angle_to_home(void) {
 void obj_set_gfx_pos_at_obj_pos(struct Object *obj1, struct Object *obj2) {
     vec3f_copy_y_off(obj1->header.gfx.pos, &obj2->oPosVec, obj2->oGraphYOffset);
 
-    obj1->header.gfx.angle[0] = obj2->oMoveAnglePitch & 0xFFFF;
-    obj1->header.gfx.angle[1] = obj2->oMoveAngleYaw & 0xFFFF;
-    obj1->header.gfx.angle[2] = obj2->oMoveAngleRoll & 0xFFFF;
+    obj1->header.gfx.angle[0] = (obj2->oMoveAnglePitch & 0xFFFF);
+    obj1->header.gfx.angle[1] = (obj2->oMoveAngleYaw   & 0xFFFF);
+    obj1->header.gfx.angle[2] = (obj2->oMoveAngleRoll  & 0xFFFF);
 }
 
 /**
@@ -1859,7 +1859,7 @@ s32 cur_obj_is_mario_on_platform(void) {
 }
 
 s32 cur_obj_shake_y_until(s32 cycles, s32 amount) {
-    if (o->oTimer & 0x1) {
+    if ((o->oTimer & (2 - 1)) != 0) {
         o->oPosY -= amount;
         // Return FALSE since o->oTimer can't be equal to (cycles * 2) if it is odd.
         return FALSE;

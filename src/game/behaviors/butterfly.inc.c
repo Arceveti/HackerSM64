@@ -7,15 +7,15 @@ void bhv_butterfly_init(void) {
     vec3f_copy(&o->oHomeVec, &o->oPosVec);
 }
 
-void butterfly_step(s32 speed) {
+void butterfly_step(f32 speed) {
     s16 yaw = o->oMoveAngleYaw;
     s16 pitch = o->oMoveAnglePitch;
     s16 yPhase = o->oButterflyYPhase;
     f32 floorY;
 
-    o->oVelX = sins(yaw) * (f32) speed;
-    o->oVelY = sins(pitch) * (f32) speed;
-    o->oVelZ = coss(yaw) * (f32) speed;
+    o->oVelX = sins(yaw) * speed;
+    o->oVelY = sins(pitch) * speed;
+    o->oVelZ = coss(yaw) * speed;
 
     o->oPosX += o->oVelX;
     o->oPosZ += o->oVelZ;
@@ -39,13 +39,13 @@ void butterfly_step(s32 speed) {
 }
 
 void butterfly_calculate_angle(void) {
-    s32 yPhase = 5 * o->oButterflyYPhase / 4;
+    s32 yPhase = ((5 * o->oButterflyYPhase) >> 2);
     gMarioObject->oPosX += yPhase;
     gMarioObject->oPosZ += yPhase;
     obj_turn_toward_object(o, gMarioObject, O_MOVE_ANGLE_YAW_INDEX, 0x300);
     gMarioObject->oPosX -= yPhase;
     gMarioObject->oPosZ -= yPhase;
-    yPhase = (5 * o->oButterflyYPhase + 0x100) / 4;
+    yPhase = (((5 * o->oButterflyYPhase) + 0x100) >> 2);
     gMarioObject->oPosY += yPhase;
     obj_turn_toward_object(o, gMarioObject, O_MOVE_ANGLE_PITCH_INDEX, 0x500);
     gMarioObject->oPosY -= yPhase;

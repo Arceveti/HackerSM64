@@ -67,7 +67,7 @@ void bhv_homing_amp_loop(void);
 void bhv_circling_amp_init(void);
 void bhv_circling_amp_loop(void);
 void bhv_butterfly_init(void);
-void butterfly_step(s32 speed);
+void butterfly_step(f32 speed);
 void butterfly_calculate_angle(void);
 void butterfly_act_rest(void);
 void butterfly_act_follow_mario(void);

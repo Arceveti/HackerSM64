@@ -5,18 +5,18 @@ void bhv_bouncing_fireball_flame_loop(void) {
     cur_obj_update_floor_and_walls();
 
     switch (o->oAction) {
-        case 0:
+        case BOUNCING_FLAME_ACT_SPAWNED:
             if (o->oTimer == 0) {
                 o->oAnimState = random_float() * 10.0f;
                 o->oVelY = 30.0f;
             }
 
             if (o->oMoveFlags & OBJ_MOVE_LANDED) {
-                o->oAction++;
+                o->oAction++; // BOUNCING_FLAME_ACT_LANDED
             }
             break;
 
-        case 1:
+        case BOUNCING_FLAME_ACT_LANDED:
             if (o->oTimer == 0) {
                 o->oVelY = 50.0f;
                 o->oForwardVel = 30.0f;
@@ -44,13 +44,13 @@ void bhv_bouncing_fireball_spawner_loop(void) {
     f32 scale;
 
     switch (o->oAction) {
-        case 0:
+        case BOUNCING_FIREBALL_SPAWNER_ACT_IDLE:
             if (o->oDistanceToMario < 2000.0f) {
-                o->oAction = 1;
+                o->oAction++; // BOUNCING_FIREBALL_SPAWNER_ACT_SPAWN_FLAME
             }
             break;
 
-        case 1:
+        case BOUNCING_FIREBALL_SPAWNER_ACT_SPAWN_FLAME:
             flameObj = spawn_object(o, MODEL_RED_FLAME, bhvBouncingFireballFlame);
             scale = (10 - o->oTimer) * 0.5f;
 
@@ -60,11 +60,11 @@ void bhv_bouncing_fireball_spawner_loop(void) {
             }
 
             if (o->oTimer > 10) {
-                o->oAction++;
+                o->oAction++; // BOUNCING_FIREBALL_SPAWNER_ACT_COOLDOWN
             }
             break;
 
-        case 2:
+        case BOUNCING_FIREBALL_SPAWNER_ACT_COOLDOWN:
             if (o->oTimer == 0) {
                 o->oBouncingFireBallSpawnerRandomCooldown = random_float() * 100.0f;
             }

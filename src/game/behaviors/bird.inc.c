@@ -24,7 +24,7 @@ static void bird_act_inactive(void) {
 
             cur_obj_play_sound_2(SOUND_GENERAL_BIRDS_FLY_AWAY);
 
-            for (i = 0; i < 6; i++) {
+            for (i = 0; i < 6; i++) { //! TODO: Make this a bparam
                 spawn_object(o, MODEL_BIRDS, bhvBird);
             }
 

@@ -8,9 +8,9 @@ void opened_cannon_act_idle(void) { // act 0
     if (o->oTimer == 0) {
         o->oInteractStatus = INT_STATUS_NONE;
         cur_obj_set_pos_to_home();
-        o->oMoveAnglePitch = 0;
-        o->oMoveAngleYaw   = (s16)(o->oBehParams2ndByte << 8);
-        o->oCannonAngle    = 0;
+        o->oMoveAnglePitch = 0x0;
+        o->oMoveAngleYaw = (s16)(o->oBehParams2ndByte << 8);
+        o->oCannonAngle = 0x0;
         o->oCannonIsActive = FALSE;
         cur_obj_enable_rendering();
         cur_obj_become_tangible();
@@ -21,7 +21,7 @@ void opened_cannon_act_idle(void) { // act 0
         cur_obj_enable_rendering();
         if (o->oInteractStatus & INT_STATUS_INTERACTED
          && (!(o->oInteractStatus & INT_STATUS_TOUCHED_BOB_OMB))) { // bob-omb explodes when it gets into a cannon
-            o->oAction = 4;
+            o->oAction = OPENED_CANNON_ACT_RISING;
             o->oCannonIsActive = TRUE;
             o->oCannonTimeSinceActivated = 1;
         } else {
@@ -40,7 +40,7 @@ void opened_cannon_act_rising(void) { // act 4
     }
 
     o->oPosY += 5.0f;
-    f32 horizontalVel = (f32)(((o->oTimer / 2) & 0x1) - 0.5f) * 2;
+    f32 horizontalVel = ((f32)(((o->oTimer / 2) & (2 - 1)) - 0.5f) * 2);
     o->oPosX += horizontalVel;
     o->oPosZ += horizontalVel;
 
@@ -48,7 +48,7 @@ void opened_cannon_act_rising(void) { // act 4
         horizontalVel *= 2;
         o->oPosX += horizontalVel;
         o->oPosZ += horizontalVel;
-        o->oAction = 6;
+        o->oAction = OPENED_CANNON_ACT_TURNING_YAW;
     }
 }
 
@@ -58,7 +58,7 @@ void opened_cannon_act_turning_yaw(void) { // act 6
     }
 
     if (o->oTimer < 4) {
-        f32 horizontalVel = ((f32)(((o->oTimer / 2) & 0x1) - 0.5f) * 4.0f);
+        f32 horizontalVel = ((f32)(((o->oTimer / 2) & (2 - 1)) - 0.5f) * 4);
         o->oPosX += horizontalVel;
         o->oPosZ += horizontalVel;
     } else {
@@ -68,8 +68,8 @@ void opened_cannon_act_turning_yaw(void) { // act 6
                     ((sins(o->oCannonAngle) * 0x4000) + ((s16)(o->oBehParams2ndByte << 8)));
                 o->oCannonAngle += 0x400;
             } else if (o->oTimer >= 26) {
-                o->oCannonAngle = 0;
-                o->oAction = 5;
+                o->oCannonAngle = 0x0;
+                o->oAction = OPENED_CANNON_ACT_RAISE_BARREL;
             }
         }
     }
@@ -84,7 +84,7 @@ void opened_cannon_act_pitch_up(void) { // act 5
             o->oCannonAngle += 0x400;
             o->oMoveAnglePitch = (sins(o->oCannonAngle) * 0x2000);
         } else if (o->oTimer >= 25) {
-            o->oAction = 1;
+            o->oAction = OPENED_CANNON_ACT_READY;
         }
     }
 }
@@ -98,12 +98,12 @@ void opened_cannon_act_ready(void) { // act 1
 }
 
 void opened_cannon_act_shoot(void) { // act 2
-    o->oAction = 3;
+    o->oAction = OPENED_CANNON_ACT_RESETTING;
 }
 
 void opened_cannon_act_resetting(void) { // act 3
     if (o->oTimer > 3) {
-        o->oAction = 0;
+        o->oAction = OPENED_CANNON_ACT_IDLE;
     }
 }
 

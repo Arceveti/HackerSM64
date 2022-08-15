@@ -29,26 +29,26 @@ void bhv_checkerboard_elevator_group_init(void) {
         } else {
             relativePosZ =  sCheckerBoardPlatformInitPositions[type].relPosZ;
         }
-        platformObj = spawn_object_relative(i, 0, i * relativePosY, relativePosZ, o, MODEL_CHECKERBOARD_PLATFORM, bhvCheckerboardPlatformSub);
+        platformObj = spawn_object_relative(i, 0, (i * relativePosY), relativePosZ, o, MODEL_CHECKERBOARD_PLATFORM, bhvCheckerboardPlatformSub);
         platformObj->oCheckerBoardPlatformRadius = sCheckerBoardPlatformInitPositions[type].radius;
         vec3f_copy(platformObj->header.gfx.scale, sCheckerBoardPlatformInitPositions[type].scale);
     }
 }
 
 void checkerboard_plat_act_move_y(f32 vel, s32 time) {
-    o->oMoveAnglePitch = 0;
-    o->oAngleVelPitch = 0;
+    o->oMoveAnglePitch = 0x0;
+    o->oAngleVelPitch = 0x0;
     o->oForwardVel = 0.0f;
     o->oVelY = vel;
     if (o->oTimer > time) {
-        o->oAction++;
+        o->oAction++; // rotate
     }
 }
 
 void checkerboard_plat_act_rotate(s32 nextAction, s16 pitch) {
     o->oVelY = 0.0f;
     o->oAngleVelPitch = pitch;
-    if (o->oTimer + 1 == 0x8000 / abss(pitch)) {
+    if ((o->oTimer + 1) == (0x8000 / abss(pitch))) {
         o->oAction = nextAction;
     }
     o->oCheckerBoardPlatformRotateAction = nextAction;
@@ -61,30 +61,30 @@ void bhv_checkerboard_platform_init(void) {
 void bhv_checkerboard_platform_loop(void) {
     f32 radius = o->oCheckerBoardPlatformRadius;
 
-    o->oCheckerBoardPlatformRotateAction = 0;
+    o->oCheckerBoardPlatformRotateAction = CHECKERBOARD_PLATFORM_ACT_MOVE_VERTICALLY;
 
     if (o->oDistanceToMario < 1000.0f) {
         cur_obj_play_sound_1(SOUND_ENV_ELEVATOR4);
     }
 
     switch (o->oAction) {
-        case 0:
-            if (o->oBehParams2ndByte == 0) {
-                o->oAction = 1;
+        case CHECKERBOARD_PLATFORM_ACT_MOVE_VERTICALLY:
+            if (o->oBehParams2ndByte == CHECKERBOARD_PLATFORM_BP_MOVE_UP) {
+                o->oAction = CHECKERBOARD_PLATFORM_ACT_MOVE_UP;
             } else {
-                o->oAction = 3;
+                o->oAction = CHECKERBOARD_PLATFORM_ACT_MOVE_DOWN;
             }
             break;
-        case 1:
+        case CHECKERBOARD_PLATFORM_ACT_MOVE_UP:
             checkerboard_plat_act_move_y(10.0f, o->oCheckerBoardPlatformHeight);
             break;
-        case 2:
+        case CHECKERBOARD_PLATFORM_ACT_ROTATE_UP:
             checkerboard_plat_act_rotate(3, 512);
             break;
-        case 3:
+        case CHECKERBOARD_PLATFORM_ACT_MOVE_DOWN:
             checkerboard_plat_act_move_y(-10.0f, o->oCheckerBoardPlatformHeight);
             break;
-        case 4:
+        case CHECKERBOARD_PLATFORM_ACT_ROTATE_DOWN:
             checkerboard_plat_act_rotate(1, -512);
             break;
     }
@@ -93,14 +93,14 @@ void bhv_checkerboard_platform_loop(void) {
     o->oFaceAnglePitch += absi(o->oAngleVelPitch);
     o->oFaceAngleYaw = o->oMoveAngleYaw;
 
-    if (o->oMoveAnglePitch != 0) {
+    if (o->oMoveAnglePitch != 0x0) {
         f32 mul = ((o->oAngleVelPitch >= 0) ? 1.0f : -1.0f) * radius;
         o->oForwardVel = mul * sins(o->oMoveAnglePitch);
         o->oVelY       = mul * coss(o->oMoveAnglePitch);
     }
 
-    if (o->oCheckerBoardPlatformRotateAction == 1) {
-        o->oAngleVelPitch = 0;
+    if (o->oCheckerBoardPlatformRotateAction == CHECKERBOARD_PLATFORM_ACT_MOVE_UP) {
+        o->oAngleVelPitch = 0x0;
         o->oFaceAnglePitch &= ~0x7FFF;
         cur_obj_move_using_fvel_and_gravity();
     } else {

@@ -64,7 +64,7 @@ void bully_check_mario_collision(void) {
 
 void bully_act_chase_mario(void) {
     f32 homeX = o->oHomeX;
-    f32 posY = o->oPosY;
+    f32 posY  = o->oPosY;
     f32 homeZ = o->oHomeZ;
 
     if (o->oTimer < 10) {
@@ -203,7 +203,7 @@ void bully_act_level_death(void) {
             } else {
                 spawn_default_star(0, 950.0f, -6800.0f);
                 spawn_object_abs_with_rot(o, 0, MODEL_NONE, bhvLllTumblingBridge,
-                                          0, 154, -5631, 0, 0, 0);
+                                          0, 154, -5631, 0x0, 0x0, 0x0);
             }
         }
     }
@@ -259,15 +259,15 @@ void bhv_bully_loop(void) {
 
 void big_bully_spawn_minion(s32 x, s32 y, s32 z, s16 yaw) {
     struct Object *bully =
-        spawn_object_abs_with_rot(o, 0, MODEL_BULLY, bhvSmallBully, x, y, z, 0, yaw, 0);
+        spawn_object_abs_with_rot(o, 0, MODEL_BULLY, bhvSmallBully, x, y, z, 0x0, yaw, 0x0);
     bully->oBullySubtype = BULLY_STYPE_MINION;
     bully->oBehParams2ndByte = BULLY_BP_SIZE_SMALL;
 }
 
 void bhv_big_bully_with_minions_init(void) {
-    big_bully_spawn_minion(4454, 307, -5426, 0);
-    big_bully_spawn_minion(3840, 307, -6041, 0);
-    big_bully_spawn_minion(3226, 307, -5426, 0);
+    big_bully_spawn_minion(4454, 307, -5426, 0x0);
+    big_bully_spawn_minion(3840, 307, -6041, 0x0);
+    big_bully_spawn_minion(3226, 307, -5426, 0x0);
 
     cur_obj_hide();
 

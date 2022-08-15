@@ -69,7 +69,7 @@ void bhv_hidden_blue_coin_loop(void) {
 /**
  * Update function for bhvBlueCoinSwitch.
  */
-void bhv_blue_coin_switch_loop(void) {
+void bhv_blue_coin_switch_loop(void) { //! TODO: Fix VSCode braces matching
     // The switch's model is 1/3 size.
     cur_obj_scale(3.0f);
 
@@ -77,22 +77,20 @@ void bhv_blue_coin_switch_loop(void) {
         case BLUE_COIN_SWITCH_ACT_IDLE:
             // If Mario is on the switch and has ground-pounded,
             // recede and get ready to start ticking.
-            if (gMarioObject->platform == o) {
-                if (gMarioStates[0].action == ACT_GROUND_POUND_LAND) {
-                    // Set to BLUE_COIN_SWITCH_ACT_RECEDING
-                    o->oAction = BLUE_COIN_SWITCH_ACT_RECEDING;
+            if (gMarioObject->platform == o
+             && gMarioStates[0].action == ACT_GROUND_POUND_LAND) {
+                o->oAction = BLUE_COIN_SWITCH_ACT_RECEDING;
 #ifdef BLUE_COIN_SWITCH_RETRY
-                    // Recede at a rate of 16 units/frame.
-                    o->oVelY = -16.0f;
+                // Recede at a rate of 16 units/frame.
+                o->oVelY = -16.0f;
 #else
-                    // Recede at a rate of 20 units/frame.
-                    o->oVelY = -20.0f;
+                // Recede at a rate of 20 units/frame.
+                o->oVelY = -20.0f;
 #endif
-                    // Set gravity to 0 so it doesn't accelerate when receding.
-                    o->oGravity = 0.0f;
+                // Set gravity to 0 so it doesn't accelerate when receding.
+                o->oGravity = 0.0f;
 
-                    cur_obj_play_sound_2(SOUND_GENERAL_SWITCH_DOOR_OPEN);
-                }
+                cur_obj_play_sound_2(SOUND_GENERAL_SWITCH_DOOR_OPEN);
             }
 
             // Have collision
@@ -106,15 +104,13 @@ void bhv_blue_coin_switch_loop(void) {
             // and recedes at 20 units/frame, which means it will fully recede after 5 frames.
 #ifdef BLUE_COIN_SWITCH_RETRY
             if (o->oTimer > 3) {
-                // Set to BLUE_COIN_SWITCH_ACT_TICKING
                 o->oAction = BLUE_COIN_SWITCH_ACT_TICKING;
                 // ???
-                o->oVelY    = 0.0f;
+                o->oVelY = 0.0f;
                 o->oGravity = 0.0f;
 #else
             if (o->oTimer > 5) {
                 cur_obj_hide();
-                // Set to BLUE_COIN_SWITCH_ACT_TICKING
                 o->oAction = BLUE_COIN_SWITCH_ACT_TICKING;
                 o->oPosY = gMarioObject->oPosY - 40.0f;
 #endif
@@ -144,15 +140,14 @@ void bhv_blue_coin_switch_loop(void) {
                 obj_mark_for_deletion(o);
             // Set to BLUE_COIN_SWITCH_ACT_EXTENDING after the coins unload after the 240-frame timer expires.
             } else if (o->oTimer > 240) {
-                o->oAction  = BLUE_COIN_SWITCH_ACT_EXTENDING;
-                o->oVelY    = 16.0f;
+                o->oAction = BLUE_COIN_SWITCH_ACT_EXTENDING;
+                o->oVelY = 16.0f;
                 o->oGravity =  0.0f;
             }
             load_object_collision_model();
             break;
         case BLUE_COIN_SWITCH_ACT_EXTENDING:
             if (o->oTimer > 3) {
-                // Set to BLUE_COIN_SWITCH_ACT_IDLE
                 o->oAction = BLUE_COIN_SWITCH_ACT_IDLE;
             } else {
                 // Have collision while extending
@@ -163,7 +158,8 @@ void bhv_blue_coin_switch_loop(void) {
 #else
             // Delete the switch (which stops the sound) after the last coin is collected,
             // or after the coins unload after the 240-frame timer expires.
-            if ((cur_obj_nearest_object_with_behavior(bhvHiddenBlueCoin) == NULL) || (o->oTimer > 240)) {
+            if ((cur_obj_nearest_object_with_behavior(bhvHiddenBlueCoin) == NULL)
+             || (o->oTimer > 240)) {
                 obj_mark_for_deletion(o);
             }
 #endif

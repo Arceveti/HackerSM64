@@ -417,7 +417,7 @@ static void monty_mole_rock_act_held(void) {
         o->oAction = MONTY_MOLE_ROCK_ACT_MOVE;
 
         // The angle is adjusted to compensate for the start position offset
-        o->oMoveAngleYaw = (s32)(o->parentObj->oMoveAngleYaw + 500 - distToMario * 0.1f);
+        o->oMoveAngleYaw = (s32)((o->parentObj->oMoveAngleYaw + 500) - (distToMario * 0.1f));
 
         o->oForwardVel = 40.0f;
         o->oVelY = distToMario * 0.08f + 8.0f;

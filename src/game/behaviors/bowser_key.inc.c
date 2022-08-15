@@ -23,7 +23,7 @@ void bhv_bowser_key_loop(void) {
     o->oFaceAngleRoll = -0x4000;
     o->oGraphYOffset = 165.0f;
 
-    if (o->oAction == 0) {
+    if (o->oAction == BOWSER_KEY_ACT_BOUNCING) {
         if (o->oTimer == 0) {
             o->oVelY = 70.0f;
         }
@@ -34,11 +34,11 @@ void bhv_bowser_key_loop(void) {
         cur_obj_move_standard(78);
 
         if (o->oMoveFlags & OBJ_MOVE_ON_GROUND) {
-            o->oAction++; // 1
+            o->oAction++; // BOWSER_KEY_ACT_LANDED
         } else if (o->oMoveFlags & OBJ_MOVE_LANDED) {
             cur_obj_play_sound_2(SOUND_GENERAL_BOWSER_KEY_LAND);
         }
-    } else {
+    } else { // BOWSER_KEY_ACT_LANDED
         obj_set_hitbox(o, &sBowserKeyHitbox);
 
         if (o->oInteractStatus & INT_STATUS_INTERACTED) {

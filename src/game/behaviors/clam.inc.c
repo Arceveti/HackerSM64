@@ -34,7 +34,7 @@ void clam_act_opening(void) {
     s16 bubblesX, bubblesZ;
 
     if (o->oTimer > 150) {
-        o->oAction = 0;
+        o->oAction = CLAM_ACT_CLOSING;
     } else if (obj_is_rendering_enabled() && cur_obj_init_anim_check_frame(CLAM_ANIM_OPENING, 8)) {
         for (i = -DEGREES(45); i < DEGREES(45); i += 0x0555) { // ~7.5 degrees each frame
             bubblesX = (s16)(100.0f * sins(i));

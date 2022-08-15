@@ -22,14 +22,14 @@ struct ObjectHitbox sYellowCoinHitbox = {
  *     0
  **/
 s16 sCoinArrowPositions[][2] = {
-    {    0, -150 },
-    {    0,  -50 },
-    {    0,   50 },
-    {    0,  150 },
-    {  -50,  100 },
-    { -100,   50 },
-    {   50,  100 },
-    {  100,   50 },
+    {    0, -150 }, // 0
+    {    0,  -50 }, // 1
+    {    0,   50 }, // 2
+    {    0,  150 }, // 3
+    {  -50,  100 }, // 4
+    { -100,   50 }, // 5
+    {   50,  100 }, // 6
+    {  100,   50 }, // 7
 };
 
 s32 bhv_coin_sparkles_init(void) {
@@ -85,7 +85,7 @@ void bhv_temp_coin_loop(void) {
 }
 
 void bhv_coin_init(void) {
-    o->oVelY = random_float() * 10.0f + 30 + o->oCoinBaseYVel;
+    o->oVelY = (random_float() * 10.0f) + 30 + o->oCoinBaseYVel;
     o->oForwardVel = random_float() * 10.0f;
     o->oMoveAngleYaw = random_u16();
 
@@ -187,7 +187,7 @@ void spawn_coin_in_formation(s32 index, s32 shape) {
 
     switch (shape & COIN_FORMATION_BP_SHAPE_MASK) {
         case COIN_FORMATION_BP_SHAPE_HORIZONTAL_LINE:
-            pos[2] = 160 * (index - 2);
+            pos[2] = (160 * (index - 2));
             if (index > 4) {
                 spawnCoin = FALSE;
             }
@@ -200,13 +200,13 @@ void spawn_coin_in_formation(s32 index, s32 shape) {
             }
             break;
         case COIN_FORMATION_BP_SHAPE_HORIZONTAL_RING:
-            pos[0] = (sins(index << 13) * COIN_FORMATION_HORIZONTAL_RING_RADIUS);
-            pos[2] = (coss(index << 13) * COIN_FORMATION_HORIZONTAL_RING_RADIUS);
+            pos[0] = (sins(index << 13) * COIN_FORMATION_RING_RADIUS_HORIZONTAL);
+            pos[2] = (coss(index << 13) * COIN_FORMATION_RING_RADIUS_HORIZONTAL);
             break;
         case COIN_FORMATION_BP_SHAPE_VERTICAL_RING:
             snapToGround = FALSE;
-            pos[0] = (coss(index << 13) * COIN_FORMATION_VERTICAL_RING_RADIUS);
-            pos[1] = (sins(index << 13) * COIN_FORMATION_VERTICAL_RING_RADIUS) + COIN_FORMATION_VERTICAL_RING_RADIUS;
+            pos[0] = (coss(index << 13) * COIN_FORMATION_RING_RADIUS_VERTICAL);
+            pos[1] = (sins(index << 13) * COIN_FORMATION_RING_RADIUS_VERTICAL) + COIN_FORMATION_RING_RADIUS_VERTICAL;
             break;
         case COIN_FORMATION_BP_SHAPE_ARROW:
             pos[0] = sCoinArrowPositions[index][0];
@@ -319,6 +319,6 @@ void bhv_coin_sparkles_loop(void) {
 
 void bhv_golden_coin_sparkles_loop(void) {
     struct Object *sparkleObj = spawn_object(o, MODEL_SPARKLES, bhvCoinSparkles);
-    sparkleObj->oPosX += random_float() * 30.0f - 15.0f;
-    sparkleObj->oPosZ += random_float() * 30.0f - 15.0f;
+    sparkleObj->oPosX += (random_float() * 30.0f) - 15.0f;
+    sparkleObj->oPosZ += (random_float() * 30.0f) - 15.0f;
 }

@@ -46,7 +46,7 @@ void bhv_rotating_clock_arm_loop(void) {
     }
 
     // Only rotate the hands until Mario enters the painting.
-    if (o->oAction < 2) {
+    if (o->oAction < TTC_PAINTING_CLOCK_ARM_ACT_STOPPED) {
         cur_obj_rotate_face_angle_using_vel();
     }
 }

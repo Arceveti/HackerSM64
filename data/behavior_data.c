@@ -4696,7 +4696,7 @@ const BehaviorScript bhvControllablePlatformSub[] = {
     OR_INT(oFlags, OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE),
     LOAD_COLLISION_DATA(hmc_seg7_collision_controllable_platform_sub),
     BEGIN_LOOP(),
-        CALL_NATIVE(bhv_controllable_platform_sub_loop),
+        CALL_NATIVE(bhv_controllable_platform_button_loop),
         CALL_NATIVE(load_object_collision_model),
     END_LOOP(),
 };

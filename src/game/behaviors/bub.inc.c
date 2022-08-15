@@ -58,20 +58,20 @@ void bub_act_init(void) {
 
 void bub_act_swimming_towards_mario(void) {
     if (o->oTimer == 0) {
-        o->oForwardVel = random_float() * 2 + 2;
+        o->oForwardVel = (random_float() * 2) + 2;
         o->oCheepCheepRandomSwimAway = random_float();
     }
 
     f32 dy = o->oPosY - gMarioObject->oPosY;
 
-    if (o->oPosY < o->oCheepCheepWaterLevel - 50.0f) {
+    if (o->oPosY < (o->oCheepCheepWaterLevel - 50.0f)) {
         if (absf(dy) < 500.0f) {
             bub_move_vertically(1);
         } else {
             bub_move_vertically(4);
         }
     } else {
-        o->oPosY = o->oCheepCheepWaterLevel - 50.0f;
+        o->oPosY = (o->oCheepCheepWaterLevel - 50.0f);
 
         if (dy > 300.0f) {
             o->oPosY -= 1.0f;

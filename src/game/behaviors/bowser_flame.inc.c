@@ -57,7 +57,7 @@ void bhv_flame_large_burning_out_init(void) {
 }
 
 void bowser_flame_move(void) {
-    s32 timer = (((o->oFlameSpeedTimerOffset + gGlobalTimer) & 0x3F) << 10);
+    s32 timer = (((o->oFlameSpeedTimerOffset + gGlobalTimer) & (64 - 1)) << 10);
     o->oPosX += sins(o->oMoveAngleYaw) * sins(timer) * 4.0f;
     o->oPosZ += coss(o->oMoveAngleYaw) * sins(timer) * 4.0f;
 }
@@ -144,7 +144,9 @@ void bhv_bowser_sky_flame_group_falling_init(void) {
     o->oFlameSpeedTimerOffset = random_float() * 64.0f;
 }
 
-f32 sFlameFloatingYLimit[] = { -8.0f, -6.0f, -3.0f };
+static const f32 sFlameFloatingYLimit[] = {
+    -8.0f, -6.0f, -3.0f
+};
 
 void bhv_bowser_sky_flame_group_falling_loop(void) {
     cur_obj_update_floor_and_walls();
@@ -259,10 +261,10 @@ void bhv_blue_flames_group_loop(void) {
     }
 
     if (o->oTimer < 16) {
-        if (!(o->oTimer & 1)) {
+        if ((o->oTimer & (2 - 1)) == 0) {
             for (i = 0; i < 3; i++) {
                 flame = spawn_object(o, MODEL_BLUE_FLAME, bhvFlameBouncing);
-                flame->oMoveAngleYaw += i * DEGREES(120);
+                flame->oMoveAngleYaw += (i * DEGREES(120));
                 flame->header.gfx.scale[0] = o->oBlueFlameNextScale;
             }
             o->oBlueFlameNextScale -= 0.5f;

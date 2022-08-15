@@ -12,7 +12,7 @@ static struct ObjectHitbox sBowlingBallHitbox = {
     /* hurtboxHeight:     */ 0,
 };
 
-static Trajectory sThiHugeMetalBallTraj[] = {
+static const Trajectory sThiHugeMetalBallTraj[] = {
     TRAJECTORY_POS(0, /*pos*/ -4786,   101, -2166),
     TRAJECTORY_POS(1, /*pos*/ -5000,    81, -2753),
     TRAJECTORY_POS(2, /*pos*/ -5040,    33, -3846),
@@ -26,7 +26,7 @@ static Trajectory sThiHugeMetalBallTraj[] = {
     TRAJECTORY_END(),
 };
 
-static Trajectory sThiTinyMetalBallTraj[] = {
+static const Trajectory sThiTinyMetalBallTraj[] = {
     TRAJECTORY_POS(0, /*pos*/ -1476,    29,  -680),
     TRAJECTORY_POS(1, /*pos*/ -1492,    14, -1072),
     TRAJECTORY_POS(2, /*pos*/ -1500,     3, -1331),
@@ -203,7 +203,7 @@ void bhv_thi_bowling_ball_spawner_loop(void) {
         return;
     }
 
-    if (((o->oTimer % 64) == 0)
+    if (((o->oTimer & (64 - 1)) == 0)
      && is_point_within_radius_of_mario(o->oPosX, o->oPosY, o->oPosZ, 12000)
      && (s32)(random_float() * 1.5f) == 0) {
         struct Object *bowlingBall = spawn_object(o, MODEL_BOWLING_BALL, bhvBowlingBall);

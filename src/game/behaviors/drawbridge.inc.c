@@ -30,16 +30,16 @@ void bhv_lll_drawbridge_loop(void) {
     if ((s16) o->oFaceAngleRoll < -0x1FFD) {
         o->oFaceAngleRoll = 0xDFFF;
 
-        if (o->oTimer > 50 && !(o->oTimer & 0x7)) {
+        if ((o->oTimer > 50) && ((o->oTimer & (8 - 1)) == 0)) {
             o->oAction = LLL_DRAWBRIDGE_ACT_LOWER;
             cur_obj_play_sound_2(SOUND_GENERAL_DRAWBRIDGE_LOWER);
         }
     }
 
-    if ((s16) o->oFaceAngleRoll >= 0) {
-        o->oFaceAngleRoll = 0;
+    if ((s16) o->oFaceAngleRoll >= 0x0) {
+        o->oFaceAngleRoll = 0x0;
 
-        if (o->oTimer > 50 && !(o->oTimer & 0x7)) {
+        if ((o->oTimer > 50) && ((o->oTimer & (8 - 1)) == 0)) {
             o->oAction = LLL_DRAWBRIDGE_ACT_RAISE;
             cur_obj_play_sound_2(SOUND_GENERAL_DRAWBRIDGE_RAISE);
         }

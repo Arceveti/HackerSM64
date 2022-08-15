@@ -76,7 +76,7 @@ static void homing_amp_appear_loop(void) {
     if (o->oTimer < 30) {
         cur_obj_scale(0.1f + 0.9f * (f32)(o->oTimer / 30.0f));
     } else {
-        o->oAnimState = 1;
+        o->oAnimState = AMP_ANIM_STATE_ON;
     }
 
     // Once the timer becomes greater than 90, i.e. 91 frames have passed,
@@ -156,7 +156,7 @@ static void homing_amp_give_up_loop(void) {
         cur_obj_set_pos_to_home();
         cur_obj_hide();
         o->oAction = HOMING_AMP_ACT_INACTIVE;
-        o->oAnimState = 0;
+        o->oAnimState = AMP_ANIM_STATE_OFF;
         o->oForwardVel = 0.0f;
         o->oHomingAmpAvgY = o->oHomeY;
     }
@@ -173,11 +173,11 @@ static void amp_attack_cooldown_loop(void) {
     cur_obj_become_intangible();
 
     if (o->oTimer > 30) {
-        o->oAnimState = 0;
+        o->oAnimState = AMP_ANIM_STATE_OFF;
     }
 
     if (o->oTimer > 90) {
-        o->oAnimState = 1;
+        o->oAnimState = AMP_ANIM_STATE_ON;
         cur_obj_become_tangible();
         o->oAction = HOMING_AMP_ACT_CHASE;
     }
@@ -225,7 +225,7 @@ void bhv_homing_amp_loop(void) {
  */
 void bhv_circling_amp_init(void) {
     vec3f_copy(&o->oHomeVec, &o->oPosVec);
-    o->oAnimState = 1;
+    o->oAnimState = AMP_ANIM_STATE_ON;
 
     // Determine the radius of the circling amp's circle
     switch (o->oBehParams2ndByte) {

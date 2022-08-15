@@ -203,7 +203,7 @@ void bhv_lll_bowser_puzzle_piece_move(f32 xOffset, f32 zOffset) {
 
     // For the first LLL_BOWSER_PUZZLE_PIECE_SHAKE_TIME frames, shake the puzzle piece up and down.
     if (o->oTimer < LLL_BOWSER_PUZZLE_PIECE_SHAKE_TIME) {
-        if (o->oTimer & (2 - 1)) {
+        if ((o->oTimer & (2 - 1)) != 0) {
             o->oBowserPuzzlePieceOffsetY = -LLL_BOWSER_PUZZLE_PIECE_SHAKE_AMOUNT;
         }
     } else {

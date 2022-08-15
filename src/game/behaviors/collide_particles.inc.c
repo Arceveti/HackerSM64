@@ -1,10 +1,18 @@
 // collide_particles.inc.c
 
-static s16 sTinyTriMovementParams[] = { 0xD000, 0,      0x3000, 0,      0xDE67, 0x2199,
-                                        0x2199, 0x2199, 0xDE67, 0xDE67, 0x2199, 0xDE67 };
+struct TinyParticleMovementParams {
+    s16 yaw;
+    s16 vel;
+};
 
-static s16 sTinyStarMovementParams[] = { 0xE000, 0,      0,      0,      0x2000, 0,      0xE99A,
-                                         0x1666, 0x1666, 0x1666, 0xE99A, 0xE99A, 0x1666, 0xE99A };
+static const struct TinyParticleMovementParams sTinyTriMovementParams[] = {
+    { 0xD000,      0 },
+    { 0x3000,      0 },
+    { 0xDE67, 0x2199 },
+    { 0x2199, 0x2199 },
+    { 0xDE67, 0xDE67 },
+    { 0x2199, 0xDE67 },
+};
 
 void bhv_punch_tiny_triangle_loop(void) {
     if (o->oTimer == 0) {
@@ -19,7 +27,7 @@ void bhv_punch_tiny_triangle_loop(void) {
     cur_obj_scale(o->oCollisionParticleScale);
     o->oCollisionParticleScale -= 0.2f;
 
-    if (gDebugInfo[DEBUG_PAGE_EFFECTINFO][0] + 6 < o->oTimer) {
+    if ((gDebugInfo[DEBUG_PAGE_EFFECTINFO][0] + 6) < o->oTimer) {
         obj_mark_for_deletion(o);
     }
 }
@@ -30,11 +38,21 @@ void bhv_punch_tiny_triangle_init(void) {
 
     for (i = 0; i < 6; i++) {
         triangle = spawn_object(o, MODEL_DIRT_ANIMATION, bhvPunchTinyTriangle);
-        triangle->oMoveAngleYaw = gMarioObject->oMoveAngleYaw + sTinyTriMovementParams[2 * i] + 0x8000;
-        triangle->oVelY = sins(sTinyTriMovementParams[2 * i + 1]) * 25.0f;
-        triangle->oForwardVel = coss(sTinyTriMovementParams[2 * i + 1]) * 25.0f;
+        triangle->oMoveAngleYaw = gMarioObject->oMoveAngleYaw + sTinyTriMovementParams[i].yaw + 0x8000;
+        triangle->oVelY       = sins(sTinyTriMovementParams[i].vel) * 25.0f;
+        triangle->oForwardVel = coss(sTinyTriMovementParams[i].vel) * 25.0f;
     }
 }
+
+static const struct TinyParticleMovementParams sTinyStarMovementParams[] = {
+    { 0xE000,      0 },
+    {      0,      0 },
+    { 0x2000,      0 },
+    { 0xE99A, 0x1666 },
+    { 0x1666, 0x1666 },
+    { 0xE99A, 0xE99A },
+    { 0x1666, 0xE99A },
+};
 
 void bhv_wall_tiny_star_particle_loop(void) {
     if (o->oTimer == 0) {
@@ -45,7 +63,7 @@ void bhv_wall_tiny_star_particle_loop(void) {
     }
 
     cur_obj_move_using_fvel_and_gravity();
-    o->oAnimState = 4;
+    o->oAnimState = TINY_DIRT_PARTICLE_ANIM_STATE_YELLOW;
     cur_obj_scale(o->oCollisionParticleScale);
     o->oCollisionParticleScale -= 0.015f;
 }
@@ -56,9 +74,9 @@ void bhv_tiny_star_particles_init(void) {
 
     for (i = 0; i < 7; i++) {
         particle = spawn_object(o, MODEL_CARTOON_STAR, bhvWallTinyStarParticle);
-        particle->oMoveAngleYaw = gMarioObject->oMoveAngleYaw + sTinyStarMovementParams[2 * i] + 0x8000;
-        particle->oVelY = sins(sTinyStarMovementParams[2 * i + 1]) * 25.0f;
-        particle->oForwardVel = coss(sTinyStarMovementParams[2 * i + 1]) * 25.0f;
+        particle->oMoveAngleYaw = gMarioObject->oMoveAngleYaw + sTinyStarMovementParams[i].yaw + 0x8000;
+        particle->oVelY       = sins(sTinyStarMovementParams[i].vel) * 25.0f;
+        particle->oForwardVel = coss(sTinyStarMovementParams[i].vel) * 25.0f;
     }
 }
 
@@ -71,18 +89,18 @@ void bhv_pound_tiny_star_particle_loop(void) {
     }
 
     cur_obj_move_using_fvel_and_gravity();
-    o->oAnimState = 4;
+    o->oAnimState = TINY_DIRT_PARTICLE_ANIM_STATE_YELLOW;
     cur_obj_scale(o->oCollisionParticleScale);
     o->oCollisionParticleScale -= 0.015f;
 }
 
 void bhv_pound_tiny_star_particle_init(void) {
     s32 i;
-    s32 amt = 8;
+    const s32 amt = 8;
 
     struct Object *particle;
     for (i = 0; i < amt; i++) {
         particle = spawn_object(o, MODEL_CARTOON_STAR, bhvPoundTinyStarParticle);
-        particle->oMoveAngleYaw = (i * 65536) / amt;
+        particle->oMoveAngleYaw = ((i * 65536) / amt);
     }
 }

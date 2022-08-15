@@ -5,7 +5,7 @@ struct FloorSwitchTriggeredAnimationFrame {
     ModelID16 model;
 };
 
-struct FloorSwitchTriggeredAnimationFrame sFloorSwitchTriggeredAnimationFrames[][5] = {
+static const struct FloorSwitchTriggeredAnimationFrame sFloorSwitchTriggeredAnimationFrames[][5] = {
     {
         { bits_seg7_collision_0701B734, MODEL_BITS_STAIRCASE_FRAME4 },
         { bits_seg7_collision_0701B59C, MODEL_BITS_STAIRCASE_FRAME3 },
@@ -29,26 +29,28 @@ struct FloorSwitchTriggeredAnimationFrame sFloorSwitchTriggeredAnimationFrames[]
     },
 };
 
-s16 sAnimatesOnFloorSwitchPressTimers[] = { 250, 200, 200 };
+static const s16 sAnimatesOnFloorSwitchPressTimers[] = {
+    250, 200, 200
+};
 
 void bhv_animates_on_floor_switch_press_init(void) {
     o->parentObj = cur_obj_nearest_object_with_behavior(bhvFloorSwitchAnimatesObject);
 }
 
 void bhv_animates_on_floor_switch_press_loop(void) {
-    if (o->oFloorSwitchPressAnimationSwitchNotTicking != 0) {
+    if (o->oFloorSwitchPressAnimationSwitchNotTicking) {
         if (o->parentObj->oAction != 2) {
-            o->oFloorSwitchPressAnimationSwitchNotTicking = 0;
+            o->oFloorSwitchPressAnimationSwitchNotTicking = FALSE;
         }
 
-        if (o->oFloorSwitchPressAnimationDoResetTime != 0) {
+        if (o->oFloorSwitchPressAnimationDoResetTime) {
             o->oFloorSwitchPressAnimationTickTimer = sAnimatesOnFloorSwitchPressTimers[o->oBehParams2ndByte];
         } else {
             o->oFloorSwitchPressAnimationTickTimer = 0;
         }
     } else if (o->parentObj->oAction == 2) {
-        o->oFloorSwitchPressAnimationDoResetTime ^= 1;
-        o->oFloorSwitchPressAnimationSwitchNotTicking = 1;
+        o->oFloorSwitchPressAnimationDoResetTime ^= TRUE;
+        o->oFloorSwitchPressAnimationSwitchNotTicking = TRUE;
     }
 
     if (o->oFloorSwitchPressAnimationTickTimer != 0) {
@@ -70,11 +72,11 @@ void bhv_animates_on_floor_switch_press_loop(void) {
 
         if (o->oFloorSwitchPressAnimationDoubleFrame < 0) {
             o->oFloorSwitchPressAnimationDoubleFrame = 0;
-            o->oFloorSwitchPressAnimationDoResetTime = 1;
+            o->oFloorSwitchPressAnimationDoResetTime = TRUE;
         }
     }
 
-    struct FloorSwitchTriggeredAnimationFrame *floorSwitchTriggeredFrame = &sFloorSwitchTriggeredAnimationFrames[o->oBehParams2ndByte][o->oFloorSwitchPressAnimationDoubleFrame / 2];
+    const struct FloorSwitchTriggeredAnimationFrame *floorSwitchTriggeredFrame = &sFloorSwitchTriggeredAnimationFrames[o->oBehParams2ndByte][o->oFloorSwitchPressAnimationDoubleFrame / 2];
 
     o->collisionData = segmented_to_virtual(floorSwitchTriggeredFrame->collision);
 

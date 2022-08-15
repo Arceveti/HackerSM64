@@ -12,7 +12,9 @@
 /**
  * The relative heights of each cloud part.
  */
-static s8 sCloudPartHeights[] = { 11, 8, 12, 8, 9, 9 };
+static const s8 sCloudPartHeights[] = {
+    11, 8, 12, 8, 9, 9
+};
 
 /**
  * Spawn the visual parts of the cloud, including fwoosh's face.
@@ -32,7 +34,7 @@ static void cloud_act_spawn_parts(void) {
 
     if (o->oBehParams2ndByte == CLOUD_BP_FWOOSH) {
         // Spawn fwoosh's face
-        spawn_object_relative(5, 0, 0, 0, o, MODEL_FWOOSH, bhvCloudPart);
+        spawn_object_relative(CLOUD_BP_FWOOSH_FACE, 0, 0, 0, o, MODEL_FWOOSH, bhvCloudPart);
 
         cur_obj_scale(3.0f);
 
@@ -90,8 +92,8 @@ static void cloud_fwoosh_update(void) {
                 o->oTimer = 0;
             }
 
-            o->oCloudCenterX = o->oHomeX + 100.0f * coss(o->oCloudFwooshMovementRadius);
-            o->oPosZ = o->oHomeZ + 100.0f * sins(o->oCloudFwooshMovementRadius);
+            o->oCloudCenterX = o->oHomeX + (100.0f * coss(o->oCloudFwooshMovementRadius));
+            o->oPosZ         = o->oHomeZ + (100.0f * sins(o->oCloudFwooshMovementRadius));
             o->oCloudCenterY = o->oHomeY;
         }
 
@@ -114,13 +116,12 @@ static void cloud_act_main(void) {
         } else {
             o->oCloudCenterX = o->parentObj->oPosX;
             o->oCloudCenterY = o->parentObj->oPosY;
-            o->oPosZ = o->parentObj->oPosZ;
+            o->oPosZ         = o->parentObj->oPosZ;
 
             o->oMoveAngleYaw = o->parentObj->oFaceAngleYaw;
         }
     } else if (o->oBehParams2ndByte != CLOUD_BP_FWOOSH) {
-        // This code should never run, since a lakitu cloud should always have
-        // a parent
+        // This code should never run, since a lakitu cloud should always have a parent.
         if (o->oDistanceToMario > 1500.0f) {
             o->oAction = CLOUD_ACT_UNLOAD;
         }
@@ -131,7 +132,7 @@ static void cloud_act_main(void) {
     localOffset = 2 * coss(localOffsetPhase) * o->header.gfx.scale[0];
 
     o->oPosX = o->oCloudCenterX + localOffset;
-    o->oPosY = o->oCloudCenterY + localOffset + 12.0f * o->header.gfx.scale[0];
+    o->oPosY = o->oCloudCenterY + localOffset + (12.0f * o->header.gfx.scale[0]);
 }
 
 /**
@@ -175,11 +176,11 @@ void bhv_cloud_part_update(void) {
     if (o->parentObj->oAction == CLOUD_ACT_UNLOAD) {
         obj_mark_for_deletion(o);
     } else {
-        f32 scale = 2.0f / 3.0f * o->parentObj->header.gfx.scale[0];
-        s16 angleFromCenter = o->parentObj->oFaceAngleYaw + 0x10000 / 5 * o->oBehParams2ndByte;
+        f32 scale = (2.0f / 3.0f) * o->parentObj->header.gfx.scale[0];
+        s16 angleFromCenter = o->parentObj->oFaceAngleYaw + ((0x10000 / 5) * o->oBehParams2ndByte);
 
         // Takes 32 frames to cycle
-        s16 localOffsetPhase = 0x800 * gGlobalTimer + 0x4000 * o->oBehParams2ndByte;
+        s16 localOffsetPhase = (0x800 * gGlobalTimer) + (0x4000 * o->oBehParams2ndByte);
         f32 localOffset;
 
         f32 cloudRadius;
@@ -187,21 +188,18 @@ void bhv_cloud_part_update(void) {
         cur_obj_scale(scale);
 
         // Cap fwoosh's face size
-        if (o->oBehParams2ndByte == 5 && scale > 2.0f) {
+        if (o->oBehParams2ndByte == CLOUD_BP_FWOOSH_FACE && scale > 2.0f) {
             scale = o->header.gfx.scale[1] = 2.0f;
         }
 
         // Move back and forth along (1, 1, 1)
-        localOffset = 2 * coss(localOffsetPhase) * scale;
+        localOffset = (2 * coss(localOffsetPhase) * scale);
 
-        cloudRadius = 25.0f * scale;
+        cloudRadius = (25.0f * scale);
 
-        o->oPosX = o->parentObj->oCloudCenterX + cloudRadius * sins(angleFromCenter) + localOffset;
-
-        o->oPosY =
-            o->parentObj->oCloudCenterY + localOffset + scale * sCloudPartHeights[o->oBehParams2ndByte];
-
-        o->oPosZ = o->parentObj->oPosZ + cloudRadius * coss(angleFromCenter) + localOffset;
+        o->oPosX = o->parentObj->oCloudCenterX + (cloudRadius * sins(angleFromCenter)) + localOffset;
+        o->oPosY = o->parentObj->oCloudCenterY + localOffset + (scale * sCloudPartHeights[o->oBehParams2ndByte]);
+        o->oPosZ = o->parentObj->oPosZ         + (cloudRadius * coss(angleFromCenter)) + localOffset;
 
         o->oFaceAngleYaw = o->parentObj->oFaceAngleYaw;
     }

@@ -30,13 +30,13 @@ void haunted_chair_act_0(void) {
 
                 if (dAngleToPiano & 0x4000) {
                     o->oHauntedChairFallFromPianoAngle = &o->oFaceAngleRoll;
-                    o->oHauntedChairFallTargetAngle    = (dAngleToPiano > 0x0) ? 0x4000 : -0x4000;
+                    o->oHauntedChairFallTargetAngle = (dAngleToPiano > 0x0) ? 0x4000 : -0x4000;
                 } else {
                     o->oHauntedChairFallFromPianoAngle = &o->oFaceAnglePitch;
-                    o->oHauntedChairFallTargetAngle    = (dAngleToPiano < 0x0) ? 0x4000 : -0x4000;
+                    o->oHauntedChairFallTargetAngle = (dAngleToPiano < 0x0) ? 0x4000 : -0x4000;
                 }
 
-                o->oHauntedChairPitchVel = (o->oHauntedChairFallTargetAngle < 0) ? -1500.0f : 1500.0f;
+                o->oHauntedChairPitchVel = (o->oHauntedChairFallTargetAngle < 0x0) ? -1500.0f : 1500.0f;
             }
         } else {
             oscillate_toward(o->oHauntedChairFallFromPianoAngle, &o->oHauntedChairPitchVel, o->oHauntedChairFallTargetAngle,

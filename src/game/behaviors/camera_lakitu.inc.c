@@ -46,11 +46,9 @@ static void camera_lakitu_intro_act_spawn_cloud(void) {
     if (set_mario_npc_dialog(MARIO_DIALOG_LOOK_UP) == MARIO_DIALOG_STATUS_SPEAK) {
         o->oAction = CAMERA_LAKITU_INTRO_ACT_SHOW_DIALOG;
 
-        o->oPosX = 1800.0f;
-        o->oPosY = 2400.0f;
-        o->oPosZ = -2400.0f;
+        vec3f_set(&o->oPosVec, 1800.0f, 2400.0f, -2400.0f);
 
-        o->oMoveAnglePitch = 0x4000;
+        o->oMoveAnglePitch = DEGREES(90);
         o->oCameraLakituSpeed = 60.0f;
         o->oCameraLakituCircleRadius = 1000.0f;
 
@@ -90,7 +88,7 @@ static void camera_lakitu_intro_act_show_dialog(void) {
                 s16 turnAmount = 0x4000
                                  - atan2s(o->oCameraLakituCircleRadius,
                                           o->oDistanceToMario - o->oCameraLakituCircleRadius);
-                if ((s16)(o->oMoveAngleYaw - o->oAngleToMario) < 0) {
+                if ((s16)(o->oMoveAngleYaw - o->oAngleToMario) < 0x0) {
                     turnAmount = -turnAmount;
                 }
 
@@ -151,7 +149,7 @@ void bhv_camera_lakitu_update(void) {
                     break;
             }
         } else {
-            f32 mirroredX = CASTLE_MIRROR_X - gLakituState.curPos[0];
+            f32 mirroredX = (CASTLE_MIRROR_X - gLakituState.curPos[0]);
 
             if (gLakituState.curPos[0] < 1700.0f || mirroredX < 0.0f) {
                 cur_obj_hide();
@@ -166,7 +164,7 @@ void bhv_camera_lakitu_update(void) {
                 o->oFaceAnglePitch = atan2s(cur_obj_lateral_dist_to_home(),
                                             o->oPosY - gLakituState.curFocus[1]);
 
-                o->oPosX = CASTLE_MIRROR_X + mirroredX;
+                o->oPosX = (CASTLE_MIRROR_X + mirroredX);
             }
         }
     }

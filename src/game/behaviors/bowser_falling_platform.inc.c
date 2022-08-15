@@ -7,7 +7,7 @@ struct BowserFallingPlatformData {
     s16 angle;
 };
 
-struct BowserFallingPlatformData sBowserFallingPlatform[] = {
+static const struct BowserFallingPlatformData sBowserFallingPlatform[] = {
     { NULL,                                 0,     0,      0 },
     { bowser_3_seg7_collision_07004B94,  -800, -1000, -20992 },
     { bowser_3_seg7_collision_07004C18, -1158,   390, -18432 },
@@ -32,19 +32,18 @@ void falling_bowser_plat_act_start(void) {
 void falling_bowser_plat_act_check(void) {
     struct Object *bowser = o->oBitsPlatformBowser;
 
-    if (bowser->platform == o) {
-        if (bowser->oAction == BOWSER_ACT_BIG_JUMP
-            && bowser->oBowserStatus & BOWSER_STATUS_BIG_JUMP) {
-            o->oAction = BOWSER_BITS_PLAT_ACT_FALL;
-        }
+    if (bowser->platform == o
+     && bowser->oAction == BOWSER_ACT_BIG_JUMP
+     && (bowser->oBowserStatus & BOWSER_STATUS_BIG_JUMP)) {
+        o->oAction = BOWSER_BITS_PLAT_ACT_FALL;
     }
 
     if (bowser->oHealth == 1
         && (bowser->oAction == BOWSER_ACT_DANCE || bowser->oHeldState != HELD_FREE)) {
-        o->oSubAction = 1;
+        o->oSubAction = BOWSER_BITS_PLAT_SUB_ACT_CHECK_DEBUG_FALL;
     }
 
-    if (o->oSubAction == 0) {
+    if (o->oSubAction == BOWSER_BITS_PLAT_SUB_ACT_CHECK_RESET_TIMER) {
         o->oBitsPlatformTimer = 0;
     } else {
         if ((gDebugInfo[DEBUG_PAGE_EFFECTINFO][6] + 20)
@@ -68,10 +67,10 @@ void falling_bowser_plat_act_fall(void) {
         o->oGravity = -4.0f;
     }
 
-    if (!(o->oTimer & 1) && o->oTimer < 14) {
+    if (!(o->oTimer & (2 - 1)) && o->oTimer < 14) {
         s16 angle = sBowserFallingPlatform[o->oBehParams2ndByte].angle
                     + (gDebugInfo[DEBUG_PAGE_EFFECTINFO][1] << 8);
-        f32 val = -(o->oTimer / 2) * 290 + 1740;
+        f32 val = (-(o->oTimer / 2) * 290) + 1740;
         Vec3f pos;
         vec3f_copy(pos, &o->oPosVec);
         o->oPosX = sBowserFallingPlatform[o->oBehParams2ndByte].posX + (sins(angle + 0x14B0) * val);

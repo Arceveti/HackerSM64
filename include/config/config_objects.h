@@ -40,8 +40,8 @@
 /**
  * The radius of coin ring formations.
  */
-#define COIN_FORMATION_HORIZONTAL_RING_RADIUS 300.0f
-#define COIN_FORMATION_VERTICAL_RING_RADIUS 200.0f
+#define COIN_FORMATION_RING_RADIUS_HORIZONTAL 300.0f
+#define COIN_FORMATION_RING_RADIUS_VERTICAL   200.0f
 
 
 /*************************

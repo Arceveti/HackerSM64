@@ -31,6 +31,7 @@ static s32 arrow_lift_move_away(void) {
     }
 
     obj_move_xyz_using_fvel_and_yaw(o);
+
     return doneMoving;
 }
 
@@ -63,10 +64,8 @@ void bhv_arrow_lift_loop(void) {
     switch (o->oAction) {
         case ARROW_LIFT_ACT_IDLE:
             // Wait 61 frames before moving.
-            if (o->oTimer > 60) {
-                if (gMarioObject->platform == o) {
-                    o->oAction = ARROW_LIFT_ACT_MOVING_AWAY;
-                }
+            if ((o->oTimer > 60) && (gMarioObject->platform == o)) {
+                o->oAction = ARROW_LIFT_ACT_MOVING_AWAY;
             }
 
             break;
@@ -80,10 +79,8 @@ void bhv_arrow_lift_loop(void) {
 
         case ARROW_LIFT_ACT_MOVING_BACK:
             // Wait 61 frames before moving (after stopping after moving forwards).
-            if (o->oTimer > 60) {
-                if (arrow_lift_move_back()) {
-                    o->oAction = ARROW_LIFT_ACT_IDLE;
-                }
+            if ((o->oTimer > 60) && arrow_lift_move_back()) {
+                o->oAction = ARROW_LIFT_ACT_IDLE;
             }
 
             break;
