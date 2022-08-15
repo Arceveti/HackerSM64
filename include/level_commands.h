@@ -456,7 +456,7 @@ enum GoddardScene {
 #define GET_OR_SET(op, var) \
     CMD_BBBB(LEVEL_CMD_GET_OR_SET_VAR, 0x04, op, var)
 
-// Presets
+// Preset macros
 
 #define LOAD_LEVEL_DATA(level) \
     LOAD_YAY0(/*seg*/ SEGMENT_LEVEL_DATA, /*romStart*/ _##level##_segment_7SegmentRomStart, /*romEnd*/ _##level##_segment_7SegmentRomEnd)
