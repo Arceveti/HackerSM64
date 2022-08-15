@@ -185,26 +185,26 @@ void set_play_mode(s16 playMode) {
     sCurrPlayMode = playMode;
 }
 
-void warp_special(s32 arg) {
+void warp_special(s32 specialWarpDest) {
     sCurrPlayMode = PLAY_MODE_CHANGE_LEVEL;
-    sSpecialWarpDest = arg;
+    sSpecialWarpDest = specialWarpDest;
 }
 
-void fade_into_special_warp(u32 arg, u32 color) {
+void fade_into_special_warp(u32 warpArg, u32 color) {
     if (color != 0) {
         color = 0xFF;
     }
 
     fadeout_music(190);
-    play_transition(WARP_TRANSITION_FADE_INTO_COLOR, 0x10, color, color, color);
+    play_transition(WARP_TRANSITION_FADE_INTO_COLOR, 16, color, color, color);
     level_set_transition(30, NULL);
 
-    warp_special(arg);
+    warp_special(warpArg);
 }
 
-void load_level_init_text(u32 arg) {
+void load_level_init_text(u32 areaDialogIdx) {
     s32 gotAchievement;
-    u32 dialogID = gCurrentArea->dialog[arg];
+    u32 dialogID = gCurrentArea->dialog[areaDialogIdx];
 
     switch (dialogID) {
         case DIALOG_129:
