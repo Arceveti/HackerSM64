@@ -57,8 +57,8 @@ u32 gTotalStaticSurfaceData;
 static struct SurfaceNode *alloc_surface_node(u32 dynamic) {
     struct SurfaceNode **poolEnd = (struct SurfaceNode **)(dynamic ? &gDynamicSurfacePoolEnd : &gCurrStaticSurfacePoolEnd);
 
-    struct SurfaceNode *node = *poolEnd;
-    (*poolEnd)++;
+    struct SurfaceNode *node = (*poolEnd)++;
+
     gSurfaceNodesAllocated++;
 
     node->next = NULL;
@@ -73,12 +73,12 @@ static struct SurfaceNode *alloc_surface_node(u32 dynamic) {
 static struct Surface *alloc_surface(u32 dynamic) {
     struct Surface **poolEnd = (struct Surface **)(dynamic ? &gDynamicSurfacePoolEnd : &gCurrStaticSurfacePoolEnd);
 
-    struct Surface *surface = *poolEnd;
-    (*poolEnd)++;
+    struct Surface *surface = (*poolEnd)++;
+
     gSurfacesAllocated++;
 
     surface->type = SURFACE_DEFAULT;
-    surface->force = 0;
+    surface->force = 0x0;
     surface->flags = SURFACE_FLAGS_NONE;
     surface->room = 0;
     surface->object = NULL;
@@ -683,7 +683,9 @@ void load_object_collision_model(void) {
 
 #ifdef LOAD_OBJECT_COLLISION_NEAR_CAMERA
     f32 camDist = vec3_mag(obj->header.gfx.cameraToObject);
-    marioDist = MIN(marioDist, camDist);
+    if (marioDist > camDist && camDist > 0.0f) {
+        marioDist = camDist;
+    }
 #endif
 
 #ifdef AUTO_COLLISION_DISTANCE
@@ -741,7 +743,7 @@ void load_object_static_model(void) {
     u32 surfacePoolData;
 
     // Initialise a new surface pool for this block of surface data
-    gCurrStaticSurfacePool = main_pool_alloc(main_pool_available() - 0x10, MEMORY_POOL_LEFT);
+    gCurrStaticSurfacePool = main_pool_alloc((main_pool_available() - 0x10), MEMORY_POOL_LEFT);
     gCurrStaticSurfacePoolEnd = gCurrStaticSurfacePool;
     gSurfaceNodesAllocated = gNumStaticSurfaceNodes;
     gSurfacesAllocated = gNumStaticSurfaces;
