@@ -566,6 +566,8 @@ s32 act_debug_free_move(struct MarioState *m) {
         speed *= m->intendedMag * 2.0f;
         pos[0] += speed * sins(m->intendedYaw);
         pos[2] += speed * coss(m->intendedYaw);
+        m->faceAngle[1] = m->intendedYaw;
+        vec3s_set(m->marioObj->header.gfx.angle, 0x0, m->faceAngle[1], 0x0);
     }
 
     // TODO: Add ability to ignore collision
@@ -605,9 +607,7 @@ s32 act_debug_free_move(struct MarioState *m) {
         vec3f_copy(m->pos, pos);
     }
 
-    m->faceAngle[1] = m->intendedYaw;
     vec3f_copy(m->marioObj->header.gfx.pos, m->pos);
-    vec3s_set(m->marioObj->header.gfx.angle, 0, m->faceAngle[1], 0);
 
     return FALSE;
 }
