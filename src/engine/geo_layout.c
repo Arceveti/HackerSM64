@@ -73,7 +73,7 @@ void geo_layout_cmd_branch_and_link(void) {
 // GEO_CMD_END: Terminate geo layout
 void geo_layout_cmd_end(void) {
     gGeoLayoutStackIndex = gGeoLayoutReturnIndex - 1;
-    gGeoLayoutReturnIndex = (gGeoLayoutStack[gGeoLayoutStackIndex] & 0xFFFF);
+    gGeoLayoutReturnIndex = (gGeoLayoutStack[gGeoLayoutStackIndex] & BITMASK(16));
     gCurGraphNodeIndex = (gGeoLayoutStack[gGeoLayoutStackIndex] >> 16);
     gGeoLayoutCommand = (u8 *) gGeoLayoutStack[--gGeoLayoutStackIndex];
 }

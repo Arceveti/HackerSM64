@@ -525,11 +525,10 @@ void imout(void) {
 f32 gd_rand_float(void) {
     u32 temp;
     u32 i;
-    f32 val;
 
     for (i = 0; i < 4; i++) {
         if (sPrimarySeed & 0x80000000) {
-            sPrimarySeed = (sPrimarySeed << 1 | 1);
+            sPrimarySeed = ((sPrimarySeed << 1) | 0x1);
         } else {
             sPrimarySeed <<= 1;
         }
@@ -537,15 +536,13 @@ f32 gd_rand_float(void) {
     sPrimarySeed += 4;
 
     /* Seed Switch */
-    if ((sPrimarySeed ^= gd_get_ostime()) & 1) {
+    if ((sPrimarySeed ^= gd_get_ostime()) & 0x1) {
         temp = sPrimarySeed;
         sPrimarySeed = sSecondarySeed;
         sSecondarySeed = temp;
     }
 
-    val = (sPrimarySeed & 0xFFFF) / 65535.0f;
-
-    return val;
+    return (sPrimarySeed & 0xFFFF) / 65535.0f;
 }
 
 /**
@@ -572,7 +569,10 @@ s32 gd_atoi(const char *str) {
             curval = cur - '0';
             out += (curval & 0xFF);
 
-            if (*str == '\0' || *str == '.' || *str < '0' || *str > '9') {
+            if (*str == '\0'
+             || *str == '.'
+             || *str < '0'
+             || *str > '9') {
                 break;
             }
 

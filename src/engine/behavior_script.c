@@ -17,23 +17,23 @@
 #include "game/puppylights.h"
 
 // Macros for retrieving arguments from behavior scripts.
-#define BHV_CMD_GET_1ST_S8(index)  (s8)((gCurBhvCommand[index] >> 24) & 0xFF) // unused
-#define BHV_CMD_GET_1ST_U8(index)  (u8)((gCurBhvCommand[index] >> 24) & 0xFF) // unused
+#define BHV_CMD_GET_1ST_S8(index)  (s8)((gCurBhvCommand[index] >> 24) & BITMASK(8)) // unused
+#define BHV_CMD_GET_1ST_U8(index)  (u8)((gCurBhvCommand[index] >> 24) & BITMASK(8)) // unused
 
-#define BHV_CMD_GET_2ND_S8(index)  (s8)((gCurBhvCommand[index] >> 16) & 0xFF) // unused
-#define BHV_CMD_GET_2ND_U8(index)  (u8)((gCurBhvCommand[index] >> 16) & 0xFF)
+#define BHV_CMD_GET_2ND_S8(index)  (s8)((gCurBhvCommand[index] >> 16) & BITMASK(8)) // unused
+#define BHV_CMD_GET_2ND_U8(index)  (u8)((gCurBhvCommand[index] >> 16) & BITMASK(8))
 
-#define BHV_CMD_GET_3RD_S8(index)  (s8)((gCurBhvCommand[index] >>  8) & 0xFF) // unused
-#define BHV_CMD_GET_3RD_U8(index)  (u8)((gCurBhvCommand[index] >>  8) & 0xFF)
+#define BHV_CMD_GET_3RD_S8(index)  (s8)((gCurBhvCommand[index] >>  8) & BITMASK(8)) // unused
+#define BHV_CMD_GET_3RD_U8(index)  (u8)((gCurBhvCommand[index] >>  8) & BITMASK(8))
 
-#define BHV_CMD_GET_4TH_S8(index)  (s8)((gCurBhvCommand[index] >>  0) & 0xFF) // unused
-#define BHV_CMD_GET_4TH_U8(index)  (u8)((gCurBhvCommand[index] >>  0) & 0xFF)
+#define BHV_CMD_GET_4TH_S8(index)  (s8)((gCurBhvCommand[index] >>  0) & BITMASK(8)) // unused
+#define BHV_CMD_GET_4TH_U8(index)  (u8)((gCurBhvCommand[index] >>  0) & BITMASK(8))
 
 #define BHV_CMD_GET_1ST_S16(index) (s16)(gCurBhvCommand[index] >> 16)
 #define BHV_CMD_GET_1ST_U16(index) (u16)(gCurBhvCommand[index] >> 16)         // unused
 
-#define BHV_CMD_GET_2ND_S16(index) (s16)(gCurBhvCommand[index] & 0xFFFF)
-#define BHV_CMD_GET_2ND_U16(index) (u16)(gCurBhvCommand[index] & 0xFFFF)      // unused
+#define BHV_CMD_GET_2ND_S16(index) (s16)(gCurBhvCommand[index] & BITMASK(16))
+#define BHV_CMD_GET_2ND_U16(index) (u16)(gCurBhvCommand[index] & BITMASK(16))      // unused
 
 #define BHV_CMD_GET_S32(index)     (s32)(gCurBhvCommand[index])
 #define BHV_CMD_GET_U32(index)     (u32)(gCurBhvCommand[index])
@@ -51,9 +51,9 @@ UNUSED static void goto_behavior_unused(const BehaviorScript *bhvAddr) {
 // Update an object's graphical position and rotation to match its real position and rotation.
 void obj_update_gfx_pos_and_angle(struct Object *obj) {
     vec3_copy_y_off(obj->header.gfx.pos, &obj->oPosVec, obj->oGraphYOffset);
-    obj->header.gfx.angle[0] = (obj->oFaceAnglePitch & 0xFFFF);
-    obj->header.gfx.angle[1] = (obj->oFaceAngleYaw   & 0xFFFF);
-    obj->header.gfx.angle[2] = (obj->oFaceAngleRoll  & 0xFFFF);
+    obj->header.gfx.angle[0] = (obj->oFaceAnglePitch & BITMASK(16));
+    obj->header.gfx.angle[1] = (obj->oFaceAngleYaw   & BITMASK(16));
+    obj->header.gfx.angle[2] = (obj->oFaceAngleRoll  & BITMASK(16));
 }
 
 #ifdef OBJ_OPACITY_BY_CAM_DIST
@@ -468,7 +468,7 @@ static s32 bhv_cmd_or_short(void) {
     u8 field = BHV_CMD_GET_2ND_U8(0);
     s32 value = BHV_CMD_GET_2ND_S16(0);
 
-    value &= 0xFFFF;
+    value &= BITMASK(16);
     cur_obj_or_int(field, value);
 
     gCurBhvCommand++;
@@ -481,7 +481,7 @@ static s32 bhv_cmd_bit_clear(void) {
     u8 field = BHV_CMD_GET_2ND_U8(0);
     s32 value = BHV_CMD_GET_2ND_S16(0);
 
-    value = (value & 0xFFFF) ^ 0xFFFF;
+    value = ((value & BITMASK(16)) ^ BITMASK(16));
     cur_obj_and_int(field, value);
 
     gCurBhvCommand++;
@@ -872,7 +872,7 @@ void cur_obj_update(void) {
     obj->curBhvCommand = gCurBhvCommand;
 
     // Increment the object's timer.
-    if (obj->oTimer < 0x3FFFFFFF) {
+    if (obj->oTimer <= S32_MAX) {
         obj->oTimer++;
     }
 

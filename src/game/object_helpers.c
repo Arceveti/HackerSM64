@@ -593,7 +593,7 @@ u32 get_object_list_from_behavior(const BehaviorScript *behavior) {
     // If the first behavior script command is "begin <object list>", then
     // extract the object list from it
     if ((behavior[0] >> 24) == BHV_CMD_BEGIN) {
-        objectList = ((behavior[0] >> 16) & 0xFFFF);
+        objectList = ((behavior[0] >> 16) & BITMASK(16));
     } else {
         objectList = OBJ_LIST_DEFAULT;
     }
@@ -1561,9 +1561,9 @@ s32 cur_obj_angle_to_home(void) {
 void obj_set_gfx_pos_at_obj_pos(struct Object *obj1, struct Object *obj2) {
     vec3f_copy_y_off(obj1->header.gfx.pos, &obj2->oPosVec, obj2->oGraphYOffset);
 
-    obj1->header.gfx.angle[0] = (obj2->oMoveAnglePitch & 0xFFFF);
-    obj1->header.gfx.angle[1] = (obj2->oMoveAngleYaw   & 0xFFFF);
-    obj1->header.gfx.angle[2] = (obj2->oMoveAngleRoll  & 0xFFFF);
+    obj1->header.gfx.angle[0] = (obj2->oMoveAnglePitch & BITMASK(16));
+    obj1->header.gfx.angle[1] = (obj2->oMoveAngleYaw   & BITMASK(16));
+    obj1->header.gfx.angle[2] = (obj2->oMoveAngleRoll  & BITMASK(16));
 }
 
 /**

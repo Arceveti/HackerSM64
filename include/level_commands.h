@@ -75,13 +75,23 @@ enum LevelCommands {
     /*0x40*/ LEVEL_CMD_PUPPYLIGHT_NODE,
 };
 
+enum ActIndex {
+    ACT_INDEX_1,
+    ACT_INDEX_2,
+    ACT_INDEX_3,
+    ACT_INDEX_4,
+    ACT_INDEX_5,
+    ACT_INDEX_6,
+    NUM_ACTS,
+};
+
 enum LevelActs {
-    ACT_1 = (1 << 0),
-    ACT_2 = (1 << 1),
-    ACT_3 = (1 << 2),
-    ACT_4 = (1 << 3),
-    ACT_5 = (1 << 4),
-    ACT_6 = (1 << 5),
+    ACT_1 = BIT(ACT_INDEX_1),
+    ACT_2 = BIT(ACT_INDEX_2),
+    ACT_3 = BIT(ACT_INDEX_3),
+    ACT_4 = BIT(ACT_INDEX_4),
+    ACT_5 = BIT(ACT_INDEX_5),
+    ACT_6 = BIT(ACT_INDEX_6),
     ALL_ACTS = (ACT_1 | ACT_2 | ACT_3 | ACT_4 | ACT_5 | ACT_6)
 };
 
@@ -115,7 +125,7 @@ enum WarpCheckpointFlags {
     WARP_CHECKPOINT    = (1 << 7), // 0x80
 };
 
-#define WARP_DEST_LEVEL_NUM_MASK 0x7F
+#define WARP_DEST_LEVEL_NUM_MASK BITMASK(7)
 
 enum LevelCommandCreateWhirlpoolCondition {
     WHIRLPOOL_COND_ALWAYS,
@@ -363,7 +373,7 @@ enum GoddardScene {
     CMD_W(model)
 
 #define OBJECT(model, posX, posY, posZ, angleX, angleY, angleZ, behParam, beh) \
-    OBJECT_WITH_ACTS(model, posX, posY, posZ, angleX, angleY, angleZ, behParam, beh, 0x1F)
+    OBJECT_WITH_ACTS(model, posX, posY, posZ, angleX, angleY, angleZ, behParam, beh, ALL_ACTS)
 
 #define MARIO(model, behArg, beh) \
     CMD_BBH(LEVEL_CMD_INIT_MARIO, 0x0C, model), \
@@ -493,10 +503,10 @@ enum GoddardScene {
 
 // behParams
 
-#define BP1(p) (((p) & 0xFF) << 24)
-#define BP2(p) (((p) & 0xFF) << 16)
-#define BP3(p) (((p) & 0xFF) <<  8)
-#define BP4(p) (((p) & 0xFF) <<  0)
+#define BP1(p) (((p) & BITMASK(8)) << 24)
+#define BP2(p) (((p) & BITMASK(8)) << 16)
+#define BP3(p) (((p) & BITMASK(8)) <<  8)
+#define BP4(p) (((p) & BITMASK(8)) <<  0)
 
 #define BP(a, b, c, d) (BP1(a) | BP2(b) | BP3(c) | BP4(d))
 

@@ -8,8 +8,7 @@
 #endif
 
 #if !defined(__sgi) && (!defined(NON_MATCHING) || !defined(AVOID_UB))
-// asm-process isn't supported outside of IDO, and undefined behavior causes
-// crashes.
+// asm-process isn't supported outside of IDO, and undefined behavior causes crashes.
 #error Matching build is only possible on IDO; please build with NON_MATCHING=1.
 #endif
 
@@ -18,97 +17,104 @@
 #define GLUE(a, b) a ## b
 #define GLUE2(a, b) GLUE(a, b)
 
-// Avoid compiler warnings for unused variables
+// Avoid compiler warnings for unused variables.
 #ifdef __GNUC__
 #define UNUSED __attribute__((unused))
 #else
 #define UNUSED
 #endif
 
-// Avoid undefined behaviour for non-returning functions
+// Avoid undefined behaviour for non-returning functions.
 #ifdef __GNUC__
 #define NORETURN __attribute__((noreturn))
 #else
 #define NORETURN
 #endif
 
-// Always inline a function
+// Always inline a function.
 #ifdef __GNUC__
 #define ALWAYS_INLINE inline __attribute__((always_inline))
 #else
 #define ALWAYS_INLINE inline
 #endif
 
-// Fall through a switch case
+// Fall through a switch case.
 #ifdef __GNUC__
 #define FALL_THROUGH __attribute__((fallthrough))
 #else
 #define FALL_THROUGH
 #endif
 
-// Use Os when compiling the function
+// Use Og when compiling the function.
+#ifdef __GNUC__
+#define OPTIMIZE_OG inline __attribute__((optimize("Og")))
+#else
+#define OPTIMIZE_OG inline
+#endif
+
+// Use Os when compiling the function.
 #ifdef __GNUC__
 #define OPTIMIZE_OS inline __attribute__((optimize("Os")))
 #else
 #define OPTIMIZE_OS inline
 #endif
 
-// Use Ofast when compiling the function
+// Use Ofast when compiling the function.
 #ifdef __GNUC__
 #define OPTIMIZE_OFAST inline __attribute__((optimize("Ofast")))
 #else
 #define OPTIMIZE_OFAST inline
 #endif
 
-// Align to 8-byte boundary (for DMA requirements)
+// Align to 4-byte boundary.
+#ifdef __GNUC__
+#define ALIGNED4 __attribute__((aligned(4)))
+#else
+#define ALIGNED4
+#endif
+
+// Align to 8-byte boundary (for DMA requirements).
 #ifdef __GNUC__
 #define ALIGNED8 __attribute__((aligned(8)))
 #else
 #define ALIGNED8
 #endif
 
-// Align to 16-byte boundary (for audio lib requirements)
+// Align to 16-byte boundary (for audio lib requirements).
 #ifdef __GNUC__
 #define ALIGNED16 __attribute__((aligned(16)))
 #else
 #define ALIGNED16
 #endif
 
-// Align to 32-byte boundary
+// Align to 32-byte boundary.
 #ifdef __GNUC__
 #define ALIGNED32 __attribute__((aligned(32)))
 #else
 #define ALIGNED32
 #endif
 
-// Align to 64-byte boundary
+// Align to 64-byte boundary.
 #ifdef __GNUC__
 #define ALIGNED64 __attribute__((aligned(64)))
 #else
 #define ALIGNED64
 #endif
 
-// Static assertions
-#ifdef __GNUC__
-#define STATIC_ASSERT(cond, msg) _Static_assert(cond, msg)
-#else
-#define STATIC_ASSERT(cond, msg) typedef char GLUE2(static_assertion_failed, __LINE__)[(cond) ? 1 : -1]
-#endif
-
-// round up to the next multiple.
-#define ALIGN4(val)  (((val) + 0x3) & ~0x3)
-#define ALIGN8(val)  (((val) + 0x7) & ~0x7)
-#define ALIGN16(val) (((val) + 0xF) & ~0xF)
-#define ALIGN32(val) (((val) + 0x1F) & ~0x1F)
-#define ALIGN64(val) (((val) + 0x3F) & ~0x3F)
-
 #ifndef ALIGN
 #define ALIGN(VAL_, ALIGNMENT_) (((VAL_) + ((ALIGNMENT_) - 1)) & ~((ALIGNMENT_) - 1))
 #endif
 
+// round up to the next multiple.
+#define ALIGN4(val)  ALIGN((val),  4)
+#define ALIGN8(val)  ALIGN((val),  8)
+#define ALIGN16(val) ALIGN((val), 16)
+#define ALIGN32(val) ALIGN((val), 32)
+#define ALIGN64(val) ALIGN((val), 64)
+
 #ifndef NO_SEGMENTED_MEMORY
 // convert a virtual address to physical.
-#define VIRTUAL_TO_PHYSICAL(addr)   ((uintptr_t)(addr) & 0x1FFFFFFF)
+#define VIRTUAL_TO_PHYSICAL(addr)   ((uintptr_t)(addr) & BITMASK(29))
 
 // convert a physical address to virtual.
 #define PHYSICAL_TO_VIRTUAL(addr)   ((uintptr_t)(addr) | 0x80000000)
@@ -116,17 +122,18 @@
 // another way of converting virtual to physical
 #define VIRTUAL_TO_PHYSICAL2(addr)  ((u8 *)(addr) - 0x80000000U)
 #else
-// no conversion needed other than cast
+// no conversion needed other than cast.
 #define VIRTUAL_TO_PHYSICAL(addr)   ((uintptr_t)(addr))
 #define PHYSICAL_TO_VIRTUAL(addr)   ((uintptr_t)(addr))
 #define VIRTUAL_TO_PHYSICAL2(addr)  ((void *)(addr))
 #endif
 
-enum VIModes {
-    MODE_NTSC,
-    MODE_MPAL,
-    MODE_PAL,
-};
+// Static (compile-time) assertions.
+#ifdef __GNUC__
+#define STATIC_ASSERT(cond, msg) _Static_assert(cond, msg)
+#else
+#define STATIC_ASSERT(cond, msg) typedef char GLUE2(static_assertion_failed, __LINE__)[(cond) ? 1 : -1]
+#endif
 
 #define FORCE_CRASH { *(vs8*)0 = 0; }
 

@@ -1235,32 +1235,32 @@ void func_sh_802f4e50(struct PendingDmaAudioBank *audioBank, s32 audioResetStatu
     if (audioBank->remaining == 0) {
         mesg = (OSMesg) audioBank->encodedInfo;
         temp = *encodedInfo;
-        bankId = ((temp >> 8) & 0xFF);
+        bankId = ((temp >> 8) & BITMASK(8));
         switch ((u8) (temp >> 0x10)) {
             case 0:
                 if (gSeqLoadStatus[bankId] != SOUND_LOAD_STATUS_5) {
-                    gSeqLoadStatus[bankId] = (u8) (temp & 0xFF);
+                    gSeqLoadStatus[bankId] = (u8) (temp & BITMASK(8));
                 }
                 break;
             case 2:
                 if (gUnkLoadStatus[bankId] != SOUND_LOAD_STATUS_5) {
-                    gUnkLoadStatus[bankId] = (u8) (temp & 0xFF);
+                    gUnkLoadStatus[bankId] = (u8) (temp & BITMASK(8));
                 }
                 break;
             case 1:
                 if (gBankLoadStatus[bankId] != SOUND_LOAD_STATUS_5) {
-                    gBankLoadStatus[bankId] = (u8) (temp & 0xFF);
+                    gBankLoadStatus[bankId] = (u8) (temp & BITMASK(8));
                 }
                 bankId1 = gCtlEntries[bankId].bankId1;
                 bankId2 = gCtlEntries[bankId].bankId2;
                 patchStruct.bankId1 = bankId1;
                 patchStruct.bankId2 = bankId2;
-                if (bankId1 != 0xFF) {
+                if (bankId1 != BITMASK(8)) {
                     patchStruct.baseAddr1 = func_sh_802f3598(bankId1, &patchStruct.medium1);
                 } else {
                     patchStruct.baseAddr1 = NULL;
                 }
-                if (bankId2 != 0xFF) {
+                if (bankId2 != BITMASK(8)) {
                     patchStruct.baseAddr2 = func_sh_802f3598(bankId2, &patchStruct.medium2);
                 } else {
                     patchStruct.baseAddr2 = NULL;

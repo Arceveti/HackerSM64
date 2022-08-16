@@ -27,10 +27,10 @@ enum ActionStatesWaterPlunge { // act_water_plunge
 };
 
 enum WaterPlungeFlags { // act_water_plunge
-    PLUNGE_FLAGS_NONE       = (0 << 0), // 0x0
-    PLUNGE_FLAG_HOLDING_OBJ = (1 << 0), // 0x1
-    PLUNGE_FLAG_DIVING      = (1 << 1), // 0x2
-    PLUNGE_FLAG_METAL_CAP   = (1 << 2), // 0x4
+    PLUNGE_FLAGS_NONE       = 0x0,
+    PLUNGE_FLAG_HOLDING_OBJ = BIT(0), // 0x1
+    PLUNGE_FLAG_DIVING      = BIT(1), // 0x2
+    PLUNGE_FLAG_METAL_CAP   = BIT(2), // 0x4
 };
 
 s32 mario_execute_submerged_action(struct MarioState *m);

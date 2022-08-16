@@ -12,10 +12,10 @@
 // If none of the CHANNEL/SEQ/GLOBAL_FREELIST bits are set, all three locations
 // are tried.
 enum NoteAlloc {
-    NOTE_ALLOC_LAYER           = (1 << 0), // 0x1
-    NOTE_ALLOC_CHANNEL         = (1 << 1), // 0x2
-    NOTE_ALLOC_SEQ             = (1 << 2), // 0x4
-    NOTE_ALLOC_GLOBAL_FREELIST = (1 << 3), // 0x8
+    NOTE_ALLOC_LAYER           = BIT(0), // 0x1
+    NOTE_ALLOC_CHANNEL         = BIT(1), // 0x2
+    NOTE_ALLOC_SEQ             = BIT(2), // 0x4
+    NOTE_ALLOC_GLOBAL_FREELIST = BIT(3), // 0x8
 };
 
 void process_notes(void);

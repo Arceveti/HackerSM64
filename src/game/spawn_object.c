@@ -193,7 +193,7 @@ struct Object *allocate_object(struct ObjectNode *objList) {
     vec3_zero(obj->header.gfx.pos);
     obj->header.gfx.throwMatrix = NULL;
 #ifdef PUPPYLIGHTS
-    obj->oLightID = 0xFFFF;
+    obj->oLightID = PUPPYLIGHTS_ID_NULL;
 #endif
 
     return obj;

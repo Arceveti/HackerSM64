@@ -889,18 +889,18 @@ u64 *synthesis_process_notes(s16 *aiBuf, s32 bufLen, u64 *cmd)
         if (noteSubEu->needsInit) {
             flags = A_INIT;
             synthesisState->restart = FALSE;
-            synthesisState->samplePosInt = 0;
+            synthesisState->samplePosInt  = 0;
             synthesisState->samplePosFrac = 0;
-            synthesisState->curVolLeft = 1;
+            synthesisState->curVolLeft  = 1;
             synthesisState->curVolRight = 1;
             synthesisState->prevHeadsetPanRight = 0;
-            synthesisState->prevHeadsetPanLeft = 0;
+            synthesisState->prevHeadsetPanLeft  = 0;
         }
 
         resamplingRateFixedPoint = noteSubEu->resamplingRateFixedPoint;
         nParts = noteSubEu->hasTwoAdpcmParts + 1;
         samplesLenFixedPoint = (resamplingRateFixedPoint * tempBufLen * 2) + synthesisState->samplePosFrac;
-        synthesisState->samplePosFrac = (samplesLenFixedPoint & 0xFFFF);
+        synthesisState->samplePosFrac = (samplesLenFixedPoint & BITMASK(16));
 
         if (noteSubEu->isSyntheticWave) {
             cmd = load_wave_samples(cmd, noteSubEu, synthesisState, (samplesLenFixedPoint >> 0x10));
@@ -950,7 +950,7 @@ u64 *synthesis_process_notes(s16 *aiBuf, s32 bufLen, u64 *cmd)
 
             resamplingRateFixedPoint = (u16)(s32)(resamplingRate * 32768.0f);
             samplesLenFixedPoint = note->samplePosFrac + ((resamplingRateFixedPoint * bufLen) * 2);
-            note->samplePosFrac = (samplesLenFixedPoint & 0xFFFF); // 16-bit store, can't reuse
+            note->samplePosFrac = (samplesLenFixedPoint & BITMASK(16)); // 16-bit store, can't reuse
 
             if (note->sound == NULL) {
                 // A wave synthesis note (not ADPCM)
@@ -1005,12 +1005,12 @@ u64 *synthesis_process_notes(s16 *aiBuf, s32 bufLen, u64 *cmd)
                         restart = FALSE;
                         nSamplesToProcess = samplesLenAdjusted - nAdpcmSamplesProcessed;
 #ifdef VERSION_EU
-                        s2 = (synthesisState->samplePosInt & 0xf);
+                        s2 = (synthesisState->samplePosInt & BITMASK(4));
                         samplesRemaining = endPos - synthesisState->samplePosInt;
 
                         if (s2 == 0 && !synthesisState->restart)
 #else
-                        s2 = (note->samplePosInt & 0xf);
+                        s2 = (note->samplePosInt & BITMASK(4));
                         samplesRemaining = endPos - note->samplePosInt;
 
                         if (s2 == 0 && !note->restart)
@@ -1022,14 +1022,14 @@ u64 *synthesis_process_notes(s16 *aiBuf, s32 bufLen, u64 *cmd)
                         s6 = 16 - s2; // a1
 
                         if (nSamplesToProcess < samplesRemaining) {
-                            t0 = (nSamplesToProcess - s6 + 0xf) / 16;
-                            s0 = t0 * 16;
-                            s3 = s6 + s0 - nSamplesToProcess;
+                            t0 = ((nSamplesToProcess - s6) + 0xf) / 16;
+                            s0 = (t0 * 16);
+                            s3 = (s6 + s0) - nSamplesToProcess;
                         } else {
 #ifndef VERSION_EU
-                            s0 = samplesRemaining + s2 - 0x10;
+                            s0 = (samplesRemaining + s2) - 0x10;
 #else
-                            s0 = samplesRemaining - s6;
+                            s0 = (samplesRemaining - s6);
 #endif
                             s3 = 0;
                             if (s0 <= 0) {
@@ -1061,7 +1061,7 @@ u64 *synthesis_process_notes(s16 *aiBuf, s32 bufLen, u64 *cmd)
                                 (uintptr_t) (sampleAddr + (temp * 9)),
                                 (t0 * 9), flags, &note->sampleDmaIndex);
 #endif // !VERSION_EU
-                            a3 = ((uintptr_t) v0_2 & 0xf);
+                            a3 = ((uintptr_t) v0_2 & BITMASK(4));
                             aSetBuffer(cmd++, 0, DMEM_ADDR_COMPRESSED_ADPCM_DATA, 0, (t0 * 9) + a3);
                             aLoadBuffer(cmd++, VIRTUAL_TO_PHYSICAL2(v0_2 - a3));
                         } else {
@@ -1300,7 +1300,8 @@ u64 *load_wave_samples(u64 *cmd, struct NoteSubEu *noteSubEu, struct NoteSynthes
             aDMEMMove(cmd++,
                       /*dmemin */ DMEM_ADDR_UNCOMPRESSED_NOTE,
                       /*dmemout*/ DMEM_ADDR_UNCOMPRESSED_NOTE + ((1 + i) * 128),
-                      /*count  */ 128);
+                      /*count  */ 128
+            );
         }
     }
     return cmd;
@@ -1320,7 +1321,7 @@ u64 *load_wave_samples(u64 *cmd, struct Note *note, s32 nSamplesToLoad) {
         for (i = 0; i < repeats; i++) {
             aDMEMMove(cmd++,
                       /*dmemin */ DMEM_ADDR_UNCOMPRESSED_NOTE,
-                      /*dmemout*/ DMEM_ADDR_UNCOMPRESSED_NOTE + (1 + i) * sizeof(note->synthesisBuffers->samples),
+                      /*dmemout*/ DMEM_ADDR_UNCOMPRESSED_NOTE + ((1 + i) * sizeof(note->synthesisBuffers->samples)),
                       /*count  */ sizeof(note->synthesisBuffers->samples));
         }
     }

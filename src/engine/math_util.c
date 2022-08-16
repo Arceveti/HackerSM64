@@ -34,12 +34,12 @@ u32 random_u16(void) {
         gRandomSeed16 = 0;
     }
 
-    u16 temp1 = (((gRandomSeed16 & 0x00FF) << 8) ^ gRandomSeed16);
+    u16 temp1 = (((gRandomSeed16 & BITMASK(8)) << 8) ^ gRandomSeed16);
 
-    gRandomSeed16 = ((temp1 & 0x00FF) << 8) + ((temp1 & 0xFF00) >> 8);
+    gRandomSeed16 = ((temp1 & BITMASK(8)) << 8) + ((temp1 & (BITMASK(8) << 8)) >> 8);
 
-    temp1 = (((temp1 & 0x00FF) << 1) ^ gRandomSeed16);
-    u16 temp2 = ((temp1 >> 1) ^ 0xFF80);
+    temp1 = (((temp1 & BITMASK(8)) << 1) ^ gRandomSeed16);
+    u16 temp2 = ((temp1 >> 1) ^ (BITMASK(8) << 8));
 
     if ((temp1 & 0x1) == 0) {
         if (temp2 == 43605) {
@@ -857,7 +857,7 @@ f32 mtx_get_float(Mtx *mtx, u32 xIndex, u32 yIndex) {
     if (index < 16) {
         s16 *src = (s16 *)mtx;
         s32 fixed_val = (src[index +  0] << 16)
-                      | (src[index + 16] & 0xFFFF);
+                      | (src[index + 16] & BITMASK(16));
         f32 scale = (1.0f / (f32)0x00010000);
         ret = mul_without_nop((f32)fixed_val, scale);
     }
@@ -874,7 +874,7 @@ void mtx_set_float(Mtx *mtx, f32 val, u32 xIndex, u32 yIndex) {
         s32 fixed_val = mul_without_nop(val, scale);
         s16 *dst = (s16 *)mtx;
         dst[index +  0] = (fixed_val >> 16);
-        dst[index + 16] = (fixed_val & 0xFFFF);
+        dst[index + 16] = (fixed_val & BITMASK(16));
     }
 }
 
@@ -883,7 +883,7 @@ void mtx_set_float(Mtx *mtx, f32 val, u32 xIndex, u32 yIndex) {
  */
 #define MATENTRY(a, b)                          \
     ((s16 *) mtx)[a     ] = (((s32) b) >> 16);  \
-    ((s16 *) mtx)[a + 16] = (((s32) b) & 0xFFFF);
+    ((s16 *) mtx)[a + 16] = (((s32) b) & BITMASK(16));
 void mtx_rotate_xy(Mtx *mtx, s32 angle) {
     s32 c = (coss(angle) * 0x10000);
     s32 s = (sins(angle) * 0x10000);
@@ -1677,7 +1677,7 @@ OPTIMIZE_OS ALIGNED32 void mtxf_to_mtx_fast(s16* dst, float* src) {
         s32 b_int = (s32)b_scaled;
         s32 c_int = (s32)c_scaled;
 
-        s32 c_high = (c_int & 0xFFFF0000);
+        s32 c_high = (c_int & (BITMASK(16) << 16));
         s32 c_low = (c_int << 16);
 
         // Write the integer part of a, as well as garbage into the next two bytes.

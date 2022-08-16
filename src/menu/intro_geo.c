@@ -339,14 +339,16 @@ void intro_gen_face_texrect(Gfx **dlIter) {
     for (y = 0; y < 6; y++) {
         for (x = 0; x < 8; x++) {
             if (sFaceVisible[(y * 8) + x] != 0) {
-                gSPTextureRectangle((*dlIter)++, ( (x * 40)       << 2),
-                                                 ( (y * 40)       << 2),
-                                                 (((x * 40) + 39) << 2),
-                                                 (((y * 40) + 39) << 2),
-                                                 0,
-                                                 0, 0,
-                                                 (4 << 10),
-                                                 (1 << 10));
+                gSPTextureRectangle((*dlIter)++,
+                    ( (x * 40)       << 2),
+                    ( (y * 40)       << 2),
+                    (((x * 40) + 39) << 2),
+                    (((y * 40) + 39) << 2),
+                    0,
+                    0, 0,
+                    (4 << 10),
+                    (1 << 10)
+                );
             }
         }
     }
@@ -415,9 +417,9 @@ RGBA16 *intro_sample_framebuffer(s32 imageW, s32 imageH, s32 sampleW, s32 sample
                 }
             }
 
-            image[(imageH * iy) + ix] = ((R_RGBA16((RGBA16)((color[0] * size) + 0.5f)) & 0xFFFF) |
-                                         (G_RGBA16((RGBA16)((color[1] * size) + 0.5f)) & 0xFFFF) |
-                                         (B_RGBA16((RGBA16)((color[2] * size) + 0.5f)) & 0xFFFF) | MSK_RGBA16_A);
+            image[(imageH * iy) + ix] = ((R_RGBA16((RGBA16)((color[0] * size) + 0.5f)) & BITMASK(16)) |
+                                         (G_RGBA16((RGBA16)((color[1] * size) + 0.5f)) & BITMASK(16)) |
+                                         (B_RGBA16((RGBA16)((color[2] * size) + 0.5f)) & BITMASK(16)) | MSK_RGBA16_A);
         }
     }
 
@@ -474,7 +476,7 @@ Gfx *geo_intro_rumble_pak_graphic(s32 callContext, struct GraphNode *node, UNUSE
         dl = NULL;
     } else if (callContext == GEO_CONTEXT_RENDER) {
         genNode->fnNode.node.drawingLayer = LAYER_OPAQUE;
-        s32 introContext = (genNode->parameter & 0xFF);
+        s32 introContext = (genNode->parameter & BITMASK(8));
         if (introContext == INTRO_CONTEXT_NORMAL) {
             backgroundTileSix = introBackgroundIndexTable[6];
         } else if (introContext == INTRO_CONTEXT_GAME_OVER) {

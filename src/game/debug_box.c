@@ -423,7 +423,7 @@ static void append_debug_box(Vec3f center, Vec3f bounds, s16 yaw, s32 type) {
  * Ex: 0xFF000000 becomes 0xFF00007F
  */
 void debug_box_color(u32 color) {
-    if ((color & 0xFF) == 0) {
+    if ((color & MSK_RGBA32_A) == 0) {
         color |= DBG_BOX_ALPHA;
     }
     sCurBoxColor = color;

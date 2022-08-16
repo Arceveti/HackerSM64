@@ -520,13 +520,13 @@ ALWAYS_INLINE float construct_float(const float f) {
     }
 
     u32 upper = (i >> 16);
-    u32 lower = (i >>  0) & 0xFFFF;
+    u32 lower = (i & BITMASK(16));
 
-    if ((i & 0xFFFF) == 0) {
+    if ((i & BITMASK(16)) == 0) {
         __asm__ ("lui %0, %1"
                                 : "=r"(r)
                                 : "K"(upper));
-    } else if ((i & 0xFFFF0000) == 0) {
+    } else if ((i & (BITMASK(16) << 16)) == 0) {
         __asm__ ("ori %0, $0, %1"
                                 : "+r"(r)
                                 : "K"(lower));

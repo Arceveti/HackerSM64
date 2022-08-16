@@ -23,18 +23,18 @@
 #define OS_MESG_SI_COMPLETE 0x33333333
 
 #ifndef NO_SEGMENTED_MEMORY
-#define GD_VIRTUAL_TO_PHYSICAL(addr) ((uintptr_t)(addr) &0x0FFFFFFF)
-#define GD_LOWER_24(addr) ((uintptr_t)(addr) &0x00FFFFFF)
-#define GD_LOWER_29(addr) (((uintptr_t)(addr)) & 0x1FFFFFFF)
+#define GD_VIRTUAL_TO_PHYSICAL(addr) ((uintptr_t)(addr) & BITMASK(28))
+#define GD_LOWER_24(addr) ((uintptr_t)(addr) & BITMASK(24))
+#define GD_LOWER_29(addr) (((uintptr_t)(addr)) & BITMASK(29))
 #else
 #define GD_VIRTUAL_TO_PHYSICAL(addr) (addr)
 #define GD_LOWER_24(addr) ((uintptr_t)(addr))
 #define GD_LOWER_29(addr) (((uintptr_t)(addr)))
 #endif
 
-#define MTX_INTPART_PACK(w1, w2) (((w1) &0xFFFF0000) | (((w2) >> 16) & 0xFFFF))
-#define MTX_FRACPART_PACK(w1, w2) ((((w1) << 16) & 0xFFFF0000) | ((w2) &0xFFFF))
-#define LOOKAT_PACK(c) ((s32) MIN(((c) * (128.0)), 127.0) & 0xff)
+#define MTX_INTPART_PACK(w1, w2) (((w1) & (BITMASK(16) << 16)) | (((w2) >> 16) & BITMASK(16)))
+#define MTX_FRACPART_PACK(w1, w2) ((((w1) << 16) & (BITMASK(16) << 16)) | ((w2) & BITMASK(16)))
+#define LOOKAT_PACK(c) ((s32) MIN(((c) * (128.0)), 127.0) & BITMASK(8))
 
 // structs
 struct GdDisplayList {
@@ -2870,20 +2870,14 @@ UNUSED void Unknown801A4F58(void) {
     for (i = 0; i < SCREEN_SIZE; i++) { // L801A4FCC
         colour = cbufOff[i];
         if (colour) {
-            r = (s16)((colour >> 11) & 0x1F) - 1;
-            g = (s16)((colour >>  6) & 0x1F) - 1;
-            b = (s16)((colour >>  1) & 0x1F) - 1;
-            if (r < 0) {
-                r = 0;
-            }
-            if (g < 0) {
-                g = 0;
-            }
-            if (b < 0) {
-                b = 0;
-            }
+            r = (s16)((colour >> 11) & BITMASK(5)) - 1;
+            g = (s16)((colour >>  6) & BITMASK(5)) - 1;
+            b = (s16)((colour >>  1) & BITMASK(5)) - 1;
+            if (r < 0) r = 0;
+            if (g < 0) g = 0;
+            if (b < 0) b = 0;
 
-            colour = (s16)(r << 11 | g << 6 | b << 1);
+            colour = (s16)((r << 11) | (g << 6) | (b << 1));
             cbufOff[i] = colour;
             cbufOn[i] = colour;
         } else { // L801A50D8

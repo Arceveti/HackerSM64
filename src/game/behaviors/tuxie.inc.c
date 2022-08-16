@@ -272,7 +272,7 @@ void bhv_small_penguin_loop(void) {
                 obj_set_behavior(o, bhvSmallPenguin);
             }
             obj_copy_pos(o, gMarioObject);
-            if (!(gGlobalTimer & 0x1F)) {
+            if ((gGlobalTimer & (32 - 1)) == 0) {
                 play_sound(SOUND_OBJ2_BABY_PENGUIN_YELL, gMarioObject->header.gfx.cameraToObject);
             }
             break;

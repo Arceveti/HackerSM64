@@ -70,7 +70,7 @@ struct MainPoolBlock *sPoolListHeadR;
 static struct MainPoolState *gMainPoolState = NULL;
 
 uintptr_t set_segment_base_addr(s32 segment, void *addr) {
-    sSegmentTable[segment] = ((uintptr_t) addr & 0x1FFFFFFF);
+    sSegmentTable[segment] = ((uintptr_t) addr & BITMASK(29));
     return sSegmentTable[segment];
 }
 
@@ -81,13 +81,13 @@ UNUSED void *get_segment_base_addr(s32 segment) {
 #ifndef NO_SEGMENTED_MEMORY
 void *segmented_to_virtual(const void *addr) {
     size_t segment = ((uintptr_t) addr >> 24);
-    size_t offset  = ((uintptr_t) addr & 0x00FFFFFF);
+    size_t offset  = ((uintptr_t) addr & BITMASK(24));
 
     return (void *) ((sSegmentTable[segment] + offset) | 0x80000000);
 }
 
 void *virtual_to_segmented(u32 segment, const void *addr) {
-    size_t offset = ((uintptr_t) addr & 0x1FFFFFFF) - sSegmentTable[segment];
+    size_t offset = ((uintptr_t) addr & BITMASK(29)) - sSegmentTable[segment];
 
     return (void *) ((segment << 24) + offset);
 }
@@ -538,8 +538,8 @@ struct MemoryPool *mem_pool_init(u32 size, u32 side) {
     if (addr != NULL) {
         pool = (struct MemoryPool *) addr;
 
-        pool->totalSpace = size;
-        pool->firstBlock = (struct MemoryBlock *) ((u8 *) addr + sizeof(struct MemoryPool));
+        pool->totalSpace    = size;
+        pool->firstBlock    = (struct MemoryBlock *) ((u8 *) addr + sizeof(struct MemoryPool));
         pool->freeList.next = (struct MemoryBlock *) ((u8 *) addr + sizeof(struct MemoryPool));
 
         block = pool->firstBlock;

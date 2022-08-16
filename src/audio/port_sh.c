@@ -418,7 +418,7 @@ UNUSED u32 func_sh_802f6878(s32 *arg0) {
         *arg0 = 0;
         return 0U;
     }
-    *arg0 = (s32) (sp1C & 0xFFFFFF);
+    *arg0 = (s32) (sp1C & BITMASK(24));
     return (sp1C >> 0x18);
 }
 

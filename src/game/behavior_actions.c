@@ -19,6 +19,7 @@
 #include "game_init.h"
 #include "ingame_menu.h"
 #include "interaction.h"
+#include "level_commands.h"
 #include "level_misc_macros.h"
 #include "level_table.h"
 #include "level_update.h"
@@ -152,14 +153,18 @@ Gfx *geo_move_mario_part_from_parent(s32 callContext, UNUSED struct GraphNode *n
 void spawn_sparkle_particles(s32 n, s32 radius, s32 height, s32 r) {
     static s16 spawnSparkleParticleAngle = 0x0;
     s32 i;
-    s16 separation = 0x10000 / n; // Evenly spread around a circle
+    s16 separation = (0x10000 / n); // Evenly spread around a circle.
 
     for (i = 0; i < n; i++) {
-        spawn_object_relative(OBJ_BP_NONE, sins(spawnSparkleParticleAngle + i * separation) * radius, (i + 1) * height,
-                              coss(spawnSparkleParticleAngle + i * separation) * radius, o, MODEL_NONE, bhvSparkleSpawn);
+        spawn_object_relative(OBJ_BP_NONE,
+            (sins(spawnSparkleParticleAngle + (i * separation)) * radius),
+            (i + 1) * height,
+            (coss(spawnSparkleParticleAngle + (i * separation)) * radius),
+            o, MODEL_NONE, bhvSparkleSpawn
+        );
     }
 
-    spawnSparkleParticleAngle += r * 0x100;
+    spawnSparkleParticleAngle += (r * 0x100);
 }
 
 #include "behaviors/beta_boo_key.inc.c"
@@ -195,7 +200,8 @@ void set_obj_anim_with_accel_and_sound(s16 frame1, s16 frame2, s32 sound) {
         range = 1;
     }
 
-    if (cur_obj_check_anim_frame_in_range(frame1, range) || cur_obj_check_anim_frame_in_range(frame2, range)) {
+    if (cur_obj_check_anim_frame_in_range(frame1, range)
+     || cur_obj_check_anim_frame_in_range(frame2, range)) {
         cur_obj_play_sound_2(sound);
     }
 }

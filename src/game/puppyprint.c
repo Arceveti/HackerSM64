@@ -885,11 +885,15 @@ void print_small_text(s32 x, s32 y, const char *str, s32 align, s32 amount, s32 
             }
         }
 
-        gSPScisTextureRectangle(gDisplayListHead++, ((x + shakePos[0] + textPos[0]     ) << 2),
-                                                    ((y + shakePos[1] + offsetY + textPos[1] + wavePos) << 2),
-                                                    ((x +  textPos[0] + shakePos[0] + 8) << 2),
-                                                    ((y + wavePos + offsetY + shakePos[1] + 12 + textPos[1]) << 2),
-                                                    G_TX_RENDERTILE, (textX << 6), (textY << 6), (1 << 10), (1 << 10));
+        gSPScisTextureRectangle(gDisplayListHead++,
+            ((x + shakePos[0] + textPos[0]     ) << 2),
+            ((y + shakePos[1] + offsetY + textPos[1] + wavePos) << 2),
+            ((x +  textPos[0] + shakePos[0] + 8) << 2),
+            ((y + wavePos + offsetY + shakePos[1] + 12 + textPos[1]) << 2),
+            G_TX_RENDERTILE,
+            (textX << 6), (textY << 6),
+            (1 << 10), (1 << 10)
+        );
         textPos[0] += (spaceX + 1);
     }
 
@@ -1103,16 +1107,26 @@ void render_multi_image(Texture *image, s32 x, s32 y, s32 width, s32 height, UNU
 
         gDPLoadSync(dlHead++);
         gDPLoadTextureTile(dlHead++,
-            image, G_IM_FMT_RGBA, G_IM_SIZ_16b, width, height, posW, posH,
+            image, G_IM_FMT_RGBA, G_IM_SIZ_16b,
+            width, height,
+            posW, posH,
             ((posW + imW) - 1),
             ((posH + imH) - 1),
-            0, (G_TX_NOMIRROR | G_TX_WRAP), (G_TX_NOMIRROR | G_TX_WRAP), maskW, maskH, 0, 0);
+            0,
+            (G_TX_NOMIRROR | G_TX_WRAP),
+            (G_TX_NOMIRROR | G_TX_WRAP),
+            maskW, maskH,
+            0, 0
+        );
         gSPScisTextureRectangle(dlHead++,
             ((x + posW) << 2),
             ((y + posH) << 2),
             (((x + posW + imW) - mOne) << 2),
             (((y + posH + imH) - mOne) << 2),
-            G_TX_RENDERTILE, 0, 0, (modeSC << 10), (1 << 10));
+            G_TX_RENDERTILE,
+            0, 0,
+            (modeSC << 10), (1 << 10)
+        );
     }
     // If there's a remainder on the vertical side, then it will cycle through that too.
     if (height-peakH != 0) {
@@ -1122,13 +1136,27 @@ void render_multi_image(Texture *image, s32 x, s32 y, s32 width, s32 height, UNU
             posW = i * imW;
             gDPLoadSync(dlHead++);
             gDPLoadTextureTile(dlHead++,
-                image, G_IM_FMT_RGBA, G_IM_SIZ_16b, width, height, posW, posH, ((posW + imW) - 1), (height - 1), 0, (G_TX_NOMIRROR | G_TX_WRAP), (G_TX_NOMIRROR | G_TX_WRAP), maskW, maskH, 0, 0);
+                image, G_IM_FMT_RGBA, G_IM_SIZ_16b,
+                width, height,
+                posW, posH,
+                ((posW + imW) - 1),
+                (height - 1),
+                0,
+                (G_TX_NOMIRROR | G_TX_WRAP),
+                (G_TX_NOMIRROR | G_TX_WRAP),
+                maskW, maskH,
+                0, 0
+            );
             gSPScisTextureRectangle(dlHead++,
                 ((x + posW) << 2),
                 ((y + posH) << 2),
                 (((x + posW + imW) - mOne) << 2),
                 (((y + posH + imH) - mOne) << 2),
-                G_TX_RENDERTILE, 0, 0, (modeSC << 10), (1 << 10));
+                G_TX_RENDERTILE,
+                0, 0,
+                (modeSC << 10),
+                (1 << 10)
+            );
         }
     }
 

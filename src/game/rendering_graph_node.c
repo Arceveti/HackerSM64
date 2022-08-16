@@ -266,7 +266,7 @@ void switch_ucode(Gfx* dlHead, s32 ucode) {
 #endif
 
 #define UPPER_FIXED(x) ((int)((unsigned int)((x) * 0x10000) >> 16))
-#define LOWER_FIXED(x) ((int)((unsigned int)((x) * 0x10000) & 0xFFFF))
+#define LOWER_FIXED(x) ((int)((unsigned int)((x) * 0x10000) & BITMASK(16)))
 
 // Fixed-point identity matrix with the inverse of world scale
 Mtx identityMatrixWorldScale = {{

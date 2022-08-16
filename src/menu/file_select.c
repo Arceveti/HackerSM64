@@ -1883,11 +1883,11 @@ void print_score_file_course_coin_score(s8 fileIndex, s16 courseIndex, s16 x, s1
         // Print "[coin] x"
         print_menu_generic_string(x + HISCORE_COIN_ICON_X, y, textCoinX);
         // Print coin highscore
-        int_to_str(((u16) save_file_get_max_coin_score(courseIndex) & 0xFFFF), coinScoreText);
+        int_to_str(((u16) save_file_get_max_coin_score(courseIndex) & BITMASK(16)), coinScoreText);
         print_menu_generic_string(x + HISCORE_COIN_TEXT_X, y, coinScoreText);
         // Print coin highscore file
         print_menu_generic_string(x + HISCORE_COIN_NAMES_X, y,
-                         fileNames[(save_file_get_max_coin_score(courseIndex) >> 16) & 0xFFFF]);
+                         fileNames[(save_file_get_max_coin_score(courseIndex) >> 16) & BITMASK(16)]);
     }
 }
 

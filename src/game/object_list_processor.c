@@ -369,7 +369,7 @@ void unload_deactivated_objects_in_list(struct ObjectNode *objList) {
 
         if ((gCurrentObject->activeFlags & ACTIVE_FLAG_ACTIVE) != ACTIVE_FLAG_ACTIVE) {
 #ifdef PUPPYLIGHTS
-            if (gCurrentObject->oLightID != 0xFFFF) {
+            if (gCurrentObject->oLightID != PUPPYLIGHTS_ID_NULL) {
                 obj_disable_light(gCurrentObject);
             }
 #endif

@@ -65,7 +65,9 @@ static void sequence_channel_process_sound(struct SequenceChannel *seqChannel) {
 
     for (i = 0; i < 4; i++) {
         struct SequenceChannelLayer *layer = seqChannel->layers[i];
-        if (layer != NULL && layer->enabled && layer->note != NULL) {
+        if (layer != NULL
+         && layer->enabled
+         && layer->note != NULL) {
             layer->noteFreqScale = layer->freqScale * seqChannel->freqScale * gConfig.audioFrequency;
             layer->noteVelocity = layer->velocitySquare * channelVolume;
             layer->notePan = (layer->pan * panLayerWeight) + panFromChannel;
@@ -141,12 +143,7 @@ f32 get_portamento_freq_scale(struct Portamento *p) {
     p->cur += p->speed;
     u32 v0 = (u32) p->cur;
 
-#if defined(VERSION_EU) || defined(VERSION_SH)
-    if (v0 > 127)
-#else
-    if (v0 >= 127)
-#endif
-    {
+    if (v0 > 127) {
         v0 = 127;
     }
 
@@ -158,36 +155,31 @@ f32 get_portamento_freq_scale(struct Portamento *p) {
 }
 
 s32 get_vibrato_pitch_change(struct VibratoState *vib) {
-#if defined(VERSION_EU) || defined(VERSION_SH)
-    vib->time += (s32) vib->rate;
-    s32 index = ((vib->time >> 10) & 0x3F);
-    return (vib->curve[index] >> 8);
-}
-#else
     vib->time += vib->rate;
-
-    s32 index = ((vib->time >> 10) & 0x3F);
-
-    switch (index & 0x30) {
-        case 0x10:
-            index = 31 - index;
+    s32 index = ((vib->time >> 10) & BITMASK(6));
+#if defined(VERSION_EU) || defined(VERSION_SH)
+    return (vib->curve[index] >> 8);
+#else
+    switch (index & (BIT(4) | BIT(5))) {
+        case BIT(4):
+            index = (31 - index);
             FALL_THROUGH;
 
         case 0x00:
             return vib->curve[index];
 
-        case 0x20:
+        case BIT(5):
             index -= 0x20;
             break;
 
-        case 0x30:
-            index = 63 - index;
+        case (BIT(4) | BIT(5)):
+            index = (63 - index);
             break;
     }
 
     return -vib->curve[index];
-}
 #endif
+}
 
 f32 get_vibrato_freq_scale(struct VibratoState *vib) {
     if (vib->delay != 0) {
@@ -236,9 +228,9 @@ f32 get_vibrato_freq_scale(struct VibratoState *vib) {
     f32 extent = (f32) vib->extent / 4096.0f;
 
 #if defined(VERSION_EU) || defined(VERSION_SH)
-    return 1.0f + extent * (gPitchBendFrequencyScale[pitchChange + 128] - 1.0f);
+    return (1.0f + (extent * (gPitchBendFrequencyScale[pitchChange + 128] - 1.0f)));
 #else
-    return 1.0f + extent * (gPitchBendFrequencyScale[pitchChange + 127] - 1.0f);
+    return (1.0f + (extent * (gPitchBendFrequencyScale[pitchChange + 127] - 1.0f)));
 #endif
 }
 
@@ -454,7 +446,7 @@ adsr_update(struct AdsrState *adsr) {
 #if defined(VERSION_EU) || defined(VERSION_SH)
                     adsr->delay = 128;
 #else
-                    adsr->delay = adsr->sustain / 16;
+                    adsr->delay = (adsr->sustain >> 4);
 #endif
                     adsr->state = ADSR_STATE_SUSTAIN;
                 }

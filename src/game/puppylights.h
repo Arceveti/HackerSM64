@@ -10,6 +10,8 @@
 #define MAX_LIGHTS 32
 // The maximum number of dynamic lights available at one time.
 #define MAX_LIGHTS_DYNAMIC 8
+// The NULL light ID.
+#define PUPPYLIGHTS_ID_NULL BITMASK(16)
 
 // Two shapes. Choose your destiny.
 enum PuppyLightFlags {

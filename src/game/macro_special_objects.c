@@ -79,14 +79,14 @@ void spawn_macro_objects(s32 areaIndex, MacroObject *macroObjList) {
     gMacroObjectDefaultParent.header.gfx.activeAreaIndex = areaIndex;
 
     while (*macroObjList != -1) { // An encountered value of -1 means the list has ended.
-        presetID = (*macroObjList & 0x1FF) - 31; // Preset identifier for MacroObjectPresets array.
+        presetID = (*macroObjList & BITMASK(9)) - 31; // Preset identifier for MacroObjectPresets array.
 
         if (presetID < 0) {
             break;
         }
 
         // Set macro object properties from the list
-        yaw       = (((*macroObjList++ >> 9) & 0x7F) << 1);
+        yaw       = (((*macroObjList++ >> 9) & BITMASK(7)) << 1);
         x         = *macroObjList++;
         y         = *macroObjList++;
         z         = *macroObjList++;
@@ -97,12 +97,12 @@ void spawn_macro_objects(s32 areaIndex, MacroObject *macroObjList) {
 
         // If the preset has a defined param, use it instead.
         if (preset.param != 0) {
-            bparam2 = (preset.param & 0xFF);
+            bparam2 = (preset.param & BITMASK(8));
         } else {
-            bparam2 = (behParams & 0xFF);
+            bparam2 = (behParams & BITMASK(8));
         }
 
-        bparam3 = ((behParams >> 16) & 0xFF);
+        bparam3 = ((behParams >> 16) & BITMASK(8));
 
         // If the object has been killed, prevent it from respawning.
         if (bparam3 != RESPAWN_INFO_DONT_RESPAWN) {

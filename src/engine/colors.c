@@ -177,7 +177,7 @@ void colorRGB_add_hue(ColorRGB color, Color hueAdd, Color s) {
     // this is the algorithm to convert from RGB to HSV:
     Color h  = (((u8)((hue * (128.0f / 3.0f)) + hueAdd) >> 2) * 3); // needs to u8 cycle before multiplying. 0..191
     Color i  =  (h >> 5);                                           // 0..5
-    Color f  = ((h & 0x1F) << 3);                                   // 'fractional' part of 'i' 0..248 in jumps
+    Color f  = ((h & BITMASK(5)) << 3);                             // 'fractional' part of 'i' 0..248 in jumps
     Color pv = (0xFF -   s                    );                    // pv will be in range 0..255
     Color qv = (0xFF - ((s *         f ) >> 8));
     Color tv = (0xFF - ((s * (0xFF - f)) >> 8));

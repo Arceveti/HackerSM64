@@ -437,7 +437,7 @@ void process_notes(void) {
             noteSubEu = &note->noteSubEu;
             if (noteSubEu->finished
  #ifdef VERSION_SH
-             || playbackState->unkSH34 >= 1
+             || playbackState->unkSH34 > 0
  #else
              || playbackState->priority == NOTE_PRIORITY_STOPPING
  #endif
@@ -1404,7 +1404,7 @@ void note_init_all(void) {
         note->targetVolLeft = 0;
         note->targetVolRight = 0;
         note->frequency = 0.0f;
-        note->unused1 = 0x3f;
+        note->unused1 = BITMASK(6);
 #endif
         note->attributes.velocity = 0.0f;
         note->adsrVolScale = 0;
