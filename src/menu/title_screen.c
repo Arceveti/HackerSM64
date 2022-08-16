@@ -11,6 +11,7 @@
 #include "game/save_file.h"
 #include "game/sound_init.h"
 #include "game/rumble_init.h"
+#include "level_commands.h"
 #include "level_table.h"
 #include "seq_ids.h"
 #include "sm64.h"
@@ -72,13 +73,14 @@ s32 run_level_id_or_demo(s32 level) {
                 level = demoInputBufTarget->timer;
 
                 // use the first save file and act
-                gCurrSaveFileNum = 1;
-                gCurrActNum = 1;
+                gCurrSaveFileNum = SAVE_INDEX_TO_NUM(SAVE_FILE_A);
+                gCurrActNum = ACT_INDEX_TO_NUM(ACT_INDEX_1);
             }
         } else { // activity was detected, so reset the demo countdown.
             sDemoCountdown = 0;
         }
     }
+
     return level;
 }
  #endif // !DISABLE_DEMO
@@ -151,13 +153,13 @@ s32 intro_level_select(void) {
     if (gCurrLevelNum < LEVEL_MIN) gCurrLevelNum = LEVEL_MAX; // exceeded min. set to max.
 
     // Use file 4 and last act as a test
-    gCurrSaveFileNum = 4;
-    gCurrActNum = 6;
+    gCurrSaveFileNum = SAVE_INDEX_TO_NUM(SAVE_FILE_D);
+    gCurrActNum = NUM_ACTS;
 
     print_text_centered(160, 80, "SELECT STAGE");
     print_text_centered(160, 30, "PRESS START BUTTON");
-    print_text_fmt_int(40, 60, "%2d", gCurrLevelNum);
-    print_text(80, 60, sLevelSelectStageNames[gCurrLevelNum - 1]); // print stage name
+    print_text_fmt_int(  40, 60, "%2d", gCurrLevelNum);
+    print_text(          80, 60, sLevelSelectStageNames[gCurrLevelNum - 1]); // print stage name
 
     // start being pressed signals the stage to be started. that is, unless...
     if (gPlayer1Controller->buttonPressed & (START_BUTTON | A_BUTTON)) {
@@ -170,6 +172,7 @@ s32 intro_level_select(void) {
         play_sound(SOUND_MENU_STAR_SOUND, gGlobalSoundSource);
         return gCurrLevelNum;
     }
+
     return LEVEL_NONE;
 }
 
@@ -212,6 +215,7 @@ s32 intro_regular(void) {
         level = (LEVEL_FILE_SELECT + gDebugLevelSelect);
         sPlayMarioGreeting = TRUE;
     }
+
  #if !defined(DISABLE_DEMO) && defined(KEEP_MARIO_HEAD)
     return run_level_id_or_demo(level);
  #else
@@ -242,6 +246,7 @@ s32 intro_game_over(void) {
         level = (LEVEL_FILE_SELECT + gDebugLevelSelect);
         sPlayMarioGameOver = TRUE;
     }
+
  #if !defined(DISABLE_DEMO) && defined(KEEP_MARIO_HEAD)
     return run_level_id_or_demo(level);
  #else

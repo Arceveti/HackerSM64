@@ -14,6 +14,7 @@
 #include "ingame_menu.h"
 #include "level_update.h"
 #include "levels/castle_grounds/header.h"
+#include "level_commands.h"
 #include "memory.h"
 #include "print.h"
 #include "save_file.h"
@@ -700,7 +701,7 @@ void print_hud_my_score_coins(s32 useCourseCoinScore, s8 fileIndex, s8 courseInd
     s16 numCoins;
 
     if (!useCourseCoinScore) {
-        numCoins = (u16)(save_file_get_max_coin_score(courseIndex) & 0xFFFF);
+        numCoins = (u16)(save_file_get_max_coin_score(courseIndex) & BITMASK(16));
     } else {
         numCoins = save_file_get_course_coin_score(fileIndex, courseIndex);
     }
@@ -1656,14 +1657,17 @@ void render_pause_my_score_coins(void) {
     const void    **actNameTbl = segmented_to_virtual(languageTable[gInGameLanguage][2]);
 
     u8 courseIndex = COURSE_NUM_TO_INDEX(gCurrCourseNum);
-    u8 starFlags = save_file_get_star_flags(gCurrSaveFileNum - 1, COURSE_NUM_TO_INDEX(gCurrCourseNum));
+    u8 starFlags = save_file_get_star_flags(
+        SAVE_NUM_TO_INDEX(gCurrSaveFileNum),
+        COURSE_NUM_TO_INDEX(gCurrCourseNum)
+    );
 
     gSPDisplayList(gDisplayListHead++, dl_rgba16_text_begin);
     gDPSetEnvColor(gDisplayListHead++, 255, 255, 255, gDialogTextAlpha);
 
     if (courseIndex <= COURSE_NUM_TO_INDEX(COURSE_STAGES_MAX)) {
-        print_hud_my_score_coins(TRUE, gCurrSaveFileNum - 1, courseIndex, 178, 103);
-        print_hud_my_score_stars(      gCurrSaveFileNum - 1, courseIndex, 118, 103);
+        print_hud_my_score_coins(TRUE, SAVE_NUM_TO_INDEX(gCurrSaveFileNum), courseIndex, 178, 103);
+        print_hud_my_score_stars(      SAVE_NUM_TO_INDEX(gCurrSaveFileNum), courseIndex, 118, 103);
     }
 
     gSPDisplayList(gDisplayListHead++, dl_rgba16_text_end);
@@ -1671,7 +1675,7 @@ void render_pause_my_score_coins(void) {
     gDPSetEnvColor(gDisplayListHead++, 255, 255, 255, gDialogTextAlpha);
 
     if (courseIndex <= COURSE_NUM_TO_INDEX(COURSE_STAGES_MAX)
-        && (save_file_get_course_star_count(gCurrSaveFileNum - 1, courseIndex) != 0)) {
+        && (save_file_get_course_star_count(SAVE_NUM_TO_INDEX(gCurrSaveFileNum), courseIndex) != 0)) {
         print_generic_string(MYSCORE_X, 121, LANGUAGE_ARRAY(textMyScore));
     }
 
@@ -1684,7 +1688,7 @@ void render_pause_my_score_coins(void) {
 
         const unsigned char *actName = segmented_to_virtual(actNameTbl[(COURSE_NUM_TO_INDEX(gCurrCourseNum) * 6) + gDialogCourseActNum - 1]);
 
-        if (starFlags & BIT(gDialogCourseActNum - 1)) {
+        if (starFlags & BIT(ACT_NUM_TO_INDEX(gDialogCourseActNum))) {
             print_generic_string(TXT_STAR_X, 140, textStar);
         } else {
             print_generic_string(TXT_STAR_X, 140, textUnfilledStar);
@@ -1838,7 +1842,7 @@ void render_pause_castle_course_stars(s16 x, s16 y, s16 fileIndex, s16 courseInd
         nextStar++;
     }
 
-    if (starCount == nextStar && starCount != 6) {
+    if (starCount == nextStar && starCount != NUM_ACTS) {
         str[(nextStar * 2) + 0] = DIALOG_CHAR_STAR_OPEN;
         str[(nextStar * 2) + 1] = DIALOG_CHAR_SPACE;
         nextStar++;
@@ -1873,7 +1877,7 @@ void render_pause_castle_main_strings(s16 x, s16 y) {
     }
 
     if (gDialogLineNum != COURSE_NUM_TO_INDEX(COURSE_BONUS_STAGES)) {
-        while (save_file_get_course_star_count(gCurrSaveFileNum - 1, gDialogLineNum) == 0) {
+        while (save_file_get_course_star_count(SAVE_NUM_TO_INDEX(gCurrSaveFileNum), gDialogLineNum) == 0) {
             if (gDialogLineNum >= prevCourseIndex) {
                 gDialogLineNum++;
             } else {
@@ -1893,9 +1897,9 @@ void render_pause_castle_main_strings(s16 x, s16 y) {
 
     if (gDialogLineNum <= COURSE_NUM_TO_INDEX(COURSE_STAGES_MAX)) { // Main courses
         courseName = segmented_to_virtual(courseNameTbl[gDialogLineNum]);
-        render_pause_castle_course_stars(x, y, gCurrSaveFileNum - 1, gDialogLineNum);
+        render_pause_castle_course_stars(x, y, SAVE_NUM_TO_INDEX(gCurrSaveFileNum), gDialogLineNum);
         print_generic_string(x + 34, y - 5, textCoin);
-        int_to_str(save_file_get_course_coin_score(gCurrSaveFileNum - 1, gDialogLineNum), strVal);
+        int_to_str(save_file_get_course_coin_score(SAVE_NUM_TO_INDEX(gCurrSaveFileNum), gDialogLineNum), strVal);
         print_generic_string(x + 54, y - 5, strVal);
     } else { // Castle secret stars
         const unsigned char textStarX[] = { TEXT_STAR_X };
@@ -1903,7 +1907,7 @@ void render_pause_castle_main_strings(s16 x, s16 y) {
         print_generic_string(x + 40, y + 13, textStarX);
         int_to_str(
             save_file_get_total_star_count(
-                gCurrSaveFileNum - 1,
+                SAVE_NUM_TO_INDEX(gCurrSaveFileNum),
                 COURSE_NUM_TO_INDEX(COURSE_BONUS_STAGES),
                 COURSE_NUM_TO_INDEX(COURSE_MAX)
             ),

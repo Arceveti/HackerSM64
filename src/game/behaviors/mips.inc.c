@@ -3,6 +3,14 @@
  * Behavior for MIPS (everyone's favorite yellow rabbit).
  */
 
+#ifdef UNLOCK_ALL
+    #define MIPS_STAR_1_REQUIREMENT 0
+    #define MIPS_STAR_2_REQUIREMENT 0
+#else
+    #define MIPS_STAR_1_REQUIREMENT 15
+    #define MIPS_STAR_2_REQUIREMENT 50
+#endif
+
 /**
  * Initializes MIPS' physics parameters and checks if he should be active,
  * hiding him if necessary.
@@ -10,17 +18,25 @@
 void bhv_mips_init(void) {
 #ifndef UNLOCK_ALL
     // Retrieve star flags for Castle Secret Stars on current save file.
-    u8 starFlags = save_file_get_star_flags(gCurrSaveFileNum - 1, COURSE_NUM_TO_INDEX(COURSE_NONE));
+    u8 starFlags = save_file_get_star_flags(
+        SAVE_NUM_TO_INDEX(gCurrSaveFileNum),
+        COURSE_NUM_TO_INDEX(COURSE_NONE)
+    );
+    s32 starCount = save_file_get_total_star_count(
+        SAVE_NUM_TO_INDEX(gCurrSaveFileNum),
+        COURSE_NUM_TO_INDEX(COURSE_MIN),
+        COURSE_NUM_TO_INDEX(COURSE_MAX)
+    );
 
     // If the player has >= 15 stars and hasn't collected first MIPS star...
-    if (save_file_get_total_star_count(gCurrSaveFileNum - 1, COURSE_NUM_TO_INDEX(COURSE_MIN), COURSE_NUM_TO_INDEX(COURSE_MAX)) >= 15
-        && !(starFlags & SAVE_FLAG_TO_STAR_FLAG(SAVE_FLAG_COLLECTED_MIPS_STAR_1))) {
-        o->oBehParams2ndByte    = MIPS_BP_STAR_1;
+    if (starCount >= MIPS_STAR_1_REQUIREMENT
+     && !(starFlags & SAVE_FLAG_TO_STAR_FLAG(SAVE_FLAG_COLLECTED_MIPS_STAR_1))) {
+        o->oBehParams2ndByte = MIPS_BP_STAR_1;
         o->oMipsForwardVelocity = 40.0f;
     }
     // If the player has >= 50 stars and hasn't collected second MIPS star...
-    else if (save_file_get_total_star_count(gCurrSaveFileNum - 1, COURSE_NUM_TO_INDEX(COURSE_MIN), COURSE_NUM_TO_INDEX(COURSE_MAX)) >= 50
-             && !(starFlags & SAVE_FLAG_TO_STAR_FLAG(SAVE_FLAG_COLLECTED_MIPS_STAR_2))) {
+    else if (starCount >= MIPS_STAR_2_REQUIREMENT
+          && !(starFlags & SAVE_FLAG_TO_STAR_FLAG(SAVE_FLAG_COLLECTED_MIPS_STAR_2))) {
 #endif
         o->oBehParams2ndByte = MIPS_BP_STAR_2;
         o->oMipsForwardVelocity = 45.0f;

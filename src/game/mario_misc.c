@@ -190,7 +190,11 @@ void bhv_toad_message_init(void) {
 #ifdef UNLOCK_ALL
     s32 starCount = 999;
 #else
-    s32 starCount = save_file_get_total_star_count(gCurrSaveFileNum - 1, COURSE_NUM_TO_INDEX(COURSE_MIN), COURSE_NUM_TO_INDEX(COURSE_MAX));
+    s32 starCount = save_file_get_total_star_count(
+        SAVE_NUM_TO_INDEX(gCurrSaveFileNum),
+        COURSE_NUM_TO_INDEX(COURSE_MIN),
+        COURSE_NUM_TO_INDEX(COURSE_MAX)
+    );
 #endif
     s32 dialogId = GET_BPARAM1(o->oBehParams);
     s32 enoughStars = TRUE;
@@ -382,7 +386,7 @@ Gfx *geo_switch_mario_eyes(s32 callContext, struct GraphNode *node, UNUSED Mat4 
 
     if (callContext == GEO_CONTEXT_RENDER) {
         if (bodyState->eyeState == 0) {
-            blinkFrame = ((((switchCase->numCases * 32) + gAreaUpdateCounter) >> 1) & 0x1F);
+            blinkFrame = ((((switchCase->numCases * 32) + gAreaUpdateCounter) >> 1) & (32 - 1));
             if (blinkFrame < 7) {
                 switchCase->selectedCase = gMarioBlinkAnimation[blinkFrame];
             } else {

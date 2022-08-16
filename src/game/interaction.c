@@ -63,37 +63,37 @@ struct InteractionHandler {
 };
 
 static struct InteractionHandler sInteractionHandlers[] = {
-    { INTERACT_COIN,           interact_coin },
-    { INTERACT_WATER_RING,     interact_water_ring },
-    { INTERACT_STAR_OR_KEY,    interact_star_or_key },
-    { INTERACT_BBH_ENTRANCE,   interact_bbh_entrance },
-    { INTERACT_WARP,           interact_warp },
-    { INTERACT_WARP_DOOR,      interact_warp_door },
-    { INTERACT_DOOR,           interact_door },
-    { INTERACT_CANNON_BASE,    interact_cannon_base },
-    { INTERACT_IGLOO_BARRIER,  interact_igloo_barrier },
-    { INTERACT_TORNADO,        interact_tornado },
-    { INTERACT_WHIRLPOOL,      interact_whirlpool },
-    { INTERACT_STRONG_WIND,    interact_strong_wind },
-    { INTERACT_FLAME,          interact_flame },
-    { INTERACT_SNUFIT_BULLET,  interact_snufit_bullet },
-    { INTERACT_CLAM_OR_BUBBA,  interact_clam_or_bubba },
-    { INTERACT_BULLY,          interact_bully },
-    { INTERACT_SHOCK,          interact_shock },
-    { INTERACT_BOUNCE_TOP2,    interact_bounce_top },
-    { INTERACT_MR_BLIZZARD,    interact_mr_blizzard },
+    { INTERACT_COIN,           interact_coin           },
+    { INTERACT_WATER_RING,     interact_water_ring     },
+    { INTERACT_STAR_OR_KEY,    interact_star_or_key    },
+    { INTERACT_BBH_ENTRANCE,   interact_bbh_entrance   },
+    { INTERACT_WARP,           interact_warp           },
+    { INTERACT_WARP_DOOR,      interact_warp_door      },
+    { INTERACT_DOOR,           interact_door           },
+    { INTERACT_CANNON_BASE,    interact_cannon_base    },
+    { INTERACT_IGLOO_BARRIER,  interact_igloo_barrier  },
+    { INTERACT_TORNADO,        interact_tornado        },
+    { INTERACT_WHIRLPOOL,      interact_whirlpool      },
+    { INTERACT_STRONG_WIND,    interact_strong_wind    },
+    { INTERACT_FLAME,          interact_flame          },
+    { INTERACT_SNUFIT_BULLET,  interact_snufit_bullet  },
+    { INTERACT_CLAM_OR_BUBBA,  interact_clam_or_bubba  },
+    { INTERACT_BULLY,          interact_bully          },
+    { INTERACT_SHOCK,          interact_shock          },
+    { INTERACT_BOUNCE_TOP2,    interact_bounce_top     },
+    { INTERACT_MR_BLIZZARD,    interact_mr_blizzard    },
     { INTERACT_HIT_FROM_BELOW, interact_hit_from_below },
-    { INTERACT_BOUNCE_TOP,     interact_bounce_top },
-    { INTERACT_DAMAGE,         interact_damage },
-    { INTERACT_POLE,           interact_pole },
-    { INTERACT_HOOT,           interact_hoot },
-    { INTERACT_BREAKABLE,      interact_breakable },
-    { INTERACT_KOOPA,          interact_bounce_top },
-    { INTERACT_KOOPA_SHELL,    interact_koopa_shell },
-    { INTERACT_SPINY_WALKING,  interact_spiny_walking },
-    { INTERACT_CAP,            interact_cap },
-    { INTERACT_GRABBABLE,      interact_grabbable },
-    { INTERACT_TEXT,           interact_text },
+    { INTERACT_BOUNCE_TOP,     interact_bounce_top     },
+    { INTERACT_DAMAGE,         interact_damage         },
+    { INTERACT_POLE,           interact_pole           },
+    { INTERACT_HOOT,           interact_hoot           },
+    { INTERACT_BREAKABLE,      interact_breakable      },
+    { INTERACT_KOOPA,          interact_bounce_top     },
+    { INTERACT_KOOPA_SHELL,    interact_koopa_shell    },
+    { INTERACT_SPINY_WALKING,  interact_spiny_walking  },
+    { INTERACT_CAP,            interact_cap            },
+    { INTERACT_GRABBABLE,      interact_grabbable      },
+    { INTERACT_TEXT,           interact_text           },
 };
 
 static u32 sForwardKnockbackActions[][3] = {
@@ -425,8 +425,7 @@ u32 mario_check_object_grab(struct MarioState *m) {
                 m->usedObj = m->interactObj;
 
                 if (!(m->action & ACT_FLAG_AIR)) {
-                    set_mario_action(
-                        m, (m->action & ACT_FLAG_DIVING) ? ACT_DIVE_PICKING_UP : ACT_PICKING_UP, 0);
+                    set_mario_action(m, ((m->action & ACT_FLAG_DIVING) ? ACT_DIVE_PICKING_UP : ACT_PICKING_UP), 0);
                 }
 
                 result = TRUE;
@@ -480,8 +479,8 @@ u32 bully_knock_back_mario(struct MarioState *mario) {
     bully->oPosX = bullyData.posX;
     bully->oPosZ = bullyData.posZ;
 
-    if (marioDYaw < -0x4000 || marioDYaw > 0x4000) {
-        mario->faceAngle[1] += 0x8000;
+    if (marioDYaw < -DEGREES(90) || marioDYaw > DEGREES(90)) {
+        mario->faceAngle[1] += DEGREES(180);
         mario->forwardVel *= -1.0f;
 
         if (mario->action & ACT_FLAG_AIR) {
@@ -525,7 +524,7 @@ UNUSED static u32 unused_determine_knockback_action(struct MarioState *m) {
 
     m->faceAngle[1] = angleToObject;
 
-    if (facingDYaw >= -0x4000 && facingDYaw <= 0x4000) {
+    if (facingDYaw >= -DEGREES(90) && facingDYaw <= DEGREES(90)) {
         m->forwardVel *= -1.0f;
         if (m->action & (ACT_FLAG_AIR | ACT_FLAG_ON_POLE | ACT_FLAG_HANGING)) {
             bonkAction = ACT_BACKWARD_AIR_KB;
@@ -533,7 +532,7 @@ UNUSED static u32 unused_determine_knockback_action(struct MarioState *m) {
             bonkAction = ACT_SOFT_BACKWARD_GROUND_KB;
         }
     } else {
-        m->faceAngle[1] += 0x8000;
+        m->faceAngle[1] += DEGREES(180);
         if (m->action & (ACT_FLAG_AIR | ACT_FLAG_ON_POLE | ACT_FLAG_HANGING)) {
             bonkAction = ACT_FORWARD_AIR_KB;
         } else {
@@ -590,11 +589,11 @@ u32 determine_knockback_action(struct MarioState *m, UNUSED s32 arg) {
         }
     }
 
-    if (-0x4000 <= facingDYaw && facingDYaw <= 0x4000) {
+    if (-DEGREES(90) <= facingDYaw && facingDYaw <= DEGREES(90)) {
         m->forwardVel *= -1.0f;
         bonkAction = sBackwardKnockbackActions[terrainIndex][strengthIndex];
     } else {
-        m->faceAngle[1] += 0x8000;
+        m->faceAngle[1] += DEGREES(180);
         bonkAction = sForwardKnockbackActions[terrainIndex][strengthIndex];
     }
 
@@ -661,7 +660,7 @@ u32 should_push_or_pull_door(struct MarioState *m, struct Object *obj) {
 
     s16 dYaw = abs_angle_diff(obj->oMoveAngleYaw, atan2s(dz, dx));
 
-    return (dYaw <= 0x4000) ? WARP_FLAG_DOOR_PULLED : WARP_FLAG_DOOR_FLIP_MARIO;
+    return ((dYaw <= DEGREES(90)) ? WARP_FLAG_DOOR_PULLED : WARP_FLAG_DOOR_FLIP_MARIO);
 }
 
 u32 take_damage_from_interact_object(struct MarioState *m) {
@@ -677,14 +676,14 @@ u32 take_damage_from_interact_object(struct MarioState *m) {
     }
 
     if (!(m->flags & MARIO_CAP_ON_HEAD)) {
-        damage += (damage + 1) / 2;
+        damage += ((damage + 1) >> 1);
     }
 
     if (m->flags & MARIO_METAL_CAP) {
         damage = 0;
     }
 
-    m->hurtCounter += 4 * damage;
+    m->hurtCounter += (4 * damage);
 
 #if ENABLE_RUMBLE
     queue_rumble_data(5, 80);
@@ -697,8 +696,9 @@ u32 take_damage_from_interact_object(struct MarioState *m) {
 u32 take_damage_and_knock_back(struct MarioState *m, struct Object *obj) {
     u32 damage;
 
-    if (!sInvulnerable && !(m->flags & MARIO_VANISH_CAP)
-        && !(obj->oInteractionSubtype & INT_SUBTYPE_DELAY_INVINCIBILITY)) {
+    if (!sInvulnerable
+     && !(m->flags & MARIO_VANISH_CAP)
+     && !(obj->oInteractionSubtype & INT_SUBTYPE_DELAY_INVINCIBILITY)) {
         obj->oInteractStatus = (INT_STATUS_INTERACTED | INT_STATUS_ATTACKED_MARIO);
         m->interactObj = obj;
 
@@ -831,15 +831,17 @@ u32 interact_star_or_key(struct MarioState *m, UNUSED u32 interactType, struct O
         m->usedObj     = obj;
 
 #ifdef GLOBAL_STAR_IDS
-        starIndex = ((obj->oBehParams >> 24) & 0xFF);
+        starIndex = ((obj->oBehParams >> 24) & BITMASK(8));
 #else
-        starIndex = ((obj->oBehParams >> 24) & 0x1F);
+        starIndex = ((obj->oBehParams >> 24) & BITMASK(5));
 #endif
         save_file_collect_star_or_key(m->numCoins, starIndex);
 
-        m->numStars =
-            save_file_get_total_star_count(gCurrSaveFileNum - 1, COURSE_NUM_TO_INDEX(COURSE_MIN),
-                                                                 COURSE_NUM_TO_INDEX(COURSE_MAX));
+        m->numStars = save_file_get_total_star_count(
+            SAVE_NUM_TO_INDEX(gCurrSaveFileNum),
+            COURSE_NUM_TO_INDEX(COURSE_MIN),
+            COURSE_NUM_TO_INDEX(COURSE_MAX)
+        );
 
         if (!noExit) {
             drop_queued_background_music();
@@ -853,14 +855,15 @@ u32 interact_star_or_key(struct MarioState *m, UNUSED u32 interactType, struct O
             return set_mario_action(m, ACT_JUMBO_STAR_CUTSCENE, 0);
         }
 
-        return set_mario_action(m, starGrabAction, noExit + (2 * grandStar));
+        return set_mario_action(m, starGrabAction, (noExit + (2 * grandStar)));
     }
 
     return FALSE;
 }
 
 u32 interact_bbh_entrance(struct MarioState *m, UNUSED u32 interactType, struct Object *obj) {
-    if (m->action != ACT_BBH_ENTER_SPIN && m->action != ACT_BBH_ENTER_JUMP) {
+    if (m->action != ACT_BBH_ENTER_SPIN
+     && m->action != ACT_BBH_ENTER_JUMP) {
         mario_stop_riding_and_holding(m);
 
         obj->oInteractStatus = INT_STATUS_INTERACTED;
@@ -1008,9 +1011,14 @@ u32 get_door_save_file_flag(struct Object *door) {
 u32 interact_door(struct MarioState *m, UNUSED u32 interactType, struct Object *obj) {
     s16 requiredNumStars = (obj->oBehParams >> 24);
 #ifndef UNLOCK_ALL
-    s16 numStars = save_file_get_total_star_count(gCurrSaveFileNum - 1, COURSE_NUM_TO_INDEX(COURSE_MIN), COURSE_NUM_TO_INDEX(COURSE_MAX));
+    s16 numStars = save_file_get_total_star_count(
+        SAVE_NUM_TO_INDEX(gCurrSaveFileNum),
+        COURSE_NUM_TO_INDEX(COURSE_MIN),
+        COURSE_NUM_TO_INDEX(COURSE_MAX)
+    );
 #endif
-    if (m->action == ACT_WALKING || m->action == ACT_DECELERATING) {
+    if (m->action == ACT_WALKING
+     || m->action == ACT_DECELERATING) {
 #ifndef UNLOCK_ALL
         if (numStars >= requiredNumStars) {
 #endif

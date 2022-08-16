@@ -224,8 +224,10 @@ void load_level_init_text(u32 areaDialogIdx) {
             break;
 
         default:
-            gotAchievement =
-                save_file_get_star_flags((gCurrSaveFileNum - 1), COURSE_NUM_TO_INDEX(gCurrCourseNum));
+            gotAchievement = save_file_get_star_flags(
+                SAVE_NUM_TO_INDEX(gCurrSaveFileNum),
+                COURSE_NUM_TO_INDEX(gCurrCourseNum)
+            );
             break;
     }
 
@@ -457,7 +459,11 @@ void check_instant_warp(void) {
 #ifdef ENABLE_VANILLA_LEVEL_SPECIFIC_CHECKS
     if (gCurrLevelNum == LEVEL_CASTLE
  #ifndef UNLOCK_ALL
-     && (save_file_get_total_star_count((gCurrSaveFileNum - 1), COURSE_NUM_TO_INDEX(COURSE_MIN), COURSE_NUM_TO_INDEX(COURSE_MAX)) >= 70)
+     && (save_file_get_total_star_count(
+            SAVE_NUM_TO_INDEX(gCurrSaveFileNum),
+            COURSE_NUM_TO_INDEX(COURSE_MIN),
+            COURSE_NUM_TO_INDEX(COURSE_MAX)
+         ) >= 70)
  #endif // UNLOCK_ALL
     ) {
         return;
@@ -789,7 +795,7 @@ void initiate_delayed_warp(void) {
                     sound_banks_disable(SEQ_PLAYER_SFX, SOUND_BANKS_ALL);
 
                     gCurrCreditsEntry++;
-                    gCurrActNum = (gCurrCreditsEntry->actNum & 0x07);
+                    gCurrActNum = (gCurrCreditsEntry->actNum & BITMASK(3));
                     if ((gCurrCreditsEntry + 1)->levelNum == LEVEL_NONE) {
                         destWarpNode = WARP_NODE_CREDITS_END;
                     } else {
@@ -818,7 +824,6 @@ void initiate_delayed_warp(void) {
 void update_hud_values(void) {
     if (gCurrCreditsEntry == NULL) {
         s16 numHealthWedges = ((gMarioState->health > 0) ? (gMarioState->health >> 8) : 0);
-
 #ifdef BREATH_METER
         s16 numBreathWedges = ((gMarioState->breath > 0) ? (gMarioState->breath >> 8) : 0);
 #endif
@@ -1135,7 +1140,7 @@ s32 init_level(void) {
                 set_mario_action(gMarioState, ACT_IDLE, 0);
             } else if (!gDebugLevelSelect) {
                 if (gMarioState->action != ACT_UNINITIALIZED) {
-                    if (save_file_exists(gCurrSaveFileNum - 1)) {
+                    if (save_file_exists(SAVE_NUM_TO_INDEX(gCurrSaveFileNum))) {
                         set_mario_action(gMarioState, ACT_IDLE, 0);
                     } else {
                         set_mario_action(gMarioState, ACT_INTRO_CUTSCENE, 0);
@@ -1220,7 +1225,7 @@ s32 lvl_init_from_save_file(UNUSED s16 initOrUpdate, s32 levelNum) {
     sWarpDest.type = WARP_TYPE_NOT_WARPING;
     sDelayedWarpOp = WARP_OP_NONE;
 #ifdef ENABLE_VANILLA_LEVEL_SPECIFIC_CHECKS
-    gNeverEnteredCastle = !save_file_exists(gCurrSaveFileNum - 1);
+    gNeverEnteredCastle = !save_file_exists(SAVE_NUM_TO_INDEX(gCurrSaveFileNum));
 #else
     gNeverEnteredCastle = FALSE;
 #endif
@@ -1255,7 +1260,10 @@ s32 lvl_set_current_level(UNUSED s16 initOrUpdate, s32 levelNum) {
     if (is_bowser_level(gCurrLevelNum)) {
         gMarioState->numCoins = 0;
         gHudDisplay.coins = 0;
-        gCurrCourseStarFlags = save_file_get_star_flags((gCurrSaveFileNum - 1), COURSE_NUM_TO_INDEX(gCurrCourseNum));
+        gCurrCourseStarFlags = save_file_get_star_flags(
+            SAVE_NUM_TO_INDEX(gCurrSaveFileNum),
+            COURSE_NUM_TO_INDEX(gCurrCourseNum)
+        );
     }
 
     if (gSavedCourseNum != gCurrCourseNum) {

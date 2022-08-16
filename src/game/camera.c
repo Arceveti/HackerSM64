@@ -5947,7 +5947,7 @@ void camera_course_processing(struct Camera *c) {
                             break;
 
                         case SURFACE_BOSS_FIGHT_CAMERA:
-                            if (gCurrActNum == 1) {
+                            if (gCurrActNum == ACT_INDEX_TO_NUM(ACT_INDEX_1)) {
                                 set_camera_mode_boss_fight(c);
                             } else {
                                 set_camera_mode_radial(c, 60);
@@ -6273,7 +6273,7 @@ void stop_cutscene_and_retrieve_stored_info(struct Camera *c) {
 }
 
 void cap_switch_save(UNUSED s16 param) {
-    save_file_do_save(gCurrSaveFileNum - 1);
+    save_file_do_save(SAVE_NUM_TO_INDEX(gCurrSaveFileNum));
 }
 
 void init_spline_point(struct CutsceneSplinePoint *splinePoint, s8 index, u8 speed, Vec3s point) {
@@ -8549,7 +8549,7 @@ void cutscene_cap_switch_press_start(struct Camera *c) {
     vec3f_get_yaw(sMarioCamState->pos, c->pos, &yaw);
     sCutsceneVars[3].angle[1] = 0x1200;
     // Basically the amount of rotation to get from behind Mario to in front of Mario
-    sCutsceneVars[1].angle[1] = ((yaw - (sMarioCamState->faceAngle[1] + sCutsceneVars[3].angle[1])) & 0xFF00);
+    sCutsceneVars[1].angle[1] = ((yaw - (sMarioCamState->faceAngle[1] + sCutsceneVars[3].angle[1])) & (BITMASK(8) << 8));
 }
 
 /**

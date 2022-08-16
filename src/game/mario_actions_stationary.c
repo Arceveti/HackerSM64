@@ -1043,7 +1043,11 @@ s32 act_first_person(struct MarioState *m) {
     if ((m->floor != NULL)
      && (m->floor->type == SURFACE_LOOK_UP_WARP)
 #ifndef UNLOCK_ALL
-     && (save_file_get_total_star_count(gCurrSaveFileNum - 1, COURSE_NUM_TO_INDEX(COURSE_MIN), COURSE_NUM_TO_INDEX(COURSE_MAX)) >= 10)
+     && (save_file_get_total_star_count(
+            SAVE_NUM_TO_INDEX(gCurrSaveFileNum),
+            COURSE_NUM_TO_INDEX(COURSE_MIN),
+            COURSE_NUM_TO_INDEX(COURSE_MAX)
+         ) >= 10)
 #endif
     ) {
         s16 headRX = m->statusForCamera->headRotation[0];

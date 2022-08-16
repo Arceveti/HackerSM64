@@ -47,9 +47,13 @@ struct CreditsEntry *sDispCreditsEntry = NULL;
 // related to peach gfx?
 static s8 sPeachManualBlinkTime = 0;
 static s8 sPeachIsBlinking = FALSE;
-static s8 sPeachBlinkTimes[7] = { 2, 3, 2, 1, 2, 3, 2 };
+static s8 sPeachBlinkTimes[7] = {
+    2, 3, 2, 1, 2, 3, 2
+};
 
-static u8 sStarsNeededForDialog[] = { 1, 3, 8, 30, 50, 70 };
+static u8 sStarsNeededForDialog[] = {
+    1, 3, 8, 30, 50, 70
+};
 
 /**
  * Data for the jumbo star cutscene. It specifies the flight path after triple
@@ -113,9 +117,9 @@ void print_displaying_credits_entry(void) {
     if (sDispCreditsEntry != NULL) {
         String *currStrPtr = (String *) sDispCreditsEntry->string;
         String titleStr = *currStrPtr++;
-        s16 numLines = *titleStr++ - '0';
+        s16 numLines = (*titleStr++ - '0');
 
-        s16 strY = ((sDispCreditsEntry->actNum & 0x20) ? 28 : 172) + ((numLines == 1) * 16);
+        s16 strY = ((sDispCreditsEntry->actNum & BIT(5)) ? 28 : 172) + ((numLines == 1) * 16);
         s16 lineHeight = 16;
 
         dl_rgba16_begin_cutscene_msg_fade();
@@ -161,7 +165,9 @@ void bhv_end_peach_loop(void) {
     cur_obj_init_animation_with_sound(sEndPeachAnimation);
     if (cur_obj_check_if_near_animation_end()) {
         // anims: 0-3, 4, 5, 6-8, 9, 10, 11
-        if (sEndPeachAnimation <  PEACH_ANIM_3 || sEndPeachAnimation == PEACH_ANIM_DIALOG_1_PART_1 || sEndPeachAnimation == PEACH_ANIM_DIALOG_1_PART_2) {
+        if (sEndPeachAnimation <  PEACH_ANIM_3
+         || sEndPeachAnimation == PEACH_ANIM_DIALOG_1_PART_1
+         || sEndPeachAnimation == PEACH_ANIM_DIALOG_1_PART_2) {
             sEndPeachAnimation++;
         }
     }
@@ -173,7 +179,8 @@ void bhv_end_toad_loop(void) {
     cur_obj_init_animation_with_sound(sEndToadAnims[toadAnimIndex]);
     if (cur_obj_check_if_near_animation_end()) {
         // 0-1, 2-3, 4, 5, 6, 7
-        if (sEndToadAnims[toadAnimIndex] == TOAD_ANIM_WEST_WAVE_THEN_TURN || sEndToadAnims[toadAnimIndex] == TOAD_ANIM_EAST_NOD_THEN_TURN) {
+        if (sEndToadAnims[toadAnimIndex] == TOAD_ANIM_WEST_WAVE_THEN_TURN
+         || sEndToadAnims[toadAnimIndex] == TOAD_ANIM_EAST_NOD_THEN_TURN) {
             sEndToadAnims[toadAnimIndex]++;
         }
     }
@@ -186,7 +193,7 @@ Gfx *geo_switch_peach_eyes(s32 callContext, struct GraphNode *node, UNUSED s32 c
 
     if (callContext == GEO_CONTEXT_RENDER) {
         if (sPeachManualBlinkTime == 0) {
-            timer = (((gAreaUpdateCounter + 0x20) >> 1) & 0x1F);
+            timer = (((gAreaUpdateCounter + 0x20) >> 1) & (32 - 1));
             if (timer < 7) {
                 switchCase->selectedCase = (sPeachIsBlinking * 4) + sPeachBlinkTimes[timer];
             } else {
@@ -230,8 +237,9 @@ void handle_save_menu(struct MarioState *m) {
     // wait for the menu to show up
     if (is_anim_past_end(m) && gSaveOptSelectIndex != MENU_OPT_NONE) {
         // save and continue / save and quit
-        if (gSaveOptSelectIndex == MENU_OPT_SAVE_AND_CONTINUE || gSaveOptSelectIndex == MENU_OPT_SAVE_AND_QUIT) {
-            save_file_do_save(gCurrSaveFileNum - 1);
+        if (gSaveOptSelectIndex == MENU_OPT_SAVE_AND_CONTINUE
+         || gSaveOptSelectIndex == MENU_OPT_SAVE_AND_QUIT) {
+            save_file_do_save(SAVE_NUM_TO_INDEX(gCurrSaveFileNum));
 
             if (gSaveOptSelectIndex == MENU_OPT_SAVE_AND_QUIT) {
                 fade_into_special_warp(WARP_SPECIAL_MARIO_HEAD_REGULAR, 0); // reset game
@@ -264,9 +272,7 @@ struct Object *spawn_obj_at_mario_rel_yaw(struct MarioState *m, ModelID32 model,
     struct Object *obj = spawn_object(m->marioObj, model, behavior);
 
     obj->oFaceAngleYaw = m->faceAngle[1] + relYaw;
-    obj->oPosX = m->pos[0];
-    obj->oPosY = m->pos[1];
-    obj->oPosZ = m->pos[2];
+    vec3f_copy(&obj->oPosVec, m->pos);
 
     return obj;
 }
@@ -303,14 +309,15 @@ void cutscene_put_cap_on(struct MarioState *m) {
  * 3: Mario must not be in first person mode.
  */
 s32 mario_ready_to_speak(void) {
-    u32 actionGroup = gMarioState->action & ACT_GROUP_MASK;
+    u32 action = gMarioState->action;
+    u32 actionGroup = (action & ACT_GROUP_MASK);
     s32 isReadyToSpeak = FALSE;
 
-    if ((gMarioState->action == ACT_WAITING_FOR_DIALOG
+    if ((action == ACT_WAITING_FOR_DIALOG
         || actionGroup == ACT_GROUP_STATIONARY
         || actionGroup == ACT_GROUP_MOVING)
-     && !(gMarioState->action & (ACT_FLAG_RIDING_SHELL | ACT_FLAG_INVULNERABLE))
-     && gMarioState->action != ACT_FIRST_PERSON) {
+     && !(action & (ACT_FLAG_RIDING_SHELL | ACT_FLAG_INVULNERABLE))
+     && action != ACT_FIRST_PERSON) {
         isReadyToSpeak = TRUE;
     }
 
@@ -360,10 +367,10 @@ s32 act_reading_npc_dialog(struct MarioState *m) {
     s32 headTurnAmount = 0;
 
     if (m->actionArg == MARIO_DIALOG_LOOK_UP) {
-        headTurnAmount = -1024;
+        headTurnAmount = -0x400;
     }
     if (m->actionArg == MARIO_DIALOG_LOOK_DOWN) {
-        headTurnAmount = 384;
+        headTurnAmount = 0x180;
     }
 
     if (m->actionState < 8) {
@@ -385,8 +392,8 @@ s32 act_reading_npc_dialog(struct MarioState *m) {
         }
     }
     vec3f_copy(m->marioObj->header.gfx.pos, m->pos);
-    vec3s_set(m->marioObj->header.gfx.angle, 0, m->faceAngle[1], 0);
-    vec3s_set(m->marioBodyState->headAngle, m->actionTimer, 0, 0);
+    vec3s_set(m->marioObj->header.gfx.angle, 0x0, m->faceAngle[1], 0x0);
+    vec3s_set(m->marioBodyState->headAngle, m->actionTimer, 0x0, 0x0);
 
     if (m->actionState != 8) {
         m->actionState++;
@@ -412,7 +419,7 @@ s32 act_disappeared(struct MarioState *m) {
     m->marioObj->header.gfx.node.flags &= ~GRAPH_RENDER_ACTIVE;
     if (m->actionArg) {
         m->actionArg--;
-        if ((m->actionArg & 0xFFFF) == 0) {
+        if ((m->actionArg & BITMASK(16)) == 0) {
             level_trigger_warp(m, (m->actionArg >> 16));
         }
     }
@@ -650,7 +657,7 @@ void general_star_dance_handler(struct MarioState *m, s32 isInWater) {
         }
     } else if (m->actionState == ACT_STATE_STAR_DANCE_DO_SAVE && gDialogResponse != DIALOG_RESPONSE_NONE) {
         if (gDialogResponse == DIALOG_RESPONSE_YES) {
-            save_file_do_save(gCurrSaveFileNum - 1);
+            save_file_do_save(SAVE_NUM_TO_INDEX(gCurrSaveFileNum));
         }
         m->actionState = ACT_STATE_STAR_DANCE_RETURN;
     } else if (m->actionState == ACT_STATE_STAR_DANCE_RETURN && is_anim_at_end(m)) {
@@ -2573,7 +2580,7 @@ static s32 act_credits_cutscene(struct MarioState *m) {
         level_trigger_warp(m, WARP_OP_CREDITS_NEXT);
     }
 
-    m->marioObj->header.gfx.angle[1] += ((gCurrCreditsEntry->actNum & 0xC0) << 8);
+    m->marioObj->header.gfx.angle[1] += ((gCurrCreditsEntry->actNum & (BITMASK(2) << 6)) << 8);
 
     return FALSE;
 }
@@ -2582,14 +2589,23 @@ static s32 act_end_waving_cutscene(struct MarioState *m) {
     if (m->actionState == ACT_STATE_END_WAVING_CUTSCENE_INIT) {
         m->statusForCamera->cameraEvent = CAM_EVENT_START_END_WAVING;
 
-        sEndPeachObj = spawn_object_abs_with_rot(gCurrentObject, 0, MODEL_PEACH, bhvEndPeach, 60, 906,
-                                                 -1180, 0, 0, 0);
+        sEndPeachObj = spawn_object_abs_with_rot(
+            gCurrentObject, 0, MODEL_PEACH, bhvEndPeach,
+              60, 906, -1180,
+            0x0, 0x0, 0x0
+        );
 
-        sEndRightToadObj = spawn_object_abs_with_rot(gCurrentObject, 0, MODEL_TOAD, bhvEndToad, 180,
-                                                     906, -1170, 0, 0, 0);
+        sEndRightToadObj = spawn_object_abs_with_rot(
+            gCurrentObject, 0, MODEL_TOAD, bhvEndToad,
+             180, 906, -1170,
+            0x0, 0x0, 0x0
+        );
 
-        sEndLeftToadObj = spawn_object_abs_with_rot(gCurrentObject, 0, MODEL_TOAD, bhvEndToad, -180,
-                                                    906, -1170, 0, 0, 0);
+        sEndLeftToadObj = spawn_object_abs_with_rot(
+            gCurrentObject, 0, MODEL_TOAD, bhvEndToad,
+            -180, 906, -1170,
+            0x0, 0x0, 0x0
+        );
 
         sEndPeachObj->oOpacity = 255;
         sEndRightToadObj->oOpacity = 255;

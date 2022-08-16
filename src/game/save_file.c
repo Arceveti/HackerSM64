@@ -255,7 +255,7 @@ static void touch_coin_score_age(s32 fileIndex, s32 courseIndex) {
         for (i = 0; i < NUM_SAVE_FILES; i++) {
             age = get_coin_score_age(i, courseIndex);
             if (age < currentAge) {
-                set_coin_score_age(i, courseIndex, age + 1);
+                set_coin_score_age(i, courseIndex, (age + 1));
             }
         }
 
@@ -406,8 +406,9 @@ void puppycam_check_save(void) {
  */
 void save_file_reload(void) {
     // Copy save file data from backup
-    bcopy(&gSaveBuffer.files[gCurrSaveFileNum - 1][1], &gSaveBuffer.files[gCurrSaveFileNum - 1][0],
-          sizeof(gSaveBuffer.files[gCurrSaveFileNum - 1][0]));
+    bcopy(&gSaveBuffer.files[SAVE_NUM_TO_INDEX(gCurrSaveFileNum)][1],
+          &gSaveBuffer.files[SAVE_NUM_TO_INDEX(gCurrSaveFileNum)][0],
+          sizeof(gSaveBuffer.files[SAVE_NUM_TO_INDEX(gCurrSaveFileNum)][0]));
 
     gMainMenuDataModified = FALSE;
     gSaveFileModified = FALSE;
@@ -418,7 +419,7 @@ void save_file_reload(void) {
  * If coin score is greater than the current high score, update it.
  */
 void save_file_collect_star_or_key(s16 coinScore, s16 starIndex) {
-    s32 fileIndex = gCurrSaveFileNum - 1;
+    s32 fileIndex = SAVE_NUM_TO_INDEX(gCurrSaveFileNum);
     s32 courseIndex = COURSE_NUM_TO_INDEX(gCurrCourseNum);
 #ifdef GLOBAL_STAR_IDS
     s32 starByte = COURSE_NUM_TO_INDEX(starIndex / 7);
@@ -427,17 +428,17 @@ void save_file_collect_star_or_key(s16 coinScore, s16 starIndex) {
     s32 starFlag = BIT(starIndex);
 #endif
 
-    gLastCompletedCourseNum = courseIndex + 1;
-    gLastCompletedStarNum = starIndex + 1;
+    gLastCompletedCourseNum = COURSE_INDEX_TO_NUM(courseIndex);
+    gLastCompletedStarNum = COURSE_INDEX_TO_NUM(starIndex);
     sUnusedGotGlobalCoinHiScore = FALSE;
     gGotFileCoinHiScore = FALSE;
 
     if (courseIndex >= COURSE_NUM_TO_INDEX(COURSE_MIN)
-        && courseIndex <= COURSE_NUM_TO_INDEX(COURSE_STAGES_MAX)) {
+     && courseIndex <= COURSE_NUM_TO_INDEX(COURSE_STAGES_MAX)) {
         //! Compares the coin score as a 16 bit value, but only writes the 8 bit
         // truncation. This can allow a high score to decrease.
 
-        if (coinScore > ((u16) save_file_get_max_coin_score(courseIndex) & 0xFFFF)) {
+        if (coinScore > ((u16) save_file_get_max_coin_score(courseIndex) & BITMASK(16))) {
             sUnusedGotGlobalCoinHiScore = TRUE;
         }
 
@@ -544,13 +545,13 @@ s32 save_file_get_total_star_count(s32 fileIndex, s32 minCourse, s32 maxCourse) 
 }
 
 void save_file_set_flags(u32 flags) {
-    gSaveBuffer.files[gCurrSaveFileNum - 1][0].flags |= (flags | SAVE_FLAG_FILE_EXISTS);
+    gSaveBuffer.files[SAVE_NUM_TO_INDEX(gCurrSaveFileNum)][0].flags |= (flags | SAVE_FLAG_FILE_EXISTS);
     gSaveFileModified = TRUE;
 }
 
 void save_file_clear_flags(u32 flags) {
-    gSaveBuffer.files[gCurrSaveFileNum - 1][0].flags &= ~flags;
-    gSaveBuffer.files[gCurrSaveFileNum - 1][0].flags |= SAVE_FLAG_FILE_EXISTS;
+    gSaveBuffer.files[SAVE_NUM_TO_INDEX(gCurrSaveFileNum)][0].flags &= ~flags;
+    gSaveBuffer.files[SAVE_NUM_TO_INDEX(gCurrSaveFileNum)][0].flags |= SAVE_FLAG_FILE_EXISTS;
     gSaveFileModified = TRUE;
 }
 
@@ -580,7 +581,7 @@ u32 save_file_get_flags(void) {
     if (gCurrCreditsEntry != NULL || gCurrDemoInput != NULL) {
         return 0;
     }
-    return gSaveBuffer.files[gCurrSaveFileNum - 1][0].flags;
+    return gSaveBuffer.files[SAVE_NUM_TO_INDEX(gCurrSaveFileNum)][0].flags;
 #endif
 }
 
@@ -590,7 +591,7 @@ u32 save_file_get_flags(void) {
  */
 #ifdef COMPLETE_SAVE_FILE
 u32 save_file_get_star_flags(UNUSED s32 fileIndex, UNUSED s32 courseIndex) {
-    return 0x7F;
+    return BITMASK(7);
 }
 #else
 u32 save_file_get_star_flags(s32 fileIndex, s32 courseIndex) {
@@ -599,7 +600,7 @@ u32 save_file_get_star_flags(s32 fileIndex, s32 courseIndex) {
     if (courseIndex == COURSE_NUM_TO_INDEX(COURSE_NONE)) {
         starFlags = SAVE_FLAG_TO_STAR_FLAG(gSaveBuffer.files[fileIndex][0].flags);
     } else {
-        starFlags =( gSaveBuffer.files[fileIndex][0].courseStars[courseIndex] & 0x7F);
+        starFlags = (gSaveBuffer.files[fileIndex][0].courseStars[courseIndex] & BITMASK(7));
     }
 
     return starFlags;
@@ -638,7 +639,7 @@ s32 save_file_is_cannon_unlocked(void) {
 #ifdef UNLOCK_ALL
     return TRUE;
 #else
-    return ((gSaveBuffer.files[gCurrSaveFileNum - 1][0].courseStars[gCurrCourseNum] & COURSE_FLAG_CANNON_UNLOCKED) != 0);
+    return ((gSaveBuffer.files[SAVE_NUM_TO_INDEX(gCurrSaveFileNum)][0].courseStars[gCurrCourseNum] & COURSE_FLAG_CANNON_UNLOCKED) != 0);
 #endif
 }
 
@@ -646,13 +647,13 @@ s32 save_file_is_cannon_unlocked(void) {
  * Sets the cannon status to unlocked in the current course.
  */
 void save_file_set_cannon_unlocked(void) {
-    gSaveBuffer.files[gCurrSaveFileNum - 1][0].courseStars[gCurrCourseNum] |= COURSE_FLAG_CANNON_UNLOCKED;
-    gSaveBuffer.files[gCurrSaveFileNum - 1][0].flags |= SAVE_FLAG_FILE_EXISTS;
+    gSaveBuffer.files[SAVE_NUM_TO_INDEX(gCurrSaveFileNum)][0].courseStars[gCurrCourseNum] |= COURSE_FLAG_CANNON_UNLOCKED;
+    gSaveBuffer.files[SAVE_NUM_TO_INDEX(gCurrSaveFileNum)][0].flags |= SAVE_FLAG_FILE_EXISTS;
     gSaveFileModified = TRUE;
 }
 
 void save_file_set_cap_pos(s16 x, s16 y, s16 z) {
-    struct SaveFile *saveFile = &gSaveBuffer.files[gCurrSaveFileNum - 1][0];
+    struct SaveFile *saveFile = &gSaveBuffer.files[SAVE_NUM_TO_INDEX(gCurrSaveFileNum)][0];
 
     saveFile->capLevel = gCurrLevelNum;
     saveFile->capArea = gCurrAreaIndex;
@@ -665,7 +666,7 @@ void save_file_set_cap_pos(s16 x, s16 y, s16 z) {
 }
 
 s32 save_file_get_cap_pos(Vec3s capPos) {
-    struct SaveFile *saveFile = &gSaveBuffer.files[gCurrSaveFileNum - 1][0];
+    struct SaveFile *saveFile = &gSaveBuffer.files[SAVE_NUM_TO_INDEX(gCurrSaveFileNum)][0];
     s32 flags = save_file_get_flags();
 
     if (saveFile->capLevel == gCurrLevelNum
@@ -683,14 +684,14 @@ s32 save_file_get_cap_pos(Vec3s capPos) {
 
 #ifdef SAVE_NUM_LIVES
 void save_file_set_num_lives(s8 numLives) {
-    struct SaveFile *saveFile = &gSaveBuffer.files[gCurrSaveFileNum - 1][0];
+    struct SaveFile *saveFile = &gSaveBuffer.files[SAVE_NUM_TO_INDEX(gCurrSaveFileNum)][0];
     saveFile->numLives = numLives;
     saveFile->flags |= SAVE_FLAG_FILE_EXISTS;
     gSaveFileModified = TRUE;
 }
 
 s32 save_file_get_num_lives(void) {
-    struct SaveFile *saveFile = &gSaveBuffer.files[gCurrSaveFileNum - 1][0];
+    struct SaveFile *saveFile = &gSaveBuffer.files[SAVE_NUM_TO_INDEX(gCurrSaveFileNum)][0];
     return saveFile->numLives;
 }
 #endif
@@ -722,7 +723,7 @@ u32 save_file_get_sound_mode(void) {
 
 void save_file_move_cap_to_default_location(void) {
     if (save_file_get_flags() & SAVE_FLAG_CAP_ON_GROUND) {
-        switch (gSaveBuffer.files[gCurrSaveFileNum - 1][0].capLevel) {
+        switch (gSaveBuffer.files[SAVE_NUM_TO_INDEX(gCurrSaveFileNum)][0].capLevel) {
             case LEVEL_SSL:
                 save_file_set_flags(SAVE_FLAG_CAP_ON_KLEPTO);
                 break;

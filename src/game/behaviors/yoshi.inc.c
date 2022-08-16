@@ -18,7 +18,11 @@ void bhv_yoshi_init(void) {
 
     if (sYoshiDead
 #if !(defined(ENABLE_VANILLA_LEVEL_SPECIFIC_CHECKS) || defined(UNLOCK_ALL))
-     || (save_file_get_total_star_count(gCurrSaveFileNum - 1, COURSE_NUM_TO_INDEX(COURSE_MIN), COURSE_NUM_TO_INDEX(COURSE_MAX)) < 120)
+     || (save_file_get_total_star_count(
+            SAVE_NUM_TO_INDEX(gCurrSaveFileNum),
+            COURSE_NUM_TO_INDEX(COURSE_MIN),
+            COURSE_NUM_TO_INDEX(COURSE_MAX)
+         ) < 120)
 #endif
     ) {
         obj_mark_for_deletion(o);

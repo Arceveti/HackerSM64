@@ -2,13 +2,14 @@
 
 #include "sm64.h"
 #include "moving_texture.h"
+#include "level_commands.h"
 #include "area.h"
 #include "camera.h"
 #include "rendering_graph_node.h"
-#include "engine/math_util.h"
 #include "memory.h"
 #include "save_file.h"
 #include "segment2.h"
+#include "engine/math_util.h"
 #include "engine/surface_collision.h"
 #include "geo_misc.h"
 #include "rendering_graph_node.h"
@@ -622,9 +623,13 @@ Gfx *geo_movtex_draw_water_regions(s32 callContext, struct GraphNode *node, UNUS
                 return NULL;
             }
 #ifdef JRB_ACT_SPECIFIC_MIST
-            if (gCurrActNum != 1)
+            if (gCurrActNum != ACT_INDEX_TO_NUM(ACT_INDEX_1))
 #else
-            if (save_file_get_star_flags((gCurrSaveFileNum - 1), COURSE_NUM_TO_INDEX(COURSE_JRB)) & STAR_FLAG_ACT_1) // first star in JRB complete
+            if (save_file_get_star_flags(
+                    SAVE_NUM_TO_INDEX(gCurrSaveFileNum),
+                    COURSE_NUM_TO_INDEX(COURSE_JRB)
+                ) & STAR_FLAG_ACT_1
+            ) // first star in JRB complete
 #endif
             {
                 return NULL;

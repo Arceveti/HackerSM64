@@ -952,7 +952,11 @@ void move_ddd_painting(struct Object *obj, f32 frontPos, f32 backPos, f32 speed)
     return;
 #endif
     // Obtain the DDD star flags and find out whether Board Bowser's Sub was collected.
-    if (save_file_get_star_flags((gCurrSaveFileNum - 1), COURSE_NUM_TO_INDEX(COURSE_DDD)) & STAR_FLAG_ACT_1) {
+    if (save_file_get_star_flags(
+            SAVE_NUM_TO_INDEX(gCurrSaveFileNum),
+            COURSE_NUM_TO_INDEX(COURSE_DDD)
+        ) & STAR_FLAG_ACT_1
+    ) {
         // Get the other save file flags and check whether DDD has already moved back.
         if (save_file_get_flags() & SAVE_FLAG_DDD_MOVED_BACK) {
             // If the painting has already moved back, place it in the back position.

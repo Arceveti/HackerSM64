@@ -17,7 +17,11 @@ void bhv_spawned_star_init(void) {
         o->oBehParams = o->parentObj->oBehParams;
     }
     s32 param = GET_BPARAM1(o->oBehParams);
-    if (BIT(param) & save_file_get_star_flags((gCurrSaveFileNum - 1), COURSE_NUM_TO_INDEX(gCurrCourseNum))) {
+    if (save_file_get_star_flags(
+            SAVE_NUM_TO_INDEX(gCurrSaveFileNum),
+            COURSE_NUM_TO_INDEX(gCurrCourseNum)
+        ) & BIT(param)
+    ) {
         cur_obj_set_model(MODEL_TRANSPARENT_STAR);
     }
 

@@ -12,7 +12,9 @@ static struct ObjectHitbox sRollingSphereHitbox = {
     /* hurtboxHeight:     */ 0,
 };
 
-static const Vec3f sSnowmanHeadPos = { -4230.0f, -1344.0f, 1813.0f };
+static const Vec3f sSnowmanHeadPos = {
+    -4230.0f, -1344.0f, 1813.0f
+};
 
 void bhv_snowmans_bottom_init(void) {
     vec3f_copy(&o->oHomeVec, &o->oPosVec);
@@ -154,7 +156,10 @@ void bhv_snowmans_bottom_loop(void) {
 }
 
 void bhv_snowmans_head_init(void) {
-    u8 starFlags = save_file_get_star_flags(gCurrSaveFileNum - 1, COURSE_NUM_TO_INDEX(gCurrCourseNum));
+    u8 starFlags = save_file_get_star_flags(
+        SAVE_NUM_TO_INDEX(gCurrSaveFileNum),
+        COURSE_NUM_TO_INDEX(gCurrCourseNum)
+    );
     s8 behParams = GET_BPARAM1(o->oBehParams);
 
     cur_obj_scale(0.7f);
@@ -163,8 +168,13 @@ void bhv_snowmans_head_init(void) {
     o->oFriction = 0.999f;
     o->oBuoyancy = 2.0f;
 
-    if ((starFlags & BIT(behParams)) && gCurrActNum != behParams + 1) {
-        spawn_object_abs_with_rot(o, 0, MODEL_CCM_SNOWMAN_BASE, bhvBigSnowmanWhole, sSnowmanHeadPos[0], sSnowmanHeadPos[1], sSnowmanHeadPos[2], 0, 0, 0);
+    if ((starFlags & BIT(behParams)) && gCurrActNum != ACT_INDEX_TO_NUM(behParams)) {
+        spawn_object_abs_with_rot(o, 0, MODEL_CCM_SNOWMAN_BASE, bhvBigSnowmanWhole,
+            sSnowmanHeadPos[0],
+            sSnowmanHeadPos[1],
+            sSnowmanHeadPos[2],
+            0, 0, 0
+        );
         vec3f_copy(&o->oPosVec, sSnowmanHeadPos);
         o->oAction = SNOWMANS_HEAD_ACT_NONE;
     }

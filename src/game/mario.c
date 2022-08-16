@@ -1916,7 +1916,11 @@ void init_mario_from_save_file(struct MarioState *m) {
     m->animList = &gMarioAnimsBuf;
 
     m->numCoins = 0;
-    m->numStars = save_file_get_total_star_count(gCurrSaveFileNum - 1, COURSE_NUM_TO_INDEX(COURSE_MIN), COURSE_NUM_TO_INDEX(COURSE_MAX));
+    m->numStars = save_file_get_total_star_count(
+        SAVE_NUM_TO_INDEX(gCurrSaveFileNum),
+        COURSE_NUM_TO_INDEX(COURSE_MIN),
+        COURSE_NUM_TO_INDEX(COURSE_MAX)
+    );
     m->numKeys = 0;
 
 #ifdef SAVE_NUM_LIVES
