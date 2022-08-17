@@ -12,17 +12,24 @@ struct ObjectHitbox sEyerokHitbox = {
     /* hurtboxHeight:     */ 1,
 };
 
-s8 sEyerokAnimStatesList[] = { 0, 1, 3, 2, 1, 0 };
+const s8 sEyerokAnimStatesList[] = {
+    EYEROK_HAND_ANIM_STATE_EYE_OPEN,
+    EYEROK_HAND_ANIM_STATE_EYE_MOSTLY_OPEN,
+    EYEROK_HAND_ANIM_STATE_EYE_CLOSED,
+    EYEROK_HAND_ANIM_STATE_EYE_MOSTLY_CLOSED,
+    EYEROK_HAND_ANIM_STATE_EYE_MOSTLY_OPEN,
+    EYEROK_HAND_ANIM_STATE_EYE_OPEN
+};
 
 static s32 eyerok_check_mario_relative_z(s32 relZ) {
-    return gMarioObject->oPosZ - o->oHomeZ < relZ;
+    return ((gMarioObject->oPosZ - o->oHomeZ) < relZ);
 }
 
 static void eyerok_spawn_hand(s16 side, ModelID32 model, const BehaviorScript *behavior) {
-    struct Object *hand = spawn_object_relative_with_scale(side, -500 * side, 0, 300, 1.5f, o, model, behavior);
+    struct Object *hand = spawn_object_relative_with_scale(side, (-500 * side), 0, 300, 1.5f, o, model, behavior);
 
     if (hand != NULL) {
-        hand->oFaceAngleYaw -= 0x4000 * side;
+        hand->oFaceAngleYaw -= (DEGREES(90) * side);
     }
 }
 
@@ -39,9 +46,9 @@ static void eyerok_boss_act_sleep(void) {
 static void eyerok_boss_act_wake_up(void) {
     if (o->oEyerokBossNumHands == 2) {
         if (o->oTimer > 5) {
-            if (o->oSubAction == 0) {
+            if (o->oSubAction == EYEROK_BOSS_SUB_ACT_WAKE_LOWER_VOLUME) {
                 seq_player_lower_volume(SEQ_PLAYER_LEVEL, 60, 40);
-                o->oSubAction++;
+                o->oSubAction++; // EYEROK_BOSS_SUB_ACT_WAKE_WAIT_FOR_DIALOG
             }
 
             if (o->oEyerokBossOffsetFromHome == 0.0f && mario_ready_to_speak()) {
@@ -107,7 +114,7 @@ static void eyerok_boss_act_fight(void) {
                 }
 
                 o->oEyerokBossClampedMarioPosZ = gMarioObject->oPosZ;
-                clamp_f32(&o->oEyerokBossClampedMarioPosZ, o->oPosZ + 400.0f, o->oPosZ + 1600.0f);
+                clamp_f32(&o->oEyerokBossClampedMarioPosZ, (o->oPosZ + 400.0f), (o->oPosZ + 1600.0f));
             } else {
                 o->oEyerokBossActiveHand = (o->oEyerokBossAttackPhase & 0x1);
 
@@ -169,7 +176,7 @@ static s32 eyerok_hand_check_attacked(void) {
         o->oMoveAngleYaw = o->oFaceAngleYaw + 0x8000;
         o->oMoveFlags = OBJ_MOVE_NONE;
         o->oGravity = -4.0f;
-        o->oAnimState = 3;
+        o->oAnimState = EYEROK_HAND_ANIM_STATE_EYE_CLOSED;
 
         return TRUE;
     } else {
@@ -249,7 +256,7 @@ static void eyerok_hand_act_open(void) {
 
     if (cur_obj_init_anim_and_check_if_end(EYEROK_HAND_ANIM_OPEN)) {
         o->oAction = EYEROK_HAND_ACT_SHOW_EYE;
-        o->oEyerokHandAnimStateIndex = 2;
+        o->oEyerokHandAnimStateIndex = EYEROK_HAND_ANIM_STATE_INDEX_EYE_CLOSED;
         o->oEyerokHandEyeShownTimer = 60;
 
         o->collisionData = segmented_to_virtual(ssl_seg7_collision_070282F8);
@@ -271,19 +278,19 @@ static void eyerok_hand_act_show_eye(void) {
 
     if (!eyerok_hand_check_attacked()) {
         if (o->parentObj->oEyerokBossActiveHand == 0) {
-            if (o->oAnimState < 3) {
+            if (o->oAnimState < EYEROK_HAND_ANIM_STATE_EYE_CLOSED) {
                 o->oAnimState++;
             } else if (cur_obj_check_if_near_animation_end()) {
                 o->oAction = EYEROK_HAND_ACT_CLOSE;
             }
         } else {
             if (o->oEyerokHandEyeShownTimer--) {
-                if (o->oEyerokHandAnimStateIndex != 0) {
+                if (o->oEyerokHandAnimStateIndex != EYEROK_HAND_ANIM_STATE_INDEX_EYE_OPEN_1) {
                     o->oEyerokHandAnimStateIndex--;
                 }
                 o->oAnimState = sEyerokAnimStatesList[o->oEyerokHandAnimStateIndex];
             } else {
-                o->oEyerokHandAnimStateIndex = 5;
+                o->oEyerokHandAnimStateIndex = EYEROK_HAND_ANIM_STATE_INDEX_EYE_OPEN_2;
                 o->oEyerokHandEyeShownTimer = random_linear_offset(20, 50);
             }
 
@@ -363,7 +370,7 @@ static void eyerok_hand_act_retreat(void) {
 
     obj_face_yaw_approach(0, 400);
 
-    if (approach_f32_ptr(&o->oPosY, o->oHomeY, 20.0f) && distToHome == 0.0f && o->oFaceAngleYaw == 0) {
+    if (approach_f32_ptr(&o->oPosY, o->oHomeY, 20.0f) && distToHome == 0.0f && o->oFaceAngleYaw == 0x0) {
         o->oAction = EYEROK_HAND_ACT_IDLE;
         o->parentObj->oEyerokBossActiveHand -= o->oBehParams2ndByte;
 
@@ -402,14 +409,14 @@ static void eyerok_hand_act_smash(void) {
                 s16 dYawToMario = abs_angle_diff(o->oFaceAngleYaw, o->oAngleToMario);
                 if (
                     o->oDistanceToMario < 300.0f
-                    && dYawToMario > 0x2000
-                    && dYawToMario < 0x6000
+                    && dYawToMario > DEGREES(45)
+                    && dYawToMario < DEGREES(135)
                 ) {
                     o->oAction = EYEROK_HAND_ACT_FIST_SWEEP;
-                    if ((s16)(o->oFaceAngleYaw - o->oAngleToMario) < 0) {
-                        o->oMoveAngleYaw = 0x4000;
+                    if ((s16)(o->oFaceAngleYaw - o->oAngleToMario) < 0x0) {
+                        o->oMoveAngleYaw = DEGREES(90);
                     } else {
-                        o->oMoveAngleYaw = -0x4000;
+                        o->oMoveAngleYaw = -DEGREES(90);
                     }
                 } else {
                     o->oAction = EYEROK_HAND_ACT_RETREAT;
@@ -427,9 +434,9 @@ static void eyerok_hand_act_fist_push(void) {
         o->oForwardVel = 0.0f;
 
         if (o->oPosX - gMarioObject->oPosX < 0.0f) {
-            o->oMoveAngleYaw = 0x4000;
+            o->oMoveAngleYaw = DEGREES(90);
         } else {
-            o->oMoveAngleYaw = -0x4000;
+            o->oMoveAngleYaw = -DEGREES(90);
         }
     } else {
         o->oForwardVel = 50.0f;
@@ -452,7 +459,7 @@ static void eyerok_hand_act_begin_double_pound(void) {
         o->parentObj->oEyerokBossAttackCountdown < 0
         || o->parentObj->oEyerokBossActiveHand == o->oBehParams2ndByte) {
         o->oAction = EYEROK_HAND_ACT_DOUBLE_POUND;
-        o->oMoveAngleYaw = (s32)(o->oFaceAngleYaw - (0x4000 * o->parentObj->oEyerokBossFightSideZ));
+        o->oMoveAngleYaw = (s32)(o->oFaceAngleYaw - (DEGREES(90) * o->parentObj->oEyerokBossFightSideZ));
     } else {
         f32 homeXOffset = o->parentObj->oPosX + (400.0f * o->parentObj->oEyerokBossFightSideZ) - (180.0f * o->oBehParams2ndByte);
 
@@ -549,5 +556,5 @@ void bhv_eyerok_hand_loop(void) {
     }
 
     load_object_collision_model();
-    o->header.gfx.scale[0] = 1.5f * o->oBehParams2ndByte;
+    o->header.gfx.scale[0] = (1.5f * o->oBehParams2ndByte);
 }

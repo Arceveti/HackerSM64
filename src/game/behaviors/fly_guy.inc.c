@@ -21,7 +21,11 @@ static struct ObjectHitbox sFlyGuyHitbox = {
 /**
  * Unused jitter amounts.
  */
-static s16 sFlyGuyJitterAmounts[] = { 0x1000, -0x2000, 0x2000 };
+static const s16 sFlyGuyJitterAmounts[] = {
+     0x1000,
+    -0x2000,
+     0x2000
+};
 
 /**
  * Return to regular size. When mario is close enough or home is far enough,
@@ -42,7 +46,7 @@ static void fly_guy_act_idle(void) {
         } else {
             // Randomly enter the approach mario action - but this doesn't
             // really do anything since we come right back to idle
-            if (o->oFlyGuyIdleTimer >= 3 || o->oFlyGuyIdleTimer == ((u16)random_u16() & 1) + 2) {
+            if (o->oFlyGuyIdleTimer >= 3 || o->oFlyGuyIdleTimer == ((u16)random_u16() & 0x1) + 2) {
                 o->oFlyGuyIdleTimer = 0;
                 o->oAction = FLY_GUY_ACT_APPROACH_MARIO;
             } else {
@@ -71,15 +75,15 @@ static void fly_guy_act_approach_mario(void) {
         if (abs_angle_diff(o->oAngleToMario, o->oFaceAngleYaw) < 0x2000
             && (o->oPosY - gMarioObject->oPosY > 400.0f || o->oDistanceToMario < 400.0f)) {
             // Either shoot fire or lunge
-            if (o->oBehParams2ndByte != FLY_GUY_BP_LUNGES && random_u16() % 2) {
+            if (o->oBehParams2ndByte != FLY_GUY_BP_LUNGES && (random_u16() & 0x1)) {
                 o->oAction = FLY_GUY_ACT_SHOOT_FIRE;
                 o->oFlyGuyScaleVel = 0.06f;
             } else {
                 o->oAction = FLY_GUY_ACT_LUNGE;
                 o->oFlyGuyLungeTargetPitch = obj_turn_pitch_toward_mario(-200.0f, 0);
 
-                o->oForwardVel = 25.0f * coss(o->oFlyGuyLungeTargetPitch);
-                o->oVelY = 25.0f * -sins(o->oFlyGuyLungeTargetPitch);
+                o->oForwardVel = (25.0f *  coss(o->oFlyGuyLungeTargetPitch));
+                o->oVelY       = (25.0f * -sins(o->oFlyGuyLungeTargetPitch));
                 o->oFlyGuyLungeYDecel = -o->oVelY / 30.0f;
             }
         }
@@ -160,7 +164,8 @@ static void fly_guy_act_shoot_fire(void) {
                 /*model      */ MODEL_RED_FLAME_SHADOW,
                 /*startSpeed */ 25.0f,
                 /*endSpeed   */ 20.0f,
-                /*movePitch  */ fireMovePitch);
+                /*movePitch  */ fireMovePitch
+            );
         }
     } else {
         //! By triggering this repeatedly, we can keep obj_grow_then_shrink

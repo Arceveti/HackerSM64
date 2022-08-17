@@ -34,7 +34,7 @@ void floating_platform_act_move_to_home(void) {
         }
     } else {
         o->oFaceAnglePitch /= 2;
-        o->oFaceAngleRoll /= 2;
+        o->oFaceAngleRoll  /= 2;
         o->oFloatingPlatformMarioWeightWobbleOffset -= 5.0f;
 
         o->oVelY = 10.0f;
@@ -45,7 +45,7 @@ void floating_platform_act_move_to_home(void) {
     }
 
     o->oPosY = o->oHomeY - 64.0f - o->oFloatingPlatformMarioWeightWobbleOffset
-               + sins(o->oFloatingPlatformWaterSurfaceWobbleOffset * 0x800) * 10.0f;
+               + (sins(o->oFloatingPlatformWaterSurfaceWobbleOffset * 0x800) * 10.0f);
 
     o->oFloatingPlatformWaterSurfaceWobbleOffset++;
 

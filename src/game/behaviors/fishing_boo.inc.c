@@ -21,12 +21,12 @@ void bhv_beta_moving_flames_spawn_loop(void) {
         case 6:
         case 7:
             spawn_object(o, MODEL_RED_FLAME, bhvBetaMovingFlames);
-            o->oAction++;
+            o->oAction++; // 8
             break;
         case 8:
             break;
         case 9:
-            o->oAction++;
+            o->oAction++; // 10
             break;
     }
 }

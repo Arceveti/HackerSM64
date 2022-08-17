@@ -44,26 +44,19 @@ void bhv_ground_sand_init(void) {
     cur_obj_spawn_particles(&sSandParticles);
 }
 
-static s16 sSmokeMovementParams[] = {
-    /* forwardVel  */  2,
-    /* velY        */ -8,
-    /* gravity     */  1,
-    /* rangeLength */  4
-};
-
 void spawn_smoke_with_velocity(void) {
     struct Object *smoke = spawn_object_with_scale(o, MODEL_SMOKE, bhvWhitePuffSmoke2, 1.0f);
 
-    smoke->oForwardVel = sSmokeMovementParams[0];
-    smoke->oVelY = sSmokeMovementParams[1];
-    smoke->oGravity = sSmokeMovementParams[2];
+    smoke->oForwardVel = 2.0f;
+    smoke->oVelY = -8.0f;
+    smoke->oGravity = 1.0f;
 
-    obj_translate_xyz_random(smoke, sSmokeMovementParams[3]);
+    obj_translate_xyz_random(smoke, 4.0f);
 }
 
 // TODO Fix name
 void clear_particle_flags(u32 flags) {
-    o->parentObj->oActiveParticleFlags &= flags ^ 0xFFFFFFFF; // Clear the flags given (could just be ~flags)
+    o->parentObj->oActiveParticleFlags &= (flags ^ 0xFFFFFFFF); // Clear the flags given (could just be ~flags)
 }
 
 static struct SpawnParticlesInfo sSnowParticles = {

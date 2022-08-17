@@ -20,22 +20,22 @@ struct ObjectHitbox sExclamationBoxHitbox = {
 };
 
 struct ExclamationBoxContents sExclamationBoxContents[] = {
-    { EXCLAMATION_BOX_BP_WING_CAP,         0, MODEL_MARIOS_WING_CAP,  bhvWingCap               },
-    { EXCLAMATION_BOX_BP_METAL_CAP,        0, MODEL_MARIOS_METAL_CAP, bhvMetalCap              },
-    { EXCLAMATION_BOX_BP_VANISH_CAP,       0, MODEL_MARIOS_CAP,       bhvVanishCap             },
-    { EXCLAMATION_BOX_BP_KOOPA_SHELL,      0, MODEL_KOOPA_SHELL,      bhvKoopaShell            },
-    { EXCLAMATION_BOX_BP_COINS_1,          0, MODEL_YELLOW_COIN,      bhvSingleCoinGetsSpawned },
-    { EXCLAMATION_BOX_BP_COINS_3,          0, MODEL_NONE,             bhvThreeCoinsSpawn       },
-    { EXCLAMATION_BOX_BP_COINS_10,         0, MODEL_NONE,             bhvTenCoinsSpawn         },
-    { EXCLAMATION_BOX_BP_1UP_WALKING,      0, MODEL_1UP,              bhv1upWalking            },
-    { EXCLAMATION_BOX_BP_STAR_1,           0, MODEL_STAR,             bhvSpawnedStar           },
-    { EXCLAMATION_BOX_BP_1UP_RUNNING_AWAY, 0, MODEL_1UP,              bhv1upRunningAway        },
-    { EXCLAMATION_BOX_BP_STAR_2,           1, MODEL_STAR,             bhvSpawnedStar           },
-    { EXCLAMATION_BOX_BP_STAR_3,           2, MODEL_STAR,             bhvSpawnedStar           },
-    { EXCLAMATION_BOX_BP_STAR_4,           3, MODEL_STAR,             bhvSpawnedStar           },
-    { EXCLAMATION_BOX_BP_STAR_5,           4, MODEL_STAR,             bhvSpawnedStar           },
-    { EXCLAMATION_BOX_BP_STAR_6,           5, MODEL_STAR,             bhvSpawnedStar           },
-    { EXCLAMATION_BOX_BP_NULL,             0, MODEL_NONE,             NULL                     }
+    { EXCLAMATION_BOX_BP_WING_CAP,                   0, MODEL_MARIOS_WING_CAP,  bhvWingCap               },
+    { EXCLAMATION_BOX_BP_METAL_CAP,                  0, MODEL_MARIOS_METAL_CAP, bhvMetalCap              },
+    { EXCLAMATION_BOX_BP_VANISH_CAP,                 0, MODEL_MARIOS_CAP,       bhvVanishCap             },
+    { EXCLAMATION_BOX_BP_KOOPA_SHELL,                0, MODEL_KOOPA_SHELL,      bhvKoopaShell            },
+    { EXCLAMATION_BOX_BP_COINS_1,                    0, MODEL_YELLOW_COIN,      bhvSingleCoinGetsSpawned },
+    { EXCLAMATION_BOX_BP_COINS_3,                    0, MODEL_NONE,             bhvThreeCoinsSpawn       },
+    { EXCLAMATION_BOX_BP_COINS_10,                   0, MODEL_NONE,             bhvTenCoinsSpawn         },
+    { EXCLAMATION_BOX_BP_1UP_WALKING,                0, MODEL_1UP,              bhv1upWalking            },
+    { EXCLAMATION_BOX_BP_STAR_1,           ACT_INDEX_1, MODEL_STAR,             bhvSpawnedStar           },
+    { EXCLAMATION_BOX_BP_1UP_RUNNING_AWAY,           0, MODEL_1UP,              bhv1upRunningAway        },
+    { EXCLAMATION_BOX_BP_STAR_2,           ACT_INDEX_2, MODEL_STAR,             bhvSpawnedStar           },
+    { EXCLAMATION_BOX_BP_STAR_3,           ACT_INDEX_3, MODEL_STAR,             bhvSpawnedStar           },
+    { EXCLAMATION_BOX_BP_STAR_4,           ACT_INDEX_4, MODEL_STAR,             bhvSpawnedStar           },
+    { EXCLAMATION_BOX_BP_STAR_5,           ACT_INDEX_5, MODEL_STAR,             bhvSpawnedStar           },
+    { EXCLAMATION_BOX_BP_STAR_6,           ACT_INDEX_6, MODEL_STAR,             bhvSpawnedStar           },
+    { EXCLAMATION_BOX_BP_NULL,                       0, MODEL_NONE,             NULL                     }
 };
 
 void bhv_rotating_exclamation_mark_loop(void) {
@@ -88,7 +88,7 @@ void exclamation_box_act_active(void) {
     }
     if (cur_obj_was_attacked_or_ground_pounded()) {
         cur_obj_become_intangible();
-        o->oExclamationBoxScaleAngle = 0x4000;
+        o->oExclamationBoxScaleAngle = DEGREES(90);
         o->oVelY = 30.0f;
         o->oGravity = -8.0f;
         o->oFloorHeight = o->oPosY;
@@ -106,9 +106,9 @@ void exclamation_box_act_scaling(void) {
         o->oVelY = 0.0f;
         o->oGravity = 0.0f;
     }
-    o->oExclamationBoxVerticalScale = (sins(o->oExclamationBoxScaleAngle) + 1.0f) * 0.3f + 0.0f;
-    o->oExclamationBoxHorizontalScale = (-sins(o->oExclamationBoxScaleAngle) + 1.0f) * 0.5f + 1.0f;
-    o->oGraphYOffset = (-sins(o->oExclamationBoxScaleAngle) + 1.0f) * 26.0f;
+    o->oExclamationBoxVerticalScale   = (( sins(o->oExclamationBoxScaleAngle) + 1.0f) *  0.3f) + 0.0f;
+    o->oExclamationBoxHorizontalScale = ((-sins(o->oExclamationBoxScaleAngle) + 1.0f) *  0.5f) + 1.0f;
+    o->oGraphYOffset                  = ((-sins(o->oExclamationBoxScaleAngle) + 1.0f) * 26.0f);
     o->oExclamationBoxScaleAngle += 0x1000;
     o->header.gfx.scale[0] = o->oExclamationBoxHorizontalScale * 2.0f;
     o->header.gfx.scale[1] = o->oExclamationBoxVerticalScale   * 2.0f;

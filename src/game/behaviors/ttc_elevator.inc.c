@@ -18,7 +18,8 @@ static s8 sTTCElevatorSpeeds[] = {
  */
 void bhv_ttc_elevator_init(void) {
     // If behParam is nonzero, then move 100 * behParam units. Otherwise default to 500
-    f32 peakOffset = ((o->oBehParams >> 16) & BITMASK(16)) ? (100.0f * ((o->oBehParams >> 16) & BITMASK(16))) : 500.0f;
+    s32 behParam = ((o->oBehParams >> 16) & BITMASK(16));
+    f32 peakOffset = behParam ? (100.0f * behParam) : 500.0f;
 
     o->oTTCElevatorPeakY = o->oPosY + peakOffset;
 }

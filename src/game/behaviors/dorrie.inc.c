@@ -6,7 +6,7 @@ void dorrie_raise_head(void) {
     o->oDorrieNeckAngle -= (s16) absf(370.0f * sins(o->oDorrieHeadRaiseSpeed));
 
     f32 xzDisp = 440.0f * (coss(o->oDorrieNeckAngle) - coss(startAngle));
-    f32 yDisp = 440.0f * (sins(o->oDorrieNeckAngle) - sins(startAngle));
+    f32 yDisp  = 440.0f * (sins(o->oDorrieNeckAngle) - sins(startAngle));
 
     vec3f_set(
         gMarioState->pos,
@@ -46,7 +46,7 @@ void dorrie_act_move(void) {
 
         obj_forward_vel_approach(targetSpeed, 0.5f);
         o->oDorrieYawVel =
-            approach_s16_symmetric(o->oDorrieYawVel, (s16)(targetYaw - o->oMoveAngleYaw) / 50, 5);
+            approach_s16_symmetric(o->oDorrieYawVel, ((s16)(targetYaw - o->oMoveAngleYaw) / 50), 5);
         o->oMoveAngleYaw += o->oDorrieYawVel;
     }
 
@@ -110,7 +110,7 @@ void bhv_dorrie_update(void) {
         // Shift dorrie's bounds to account for her neck
         f32 boundsShift = 440.0f * coss(o->oDorrieNeckAngle) * coss(o->oMoveAngleYaw - o->oDorrieAngleToHome);
 
-        if (clamp_f32(&o->oDorrieDistToHome, 1650.0f + boundsShift, 2300.0f + boundsShift)) {
+        if (clamp_f32(&o->oDorrieDistToHome, (1650.0f + boundsShift), (2300.0f + boundsShift))) {
             o->oPosX = o->oHomeX - o->oDorrieDistToHome * sins(o->oDorrieAngleToHome);
             o->oPosZ = o->oHomeZ - o->oDorrieDistToHome * coss(o->oDorrieAngleToHome);
         }

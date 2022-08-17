@@ -1,7 +1,7 @@
 // falling_rising_platform.inc.c
 
 void bhv_squishable_platform_loop(void) {
-    o->header.gfx.scale[1] = (sins(o->oBitfsPlatformTimer) + 1.0f) * 0.3f + 0.4f;
+    o->header.gfx.scale[1] = ((sins(o->oBitfsPlatformTimer) + 1.0f) * 0.3f) + 0.4f;
     o->oBitfsPlatformTimer += 0x80;
 }
 
@@ -15,7 +15,7 @@ void bhv_bitfs_sinking_cage_pole_loop(void) {
 }
 
 void bhv_bitfs_sinking_cage_platform_loop(void) {
-    if (o->oBehParams2ndByte != 0) {
+    if (o->oBehParams2ndByte != SINKING_POLE_PLATFORM_BP_LOW) {
         if (o->oTimer == 0) {
             o->oPosY -= 300.0f;
         }

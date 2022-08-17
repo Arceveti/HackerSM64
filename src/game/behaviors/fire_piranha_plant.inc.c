@@ -70,8 +70,10 @@ static void fire_piranha_plant_act_hide(void) {
                 obj_die_if_health_non_positive();
                 set_object_respawn_info_bits(o, RESPAWN_INFO_TYPE_NORMAL);
             }
-        } else if (sNumActiveFirePiranhaPlants < 2 && o->oTimer > 100
-                   && o->oDistanceToMario > 100.0f && o->oDistanceToMario < 800.0f) {
+        } else if (sNumActiveFirePiranhaPlants < 2
+                && o->oTimer > 100
+                && o->oDistanceToMario > 100.0f
+                && o->oDistanceToMario < 800.0f) {
             cur_obj_play_sound_2(SOUND_OBJ_PIRANHA_PLANT_APPEAR);
 
             o->oFirePiranhaPlantActive = TRUE;
@@ -101,12 +103,14 @@ static void fire_piranha_plant_act_grow(void) {
             cur_obj_rotate_yaw_toward(o->oAngleToMario, 0x400);
         } else if (obj_is_rendering_enabled() && cur_obj_check_anim_frame(56)) {
             cur_obj_play_sound_2(SOUND_OBJ_FLAME_BLOWN);
-            obj_spit_fire(0,
-                          (s32)( 30.0f * o->oFirePiranhaPlantNeutralScale),
-                          (s32)(140.0f * o->oFirePiranhaPlantNeutralScale),
-                               (  2.5f * o->oFirePiranhaPlantNeutralScale),
-                          MODEL_RED_FLAME_SHADOW,
-                          20.0f, 15.0f, 0x1000);
+            obj_spit_fire(
+                0,
+                (s32)( 30.0f * o->oFirePiranhaPlantNeutralScale),
+                (s32)(140.0f * o->oFirePiranhaPlantNeutralScale),
+                     (  2.5f * o->oFirePiranhaPlantNeutralScale),
+                MODEL_RED_FLAME_SHADOW,
+                20.0f, 15.0f, 0x1000
+            );
         }
     } else if (o->oFirePiranhaPlantScale > o->oFirePiranhaPlantNeutralScale / 2) {
         cur_obj_become_tangible();

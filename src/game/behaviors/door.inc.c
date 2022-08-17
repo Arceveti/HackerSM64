@@ -5,7 +5,7 @@ struct DoorAction {
     ObjAction32 action;
 };
 
-static struct DoorAction sDoorActions[] = {
+static const struct DoorAction sDoorActions[] = {
     { INT_STATUS_WARP_DOOR_PULLED, DOOR_ACT_WARP_PULLED },
     { INT_STATUS_WARP_DOOR_PUSHED, DOOR_ACT_WARP_PUSHED },
     { INT_STATUS_DOOR_PULLED,      DOOR_ACT_PULLED      },
@@ -13,9 +13,15 @@ static struct DoorAction sDoorActions[] = {
     { -1,                          DOOR_ACT_CLOSED      },
 };
 
-static s32 sDoorOpenSounds[] = { SOUND_GENERAL_OPEN_WOOD_DOOR, SOUND_GENERAL_OPEN_IRON_DOOR };
+static const s32 sDoorOpenSounds[] = {
+    SOUND_GENERAL_OPEN_WOOD_DOOR,
+    SOUND_GENERAL_OPEN_IRON_DOOR
+};
 
-static s32 sDoorCloseSounds[] = { SOUND_GENERAL_CLOSE_WOOD_DOOR, SOUND_GENERAL_CLOSE_IRON_DOOR };
+static const s32 sDoorCloseSounds[] = {
+    SOUND_GENERAL_CLOSE_WOOD_DOOR,
+    SOUND_GENERAL_CLOSE_IRON_DOOR
+};
 
 void door_animation_and_reset(s32 animIndex) {
     cur_obj_init_animation_with_sound(animIndex);

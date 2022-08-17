@@ -38,12 +38,7 @@ static void enemy_lakitu_act_uninitialized(void) {
 static void enemy_lakitu_update_vel_y(f32 offsetY) {
     // In order to encourage oscillation, pass mario by a small margin before
     // accelerating the opposite direction
-    f32 margin;
-    if (o->oVelY < 0.0f) {
-        margin = -3.0f;
-    } else {
-        margin = 3.0f;
-    }
+    f32 margin = (o->oVelY < 0.0f) ? -3.0f : 3.0f;
 
     if (o->oPosY < gMarioObject->oPosY + offsetY + margin) {
         obj_y_vel_approach(4.0f, 0.4f);

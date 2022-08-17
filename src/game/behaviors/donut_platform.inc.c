@@ -10,11 +10,16 @@ void bhv_donut_row_init(void) {
 }
 
 void bhv_donut_platform_spawner_update(void) {
-    if (o->oDonutPlatformObject == NULL) {
-        if (o->oDistanceToMario > 1000.0f && o->oDistanceToMario < 2000.0f) {
-            o->oDonutPlatformObject = spawn_object_relative(OBJ_BP_NONE, 0, 0, 0,
-                                                            o, MODEL_RR_DONUT_PLATFORM, bhvDonutPlatform);
-        }
+    if (o->oDonutPlatformObject == NULL
+     && o->oDistanceToMario > 1000.0f
+     && o->oDistanceToMario < 2000.0f) {
+        o->oDonutPlatformObject = spawn_object_relative(
+            OBJ_BP_NONE,
+            0, 0, 0,
+            o,
+            MODEL_RR_DONUT_PLATFORM,
+            bhvDonutPlatform
+        );
     }
 }
 
