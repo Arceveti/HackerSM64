@@ -489,7 +489,7 @@ void load_area_terrain(s32 index, TerrainData *data, RoomData *surfaceRooms, Mac
     clear_static_surfaces();
 
     // Initialise a new surface pool for this block of static surface data
-    gCurrStaticSurfacePool = main_pool_alloc(main_pool_available() - 0x10, MEMORY_POOL_LEFT);
+    gCurrStaticSurfacePool = main_pool_alloc((main_pool_available() - 0x10), MEMORY_POOL_LEFT);
     gCurrStaticSurfacePoolEnd = gCurrStaticSurfacePool;
 
     // A while loop iterating through each section of the level data. Sections of data

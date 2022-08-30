@@ -97,10 +97,10 @@ static struct InteractionHandler sInteractionHandlers[] = {
 };
 
 static u32 sForwardKnockbackActions[][3] = {
-//    Soft                        Normal                 Hard
-    { ACT_SOFT_FORWARD_GROUND_KB, ACT_FORWARD_GROUND_KB, ACT_HARD_FORWARD_GROUND_KB }, // Ground
-    { ACT_FORWARD_AIR_KB,         ACT_FORWARD_AIR_KB,    ACT_HARD_FORWARD_AIR_KB    }, // Air
-    { ACT_FORWARD_WATER_KB,       ACT_FORWARD_WATER_KB,  ACT_FORWARD_WATER_KB       }, // Water
+//    Soft                         Normal                  Hard
+    { ACT_SOFT_FORWARD_GROUND_KB,  ACT_FORWARD_GROUND_KB,  ACT_HARD_FORWARD_GROUND_KB  }, // Ground
+    { ACT_FORWARD_AIR_KB,          ACT_FORWARD_AIR_KB,     ACT_HARD_FORWARD_AIR_KB     }, // Air
+    { ACT_FORWARD_WATER_KB,        ACT_FORWARD_WATER_KB,   ACT_FORWARD_WATER_KB        }, // Water
 };
 
 static u32 sBackwardKnockbackActions[][3] = {

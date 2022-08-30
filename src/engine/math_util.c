@@ -616,7 +616,8 @@ void mtxf_rotate_xyz_and_translate_and_mul(Vec3s rot, Vec3f trans, Mat4 dest, Ma
  * angle allows a bank rotation of the camera.
  */
 void mtxf_lookat(Mat4 mtx, Vec3f from, Vec3f to, s32 roll) {
-    Vec3f colX, colY, colZ;
+    s32 i, j;
+    Vec3f col[3];
     f32 dx = to[0] - from[0];
     f32 dz = to[2] - from[2];
     f32 invLength = sqrtf(sqr(dx) + sqr(dz));
@@ -624,27 +625,23 @@ void mtxf_lookat(Mat4 mtx, Vec3f from, Vec3f to, s32 roll) {
     dx *= invLength;
     dz *= invLength;
     f32 sr  = sins(roll);
-    colY[1] = coss(roll);
-    colY[0] =  sr * dz;
-    colY[2] = -sr * dx;
-    vec3f_diff(colZ, from, to); // to & from are swapped
-    vec3f_normalize(colZ);
-    vec3f_cross(colX, colY, colZ);
-    vec3f_normalize(colX);
-    vec3f_cross(colY, colZ, colX);
-    vec3f_normalize(colY);
-    mtx[0][0] = colX[0];
-    mtx[1][0] = colX[1];
-    mtx[2][0] = colX[2];
-    mtx[0][1] = colY[0];
-    mtx[1][1] = colY[1];
-    mtx[2][1] = colY[2];
-    mtx[0][2] = colZ[0];
-    mtx[1][2] = colZ[1];
-    mtx[2][2] = colZ[2];
-    mtx[3][0] = -vec3f_dot(from, colX);
-    mtx[3][1] = -vec3f_dot(from, colY);
-    mtx[3][2] = -vec3f_dot(from, colZ);
+    col[1][1] = coss(roll);
+    col[1][0] =  sr * dz;
+    col[1][2] = -sr * dx;
+    vec3f_diff(col[2], from, to); // to & from are swapped
+    vec3f_normalize(col[2]);
+    vec3f_cross(col[0], col[1], col[2]);
+    vec3f_normalize(col[0]);
+    vec3f_cross(col[1], col[2], col[0]);
+    vec3f_normalize(col[1]);
+    for (i = 0; i < 3; i++) {
+        for (j = 0; j < 3; j++) {
+            mtx[j][i] = col[i][j];
+        }
+    }
+    mtx[3][0] = -vec3f_dot(from, col[0]);
+    mtx[3][1] = -vec3f_dot(from, col[1]);
+    mtx[3][2] = -vec3f_dot(from, col[2]);
     MTXF_END(mtx);
 }
 
@@ -916,9 +913,9 @@ void create_transformation_from_matrices(Mat4 dst, Mat4 a1, Mat4 a2) {
                       + (a1[i][2] * a2[j][2]);
         }
     }
-    dst[3][0] -= medium[0];
-    dst[3][1] -= medium[1];
-    dst[3][2] -= medium[2];
+    for (i = 0; i < 3; i++) {
+        dst[3][i] -= medium[i];
+    }
     *((u32 *) &dst[3][3]) = FLOAT_ONE;
 }
 
@@ -1317,10 +1314,10 @@ void evaluate_cubic_spline(f32 progress, Vec3f pos, Vec3f spline1, Vec3f spline2
     f32 sqp = sqr(progress);           // p^3
     f32 hcp = (sqp * progress) / 2.0f; // (p^3)/2
 
-    B[0] = cube(omp) / 6.0f;                                    // ((1-p)^3)/6
-    B[1] =  hcp - sqp + (2.0f / 3.0f);                          //  (p^3)/2 - p^2 + 2/3
-    B[2] = -hcp + sqp / 2.0f + progress / 2.0f + (1.0f / 6.0f); // -(p^3)/2 + (p^2)/2 + (p^1)/2 + 1/6
-    B[3] =  hcp / 3.0f;                                         //  (p^3)/6
+    B[0] = cube(omp) / 6.0f;                                      // ((1-p)^3)/6
+    B[1] =  hcp - sqp + (2.0f / 3.0f);                            //  (p^3)/2 - p^2 + 2/3
+    B[2] = -hcp + sqp / 2.0f + (progress / 2.0f) + (1.0f / 6.0f); // -(p^3)/2 + (p^2)/2 + (p^1)/2 + 1/6
+    B[3] =  hcp / 3.0f;                                           //  (p^3)/6
 
     pos[0] = (B[0] * spline1[0]) + (B[1] * spline2[0]) + (B[2] * spline3[0]) + (B[3] * spline4[0]);
     pos[1] = (B[0] * spline1[1]) + (B[1] * spline2[1]) + (B[2] * spline3[1]) + (B[3] * spline4[1]);
@@ -1428,15 +1425,15 @@ void anim_spline_init(Vec4s *keyFrames) {
  */
 s32 anim_spline_poll(Vec3f result) {
     Vec4f weights;
-    s32 i;
+    s32 i, j;
     s32 hasEnded = FALSE;
 
     vec3_zero(result);
     spline_get_weights(weights, gSplineKeyframeFraction, gSplineState);
     for (i = 0; i < 4; i++) {
-        result[0] += weights[i] * gSplineKeyframe[i][1];
-        result[1] += weights[i] * gSplineKeyframe[i][2];
-        result[2] += weights[i] * gSplineKeyframe[i][3];
+        for (j = 0; j < 3; j++) {
+            result[j] += weights[i] * gSplineKeyframe[i][j];
+        }
     }
 
     gSplineKeyframeFraction += (gSplineKeyframe[0][0] * (1.0f / 1000.0f));
@@ -1507,7 +1504,9 @@ s32 ray_surface_intersect(Vec3f orig, Vec3f dir, f32 dir_length, struct Surface 
     // Determine the cos(angle) difference between ray and surface normals.
     f32 det = vec3f_dot(e1, h);
     // Check if we're perpendicular or pointing away from the surface.
-    if (det < NEAR_ZERO) return FALSE;
+    if (det < NEAR_ZERO) {
+        return FALSE;
+    }
     // Check if we're making contact with the surface.
     // Make f the inverse of the cos(angle) between ray and surface normals.
     f32 f = 1.0f / det; // invDet
@@ -1517,19 +1516,25 @@ s32 ray_surface_intersect(Vec3f orig, Vec3f dir, f32 dir_length, struct Surface 
     // Make 'u' the cos(angle) between vectors 's' and normals, divided by 'det'.
     f32 u = f * vec3f_dot(s, h);
     // Check if 'u' is within bounds.
-    if ((u < 0.0f) || (u > 1.0f)) return FALSE;
+    if ((u < 0.0f) || (u > 1.0f)) {
+        return FALSE;
+    }
     // Make 'q' the cross product of 's' and edge 1.
     Vec3f q;
     vec3f_cross(q, s, e1);
     // Make 'v' the cos(angle) between the ray and 'q', divided by 'det'.
     f32 v = f * vec3f_dot(dir, q);
     // Check if 'v' is within bounds.
-    if ((v < 0.0f) || ((u + v) > 1.0f)) return FALSE;
+    if ((v < 0.0f) || ((u + v) > 1.0f)) {
+        return FALSE;
+    }
     // Get the length between our origin and the surface contact point.
     // Make '*length' the cos(angle) betqwwn edge 2 and 'q', divided by 'det'.
     *length = f * vec3f_dot(e2, q);
     // Check if the length to the hit point is shorter than the ray length.
-    if ((*length <= NEAR_ZERO) || (*length > dir_length)) return FALSE;
+    if ((*length <= NEAR_ZERO) || (*length > dir_length)) {
+        return FALSE;
+    }
     // Successful contact.
     // Make 'add_dir' into 'dir' scaled by 'length'.
     Vec3f add_dir;
@@ -1558,7 +1563,9 @@ void find_surface_on_ray_list(struct SurfaceNode *list, Vec3f orig, Vec3f dir, f
     // Iterate through every surface of the list
     for (; list != NULL; list = list->next) {
         // Reject surface if out of vertical bounds
-        if ((list->surface->lowerY > top) || (list->surface->upperY < bottom)) continue;
+        if ((list->surface->lowerY > top) || (list->surface->upperY < bottom)) {
+            continue;
+        }
         // Check intersection between the ray and this surface
         hit = ray_surface_intersect(orig, dir, dir_length, list->surface, chk_hit_pos, &length);
         if (hit && (length <= *max_length)) {

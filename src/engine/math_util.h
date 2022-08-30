@@ -93,16 +93,16 @@ extern const f32 gSineTable[];
 // from limits.h
 #define S8_MAX __SCHAR_MAX__
 #define S8_MIN (-S8_MAX - 1)
-#define U8_MAX (S8_MAX * 2 + 1)
+#define U8_MAX ((S8_MAX * 2) + 1)
 #define S16_MAX __SHRT_MAX__
 #define S16_MIN (-S16_MAX - 1)
-#define U16_MAX (S16_MAX * 2 + 1)
+#define U16_MAX ((S16_MAX * 2) + 1)
 #define S32_MAX __INT_MAX__
 #define S32_MIN (-S32_MAX - 1)
-#define U32_MAX (S32_MAX * 2U + 1U)
+#define U32_MAX ((S32_MAX * 2U) + 1U)
 #define S64_MAX __LONG_LONG_MAX__
 #define S64_MIN (-S64_MAX - 1LL)
-#define U64_MAX (S64_MAX * 2ULL + 1ULL)
+#define U64_MAX ((S64_MAX * 2ULL) + 1ULL)
 #define F32_MAX __FLT_MAX__
 #define F32_MIN __FLT_MIN__
 #define F64_MAX __DBL_MAX__
