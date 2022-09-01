@@ -314,10 +314,6 @@ void print_act_selector_strings(void) {
     u8 **actNameTbl = segmented_to_virtual(seg2_act_name_table);
 #endif
     u8 *selectedActName;
-#if !MULTILANG
-    s16 lvlNameX;
-    s16 actNameX;
-#endif
     s8 i;
 #if MULTILANG
     s16 language = eu_get_language();
@@ -369,12 +365,7 @@ void print_act_selector_strings(void) {
 #endif
     }
 
-#if MULTILANG
-    print_generic_string(get_str_x_pos_from_center(160, (currLevelName + 3), 10.0f), 33, (currLevelName + 3));
-#else
-    lvlNameX = get_str_x_pos_from_center(160, (currLevelName + 3), 10.0f);
-    print_generic_string(lvlNameX, 33, (currLevelName + 3));
-#endif
+    print_menu_generic_string_centered(160, 33, (currLevelName + 3), 10.0f);
 
     gSPDisplayList(gDisplayListHead++, dl_ia_text_end);
 
@@ -390,12 +381,7 @@ void print_act_selector_strings(void) {
     if (sVisibleStars != 0) {
         selectedActName = segmented_to_virtual(actNameTbl[(COURSE_NUM_TO_INDEX(gCurrCourseNum) * 6) + sSelectedActIndex]);
 
-#if MULTILANG
-        print_menu_generic_string(get_str_x_pos_from_center(ACT_NAME_X, selectedActName, 8.0f), 81, selectedActName);
-#else
-        actNameX = get_str_x_pos_from_center(ACT_NAME_X, selectedActName, 8.0f);
-        print_menu_generic_string(actNameX, 81, selectedActName);
-#endif
+        print_menu_generic_string_centered(ACT_NAME_X, 81, selectedActName, 8.0f);
     }
 
     // Print the numbers above each star.

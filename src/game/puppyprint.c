@@ -82,7 +82,7 @@ ssize_t ramsizeSegment[NUM_TLB_SEGMENTS + 1] = {
     0, 0, 0,
     0, 0, 0,
     0, 0, 0,
-    0, 0, 0
+    0, 0, 0,
 };
 s8 audioRamViewer = FALSE;
 s32 mempool;
@@ -99,16 +99,16 @@ extern u8 _goddardSegmentStart[];
 extern u8 _goddardSegmentEnd[];
 
 // Here is stored the rom addresses of the global code segments. If you get rid of any, it's best to just write them as NULL.
-uintptr_t ramP[5][2] = {
-    {(uintptr_t)_buffersSegmentBssStart,      (uintptr_t)_buffersSegmentBssEnd},
-    {(uintptr_t)_mainSegmentStart,            (uintptr_t)_mainSegmentEnd},
-    {(uintptr_t)_engineSegmentStart,          (uintptr_t)_engineSegmentEnd},
-    {(uintptr_t)_framebuffersSegmentBssStart, (uintptr_t)_framebuffersSegmentBssEnd},
-    {(uintptr_t)_goddardSegmentStart,         (uintptr_t)_goddardSegmentEnd},
+void *ramP[5][2] = {
+    {(void *)_buffersSegmentBssStart,      (void *)_buffersSegmentBssEnd},
+    {(void *)_mainSegmentStart,            (void *)_mainSegmentEnd},
+    {(void *)_engineSegmentStart,          (void *)_engineSegmentEnd},
+    {(void *)_framebuffersSegmentBssStart, (void *)_framebuffersSegmentBssEnd},
+    {(void *)_goddardSegmentStart,         (void *)_goddardSegmentEnd},
 };
 
 void puppyprint_calculate_ram_usage(void) {
-    uintptr_t temp[2];
+    void *temp[2];
     s32 i = 0;
 
     for (i = 0; i < 5; i++) {
@@ -215,7 +215,9 @@ void print_ram_bar(void) {
         render_blank_box(prevGraph, RAM_BAR_TOP, graphPos, RAM_BAR_BOTTOM,
             colourChart[i][0],
             colourChart[i][1],
-            colourChart[i][2], 255);
+            colourChart[i][2],
+            255
+        );
         prevGraph = graphPos;
     }
 
@@ -520,14 +522,16 @@ void puppyprint_render_standard(void) {
     print_small_text((SCREEN_WIDTH - 16), 16, textBytes, PRINT_TEXT_ALIGN_RIGHT, PRINT_ALL, FONT_OUTLINE);
 
 #ifndef ENABLE_CREDITS_BENCHMARK
+    struct MarioState *m = gMarioState;
     // Very little point printing useless info if Mario doesn't even exist.
-    if (gMarioState->marioObj) {
+    if (m->marioObj) {
         sprintf(textBytes, "Mario Pos#X: %d#Y: %d#Z: %d#D: %X#A: %x",
-            (s32)(gMarioState->pos[0]),
-            (s32)(gMarioState->pos[1]),
-            (s32)(gMarioState->pos[2]),
-            (u16)(gMarioState->faceAngle[1]),
-            (u32)(gMarioState->action & ACT_ID_MASK));
+            (s32)(m->pos[0]),
+            (s32)(m->pos[1]),
+            (s32)(m->pos[2]),
+            (u16)(m->faceAngle[1]),
+            (u32)(m->action & ACT_ID_MASK)
+        );
         print_small_text((SCREEN_WIDTH - 16), 32, textBytes, PRINT_TEXT_ALIGN_RIGHT, PRINT_ALL, FONT_OUTLINE);
     }
     // Same for the camera, especially so because this will crash otherwise.
@@ -536,7 +540,8 @@ void puppyprint_render_standard(void) {
             (s32)(gCamera->pos[0]),
             (s32)(gCamera->pos[1]),
             (s32)(gCamera->pos[2]),
-            (u16)(gCamera->yaw));
+            (u16)(gCamera->yaw)
+        );
         print_small_text((SCREEN_WIDTH - 16), 140, textBytes, PRINT_TEXT_ALIGN_RIGHT, PRINT_ALL, FONT_OUTLINE);
     }
 #endif
@@ -721,7 +726,7 @@ void render_blank_box(s32 x1, s32 y1, s32 x2, s32 y2, s32 r, s32 g, s32 b, s32 a
         cycleadd = 0;
     }
 
-    gDPSetFillColor(dlHead++, (GPACK_RGBA5551(r, g, b, 1) << 16) | GPACK_RGBA5551(r, g, b, 1));
+    gDPSetFillColor(dlHead++, ((GPACK_RGBA5551(r, g, b, 1) << 16) | GPACK_RGBA5551(r, g, b, 1)));
 
     gDisplayListHead = dlHead;
 

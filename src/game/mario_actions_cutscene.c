@@ -627,7 +627,7 @@ void general_star_dance_handler(struct MarioState *m, s32 isInWater) {
                 }
 #endif
                 disable_background_sound();
-                //! TODO: Is this check necessary? Both seem to do the exact same thing.
+                //! TODO: Is this check necessary? Both seem to do the exact same thing in-game.
                 if (m->actionArg & 0x1) {
                     // No exit
                     play_course_clear(obj_has_model(celebStar, MODEL_BOWSER_KEY));
