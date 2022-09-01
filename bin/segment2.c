@@ -2585,41 +2585,39 @@ const Texture texture_waterbox_lava[] = {
 #include "textures/segment2/segment2.13C58.rgba16.inc.c"
 };
 
-// Unreferenced light group
-
 // 0x02014470 - 0x020144B0
 static const Mtx matrix_identity = {
+    {
 #ifndef GBI_FLOATS
-    {{ 0x00010000, 0x00000000, 0x00000001, 0x00000000 },
-     { 0x00000000, 0x00010000, 0x00000000, 0x00000001 },
-     { 0x00000000, 0x00000000, 0x00000000, 0x00000000 },
-     { 0x00000000, 0x00000000, 0x00000000, 0x00000000 }}
+        { 0x00010000, 0x00000000, 0x00000001, 0x00000000 },
+        { 0x00000000, 0x00010000, 0x00000000, 0x00000001 },
+        { 0x00000000, 0x00000000, 0x00000000, 0x00000000 },
+        { 0x00000000, 0x00000000, 0x00000000, 0x00000000 },
 #else
-    {{ 1.0f, 0.0f, 0.0f, 0.0f },
-     { 0.0f, 1.0f, 0.0f, 0.0f },
-     { 0.0f, 0.0f, 1.0f, 0.0f },
-     { 0.0f, 0.0f, 0.0f, 1.0f }}
+        { 1.0f, 0.0f, 0.0f, 0.0f },
+        { 0.0f, 1.0f, 0.0f, 0.0f },
+        { 0.0f, 0.0f, 1.0f, 0.0f },
+        { 0.0f, 0.0f, 0.0f, 1.0f },
 #endif
+    }
 };
 
 
 // 0x020144B0 - 0x020144F0
 static const Mtx matrix_fullscreen = {
+    {
 #ifndef GBI_FLOATS
-    // {{                               0x00000000, 0x00000000,                              0x00000000, 0x00000000 },
-    //  {                               0x00000000, 0xffff0000,                              0xffffffff, 0xffff0001 },
-    //  { (((65536 * 2 / SCREEN_WIDTH) << 16) | 0), 0x00000000, (0 << 16) | (65536 * 2 / SCREEN_HEIGHT), 0x00000000 },
-    //  {                               0x00000000, 0x00000000,                              0x00000000, 0x00000000 }}
-    {{                      0x00000000, 0x00000000,               0x00000000, 0x00000000 },
-     {                      0x00000000, 0xffff0000,               0xffffffff, 0xffff0001 },
-     { ((131072 / SCREEN_WIDTH) << 16), 0x00000000, (131072 / SCREEN_HEIGHT), 0x00000000 },
-     {                      0x00000000, 0x00000000,               0x00000000, 0x00000000 }}
+        {                               0x00000000, 0x00000000,                                0x00000000, 0x00000000 },
+        {                               0x00000000, 0xffff0000,                                0xffffffff, 0xffff0001 },
+        { (((65536 * 2 / SCREEN_WIDTH) << 16) | 0), 0x00000000, ((0 << 16) | (65536 * 2 / SCREEN_HEIGHT)), 0x00000000 },
+        {                               0x00000000, 0x00000000,                                0x00000000, 0x00000000 },
 #else
-    {{ (2.0f / SCREEN_WIDTH),                   0.0f,  0.0f, 0.0f },
-     {                  0.0f, (2.0f / SCREEN_HEIGHT),  0.0f, 0.0f },
-     {                  0.0f,                   0.0f, -1.0f, 0.0f },
-     {                 -1.0f,                  -1.0f, -1.0f, 1.0f }}
+        { (2.0f / SCREEN_WIDTH),                   0.0f,  0.0f, 0.0f },
+        {                  0.0f, (2.0f / SCREEN_HEIGHT),  0.0f, 0.0f },
+        {                  0.0f,                   0.0f, -1.0f, 0.0f },
+        {                 -1.0f,                  -1.0f, -1.0f, 1.0f },
 #endif
+    }
 };
 
 
@@ -2635,7 +2633,15 @@ const Gfx dl_draw_quad_verts_4567[] = {
     gsSPEndDisplayList(),
 };
 
-const Gfx dl_shadow_begin[] = {
+const Gfx dl_shadow_begin_decal[] = {
+    gsDPPipeSync(),
+    gsSPClearGeometryMode(G_LIGHTING),
+    gsDPSetCombineMode(G_CC_MODULATEIFADEA, G_CC_MODULATEIFADEA),
+    gsSPTexture(0xFFFF, 0xFFFF, 0, G_TX_RENDERTILE, G_ON),
+    gsSPEndDisplayList(),
+};
+
+const Gfx dl_shadow_begin_non_decal[] = {
     gsDPPipeSync(),
     gsSPClearGeometryMode(G_LIGHTING | G_CULL_BACK),
     gsDPSetCombineMode(G_CC_MODULATEIFADEA, G_CC_MODULATEIFADEA),
@@ -2645,25 +2651,21 @@ const Gfx dl_shadow_begin[] = {
 
 #ifdef HD_SHADOWS
 const Gfx dl_shadow_circle[] = {
-    gsSPDisplayList(dl_shadow_begin),
     gsDPLoadTextureBlock(texture_shadow_quarter_circle_64, G_IM_FMT_IA, G_IM_SIZ_8b, 64, 64, 0, (G_TX_WRAP | G_TX_MIRROR), (G_TX_WRAP | G_TX_MIRROR), 6, 6, G_TX_NOLOD, G_TX_NOLOD),
     gsSPEndDisplayList(),
 };
 
 const Gfx dl_shadow_square[] = {
-    gsSPDisplayList(dl_shadow_begin),
     gsDPLoadTextureBlock(texture_shadow_quarter_square_64, G_IM_FMT_IA, G_IM_SIZ_8b, 64, 64, 0, (G_TX_WRAP | G_TX_MIRROR), (G_TX_WRAP | G_TX_MIRROR), 6, 6, G_TX_NOLOD, G_TX_NOLOD),
     gsSPEndDisplayList(),
 };
 #else
 const Gfx dl_shadow_circle[] = {
-    gsSPDisplayList(dl_shadow_begin),
     gsDPLoadTextureBlock(texture_shadow_quarter_circle, G_IM_FMT_IA, G_IM_SIZ_8b, 16, 16, 0, (G_TX_WRAP | G_TX_MIRROR), (G_TX_WRAP | G_TX_MIRROR), 4, 4, G_TX_NOLOD, G_TX_NOLOD),
     gsSPEndDisplayList(),
 };
 
 const Gfx dl_shadow_square[] = {
-    gsSPDisplayList(dl_shadow_begin),
     gsDPLoadTextureBlock(texture_shadow_quarter_square, G_IM_FMT_IA, G_IM_SIZ_8b, 16, 16, 0, (G_TX_WRAP | G_TX_MIRROR), (G_TX_WRAP | G_TX_MIRROR), 4, 4, G_TX_NOLOD, G_TX_NOLOD),
     gsSPEndDisplayList(),
 };
@@ -2671,14 +2673,14 @@ const Gfx dl_shadow_square[] = {
 
 static const Vtx vertex_shadow[] = {
 #ifdef HD_SHADOWS
-    {{{    -1,      0,     -1}, 0, { -2032,  -2032}, {0xff, 0xff, 0xff, 0xff}}},
-    {{{     1,      0,     -1}, 0, {  2032,  -2032}, {0xff, 0xff, 0xff, 0xff}}},
-    {{{    -1,      0,      1}, 0, { -2032,   2032}, {0xff, 0xff, 0xff, 0xff}}},
+    {{{    -1,      0,     -1}, 0, { -2064,  -2064}, {0xff, 0xff, 0xff, 0xff}}},
+    {{{     1,      0,     -1}, 0, {  2032,  -2064}, {0xff, 0xff, 0xff, 0xff}}},
+    {{{    -1,      0,      1}, 0, { -2064,   2032}, {0xff, 0xff, 0xff, 0xff}}},
     {{{     1,      0,      1}, 0, {  2032,   2032}, {0xff, 0xff, 0xff, 0xff}}},
 #else
-    {{{    -1,      0,     -1}, 0, {  -496,   -496}, {0xff, 0xff, 0xff, 0xff}}},
-    {{{     1,      0,     -1}, 0, {   496,   -496}, {0xff, 0xff, 0xff, 0xff}}},
-    {{{    -1,      0,      1}, 0, {  -496,    496}, {0xff, 0xff, 0xff, 0xff}}},
+    {{{    -1,      0,     -1}, 0, {  -528,   -528}, {0xff, 0xff, 0xff, 0xff}}},
+    {{{     1,      0,     -1}, 0, {   496,   -528}, {0xff, 0xff, 0xff, 0xff}}},
+    {{{    -1,      0,      1}, 0, {  -528,    496}, {0xff, 0xff, 0xff, 0xff}}},
     {{{     1,      0,      1}, 0, {   496,    496}, {0xff, 0xff, 0xff, 0xff}}},
 #endif
 };
@@ -2716,7 +2718,7 @@ const Gfx dl_star_glow[] = {
 
     gsDPSetTextureImage(G_IM_FMT_IA, G_IM_SIZ_16b, 1, texture_radial_light),
     gsDPLoadSync(),
-    gsDPLoadBlock(G_TX_LOADTILE, 0, 0, 32 * 32 - 1, CALC_DXT(32, G_IM_SIZ_16b_BYTES)),
+    gsDPLoadBlock(G_TX_LOADTILE, 0, 0, ((32 * 32) - 1), CALC_DXT(32, G_IM_SIZ_16b_BYTES)),
     gsSPVertex(vertex_star_glow, 4, 0),
     gsSP2Triangles( 0,  1,  2, 0x0,  0,  2,  3, 0x0),
 

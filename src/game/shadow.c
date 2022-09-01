@@ -176,8 +176,9 @@ s32 correct_lava_shadow_height(f32 *floorHeight) {
  * shadowType 0 uses a circle texture, the rest use a square texture.
  * Uses environment alpha for shadow solidity.
  */
-static Gfx *shadow_display_list(s8 shadowType, Alpha solidity) {
+static Gfx *shadow_display_list(s8 shadowType, Alpha solidity, s8 isDecal) {
     u32 gfxCmds = (
+        /*gSPDisplayList    */ 1 +
         /*gSPDisplayList    */ 1 +
         /*gDPSetEnvColor    */ 1 +
         /*gSPDisplayList    */ 1 +
@@ -188,9 +189,11 @@ static Gfx *shadow_display_list(s8 shadowType, Alpha solidity) {
         return NULL;
     }
     Gfx *gfx = gfxHead;
-    Gfx *dl_shadow = (shadowType == SHADOW_CIRCLE) ? dl_shadow_circle : dl_shadow_square;
+    Gfx *dl_shadow_begin = isDecal ? dl_shadow_begin_decal : dl_shadow_begin_non_decal;
+    Gfx *dl_shadow_shape = (shadowType == SHADOW_CIRCLE) ? dl_shadow_circle : dl_shadow_square;
 
-    gSPDisplayList(gfx++, dl_shadow);
+    gSPDisplayList(gfx++, dl_shadow_begin);
+    gSPDisplayList(gfx++, dl_shadow_shape);
     gDPSetEnvColor(gfx++, 255, 255, 255, solidity);
     gSPDisplayList(gfx++, dl_shadow_end);
     gSPEndDisplayList(gfx);
@@ -361,5 +364,5 @@ Gfx *create_shadow_below_xyz(Vec3f pos, Vec3f floorNormal, Vec3f scaleVec, s16 s
     vec3f_set(floorNormal, nx, ny, nz);
 
     // Generate the shadow display list with type and solidity.
-    return shadow_display_list(shadowType, solidity);
+    return shadow_display_list(shadowType, solidity, *isDecal);
 }

@@ -270,14 +270,14 @@ void switch_ucode(Gfx* dlHead, s32 ucode) {
 
 // Fixed-point identity matrix with the inverse of world scale
 Mtx identityMatrixWorldScale = {{
-    {UPPER_FIXED(1.0f / WORLD_SCALE) << 16, 0x00000000,
-     UPPER_FIXED(1.0f / WORLD_SCALE) <<  0, 0x00000000},
-    {0x00000000,                            UPPER_FIXED(1.0f / WORLD_SCALE) << 16,
-     0x00000000,                            UPPER_FIXED(1.0f)               <<  0},
-    {LOWER_FIXED(1.0f / WORLD_SCALE) << 16, 0x00000000,
-     LOWER_FIXED(1.0f / WORLD_SCALE) <<  0, 0x00000000},
-    {0x00000000,                            LOWER_FIXED(1.0f / WORLD_SCALE) << 16,
-     0x00000000,                            LOWER_FIXED(1.0f)               <<  0}
+    {(UPPER_FIXED(1.0f / WORLD_SCALE) << 16), 0x00000000,
+     (UPPER_FIXED(1.0f / WORLD_SCALE) <<  0), 0x00000000},
+    {0x00000000,                              (UPPER_FIXED(1.0f / WORLD_SCALE) << 16),
+     0x00000000,                              (UPPER_FIXED(1.0f)               <<  0)},
+    {(LOWER_FIXED(1.0f / WORLD_SCALE) << 16), 0x00000000,
+     (LOWER_FIXED(1.0f / WORLD_SCALE) <<  0), 0x00000000},
+    {0x00000000,                              (LOWER_FIXED(1.0f / WORLD_SCALE) << 16),
+     0x00000000,                              (LOWER_FIXED(1.0f)               <<  0)}
 }};
 
 /**
@@ -986,9 +986,10 @@ void geo_process_shadow(struct GraphNodeShadow *node) {
             animOffset[2] = get_curr_anim_info() * animScale;
             gCurrAnimAttribute -= 6;
 
-            // simple matrix rotation so the shadow offset rotates along with the object
-            f32 sinAng = sins(gCurGraphNodeObject->angle[1]);
-            f32 cosAng = coss(gCurGraphNodeObject->angle[1]);
+            // Simple matrix rotation so the shadow offset rotates along with the object.
+            s16 yaw = gCurGraphNodeObject->angle[1];
+            f32 sinAng = sins(yaw);
+            f32 cosAng = coss(yaw);
 
             shadowPos[0] += ( animOffset[0] * cosAng) + (animOffset[2] * sinAng);
             shadowPos[2] += (-animOffset[0] * sinAng) + (animOffset[2] * cosAng);
@@ -998,12 +999,15 @@ void geo_process_shadow(struct GraphNodeShadow *node) {
         Vec3f scaleVec;
         s8 isDecal;
 
-        Gfx *shadowList = create_shadow_below_xyz(shadowPos, floorNormal, scaleVec, shadowScale,
-                                                  node->shadowSolidity, node->shadowType, shifted, &isDecal);
+        Gfx *shadowList = create_shadow_below_xyz(
+            shadowPos, floorNormal, scaleVec, shadowScale,
+            node->shadowSolidity, node->shadowType, shifted, &isDecal
+        );
 
         if (shadowList != NULL) {
             mtxf_shadow(gMatStack[gMatStackIndex + 1],
-                floorNormal, shadowPos, scaleVec, gCurGraphNodeObject->angle[1]);
+                floorNormal, shadowPos, scaleVec, gCurGraphNodeObject->angle[1]
+            );
 
             inc_mat_stack();
             geo_append_display_list(
