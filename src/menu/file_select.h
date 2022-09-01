@@ -9,13 +9,13 @@
 enum MenuLayers {
     MENU_LAYER_NONE,
     MENU_LAYER_MAIN,
-    MENU_LAYER_SUBMENU
+    MENU_LAYER_SUBMENU,
 };
 
 enum MenuEraseButtonHoverStates {
     MENU_ERASE_HOVER_NONE,
     MENU_ERASE_HOVER_YES,
-    MENU_ERASE_HOVER_NO
+    MENU_ERASE_HOVER_NO,
 };
 
 enum MainMenuButtonStates {
@@ -25,13 +25,13 @@ enum MainMenuButtonStates {
     MENU_BUTTON_STATE_SHRINKING,
     MENU_BUTTON_STATE_ZOOM_IN_OUT,
     MENU_BUTTON_STATE_ZOOM_IN,
-    MENU_BUTTON_STATE_ZOOM_OUT
+    MENU_BUTTON_STATE_ZOOM_OUT,
 };
 
 enum MenuButtonTypes {
     MENU_BUTTON_NONE = -1, // no button selected (on main menu screen)
 
-    // Main Menu (SELECT FILE)
+    // Main Menu (SELECT FILE) 0..7
     MENU_BUTTON_MAIN_MIN,
     MENU_BUTTON_PLAY_FILE_A = MENU_BUTTON_MAIN_MIN,
     MENU_BUTTON_PLAY_FILE_B,
@@ -42,7 +42,7 @@ enum MenuButtonTypes {
     MENU_BUTTON_ERASE,
     MENU_BUTTON_MAIN_MAX,
 
-    // Score Menu (CHECK FILE)
+    // Score Menu (CHECK FILE) 7..14
     MENU_BUTTON_SCORE_MIN = MENU_BUTTON_MAIN_MAX,
     MENU_BUTTON_SCORE_FILE_A = MENU_BUTTON_SCORE_MIN,
     MENU_BUTTON_SCORE_FILE_B,
@@ -53,7 +53,7 @@ enum MenuButtonTypes {
     MENU_BUTTON_SCORE_ERASE_FILE,
     MENU_BUTTON_SCORE_MAX,
 
-    // Copy Menu (COPY FILE)
+    // Copy Menu (COPY FILE) 14..21
     MENU_BUTTON_COPY_MIN = MENU_BUTTON_SCORE_MAX,
     MENU_BUTTON_COPY_FILE_A = MENU_BUTTON_COPY_MIN,
     MENU_BUTTON_COPY_FILE_B,
@@ -64,7 +64,7 @@ enum MenuButtonTypes {
     MENU_BUTTON_COPY_ERASE_FILE,
     MENU_BUTTON_COPY_MAX,
 
-    // Erase Menu (ERASE FILE)
+    // Erase Menu (ERASE FILE) 21..28
     MENU_BUTTON_ERASE_MIN = MENU_BUTTON_COPY_MAX,
     MENU_BUTTON_ERASE_FILE_A = MENU_BUTTON_ERASE_MIN,
     MENU_BUTTON_ERASE_FILE_B,
@@ -75,7 +75,7 @@ enum MenuButtonTypes {
     MENU_BUTTON_ERASE_COPY_FILE,
     MENU_BUTTON_ERASE_MAX,
 
-    // Sound Mode Menu (SOUND SELECT)
+    // Sound Mode Menu (SOUND SELECT) 28..31
     // This menu includes language settings on EU
     MENU_BUTTON_SOUND_MODE = MENU_BUTTON_ERASE_MAX,
     MENU_BUTTON_OPTION_MIN,
@@ -92,12 +92,12 @@ enum MenuButtonTypes {
     MENU_BUTTON_LANGUAGE_RETURN,
 #endif
 
-    MENU_BUTTON_OPTION_MAX
+    MENU_BUTTON_OPTION_MAX,
 };
 
 enum ScoreMenuMessageID {
     SCORE_MSG_CHECK_FILE,
-    SCORE_MSG_NOSAVE_DATA
+    SCORE_MSG_NOSAVE_DATA,
 };
 
 enum CopyMenuMessageID {
@@ -105,13 +105,13 @@ enum CopyMenuMessageID {
     COPY_MSG_COPY_WHERE,
     COPY_MSG_NOSAVE_EXISTS,
     COPY_MSG_COPY_COMPLETE,
-    COPY_MSG_SAVE_EXISTS
+    COPY_MSG_SAVE_EXISTS,
 };
 
 enum CopyMenuActionPhase {
     COPY_PHASE_MAIN,
     COPY_PHASE_COPY_WHERE,
-    COPY_PHASE_COPY_COMPLETE
+    COPY_PHASE_COPY_COMPLETE,
 };
 
 enum EraseMenuMessageID {
@@ -119,17 +119,17 @@ enum EraseMenuMessageID {
     ERASE_MSG_PROMPT,
     ERASE_MSG_NOSAVE_EXISTS,
     ERASE_MSG_MARIO_ERASED,
-    ERASE_MSG_SAVE_EXISTS
+    ERASE_MSG_SAVE_EXISTS,
 };
 
 enum EraseMenuActionPhase {
     ERASE_PHASE_MAIN,
     ERASE_PHASE_PROMPT,
-    ERASE_PHASE_MARIO_ERASED
+    ERASE_PHASE_MARIO_ERASED,
 };
 
 enum SoundModeMenuActionPhase {
-    SOUND_MODE_PHASE_MAIN
+    SOUND_MODE_PHASE_MAIN,
 };
 
 void beh_yellow_background_menu_init(void);
