@@ -12,6 +12,15 @@ enum MenuLayers {
     MENU_LAYER_SUBMENU,
 };
 
+enum MenuPages {
+    MENU_PAGE_MAIN,
+    MENU_PAGE_SCORE,
+    MENU_PAGE_COPY,
+    MENU_PAGE_ERASE,
+    MENU_PAGE_OPTIONS,
+    NUM_MENU_PAGES,
+};
+
 enum MenuEraseButtonHoverStates {
     MENU_ERASE_HOVER_NONE,
     MENU_ERASE_HOVER_YES,
@@ -77,9 +86,9 @@ enum MenuButtonTypes {
 
     // Sound Mode Menu (SOUND SELECT) 28..31
     // This menu includes language settings on EU
-    MENU_BUTTON_SOUND_MODE = MENU_BUTTON_ERASE_MAX,
-    MENU_BUTTON_OPTION_MIN,
-    MENU_BUTTON_STEREO = MENU_BUTTON_OPTION_MIN,
+    MENU_BUTTON_OPTIONS = MENU_BUTTON_ERASE_MAX,
+    MENU_BUTTON_OPTIONS_MIN,
+    MENU_BUTTON_STEREO = MENU_BUTTON_OPTIONS_MIN,
     MENU_BUTTON_MONO,
     MENU_BUTTON_HEADSET,
 
@@ -92,7 +101,7 @@ enum MenuButtonTypes {
     MENU_BUTTON_LANGUAGE_RETURN,
 #endif
 
-    MENU_BUTTON_OPTION_MAX,
+    MENU_BUTTON_OPTIONS_MAX,
 };
 
 enum ScoreMenuMessageID {
