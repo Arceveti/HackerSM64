@@ -41,19 +41,18 @@ enum GraphNodeTypes {
     /*0x06*/ GRAPH_NODE_TYPE_TRANSLATION_ROTATION,
     /*0x07*/ GRAPH_NODE_TYPE_OBJECT,
     /*0x08*/ GRAPH_NODE_TYPE_ANIMATED_PART,
-    /*0x09*/ GRAPH_NODE_TYPE_BONE,
-    /*0x0A*/ GRAPH_NODE_TYPE_BILLBOARD,
-    /*0x0B*/ GRAPH_NODE_TYPE_DISPLAY_LIST,
-    /*0x0C*/ GRAPH_NODE_TYPE_SCALE,
-    /*0x0D*/ GRAPH_NODE_TYPE_SHADOW,
-    /*0x0E*/ GRAPH_NODE_TYPE_OBJECT_PARENT,
-    /*0x0F*/ GRAPH_NODE_TYPE_GENERATED_LIST,
-    /*0x10*/ GRAPH_NODE_TYPE_BACKGROUND,
-    /*0x11*/ GRAPH_NODE_TYPE_HELD_OBJ,
-    /*0x12*/ GRAPH_NODE_TYPE_Z_OFFSET,
-    /*0x13*/ GRAPH_NODE_TYPE_CULLING_RADIUS,
-    /*0x14*/ GRAPH_NODE_TYPE_ROOT,
-    /*0x15*/ GRAPH_NODE_TYPE_START,
+    /*0x09*/ GRAPH_NODE_TYPE_BILLBOARD,
+    /*0x0A*/ GRAPH_NODE_TYPE_DISPLAY_LIST,
+    /*0x0B*/ GRAPH_NODE_TYPE_SCALE,
+    /*0x0C*/ GRAPH_NODE_TYPE_SHADOW,
+    /*0x0D*/ GRAPH_NODE_TYPE_OBJECT_PARENT,
+    /*0x0E*/ GRAPH_NODE_TYPE_GENERATED_LIST,
+    /*0x0F*/ GRAPH_NODE_TYPE_BACKGROUND,
+    /*0x10*/ GRAPH_NODE_TYPE_HELD_OBJ,
+    /*0x11*/ GRAPH_NODE_TYPE_Z_OFFSET,
+    /*0x12*/ GRAPH_NODE_TYPE_CULLING_RADIUS,
+    /*0x13*/ GRAPH_NODE_TYPE_ROOT,
+    /*0x14*/ GRAPH_NODE_TYPE_START,
 };
 
 // Passed as first argument to a GraphNodeFunc to give information about in
@@ -219,13 +218,6 @@ struct GraphNodeAnimatedPart {
     /*0x18*/ Vec3s translation;
 };
 
-struct GraphNodeBone {
-    struct GraphNode node;
-    void *displayList;
-    Vec3s translation;
-    Vec3s rotation;
-};
-
 /** A GraphNode that draws a display list rotated in a way to always face the
  *  camera. Note that if the entire object is a billboard (like a coin or 1-up)
  *  then it simply sets the billboard flag for the entire object, this node is
@@ -357,7 +349,6 @@ struct GraphNodeScale               *init_graph_node_scale               (struct
 struct GraphNodeObject              *init_graph_node_object              (struct AllocOnlyPool *pool, struct GraphNodeObject              *graphNode, struct GraphNode *sharedChild, Vec3f pos, Vec3s angle, Vec3f scale);
 struct GraphNodeCullingRadius       *init_graph_node_culling_radius      (struct AllocOnlyPool *pool, struct GraphNodeCullingRadius       *graphNode, s16 radius);
 struct GraphNodeAnimatedPart        *init_graph_node_animated_part       (struct AllocOnlyPool *pool, struct GraphNodeAnimatedPart        *graphNode, s32 drawingLayer, void *displayList, Vec3s translation);
-struct GraphNodeBone                *init_graph_node_bone                (struct AllocOnlyPool *pool, struct GraphNodeBone                *graphNode, s32 drawingLayer, void *displayList, Vec3s translation, Vec3s rotation);
 struct GraphNodeBillboard           *init_graph_node_billboard           (struct AllocOnlyPool *pool, struct GraphNodeBillboard           *graphNode, s32 drawingLayer, void *displayList, Vec3s translation);
 struct GraphNodeDisplayList         *init_graph_node_display_list        (struct AllocOnlyPool *pool, struct GraphNodeDisplayList         *graphNode, s32 drawingLayer, void *displayList);
 struct GraphNodeShadow              *init_graph_node_shadow              (struct AllocOnlyPool *pool, struct GraphNodeShadow              *graphNode, s16 shadowScale, u8 shadowSolidity, u8 shadowType);

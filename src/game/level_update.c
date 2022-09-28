@@ -363,8 +363,7 @@ void init_mario_after_warp(void) {
 
         if (sWarpDest.levelNum == LEVEL_CASTLE
          && sWarpDest.areaIdx == 1
-         && (sWarpDest.nodeId == WARP_CASTLE_INSIDE_1_1F
-          || sWarpDest.nodeId == WARP_CASTLE_INSIDE_1_FROM_SECRET_WARP)
+         && sWarpDest.nodeId == WARP_CASTLE_INSIDE_1_FROM_SECRET_WARP
         ) {
             play_sound(SOUND_MENU_MARIO_CASTLE_WARP, gGlobalSoundSource);
         }
@@ -375,6 +374,14 @@ void init_mario_after_warp(void) {
           || sWarpDest.nodeId == WARP_CASTLE_GROUNDS_MAIN_ENTRY
           || sWarpDest.nodeId == WARP_CASTLE_GROUNDS_FROM_COTMC
           || sWarpDest.nodeId == WARP_CASTLE_GROUNDS_FROM_DDD_DOOR)) {
+            play_sound(SOUND_MENU_MARIO_CASTLE_WARP, gGlobalSoundSource);
+        }
+#endif
+#ifndef DISABLE_EXIT_COURSE
+        if (sWarpDest.levelNum == EXIT_COURSE_LEVEL
+         && sWarpDest.areaIdx == EXIT_COURSE_AREA
+         && sWarpDest.nodeId == EXIT_COURSE_NODE
+        ) {
             play_sound(SOUND_MENU_MARIO_CASTLE_WARP, gGlobalSoundSource);
         }
 #endif

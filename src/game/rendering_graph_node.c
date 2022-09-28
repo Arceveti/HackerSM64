@@ -871,50 +871,6 @@ void geo_process_animated_part(struct GraphNodeAnimatedPart *node) {
 }
 
 /**
- * Render an animated part that has an initial rotation value
- */
-void geo_process_bone(struct GraphNodeBone *node) {
-    Vec3s rotation    = { node->rotation[0],    node->rotation[1],    node->rotation[2]    };
-    Vec3f translation = { node->translation[0], node->translation[1], node->translation[2] };
-
-    switch (gCurrAnimType) {
-        case ANIM_TYPE_TRANSLATION:
-            translation[0] += get_curr_anim_info() * gCurrAnimTranslationMultiplier;
-            translation[1] += get_curr_anim_info() * gCurrAnimTranslationMultiplier;
-            translation[2] += get_curr_anim_info() * gCurrAnimTranslationMultiplier;
-            gCurrAnimType = ANIM_TYPE_ROTATION;
-            break;
-        case ANIM_TYPE_VERTICAL_TRANSLATION:
-            gCurrAnimAttribute += 2;
-            translation[1] += get_curr_anim_info() * gCurrAnimTranslationMultiplier;
-            gCurrAnimAttribute += 2;
-            gCurrAnimType = ANIM_TYPE_ROTATION;
-            break;
-        case ANIM_TYPE_LATERAL_TRANSLATION:
-            translation[0] += get_curr_anim_info() * gCurrAnimTranslationMultiplier;
-            gCurrAnimAttribute += 2;
-            translation[2] += get_curr_anim_info() * gCurrAnimTranslationMultiplier;
-            gCurrAnimType = ANIM_TYPE_ROTATION;
-            break;
-        case ANIM_TYPE_NO_TRANSLATION:
-            gCurrAnimAttribute += 6;
-            gCurrAnimType = ANIM_TYPE_ROTATION;
-            break;
-    }
-
-    if (gCurrAnimType == ANIM_TYPE_ROTATION) {
-        rotation[0] += get_curr_anim_info();
-        rotation[1] += get_curr_anim_info();
-        rotation[2] += get_curr_anim_info();
-    }
-
-    mtxf_rotate_xyz_and_translate_and_mul(rotation, translation, gMatStack[gMatStackIndex + 1], gMatStack[gMatStackIndex]);
-
-    inc_mat_stack();
-    append_dl_and_return((struct GraphNodeDisplayList *)node);
-}
-
-/**
  * Initialize the animation-related global variables for the currently drawn
  * object's animation.
  */
@@ -1278,7 +1234,6 @@ static GeoProcessFunc GeoProcessJumpTable[] = {
     /*GRAPH_NODE_TYPE_TRANSLATION_ROTATION  */ geo_process_translation_rotation,
     /*GRAPH_NODE_TYPE_OBJECT                */ geo_process_object,
     /*GRAPH_NODE_TYPE_ANIMATED_PART         */ geo_process_animated_part,
-    /*GRAPH_NODE_TYPE_BONE                  */ geo_process_bone,
     /*GRAPH_NODE_TYPE_BILLBOARD             */ geo_process_billboard,
     /*GRAPH_NODE_TYPE_DISPLAY_LIST          */ geo_process_display_list,
     /*GRAPH_NODE_TYPE_SCALE                 */ geo_process_scale,

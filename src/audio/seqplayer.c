@@ -1573,11 +1573,11 @@ void sequence_channel_process_script(struct SequenceChannel *seqChannel) {
                     case chan_dynsetdyntable: // chan_dynsetdyntable
                         if (value != -1) {
 #if defined(VERSION_EU) || defined(VERSION_SH)
-                            seqData = (*seqChannel->dynTable)[value];
+                            seqData = (*seqChannel->dynTable)[(u8) value];
                             sp38 = (u16)((seqData[0] << 8) + seqData[1]);
                             seqChannel->dynTable = (void *) (seqPlayer->seqData + sp38);
 #else // (VERSION_JP || VERSION_US)
-                            sp5A = (u16)((((*seqChannel->dynTable)[value])[0] << 8) + (((*seqChannel->dynTable)[value])[1]));
+                            sp5A = (u16)((((*seqChannel->dynTable)[(u8) value])[0] << 8) + (((*seqChannel->dynTable)[(u8) value])[1]));
                             seqChannel->dynTable = (void *) (seqPlayer->seqData + sp5A);
 #endif // (VERSION_JP || VERSION_US)
                         }
@@ -1847,7 +1847,7 @@ void sequence_channel_process_script(struct SequenceChannel *seqChannel) {
                                 eu_stubbed_printf_0("Audio:Track: CTBLCALL Macro Level Over Error!\n");
                             }
 
-                            seqData = (*seqChannel->dynTable)[value];
+                            seqData = (*seqChannel->dynTable)[(u8) value];
                             state->stack[state->depth++] = state->pc;
                             sp38 = (u16)((seqData[0] << 8) + seqData[1]);
                             state->pc = seqPlayer->seqData + sp38;
@@ -1856,7 +1856,7 @@ void sequence_channel_process_script(struct SequenceChannel *seqChannel) {
                                 eu_stubbed_printf_3("Err :Sub %x ,address %x:Undefined SubTrack Function %x", seqChannel, state->pc, sp38);
                             }
 #else
-                            seqData = (*seqChannel->dynTable)[value];
+                            seqData = (*seqChannel->dynTable)[(u8) value];
                             state->stack[state->depth++] = state->pc;
                             sp5A = ((seqData[0] << 8) + seqData[1]);
                             state->pc = seqPlayer->seqData + sp5A;
@@ -1965,13 +1965,13 @@ void sequence_channel_process_script(struct SequenceChannel *seqChannel) {
                         break;
 
                     case chan_unk_0xb5_dyn_set_unkC8:
-                        seqChannel->unkC8 = *(u16 *) (*seqChannel->dynTable)[value];
+                        seqChannel->unkC8 = *(u16 *) (*seqChannel->dynTable)[(u8) value];
                         break;
 
                     case chan_unk_0xb6_read_dyntable:
-                        value = (*seqChannel->dynTable)[0][value];
+                        value = (*seqChannel->dynTable)[0][(u8) value];
                         break;
-#endif // VERSION_SH
+#endif
                 }
             } else {
 #ifdef VERSION_SH
@@ -1999,7 +1999,7 @@ void sequence_channel_process_script(struct SequenceChannel *seqChannel) {
 
                         case chan_unk_0x98_dyn_set_scriptstate_pc:
                             if (value != -1 && seq_channel_set_layer(seqChannel, loBits) != -1) {
-                                seqData = (*seqChannel->dynTable)[value];
+                                seqData = (*seqChannel->dynTable)[(u8) value];
                                 sp5A = ((seqData[0] << 8) + seqData[1]);
                                 seqChannel->layers[loBits]->scriptState.pc = seqPlayer->seqData + sp5A;
                             }
@@ -2070,7 +2070,7 @@ void sequence_channel_process_script(struct SequenceChannel *seqChannel) {
 
                     case chan_dynsetlayer: // chan_dynsetlayer
                         if (value != -1 && seq_channel_set_layer(seqChannel, loBits) != -1) {
-                            seqData = (*seqChannel->dynTable)[value];
+                            seqData = (*seqChannel->dynTable)[(u8) value];
                             sp5A = ((seqData[0] << 8) + seqData[1]);
                             seqChannel->layers[loBits]->scriptState.pc = seqPlayer->seqData + sp5A;
                         }
