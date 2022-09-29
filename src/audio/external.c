@@ -20,9 +20,9 @@
 // N.B. sound banks are different from the audio banks referred to in other
 // files. We should really fix our naming to be less ambiguous...
 #define MAX_BACKGROUND_MUSIC_QUEUE_SIZE 6
-#define MAX_CHANNELS_PER_SOUND_BANK 1
+#define MAX_CHANNELS_PER_SOUND_BANK     1
 
-#define SAMPLES_TO_OVERPRODUCE 0x10
+#define SAMPLES_TO_OVERPRODUCE           0x10
 #define EXTRA_BUFFERED_AI_SAMPLES_TARGET 0x40
 
 struct Sound {

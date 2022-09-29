@@ -516,7 +516,7 @@ s32 music_unchanged_through_warp(s16 id) {
      && levelNum == gCurrLevelNum
      && destArea == gCurrAreaIndex) {
         s16 currBgMusic = get_current_background_music();
-        if (currBgMusic == SEQUENCE_ARGS(4, SEQ_EVENT_POWERUP | SEQ_FLAG_VARIATION)
+        if (currBgMusic == SEQUENCE_ARGS(4, (SEQ_EVENT_POWERUP | SEQ_FLAG_VARIATION))
          || currBgMusic == SEQUENCE_ARGS(4, SEQ_EVENT_POWERUP)) {
             unchanged = FALSE;
         }

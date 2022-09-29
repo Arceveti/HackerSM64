@@ -469,7 +469,7 @@ s32 act_reading_automatic_dialog(struct MarioState *m) {
                 set_mario_action(m, ACT_WATER_IDLE, 0); // 100c star?
             } else {
                 // make Mario walk into door after star dialog
-                set_mario_action(m, (m->prevAction == ACT_UNLOCKING_STAR_DOOR) ? ACT_WALKING : ACT_IDLE, 0);
+                set_mario_action(m, ((m->prevAction == ACT_UNLOCKING_STAR_DOOR) ? ACT_WALKING : ACT_IDLE), 0);
             }
         }
     }
