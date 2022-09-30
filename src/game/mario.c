@@ -1923,12 +1923,10 @@ void init_mario_from_save_file(struct MarioState *m) {
         COURSE_NUM_TO_INDEX(COURSE_MAX)
     );
     m->numKeys = 0;
-
-#ifdef SAVE_NUM_LIVES
-    s8 savedLives = save_file_get_num_lives();
-    m->numLives = (savedLives > DEFAULT_NUM_LIVES) ? savedLives : DEFAULT_NUM_LIVES;
+#ifdef ENABLE_LIVES
+    m->numLives = ENABLE_LIVES;
 #else
-    m->numLives = DEFAULT_NUM_LIVES;
+    m->numLives = 0;
 #endif
     m->health = 0x880;
 #ifdef BREATH_METER
