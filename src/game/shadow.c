@@ -264,8 +264,8 @@ Gfx *create_shadow_below_xyz(Vec3f pos, Vec3f floorNormal, Vec3f scaleVec, s16 s
     s32 isEnvBox = FALSE;
 
     if (waterLevel > FLOOR_LOWER_LIMIT_MISC
-        && y >= waterLevel
-        && floorHeight <= waterLevel) {
+     && y >= waterLevel
+     && floorHeight <= waterLevel) {
         // Skip shifting the shadow height later, since the find_water_level_and_floor call above uses the already shifted position.
         shifted = FALSE;
 

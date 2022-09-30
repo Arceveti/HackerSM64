@@ -1741,7 +1741,9 @@ s32 execute_mario_action(struct MarioState *m) {
         }
 #endif
 #ifdef ENABLE_DEBUG_FREE_MOVE
-        if ((gPlayer1Controller->buttonDown & U_JPAD) && !(gPlayer1Controller->buttonDown & (L_TRIG | Z_TRIG))) {
+        if (m->action != ACT_DEBUG_FREE_MOVE
+         && (gPlayer1Controller->buttonDown & U_JPAD)
+         && !(gPlayer1Controller->buttonDown & (L_TRIG | Z_TRIG))) {
             set_camera_mode(m->area->camera, CAMERA_MODE_8_DIRECTIONS, 1);
             set_mario_action(m, ACT_DEBUG_FREE_MOVE, 0);
         }
@@ -1874,8 +1876,7 @@ void init_mario(struct MarioState *m) {
     vec3s_to_vec3f(m->pos, gMarioSpawnInfo->startPos);
     vec3f_copy(m->prevPos, m->pos);
     vec3_zero(m->vel);
-    m->floorHeight =
-        find_floor(m->pos[0], m->pos[1], m->pos[2], &m->floor);
+    m->floorHeight = find_floor(m->pos[0], m->pos[1], m->pos[2], &m->floor);
 
     if (m->pos[1] < m->floorHeight) {
         m->pos[1] = m->floorHeight;

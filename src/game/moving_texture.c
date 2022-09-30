@@ -137,10 +137,16 @@ extern Texture ttc_yellow_triangle[];
  * An array for converting a movtex texture id to a pointer that can
  * be passed to gDPSetTextureImage.
  */
-Texture *gMovtexIdToTexture[] = { texture_waterbox_water,     texture_waterbox_mist,
-                                  texture_waterbox_jrb_water, texture_waterbox_unknown_water,
-                                  texture_waterbox_lava,      ssl_quicksand,
-                                  ssl_pyramid_sand,           ttc_yellow_triangle };
+Texture *gMovtexIdToTexture[] = {
+    texture_waterbox_water,
+    texture_waterbox_mist,
+    texture_waterbox_jrb_water,
+    texture_waterbox_unknown_water,
+    texture_waterbox_lava,
+    ssl_quicksand,
+    ssl_pyramid_sand,
+    ttc_yellow_triangle
+};
 
 extern Gfx    castle_grounds_dl_waterfall[];
 extern Movtex castle_grounds_movtex_tris_waterfall[];

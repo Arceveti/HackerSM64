@@ -111,8 +111,8 @@ static s32 find_wall_collisions_from_list(struct SurfaceNode *surfaceNode, struc
 
     struct Object *obj = o;
     s32 passVanishWalls = ((obj != NULL)
-     && ((obj->activeFlags & ACTIVE_FLAG_MOVE_THROUGH_GRATE) ||
-         ((obj == gMarioObject) && (gMarioState->flags & MARIO_VANISH_CAP)))
+     && ((obj->activeFlags & ACTIVE_FLAG_MOVE_THROUGH_GRATE)
+      || ((obj == gMarioObject) && (gMarioState->flags & MARIO_VANISH_CAP)))
     );
 
     TerrainData type = SURFACE_DEFAULT;

@@ -622,7 +622,7 @@ void focus_on_mario(Vec3f focus, Vec3f pos, f32 posYOff, f32 focYOff, f32 dist, 
 
     vec3f_copy_y_off(marioPos, sMarioCamState->pos, posYOff);
 
-    vec3f_set_dist_and_angle(marioPos, pos, dist, pitch + sLakituPitch, yaw);
+    vec3f_set_dist_and_angle(marioPos, pos, dist, (pitch + sLakituPitch), yaw);
 
     vec3f_copy_y_off(focus, sMarioCamState->pos, focYOff);
 }
@@ -634,7 +634,7 @@ void set_camera_height(struct Camera *c, f32 goalHeight) {
     struct Surface *surface;
     f32 marioFloorHeight, marioCeilHeight, camFloorHeight;
     f32 baseOff = MARIO_EYE_HEIGHT;
-    f32 camCeilHeight = find_ceil(c->pos[0], gLakituState.goalPos[1] - 50.f, c->pos[2], &surface);
+    f32 camCeilHeight = find_ceil(c->pos[0], (gLakituState.goalPos[1] - 50.f), c->pos[2], &surface);
 
     if (sMarioCamState->action & ACT_FLAG_HANGING) {
         marioCeilHeight = sMarioGeometry.currCeilHeight;
@@ -798,7 +798,7 @@ s32 update_radial_camera(struct Camera *c, Vec3f focus, Vec3f pos) {
 
     sAreaYaw = camYaw - sModeOffsetYaw;
     calc_y_to_curr_floor(&posY, 1.f, 200.f, &focusY, 0.9f, 200.f);
-    focus_on_mario(focus, pos, posY + yOff, focusY + yOff, sLakituDist + baseDist, pitch, camYaw);
+    focus_on_mario(focus, pos, (posY + yOff), (focusY + yOff), (sLakituDist + baseDist), pitch, camYaw);
 #ifdef ENABLE_VANILLA_CAM_PROCESSING
     camYaw = find_in_bounds_yaw_wdw_bob_thi(pos, focus, camYaw);
 #endif
@@ -818,7 +818,7 @@ s32 update_8_directions_camera(struct Camera *c, Vec3f focus, Vec3f pos) {
 
     sAreaYaw = camYaw;
     calc_y_to_curr_floor(&posY, 1.f, 200.f, &focusY, 0.9f, 200.f);
-    focus_on_mario(focus, pos, posY + yOff, focusY + yOff, sLakituDist + baseDist, pitch, camYaw);
+    focus_on_mario(focus, pos, (posY + yOff), (focusY + yOff), (sLakituDist + baseDist), pitch, camYaw);
     pan_ahead_of_player(c);
 #ifdef ENABLE_VANILLA_CAM_PROCESSING
     if (gCurrLevelArea == AREA_DDD_SUB) {
@@ -848,18 +848,17 @@ void radial_camera_move(struct Camera *c) {
 
     // Check if Mario stepped on a surface that rotates the camera. For example, when Mario enters the
     // gate in BoB, the camera turns right to face up the hill path
-    if (!(gCameraMovementFlags & CAM_MOVE_ROTATE)) {
-        if (sMarioGeometry.currFloorType == SURFACE_CAMERA_MIDDLE
-            && sMarioGeometry.prevFloorType != SURFACE_CAMERA_MIDDLE) {
-            gCameraMovementFlags |= (CAM_MOVE_RETURN_TO_MIDDLE | CAM_MOVE_ENTERED_ROTATE_SURFACE);
-        }
-        if (sMarioGeometry.currFloorType == SURFACE_CAMERA_ROTATE_RIGHT
-            && sMarioGeometry.prevFloorType != SURFACE_CAMERA_ROTATE_RIGHT) {
-            gCameraMovementFlags |= (CAM_MOVE_ROTATE_RIGHT | CAM_MOVE_ENTERED_ROTATE_SURFACE);
-        }
-        if (sMarioGeometry.currFloorType == SURFACE_CAMERA_ROTATE_LEFT
-            && sMarioGeometry.prevFloorType != SURFACE_CAMERA_ROTATE_LEFT) {
-            gCameraMovementFlags |= (CAM_MOVE_ROTATE_LEFT | CAM_MOVE_ENTERED_ROTATE_SURFACE);
+    if (!(gCameraMovementFlags & CAM_MOVE_ROTATE) && sMarioGeometry.prevFloorType != sMarioGeometry.currFloorType) {
+        switch (sMarioGeometry.currFloorType) {
+            case SURFACE_CAMERA_MIDDLE:
+                gCameraMovementFlags |= (CAM_MOVE_RETURN_TO_MIDDLE | CAM_MOVE_ENTERED_ROTATE_SURFACE);
+                break;
+            case SURFACE_CAMERA_ROTATE_RIGHT:
+                gCameraMovementFlags |= (CAM_MOVE_ROTATE_RIGHT | CAM_MOVE_ENTERED_ROTATE_SURFACE);
+                break;
+            case SURFACE_CAMERA_ROTATE_LEFT:
+                gCameraMovementFlags |= (CAM_MOVE_ROTATE_LEFT | CAM_MOVE_ENTERED_ROTATE_SURFACE);
+                break;
         }
     }
 
@@ -893,35 +892,41 @@ void radial_camera_move(struct Camera *c) {
         }
     } else {
         // Prevent the player from rotating into obstructing walls
-        if ((gCameraMovementFlags & CAM_MOVE_ROTATE_RIGHT) && avoidStatus == AVOID_STATUS_WALL_COVERING_MARIO
-            && avoidYaw + 0x10 < sModeOffsetYaw) {
+        if ((gCameraMovementFlags & CAM_MOVE_ROTATE_RIGHT)
+         && avoidStatus == AVOID_STATUS_WALL_COVERING_MARIO
+         && avoidYaw + 0x10 < sModeOffsetYaw) {
             sModeOffsetYaw = avoidYaw;
             gCameraMovementFlags &= ~(CAM_MOVE_ROTATE_RIGHT | CAM_MOVE_ENTERED_ROTATE_SURFACE);
         }
-        if ((gCameraMovementFlags & CAM_MOVE_ROTATE_LEFT) && avoidStatus == AVOID_STATUS_WALL_COVERING_MARIO
-            && avoidYaw - 0x10 > sModeOffsetYaw) {
+        if ((gCameraMovementFlags & CAM_MOVE_ROTATE_LEFT)
+         && avoidStatus == AVOID_STATUS_WALL_COVERING_MARIO
+         && avoidYaw - 0x10 > sModeOffsetYaw) {
             sModeOffsetYaw = avoidYaw;
             gCameraMovementFlags &= ~(CAM_MOVE_ROTATE_LEFT | CAM_MOVE_ENTERED_ROTATE_SURFACE);
         }
 
         // If it's the first time rotating, just rotate to +-60 degrees
-        if (!(s2ndRotateFlags & CAM_MOVE_ROTATE_RIGHT) && (gCameraMovementFlags & CAM_MOVE_ROTATE_RIGHT)
-            && camera_approach_s16_symmetric_bool(&sModeOffsetYaw, maxAreaYaw, rotateSpeed) == 0) {
+        if (!(s2ndRotateFlags & CAM_MOVE_ROTATE_RIGHT)
+         && (gCameraMovementFlags & CAM_MOVE_ROTATE_RIGHT)
+         && camera_approach_s16_symmetric_bool(&sModeOffsetYaw, maxAreaYaw, rotateSpeed) == 0) {
             gCameraMovementFlags &= ~(CAM_MOVE_ROTATE_RIGHT | CAM_MOVE_ENTERED_ROTATE_SURFACE);
         }
-        if (!(s2ndRotateFlags & CAM_MOVE_ROTATE_LEFT) && (gCameraMovementFlags & CAM_MOVE_ROTATE_LEFT)
-            && camera_approach_s16_symmetric_bool(&sModeOffsetYaw, minAreaYaw, rotateSpeed) == 0) {
+        if (!(s2ndRotateFlags & CAM_MOVE_ROTATE_LEFT)
+         && (gCameraMovementFlags & CAM_MOVE_ROTATE_LEFT)
+         && camera_approach_s16_symmetric_bool(&sModeOffsetYaw, minAreaYaw, rotateSpeed) == 0) {
             gCameraMovementFlags &= ~(CAM_MOVE_ROTATE_LEFT | CAM_MOVE_ENTERED_ROTATE_SURFACE);
         }
 
         // If it's the second time rotating, rotate all the way to +-105 degrees.
-        if ((s2ndRotateFlags & CAM_MOVE_ROTATE_RIGHT) && (gCameraMovementFlags & CAM_MOVE_ROTATE_RIGHT)
-            && camera_approach_s16_symmetric_bool(&sModeOffsetYaw, DEGREES(105), rotateSpeed) == 0) {
+        if ((s2ndRotateFlags & CAM_MOVE_ROTATE_RIGHT)
+         && (gCameraMovementFlags & CAM_MOVE_ROTATE_RIGHT)
+         && camera_approach_s16_symmetric_bool(&sModeOffsetYaw, DEGREES(105), rotateSpeed) == 0) {
             gCameraMovementFlags &= ~(CAM_MOVE_ROTATE_RIGHT | CAM_MOVE_ENTERED_ROTATE_SURFACE);
             s2ndRotateFlags &= ~CAM_MOVE_ROTATE_RIGHT;
         }
-        if ((s2ndRotateFlags & CAM_MOVE_ROTATE_LEFT) && (gCameraMovementFlags & CAM_MOVE_ROTATE_LEFT)
-            && camera_approach_s16_symmetric_bool(&sModeOffsetYaw, DEGREES(-105), rotateSpeed) == 0) {
+        if ((s2ndRotateFlags & CAM_MOVE_ROTATE_LEFT)
+         && (gCameraMovementFlags & CAM_MOVE_ROTATE_LEFT)
+         && camera_approach_s16_symmetric_bool(&sModeOffsetYaw, DEGREES(-105), rotateSpeed) == 0) {
             gCameraMovementFlags &= ~(CAM_MOVE_ROTATE_LEFT | CAM_MOVE_ENTERED_ROTATE_SURFACE);
             s2ndRotateFlags &= ~CAM_MOVE_ROTATE_LEFT;
         }
@@ -1073,9 +1078,8 @@ void mode_8_directions_camera(struct Camera *c) {
     }
 #ifdef PARALLEL_LAKITU_CAM
     // extra functionality
-    else if ((gPlayer1Controller->buttonPressed & U_JPAD) && !(sMarioCamState->action & ACT_DEBUG_FREE_MOVE)) {
-        s8DirModeYawOffset = 0;
-        s8DirModeYawOffset = gMarioState->faceAngle[1] - 0x8000;
+    else if (gPlayer1Controller->buttonPressed & U_JPAD) {
+        s8DirModeYawOffset = (gMarioState->faceAngle[1] + DEGREES(180));
     } else if (gPlayer1Controller->buttonDown & L_JPAD) {
         s8DirModeYawOffset -= DEGREES(2);
     } else if (gPlayer1Controller->buttonDown & R_JPAD) {
@@ -1667,7 +1671,7 @@ s32 update_behind_mario_camera(struct Camera *c, Vec3f focus, Vec3f pos) {
         pitchInc = 0x800;
     }
 
-    approach_s16_asymptotic_bool(&yaw, marioYaw + goalYawOff, yawSpeed);
+    approach_s16_asymptotic_bool(&yaw, (marioYaw + goalYawOff), yawSpeed);
     camera_approach_s16_symmetric_bool(&pitch, goalPitch, pitchInc);
     if (dist < 300.f) {
         dist = 300.f;
@@ -2692,8 +2696,7 @@ void update_lakitu(struct Camera *c) {
     s16 newYaw;
 
     if (!(gCameraMovementFlags & CAM_MOVE_PAUSE_SCREEN)) {
-        newYaw = next_lakitu_state(newPos, newFoc, c->pos, c->focus, sOldPosition, sOldFocus,
-                                   c->nextYaw);
+        newYaw = next_lakitu_state(newPos, newFoc, c->pos, c->focus, sOldPosition, sOldFocus, c->nextYaw);
         set_or_approach_s16_symmetric(&c->yaw, newYaw, sYawSpeed);
         sStatusFlags &= ~CAM_FLAG_UNUSED_CUTSCENE_ACTIVE;
 
@@ -3025,17 +3028,17 @@ void reset_camera(struct Camera *c) {
     sModeOffsetYaw = 0;
     sSpiralStairsYawOffset = 0;
     sLakituDist = 0;
-    sLakituPitch = 0;
-    sAreaYaw = 0;
-    sAreaYawChange = 0.f;
+    sLakituPitch = 0x0;
+    sAreaYaw = 0x0;
+    sAreaYawChange = 0x0;
     sPanDistance = 0.f;
     sCannonYOffset = 0.f;
     sZoomAmount = 0.f;
     sZeroZoomDist = 0.f;
     sBehindMarioSoundTimer = 0;
-    sCSideButtonYaw = 0;
-    s8DirModeBaseYaw = 0;
-    s8DirModeYawOffset = 0;
+    sCSideButtonYaw = 0x0;
+    s8DirModeBaseYaw = 0x0;
+    s8DirModeYawOffset = sMarioCamState->faceAngle[1] + DEGREES(180);
     c->doorStatus = DOOR_DEFAULT;
     sMarioCamState->headRotation[0] = 0;
     sMarioCamState->headRotation[1] = 0;
@@ -3063,8 +3066,8 @@ void init_camera(struct Camera *c) {
 
     sCreditsPlayer2Pitch = 0;
     sCreditsPlayer2Yaw = 0;
-    gPrevLevel = gCurrLevelArea / 16;
-    gCurrLevelArea = (gCurrLevelNum * 16) + gCurrentArea->index;
+    gPrevLevel = (gCurrLevelArea >> 4);
+    gCurrLevelArea = ((gCurrLevelNum << 4) | gCurrentArea->index);
     sSelectionFlags &= CAM_MODE_MARIO_SELECTED;
     sFramesPaused = 0;
     gLakituState.mode = c->mode;
@@ -3211,11 +3214,11 @@ void init_camera(struct Camera *c) {
 /**
  * Zooms out the camera if paused and the level is 'outside', as determined by sZoomOutAreaMasks.
  *
- * Because gCurrLevelArea is assigned gCurrLevelNum * 16 + gCurrentArea->index,
+ * Because gCurrLevelArea is assigned ((gCurrLevelNum << 4) | gCurrentArea->index),
  * dividing by 32 maps 2 levels to one index.
  *
  * areaBit definition:
- * (gCurrLevelArea & 0x10) / 4):
+ * (gCurrLevelArea & 0x10) >> 2):
  *      This adds 4 to the shift if the level is an odd multiple of 16
  *
  * ((gCurrLevelArea & 0xF) - 1) & 3):
@@ -3224,8 +3227,8 @@ void init_camera(struct Camera *c) {
  */
 void zoom_out_if_paused_and_outside(struct GraphNodeCamera *camera) {
     s16 yaw;
-    s32 areaMaskIndex = gCurrLevelArea / 32;
-    s32 areaBit = BIT(((gCurrLevelArea & 0x10) / 4) + (((gCurrLevelArea & 0xF) - 1) & 3));
+    s32 areaMaskIndex = (gCurrLevelArea >> 5);
+    s32 areaBit = BIT(((gCurrLevelArea & 0x10) >> 2) + (((gCurrLevelArea & 0xF) - 1) & 3));
 
     if (areaMaskIndex >= LEVEL_MAX / 2) {
         areaMaskIndex = 0;
@@ -3275,7 +3278,7 @@ void create_camera(struct GraphNodeCamera *gc, struct AllocOnlyPool *pool) {
     c->areaCenX = gc->focus[0];
     c->areaCenY = gc->focus[1];
     c->areaCenZ = gc->focus[2];
-    c->yaw = 0;
+    c->yaw = 0x0;
     vec3f_copy(c->pos, gc->pos);
     vec3f_copy(c->focus, gc->focus);
 }
@@ -4658,7 +4661,7 @@ void warp_camera(f32 displacementX, f32 displacementY, f32 displacementZ) {
     struct LinearTransitionPoint *start = &sModeInfo.transitionStart;
     struct LinearTransitionPoint *end = &sModeInfo.transitionEnd;
 
-    gCurrLevelArea = (gCurrLevelNum * 16) + gCurrentArea->index;
+    gCurrLevelArea = ((gCurrLevelNum << 4) | gCurrentArea->index);
     displacement[0] = displacementX;
     displacement[1] = displacementY;
     displacement[2] = displacementZ;
@@ -4902,8 +4905,8 @@ void set_camera_mode_8_directions(struct Camera *c) {
     if (c->mode != CAMERA_MODE_8_DIRECTIONS) {
         c->mode = CAMERA_MODE_8_DIRECTIONS;
         sStatusFlags &= ~CAM_FLAG_SMOOTH_MOVEMENT;
-        s8DirModeBaseYaw = 0;
-        s8DirModeYawOffset = 0;
+        s8DirModeBaseYaw = 0x0;
+        s8DirModeYawOffset = 0x0;
     }
 }
 
@@ -4989,18 +4992,20 @@ void set_fixed_cam_axis_sa_lobby(UNUSED s16 preset) {
  */
 #ifdef ENABLE_VANILLA_CAM_PROCESSING
 void check_blocking_area_processing(const u8 *mode) {
-    if ((sMarioCamState->action & ACT_FLAG_METAL_WATER) ||
-                        *mode == DEEP_WATER_CAMERA_MODE || *mode == WATER_SURFACE_CAMERA_MODE) {
+    if ((sMarioCamState->action & ACT_FLAG_METAL_WATER)
+     || *mode == DEEP_WATER_CAMERA_MODE
+     || *mode == WATER_SURFACE_CAMERA_MODE) {
         sStatusFlags |= CAM_FLAG_BLOCK_AREA_PROCESSING;
     }
 
-    if (gCurrLevelNum == LEVEL_DDD || gCurrLevelNum == LEVEL_WDW || gCurrLevelNum == LEVEL_COTMC) {
+    if (gCurrLevelNum == LEVEL_DDD
+     || gCurrLevelNum == LEVEL_WDW
+     || gCurrLevelNum == LEVEL_COTMC) {
         sStatusFlags &= ~CAM_FLAG_BLOCK_AREA_PROCESSING;
     }
 
-    if ((*mode == DEEP_WATER_CAMERA_MODE &&
-            !(sMarioCamState->action & (ACT_FLAG_SWIMMING | ACT_FLAG_METAL_WATER))) ||
-         *mode == CAMERA_MODE_INSIDE_CANNON) {
+    if ((*mode == DEEP_WATER_CAMERA_MODE && !(sMarioCamState->action & (ACT_FLAG_SWIMMING | ACT_FLAG_METAL_WATER)))
+     || *mode == CAMERA_MODE_INSIDE_CANNON) {
         sStatusFlags |= CAM_FLAG_BLOCK_AREA_PROCESSING;
     }
 #else
