@@ -75,7 +75,6 @@
 
 #ifdef DISABLE_ALL
     #undef DEBUG_ALL
-    #undef USE_PROFILER
     #undef STARTUP_SPAWN_LEVEL
     #undef STARTUP_SPAWN_AREA
     #undef STARTUP_SPAWN_POS
@@ -89,6 +88,8 @@
     #undef VISUAL_DEBUG
     #undef UNLOCK_ALL
     #undef COMPLETE_SAVE_FILE
+    #undef USE_PROFILER
+    #undef ENABLE_CREDITS_BENCHMARK
     #undef DEBUG_FORCE_CRASH_ON_BOOT
     #undef DEBUG_FORCE_CRASH_ON_L
     #undef ENABLE_DEBUG_ASSERTS
@@ -137,6 +138,17 @@
     #undef UNLOCK_ALL
     #define UNLOCK_ALL
 #endif // COMPLETE_SAVE_FILE
+
+
+/*****************
+ * config_benchmark.h
+ */
+
+#ifdef ENABLE_CREDITS_BENCHMARK
+    #define DEBUG_ALL
+    #define ENABLE_VANILLA_LEVEL_SPECIFIC_CHECKS
+    #define STARTUP_SPAWN_LEVEL LEVEL_CASTLE_GROUNDS
+#endif
 
 
 /*****************
