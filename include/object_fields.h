@@ -729,7 +729,7 @@
 #define /*0x108*/ oIntroLakituEndBirds1DestZ        OBJECT_FIELD_F32(O_INTRO_LAKITU_END_BIRDS_DEST_Z_INDEX)
 #define /*0x1AC*/ oIntroLakituCloud                 OBJECT_FIELD_OBJ(0x49)
 
-/* Main Menu Button */
+/* bhvMenuButton - Main Menu Button */
 #define /*0x0F4*/ oMenuButtonState       OBJECT_FIELD_S32(0x1B)
 #define /*0x0F8*/ oMenuButtonTimer       OBJECT_FIELD_S32(0x1C)
 #define /*0x0FC*/ O_MENU_BUTTON_ORIG_POS_INDEX   0x1D
@@ -742,6 +742,9 @@
 #define /*0x104*/ oMenuButtonOrigPosZ    OBJECT_FIELD_F32(O_MENU_BUTTON_ORIG_POS_Z_INDEX)
 #define /*0x108*/ oMenuButtonScale       OBJECT_FIELD_F32(0x20)
 #define /*0x10C*/ oMenuButtonActionPhase OBJECT_FIELD_S32(0x21)
+#define /*0x110*/ oMenuButtonType        OBJECT_FIELD_S32(0x22)
+// #define /*0x110*/ oMenuButtonType        OBJECT_FIELD_S32(0x49)
+// #define /*0x110*/ oMenuButtonType        OBJECT_FIELD_S32(0x4A)
 
 /* Manta Ray */
 #define /*0x0F4*/ O_MANTA_TARGET_ANGLE_INDEX 0x1B
@@ -808,9 +811,9 @@
 #define /*0x0F4*/ oOpenableGrillFloorSwitchObj OBJECT_FIELD_OBJ(0x1B)
 
 /* Intro Cutscene Peach */
-#define /*0x108*/ oIntroPeachYawFromFocus OBJECT_FIELD_F32(0x20)
+#define /*0x108*/ oIntroPeachYawFromFocus   OBJECT_FIELD_F32(0x20)
 #define /*0x10C*/ oIntroPeachPitchFromFocus OBJECT_FIELD_F32(0x21)
-#define /*0x110*/ oIntroPeachDistToCamera OBJECT_FIELD_F32(0x22)
+#define /*0x110*/ oIntroPeachDistToCamera   OBJECT_FIELD_F32(0x22)
 
 /* Racing Penguin */
 #define /*0x0F4*/ oRacingPenguinInitTextCooldown       OBJECT_FIELD_S32(0x1B)
