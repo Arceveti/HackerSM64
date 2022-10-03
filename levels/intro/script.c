@@ -141,8 +141,8 @@ const LevelScript level_intro_entry_level_select[] = {
     INIT_LEVEL(),
     LOAD_BEHAVIOR_DATA(),
     LOAD_TITLE_SCREEN_BG(),
-    LOAD_YAY0(/*seg*/ SEGMENT_LEVEL_DATA, _debug_level_select_yay0SegmentRomStart, _debug_level_select_yay0SegmentRomEnd),
-    FIXED_LOAD(/*loadAddr*/ _goddardSegmentStart, /*romStart*/ _goddardSegmentRomStart, /*romEnd*/ _goddardSegmentRomEnd),
+    LOAD_DEBUG_LEVEL_SELECT(),
+    LOAD_GODDARD(),
     ALLOC_LEVEL_POOL(),
 
     AREA(/*index*/ 1, intro_geo_debug_level_select),

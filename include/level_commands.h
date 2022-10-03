@@ -502,6 +502,9 @@ enum GoddardScene {
 #define LOAD_TITLE_SCREEN_BG() \
     LOAD_YAY0_TEXTURE(/*seg*/ SEGMENT_SKYBOX, /*romStart*/ _title_screen_bg_yay0SegmentRomStart, /*romEnd*/ _title_screen_bg_yay0SegmentRomEnd)
 
+#define LOAD_DEBUG_LEVEL_SELECT() \
+    LOAD_YAY0(/*seg*/ SEGMENT_LEVEL_DATA, _debug_level_select_yay0SegmentRomStart, _debug_level_select_yay0SegmentRomEnd)
+
 // behParams
 
 #define BP1(p) (((p) & BITMASK(8)) << 24)
