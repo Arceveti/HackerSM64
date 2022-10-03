@@ -330,7 +330,7 @@ Bool32 vec3f_normalize_check(Vec3f dest) {
 
 /// Scale vector 'dest' so it has length 1. Set to vertical vector if magnitude is zero.
 Bool32 vec3f_normalize(Vec3f dest) {
-    s32 ret = vec3f_normalize(dest);
+    s32 ret = vec3f_normalize_check(dest);
     if (!ret) {
         // Default to up vector.
         dest[0] = 0;
