@@ -255,7 +255,7 @@ static struct Surface *read_surface_data(TerrainData *vertexData, TerrainData **
 
     find_vector_perpendicular_to_plane(n, v[0], v[1], v[2]);
 
-    if (!vec3f_normalize_check(n)) return NULL;
+    vec3f_normalize(n);
 
     struct Surface *surface = alloc_surface(dynamic);
 
