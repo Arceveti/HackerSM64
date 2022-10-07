@@ -119,7 +119,7 @@ extern const f32 gSineTable[];
 #define CLAMP_F32(x)        CLAMP((x), F32_MIN, F32_MAX)
 #define CLAMP_F64(x)        CLAMP((x), F64_MIN, F64_MAX)
 
-#define SWAP(a, b)          { ((a) ^= (b)); ((b) ^= (a)); ((a) ^= (b)); }
+#define SWAP(a, b)          do { ((a) ^= (b)); ((b) ^= (a)); ((a) ^= (b)); } while (0)
 
 #define sqr(x)              (    (x) * (x))
 #define cube(x)             ( sqr(x) * (x))
@@ -160,21 +160,21 @@ extern const f32 gSineTable[];
 #define vec4_dot(a, b)      (vec3_dot((a), (b)) + ((a)[3] * (b)[3]))
 
 /// Make vector 'dest' the cross product of vectors a and b.
-#define vec3_cross(dst, a, b) {                         \
+#define vec3_cross(dst, a, b) do {                      \
     (dst)[0] = (((a)[1] * (b)[2]) - ((a)[2] * (b)[1])); \
     (dst)[1] = (((a)[2] * (b)[0]) - ((a)[0] * (b)[2])); \
     (dst)[2] = (((a)[0] * (b)[1]) - ((a)[1] * (b)[0])); \
-}
+} while (0)
 
 /**
  * Set 'dest' the normal vector of a triangle with vertices a, b and c.
  * Equivalent to cross((c-b), (c-a)).
  */
-#define find_vector_perpendicular_to_plane(dest, a, b, c) {                                     \
+#define find_vector_perpendicular_to_plane(dest, a, b, c) do {                                  \
     (dest)[0] = ((b)[1] - (a)[1]) * ((c)[2] - (b)[2]) - ((c)[1] - (b)[1]) * ((b)[2] - (a)[2]);  \
     (dest)[1] = ((b)[2] - (a)[2]) * ((c)[0] - (b)[0]) - ((c)[2] - (b)[2]) * ((b)[0] - (a)[0]);  \
     (dest)[2] = ((b)[0] - (a)[0]) * ((c)[1] - (b)[1]) - ((c)[0] - (b)[0]) * ((b)[1] - (a)[1]);  \
-}
+} while (0)
 
 /**
  * | ? ? ? 0 |
@@ -184,253 +184,253 @@ extern const f32 gSineTable[];
  * i.e. a matrix representing a linear transformation over 3 space.
  */
 // Multiply a vector by a matrix of the form
-#define linear_mtxf_mul_vec3(mtx, dstV, srcV) {                                                     \
+#define linear_mtxf_mul_vec3(mtx, dstV, srcV) do {                                                  \
     (dstV)[0] = (((mtx)[0][0] * (srcV)[0]) + ((mtx)[1][0] * (srcV)[1]) + ((mtx)[2][0] * (srcV)[2]));\
     (dstV)[1] = (((mtx)[0][1] * (srcV)[0]) + ((mtx)[1][1] * (srcV)[1]) + ((mtx)[2][1] * (srcV)[2]));\
     (dstV)[2] = (((mtx)[0][2] * (srcV)[0]) + ((mtx)[1][2] * (srcV)[1]) + ((mtx)[2][2] * (srcV)[2]));\
-}
+} while (0)
 
-#define linear_mtxf_mul_vec3_and_translate(mtx, dstV, srcV) {   \
+#define linear_mtxf_mul_vec3_and_translate(mtx, dstV, srcV) do {\
     linear_mtxf_mul_vec3((mtx), (dstV), (srcV));                \
     vec3_add((dstV), (mtx)[3]);                                 \
-}
+} while (0)
 
 // Multiply a vector by the transpose of a matrix of the form
-#define linear_mtxf_transpose_mul_vec3(mtx, dstV, srcV) {   \
+#define linear_mtxf_transpose_mul_vec3(mtx, dstV, srcV) do {\
     (dstV)[0] = vec3_dot((mtx)[0], (srcV));                 \
     (dstV)[1] = vec3_dot((mtx)[1], (srcV));                 \
     (dstV)[2] = vec3_dot((mtx)[2], (srcV));                 \
-}
+} while (0)
 
-#define vec2_set(dst, x, y) {           \
-    (dst)[0] = (x);                     \
-    (dst)[1] = (y);                     \
-}
-#define vec3_set(dst, x, y, z) {        \
-    vec2_set((dst), (x), (y));          \
-    (dst)[2] = (z);                     \
-}
-#define vec4_set(dst, x, y, z, w) {     \
-    vec3_set((dst), (x), (y), (z));     \
-    (dst)[3] = (w);                     \
-}
+#define vec2_set(dst, x, y) do {            \
+    (dst)[0] = (x);                         \
+    (dst)[1] = (y);                         \
+} while (0)
+#define vec3_set(dst, x, y, z) do {         \
+    vec2_set((dst), (x), (y));              \
+    (dst)[2] = (z);                         \
+} while (0)
+#define vec4_set(dst, x, y, z, w) do {      \
+    vec3_set((dst), (x), (y), (z));         \
+    (dst)[3] = (w);                         \
+} while (0)
 
-#define vec2_copy(dst, src) {           \
-    (dst)[0] = (src)[0];                \
-    (dst)[1] = (src)[1];                \
-}
-#define vec3_copy(dst, src) {           \
-    vec2_copy((dst), (src));            \
-    (dst)[2] = (src)[2];                \
-}
-#define vec4_copy(dst, src) {           \
-    vec3_copy((dst), (src));            \
-    (dst)[3] = (src)[3];                \
-}
+#define vec2_copy(dst, src) do {            \
+    (dst)[0] = (src)[0];                    \
+    (dst)[1] = (src)[1];                    \
+} while (0)
+#define vec3_copy(dst, src) do {            \
+    vec2_copy((dst), (src));                \
+    (dst)[2] = (src)[2];                    \
+} while (0)
+#define vec4_copy(dst, src) do {            \
+    vec3_copy((dst), (src));                \
+    (dst)[3] = (src)[3];                    \
+} while (0)
 
-#define vec3_copy_y_off(dst, src, y) {  \
-    (dst)[0] =  (src)[0];               \
-    (dst)[1] = ((src)[1] + (y));        \
-    (dst)[2] =  (src)[2];               \
-}
+#define vec3_copy_y_off(dst, src, y) do {   \
+    (dst)[0] =  (src)[0];                   \
+    (dst)[1] = ((src)[1] + (y));            \
+    (dst)[2] =  (src)[2];                   \
+} while (0)
 
-#define vec2_copy_roundf(dst, src) {    \
-    (dst)[0] = roundf((src)[0]);        \
-    (dst)[1] = roundf((src)[1]);        \
-}
-#define vec3_copy_roundf(dst, src) {    \
-    vec2_copy_roundf((dst), (src));     \
-    (dst)[2] = roundf((src)[2]);        \
-}
-#define vec4_copy_roundf(dst, src) {    \
-    vec3_copy_roundf((dst), (src));     \
-    (dst)[3] = roundf((src)[3]);        \
-}
+#define vec2_copy_roundf(dst, src) do {     \
+    (dst)[0] = roundf((src)[0]);            \
+    (dst)[1] = roundf((src)[1]);            \
+} while (0)
+#define vec3_copy_roundf(dst, src) do {     \
+    vec2_copy_roundf((dst), (src));         \
+    (dst)[2] = roundf((src)[2]);            \
+} while (0)
+#define vec4_copy_roundf(dst, src) do {     \
+    vec3_copy_roundf((dst), (src));         \
+    (dst)[3] = roundf((src)[3]);            \
+} while (0)
 
-#define vec2_copy_inverse(dst, src) {   \
-    (dst)[0] = (src)[1];                \
-    (dst)[1] = (src)[0];                \
+#define vec2_copy_inverse(dst, src) do {    \
+    (dst)[0] = (src)[1];                    \
+    (dst)[1] = (src)[0];                    \
 }
-#define vec3_copy_inverse(dst, src) {   \
-    (dst)[0] = (src)[2];                \
-    (dst)[1] = (src)[1];                \
-    (dst)[2] = (src)[0];                \
-}
-#define vec4_copy_inverse(dst, src) {   \
-    (dst)[0] = (src)[3];                \
-    (dst)[1] = (src)[2];                \
-    (dst)[2] = (src)[1];                \
-    (dst)[3] = (src)[0];                \
-}
+#define vec3_copy_inverse(dst, src) do {    \
+    (dst)[0] = (src)[2];                    \
+    (dst)[1] = (src)[1];                    \
+    (dst)[2] = (src)[0];                    \
+} while (0)
+#define vec4_copy_inverse(dst, src) do {    \
+    (dst)[0] = (src)[3];                    \
+    (dst)[1] = (src)[2];                    \
+    (dst)[2] = (src)[1];                    \
+    (dst)[3] = (src)[0];                    \
+} while (0)
 
-#define vec3_copy_offset_m1(dst, src) { \
-    (dst)[0] = (src)[1];                \
-    (dst)[1] = (src)[2];                \
-    (dst)[2] = (src)[0];                \
-}
+#define vec3_copy_offset_m1(dst, src) do {  \
+    (dst)[0] = (src)[1];                    \
+    (dst)[1] = (src)[2];                    \
+    (dst)[2] = (src)[0];                    \
+} while (0)
 
-#define vec2_copy_negative(dst, src) {  \
-    (dst)[0] = -(src)[0];               \
-    (dst)[1] = -(src)[1];               \
-}
-#define vec3_copy_negative(dst, src) {  \
-    vec2_copy_negative((dst), (src));   \
-    (dst)[2] = -(src)[2];               \
-}
-#define vec4_copy_negative(dst, src) {  \
-    vec3_copy_negative((dst), (src));   \
-    (dst)[3] = -(src)[3];               \
-}
+#define vec2_copy_negative(dst, src) do {   \
+    (dst)[0] = -(src)[0];                   \
+    (dst)[1] = -(src)[1];                   \
+} while (0)
+#define vec3_copy_negative(dst, src) do {   \
+    vec2_copy_negative((dst), (src));       \
+    (dst)[2] = -(src)[2];                   \
+} while (0)
+#define vec4_copy_negative(dst, src) do {   \
+    vec3_copy_negative((dst), (src));       \
+    (dst)[3] = -(src)[3];                   \
+} while (0)
 
-#define vec2_sum(dst, src1, src2) {     \
-    (dst)[0] = ((src1)[0] + (src2)[0]); \
-    (dst)[1] = ((src1)[1] + (src2)[1]); \
-}
-#define vec3_sum(dst, src1, src2) {     \
-    vec2_sum((dst), (src1), (src2));    \
-    (dst)[2] = ((src1)[2] + (src2)[2]); \
-}
-#define vec4_sum(dst, src1, src2) {     \
-    vec3_sum((dst), (src1), (src2));    \
-    (dst)[3] = ((src1)[3] + (src2)[3]); \
-}
+#define vec2_sum(dst, src1, src2) do {      \
+    (dst)[0] = ((src1)[0] + (src2)[0]);     \
+    (dst)[1] = ((src1)[1] + (src2)[1]);     \
+} while (0)
+#define vec3_sum(dst, src1, src2) do {      \
+    vec2_sum((dst), (src1), (src2));        \
+    (dst)[2] = ((src1)[2] + (src2)[2]);     \
+} while (0)
+#define vec4_sum(dst, src1, src2) do {      \
+    vec3_sum((dst), (src1), (src2));        \
+    (dst)[3] = ((src1)[3] + (src2)[3]);     \
+} while (0)
 
 #define vec2_add(dst, src) vec2_sum((dst), (dst), (src))
 #define vec3_add(dst, src) vec3_sum((dst), (dst), (src))
 #define vec4_add(dst, src) vec4_sum((dst), (dst), (src))
 
-#define vec2_sum_val(dst, src, x) {     \
-    (dst)[0] = ((src)[0] + (x));        \
-    (dst)[1] = ((src)[1] + (x));        \
-}
-#define vec3_sum_val(dst, src, x) {     \
-    vec2_sum_val((dst), (src), (x));    \
-    (dst)[2] = ((src)[2] + (x));        \
-}
-#define vec4_sum_val(dst, src, x) {     \
-    vec3_sum_val((dst), (src), (x));    \
-    (dst)[3] = ((src)[2] + (x));        \
-}
+#define vec2_sum_val(dst, src, x) do {      \
+    (dst)[0] = ((src)[0] + (x));            \
+    (dst)[1] = ((src)[1] + (x));            \
+} while (0)
+#define vec3_sum_val(dst, src, x) do {      \
+    vec2_sum_val((dst), (src), (x));        \
+    (dst)[2] = ((src)[2] + (x));            \
+} while (0)
+#define vec4_sum_val(dst, src, x) do {      \
+    vec3_sum_val((dst), (src), (x));        \
+    (dst)[3] = ((src)[2] + (x));            \
+} while (0)
 
 #define vec2_add_val(dst, x) vec2_sum_val((dst), (dst), (x))
 #define vec3_add_val(dst, x) vec3_sum_val((dst), (dst), (x))
 #define vec4_add_val(dst, x) vec4_sum_val((dst), (dst), (x))
 
-#define vec2_diff(dst, src1, src2) {    \
-    (dst)[0] = ((src1)[0] - (src2)[0]); \
-    (dst)[1] = ((src1)[1] - (src2)[1]); \
-}
-#define vec3_diff(dst, src1, src2) {    \
-    vec2_diff((dst), (src1), (src2));   \
-    (dst)[2] = ((src1)[2] - (src2)[2]); \
-}
-#define vec4_diff(dst, src1, src2) {    \
-    vec3_diff((dst), (src1), (src2));   \
-    (dst)[3] = ((src1)[3] - (src2)[3]); \
-}
+#define vec2_diff(dst, src1, src2) do {     \
+    (dst)[0] = ((src1)[0] - (src2)[0]);     \
+    (dst)[1] = ((src1)[1] - (src2)[1]);     \
+} while (0)
+#define vec3_diff(dst, src1, src2) do {     \
+    vec2_diff((dst), (src1), (src2));       \
+    (dst)[2] = ((src1)[2] - (src2)[2]);     \
+} while (0)
+#define vec4_diff(dst, src1, src2) do {     \
+    vec3_diff((dst), (src1), (src2));       \
+    (dst)[3] = ((src1)[3] - (src2)[3]);     \
+} while (0)
 
 #define vec2_sub(dst, src) vec2_diff((dst), (dst), (src))
 #define vec3_sub(dst, src) vec3_diff((dst), (dst), (src))
 #define vec4_sub(dst, src) vec4_diff((dst), (dst), (src))
 
-#define vec2_diff_val(dst, src, x) {    \
-    (dst)[0] = ((src)[0] - (x));        \
-    (dst)[1] = ((src)[1] - (x));        \
-}
-#define vec3_diff_val(dst, src, x) {    \
-    vec2_diff_val((dst), (src), (x));   \
-    (dst)[2] = ((src)[2] - (x));        \
-}
-#define vec4_diff_val(dst, src, x) {    \
-    vec3_diff_val((dst), (src), (x));   \
-    (dst)[3] = ((src)[3] - (x));        \
-}
+#define vec2_diff_val(dst, src, x) do {     \
+    (dst)[0] = ((src)[0] - (x));            \
+    (dst)[1] = ((src)[1] - (x));            \
+} while (0)
+#define vec3_diff_val(dst, src, x) do {     \
+    vec2_diff_val((dst), (src), (x));       \
+    (dst)[2] = ((src)[2] - (x));            \
+} while (0)
+#define vec4_diff_val(dst, src, x) do {     \
+    vec3_diff_val((dst), (src), (x));       \
+    (dst)[3] = ((src)[3] - (x));            \
+} while (0)
 
 #define vec2_sub_val(dst, x) vec2_diff_val((dst), (dst), (x))
 #define vec3_sub_val(dst, x) vec3_diff_val((dst), (dst), (x))
 #define vec4_sub_val(dst, x) vec4_diff_val((dst), (dst), (x))
 
-#define vec2_prod(dst, src1, src2) {    \
-    (dst)[0] = ((src1)[0] * (src2)[0]); \
-    (dst)[1] = ((src1)[1] * (src2)[1]); \
-}
-#define vec3_prod(dst, src1, src2) {    \
-    vec2_prod((dst), (src1), (src2));   \
-    (dst)[2] = ((src1)[2] * (src2)[2]); \
-}
-#define vec4_prod(dst, src1, src2) {    \
-    vec3_prod((dst), (src1), (src2));   \
-    (dst)[3] = ((src1)[3] * (src2)[3]); \
-}
+#define vec2_prod(dst, src1, src2) do {     \
+    (dst)[0] = ((src1)[0] * (src2)[0]);     \
+    (dst)[1] = ((src1)[1] * (src2)[1]);     \
+} while (0)
+#define vec3_prod(dst, src1, src2) do {     \
+    vec2_prod((dst), (src1), (src2));       \
+    (dst)[2] = ((src1)[2] * (src2)[2]);     \
+} while (0)
+#define vec4_prod(dst, src1, src2) do {     \
+    vec3_prod((dst), (src1), (src2));       \
+    (dst)[3] = ((src1)[3] * (src2)[3]);     \
+} while (0)
 
 #define vec2_mul(dst, src) vec2_prod((dst), (dst), (src))
 #define vec3_mul(dst, src) vec3_prod((dst), (dst), (src))
 #define vec4_mul(dst, src) vec4_prod((dst), (dst), (src))
 
-#define vec2_prod_val(dst, src, x) {    \
-    (dst)[0] = ((src)[0] * (x));        \
-    (dst)[1] = ((src)[1] * (x));        \
-}
-#define vec3_prod_val(dst, src, x) {    \
-    vec2_prod_val((dst), (src), (x));   \
-    (dst)[2] = ((src)[2] * (x));        \
-}
-#define vec4_prod_val(dst, src, x) {    \
-    vec3_prod_val((dst), (src), (x));   \
-    (dst)[3] = ((src)[3] * (x));        \
-}
+#define vec2_prod_val(dst, src, x) do {     \
+    (dst)[0] = ((src)[0] * (x));            \
+    (dst)[1] = ((src)[1] * (x));            \
+} while (0)
+#define vec3_prod_val(dst, src, x) do {     \
+    vec2_prod_val((dst), (src), (x));       \
+    (dst)[2] = ((src)[2] * (x));            \
+} while (0)
+#define vec4_prod_val(dst, src, x) do {     \
+    vec3_prod_val((dst), (src), (x));       \
+    (dst)[3] = ((src)[3] * (x));            \
+} while (0)
 
 #define vec2_mul_val(dst, x) vec2_prod_val(dst, dst, x)
 #define vec3_mul_val(dst, x) vec3_prod_val(dst, dst, x)
 #define vec4_mul_val(dst, x) vec4_prod_val(dst, dst, x)
 
-#define vec2_quot(dst, src1, src2) {    \
-    (dst)[0] = ((src1)[0] / (src2)[0]); \
-    (dst)[1] = ((src1)[1] / (src2)[1]); \
-}
-#define vec3_quot(dst, src1, src2) {    \
-    vec2_quot((dst), (src1), (src2));   \
-    (dst)[2] = ((src1)[2] / (src2)[2]); \
-}
-#define vec4_quot(dst, src1, src2) {    \
-    vec3_quot((dst), (src1), (src2));   \
-    (dst)[3] = ((src1)[3] / (src2)[3]); \
-}
+#define vec2_quot(dst, src1, src2) do {     \
+    (dst)[0] = ((src1)[0] / (src2)[0]);     \
+    (dst)[1] = ((src1)[1] / (src2)[1]);     \
+} while (0)
+#define vec3_quot(dst, src1, src2) do {     \
+    vec2_quot((dst), (src1), (src2));       \
+    (dst)[2] = ((src1)[2] / (src2)[2]);     \
+} while (0)
+#define vec4_quot(dst, src1, src2) do {     \
+    vec3_quot((dst), (src1), (src2));       \
+    (dst)[3] = ((src1)[3] / (src2)[3]);     \
+} while (0)
 
 #define vec2_div(dst, src) vec2_quot((dst), (dst), (src))
 #define vec3_div(dst, src) vec3_quot((dst), (dst), (src))
 #define vec4_div(dst, src) vec4_quot((dst), (dst), (src))
 
-#define vec2_quot_val(dst, src, x) {    \
-    (dst)[0] = ((src)[0] / (x));        \
-    (dst)[1] = ((src)[1] / (x));        \
-}
-#define vec3_quot_val(dst, src, x) {    \
-    vec2_quot_val((dst), (src), (x));   \
-    (dst)[2] = ((src)[2] / (x));        \
-}
-#define vec4_quot_val(dst, src, x) {    \
-    vec3_quot_val((dst), (src), (x));   \
-    (dst)[3] = ((src)[3] / (x));        \
-}
+#define vec2_quot_val(dst, src, x) do {     \
+    (dst)[0] = ((src)[0] / (x));            \
+    (dst)[1] = ((src)[1] / (x));            \
+} while (0)
+#define vec3_quot_val(dst, src, x) do {     \
+    vec2_quot_val((dst), (src), (x));       \
+    (dst)[2] = ((src)[2] / (x));            \
+} while (0)
+#define vec4_quot_val(dst, src, x) do {     \
+    vec3_quot_val((dst), (src), (x));       \
+    (dst)[3] = ((src)[3] / (x));            \
+} while (0)
 
 #define vec2_div_val(dst, x) vec2_quot_val((dst), (dst), (x))
 #define vec3_div_val(dst, x) vec3_quot_val((dst), (dst), (x))
 #define vec4_div_val(dst, x) vec4_quot_val((dst), (dst), (x))
 
-#define MAT4_VEC_DOT_PROD(R, A, B, row, col) {              \
+#define MAT4_VEC_DOT_PROD(R, A, B, row, col) do {           \
     (R)[(row)][(col)]  = ((A)[(row)][0] * (B)[0][(col)]);   \
     (R)[(row)][(col)] += ((A)[(row)][1] * (B)[1][(col)]);   \
     (R)[(row)][(col)] += ((A)[(row)][2] * (B)[2][(col)]);   \
-}
-#define MAT4_DOT_PROD(R, A, B, row, col) {                  \
+} while (0)
+#define MAT4_DOT_PROD(R, A, B, row, col) do {               \
     (R)[(row)][(col)]  = ((A)[(row)][0] * (B)[0][(col)]);   \
     (R)[(row)][(col)] += ((A)[(row)][1] * (B)[1][(col)]);   \
     (R)[(row)][(col)] += ((A)[(row)][2] * (B)[2][(col)]);   \
     (R)[(row)][(col)] += ((A)[(row)][3] * (B)[3][(col)]);   \
-}
+} while (0)
 
-#define MAT4_MULTIPLY(R, A, B) {        \
+#define MAT4_MULTIPLY(R, A, B) do {     \
     MAT4_DOT_PROD((R), (A), (B), 0, 0); \
     MAT4_DOT_PROD((R), (A), (B), 0, 1); \
     MAT4_DOT_PROD((R), (A), (B), 0, 2); \
@@ -447,12 +447,12 @@ extern const f32 gSineTable[];
     MAT4_DOT_PROD((R), (A), (B), 3, 1); \
     MAT4_DOT_PROD((R), (A), (B), 3, 2); \
     MAT4_DOT_PROD((R), (A), (B), 3, 3); \
-}
+} while (0)
 
-#define MTXF_END(mtx) {                         \
+#define MTXF_END(mtx) do {                      \
     (mtx)[0][3] = (mtx)[1][3] = (mtx)[2][3] = 0;\
     ((u32 *)(mtx))[15] = FLOAT_ONE;             \
-}
+} while (0)
 
 
 // Inline asm functions:
