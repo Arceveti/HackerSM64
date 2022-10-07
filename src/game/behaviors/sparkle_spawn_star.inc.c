@@ -16,12 +16,21 @@ void bhv_spawned_star_init(void) {
     if (!(o->oInteractionSubtype & INT_SUBTYPE_NO_EXIT)) {
         o->oBehParams = o->parentObj->oBehParams;
     }
-    s32 param = GET_BPARAM1(o->oBehParams);
+    u8 param = GET_BPARAM1(o->oBehParams);
+#ifdef GLOBAL_STAR_IDS
+    if (save_file_get_star_flags(
+            SAVE_NUM_TO_INDEX(gCurrSaveFileNum),
+            COURSE_NUM_TO_INDEX(param / 7)
+        ) & BIT(param % 7)
+    )
+#else
     if (save_file_get_star_flags(
             SAVE_NUM_TO_INDEX(gCurrSaveFileNum),
             COURSE_NUM_TO_INDEX(gCurrCourseNum)
         ) & BIT(param)
-    ) {
+    )
+#endif
+    {
         cur_obj_set_model(MODEL_TRANSPARENT_STAR);
     }
 

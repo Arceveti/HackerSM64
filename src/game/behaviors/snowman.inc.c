@@ -160,7 +160,7 @@ void bhv_snowmans_head_init(void) {
         SAVE_NUM_TO_INDEX(gCurrSaveFileNum),
         COURSE_NUM_TO_INDEX(gCurrCourseNum)
     );
-    s8 behParams = GET_BPARAM1(o->oBehParams);
+    u8 behParams = GET_BPARAM1(o->oBehParams);
 
     cur_obj_scale(0.7f);
 
