@@ -1737,7 +1737,7 @@ s32 execute_mario_action(struct MarioState *m) {
     if (m->action) {
 #ifdef DEBUG_FORCE_CRASH_ON_L
         if (gPlayer1Controller->buttonDown & L_TRIG) {
-            FORCE_CRASH
+            FORCE_CRASH;
         }
 #endif
 #ifdef ENABLE_DEBUG_FREE_MOVE
