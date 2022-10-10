@@ -9210,9 +9210,11 @@ void cutscene_enter_painting(struct Camera *c) {
     struct Object *ripplingPainting = gCutsceneFocus;
 
     if (ripplingPainting != NULL) {
-        f32 size = ((ripplingPainting->oPaintingPtr->sizeX + ripplingPainting->oPaintingPtr->sizeY) / 2.0f);
+        const struct Painting *painting = ripplingPainting->oPaintingData;
+
         vec3i_to_vec3s(paintingAngle, &ripplingPainting->oFaceAngleVec);
 
+        f32 size = ((painting->sizeX + painting->sizeY) / 2.0f);
         focusOffset[0] = (size * 0.5f);
         focusOffset[1] = focusOffset[0];
         focusOffset[2] = 0;

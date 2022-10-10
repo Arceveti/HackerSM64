@@ -195,7 +195,7 @@ const struct RippleAnimationInfo *get_ripple_animation(const struct Painting *pa
  * @param resetTimer if TRUE, set the timer to 0
  */
 void painting_state(struct Object *obj, s8 state, s8 centerRipples, s8 resetTimer) {
-    const struct Painting *painting = obj->oPaintingPtr;
+    const struct Painting *painting = obj->oPaintingData;
     const struct RippleAnimationInfo *anim = get_ripple_animation(painting);
 
     // Use a different set of variables depending on the state
@@ -259,11 +259,14 @@ void painting_update_mario_pos(struct Object *obj) {
     // Get Mario's position in the painting's local space.
     vec3f_world_pos_to_local_pos(marioLocalPos, marioWorldPos, &obj->oPosVec, rotation);
 
+    // Get the const painting data.
+    const struct Painting *painting = obj->oPaintingData;
+
     // Check if Mario is within the painting bounds laterally in local space.
     if (marioLocalPos[0] > -PAINTING_EDGE_MARGIN
-     && marioLocalPos[0] < (obj->oPaintingPtr->sizeX + PAINTING_EDGE_MARGIN)
+     && marioLocalPos[0] < (painting->sizeX + PAINTING_EDGE_MARGIN)
      && marioLocalPos[1] > -PAINTING_EDGE_MARGIN
-     && marioLocalPos[1] < (obj->oPaintingPtr->sizeY + PAINTING_EDGE_MARGIN)) {
+     && marioLocalPos[1] < (painting->sizeY + PAINTING_EDGE_MARGIN)) {
         // Check whether Mario is inside the wobble zone.
         if (marioLocalPos[2] < PAINTING_WOBBLE_DEPTH
          && marioLocalPos[2] > 0.0f) {
@@ -948,7 +951,7 @@ void reset_painting(struct Object *obj) {
     obj->oPaintingRippleTimer = 0;
     obj->oPaintingRippleX = 0;
     obj->oPaintingRippleY = 0;
-    if (obj->oPaintingPtr == &ddd_painting) {
+    if ((const struct Painting *)obj->oPaintingData == &ddd_painting) {
         // Move DDD painting to initial position, in case the animation
         // that moves the painting stops during level unload.
         obj->oPosX = 3456.0f;
@@ -1014,12 +1017,14 @@ Gfx *geo_painting_draw(s32 callContext, struct GraphNode *node, UNUSED void *con
         return NULL;
     }
 
-    Gfx *paintingDlist = NULL;
-    const struct Painting *painting = obj->oPaintingPtr;
+    // Get the const painting data.
+    const struct Painting *painting = obj->oPaintingData;
 
     if (painting == NULL) {
         return NULL;
     }
+
+    Gfx *paintingDlist = NULL;
 
     if (callContext != GEO_CONTEXT_RENDER) {
         // Reset the update counter.
@@ -1100,12 +1105,15 @@ void bhv_painting_init(void) {
     }
 
     const struct Painting * const* paintingGroup = sPaintingGroups[obj->oPaintingGroup];
-    obj->oPaintingPtr = segmented_to_virtual(paintingGroup[obj->oPaintingId]);
+    const struct Painting *painting = segmented_to_virtual(paintingGroup[obj->oPaintingId]);
+
+    // Set the object's painting data pointer.
+    obj->oPaintingData = painting;
 
     // The center of the painting, but with a z offset since paintings are usually between floor triangle edges laterally.
     Vec3f distPos = {
-        (obj->oPaintingPtr->sizeX * 0.5f),
-        (obj->oPaintingPtr->sizeY * 0.5f),
+        (painting->sizeX * 0.5f),
+        (painting->sizeY * 0.5f),
         PAINTING_WOBBLE_DEPTH // Distance in front of the painting to check for a room floor.
     };
 
