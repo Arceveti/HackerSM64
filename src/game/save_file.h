@@ -30,8 +30,6 @@ struct SaveFile {
     // cap can always be found in a fixed spot within the course
     u8 capLevel;
     u8 capArea;
-    // Note: the coordinates get set, but are never actually used, since the
-    // cap can always be found in a fixed spot within the course
     Vec3s capPos; // 48 bits
 
     u32 flags;
@@ -71,9 +69,9 @@ struct MainMenuSaveData {
 #endif
     u8 firstBoot;
 
-    #ifdef PUPPYCAM
+#ifdef PUPPYCAM
     struct gPuppyOptions saveOptions;
-    #endif
+#endif
     struct SaveBlockSignature signature;
 };
 
