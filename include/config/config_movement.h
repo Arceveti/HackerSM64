@@ -150,6 +150,11 @@
 #define LEDGE_GRABS_CHECK_SLOPE_ANGLE
 
 /**
+ * Prevents ledge grabbing lava, quicksand, death planes, and warps. See SURFACE_IS_UNSAFE.
+ */
+// #define LEDGE_GRABS_CHECK_UNSAFE_FLOORS
+
+/**
  * Enables bonking and wall kicking at the top of walls. This fixes some janky vanilla behavior caused by ledge grab mechanics, but may cause bonking in places where you would expect to ledge grab.
  */
 // #define WALL_KICK_TOP_OF_WALLS
