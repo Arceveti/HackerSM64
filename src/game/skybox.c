@@ -144,7 +144,7 @@ s32 calculate_skybox_scaled_x(s8 player, f32 fov) {
     s32 scaledX = yawScaled + 0.5f;
 
     if (scaledX > SKYBOX_WIDTH) {
-        scaledX -= (scaledX / SKYBOX_WIDTH * SKYBOX_WIDTH);
+        scaledX -= ((scaledX / SKYBOX_WIDTH) * SKYBOX_WIDTH);
     }
     return (SKYBOX_WIDTH - scaledX);
 }
@@ -190,7 +190,7 @@ static s32 get_top_left_tile_idx(s8 player) {
 Vtx *make_skybox_rect(s32 tileIndex, s8 colorIndex) {
     Vtx *verts = alloc_display_list(4 * sizeof(*verts));
     s16 x = (tileIndex % SKYBOX_COLS) * SKYBOX_TILE_WIDTH;
-    s16 y = SKYBOX_HEIGHT - (tileIndex / SKYBOX_COLS * SKYBOX_TILE_HEIGHT);
+    s16 y = SKYBOX_HEIGHT - ((tileIndex / SKYBOX_COLS) * SKYBOX_TILE_HEIGHT);
 
     if (verts != NULL) {
         make_vertex(verts, 0, x,                     y,                      -1,         0,         0, sSkyboxColors[colorIndex][0], sSkyboxColors[colorIndex][1], sSkyboxColors[colorIndex][2], 255);
@@ -261,7 +261,7 @@ Gfx *init_skybox_display_list(s8 player, s8 background, s8 colorIndex) {
         /*gSPDisplayList    */ 1 +
         /*gSPEndDisplayList */ 1
     );
-    void *skybox = alloc_display_list(gfxCmds * sizeof(Gfx) * sqr(SKYBOX_SIZE)); //! is the sqr(SKYBOX_SIZE) necessary?
+    void *skybox = alloc_display_list(gfxCmds * sizeof(Gfx));
     Gfx *dlist = skybox;
 
     if (skybox == NULL) {
@@ -314,8 +314,9 @@ Gfx *create_skybox_facing_camera(s8 player, s8 background, f32 fov, Vec3f pos, V
     //! fov is always set to 90.0f. If this line is removed, then the game crashes because fov is 0 on
     //! the first frame, which causes a floating point divide by 0
     fov = 90.0f;
-    s16 yaw;
-    vec3f_get_angle(pos, focus, &sSkyBoxInfo[player].pitch, &yaw);
+    s16 pitch, yaw;
+    vec3f_get_angle(pos, focus, &pitch, &yaw);
+    sSkyBoxInfo[player].pitch = pitch;
     sSkyBoxInfo[player].yaw = yaw;
     sSkyBoxInfo[player].scaledX = calculate_skybox_scaled_x(player, fov);
     sSkyBoxInfo[player].scaledY = calculate_skybox_scaled_y(player, fov);
