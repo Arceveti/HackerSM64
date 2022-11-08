@@ -162,8 +162,7 @@ s32 correct_lava_shadow_height(f32 *floorHeight) {
             *floorHeight = 3492;
             return FALSE;
         }
-    } else if (gCurrLevelNum == LEVEL_LLL
-               && gCurrAreaIndex == 1) {
+    } else if (gCurrLevelNum == LEVEL_LLL && gCurrAreaIndex == 1) {
         *floorHeight = 5;
         return FALSE;
     }
@@ -218,6 +217,7 @@ Gfx *create_shadow_below_xyz(Vec3f pos, Vec3f floorNormal, Vec3f scaleVec, s16 s
     struct Surface *floor = NULL;
     // The y-position of the floor (or water or lava) underneath the object.
     f32 floorHeight = FLOOR_LOWER_LIMIT_MISC;
+    f32 heightOffset = 0;
     f32 x = pos[0];
     f32 y = pos[1];
     f32 z = pos[2];
@@ -297,8 +297,8 @@ Gfx *create_shadow_below_xyz(Vec3f pos, Vec3f floorNormal, Vec3f scaleVec, s16 s
             if (obj != NULL
              && obj_has_behavior(obj, bhvPlatformOnTrack)
              && obj->oPlatformOnTrackType == PLATFORM_ON_TRACK_TYPE_CARPET) {
-                // Raise the shadow 5 units so the shadow doesn't clip into the flying carpet.
-                floorHeight += 5;
+                // Raise the shadow 5 units on the flying carpet to avoid clipping issues.
+                heightOffset += 5;
                 // The flying carpet is transparent.
                 *isDecal = FALSE;
             }
@@ -329,6 +329,9 @@ Gfx *create_shadow_below_xyz(Vec3f pos, Vec3f floorNormal, Vec3f scaleVec, s16 s
             floorHeight = -((x * nx) + (z * nz) + floor->originOffset) / ny;
         }
     }
+
+    // Apply y offset.
+    floorHeight += heightOffset;
 
     // -- Height checks --
 
