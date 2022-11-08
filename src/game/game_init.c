@@ -718,7 +718,7 @@ void init_controllers(void) {
             cont++;
         }
     }
-    if ((__osControllerTypes[1] == CONT_TYPE_GCN) && (gIsConsole)) {
+    if ((__osControllerTypes[1] == CONT_TYPE_GCN) && gIsConsole) {
         gGamecubeControllerPort = 1;
         gPlayer1Controller = &gControllers[1];
     } else {
