@@ -393,8 +393,6 @@ extern const BehaviorScript bhvButterfly[];
 extern const BehaviorScript bhvHoot[];
 extern const BehaviorScript bhvBetaHoldableObject[];
 extern const BehaviorScript bhvCarrySomethingHeld[];
-extern const BehaviorScript bhvCarrySomethingDropped[];
-extern const BehaviorScript bhvCarrySomethingThrown[];
 extern const BehaviorScript bhvObjectBubble[];
 extern const BehaviorScript bhvObjectWaterWave[];
 extern const BehaviorScript bhvExplosion[];

@@ -267,7 +267,7 @@ void mario_stop_riding_object(struct MarioState *m) {
 void mario_grab_used_object(struct MarioState *m) {
     if (m->heldObj == NULL) {
         m->heldObj = m->usedObj;
-        obj_set_held_state(m->heldObj, bhvCarrySomethingHeld);
+        obj_set_held_state(m->heldObj, HELD_HELD);
     }
 }
 
@@ -277,7 +277,7 @@ void mario_drop_held_object(struct MarioState *m) {
             stop_shell_music();
         }
 
-        obj_set_held_state(m->heldObj, bhvCarrySomethingDropped);
+        obj_set_held_state(m->heldObj, HELD_DROPPED);
 
 #ifdef HOLP_HEIGHT_FIX
         vec3f_copy(&m->heldObj->oPosVec, m->marioBodyState->heldObjLastPosition);
@@ -302,7 +302,7 @@ void mario_throw_held_object(struct MarioState *m) {
             stop_shell_music();
         }
 
-        obj_set_held_state(m->heldObj, bhvCarrySomethingThrown);
+        obj_set_held_state(m->heldObj, HELD_THROWN);
 
         m->heldObj->oPosX = m->marioBodyState->heldObjLastPosition[0] + (32.0f * sins(m->faceAngle[1]));
         m->heldObj->oPosY = m->marioBodyState->heldObjLastPosition[1];

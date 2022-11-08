@@ -169,30 +169,20 @@ void obj_update_pos_from_parent_transformation(Mat4 mtx, struct Object *obj) {
     linear_mtxf_mul_vec3f_and_translate(mtx, &obj->oPosVec, &obj->oParentRelativePosVec);
 }
 
-void obj_set_held_state(struct Object *obj, const BehaviorScript *heldBehavior) {
+void obj_set_held_state(struct Object *obj, u32 heldState) {
     obj->parentObj = o;
 
     if (obj->oFlags & OBJ_FLAG_HOLDABLE) {
-        if (heldBehavior == bhvCarrySomethingHeld   ) {
-            obj->oHeldState = HELD_HELD;
-        }
-
-        if (heldBehavior == bhvCarrySomethingThrown ) {
-            obj->oHeldState = HELD_THROWN;
-        }
-
-        if (heldBehavior == bhvCarrySomethingDropped) {
-            obj->oHeldState = HELD_DROPPED;
-        }
+        obj->oHeldState = heldState;
     } else {
-        obj->curBhvCommand = segmented_to_virtual(heldBehavior);
+        obj->curBhvCommand = segmented_to_virtual(bhvCarrySomethingHeld);
         obj->bhvStackIndex = 0;
     }
 }
 
 f32 lateral_dist_between_objects(struct Object *obj1, struct Object *obj2) {
-    register f32 dx = obj1->oPosX - obj2->oPosX;
-    register f32 dz = obj1->oPosZ - obj2->oPosZ;
+    f32 dx = obj1->oPosX - obj2->oPosX;
+    f32 dz = obj1->oPosZ - obj2->oPosZ;
 
     return sqrtf(sqr(dx) + sqr(dz));
 }

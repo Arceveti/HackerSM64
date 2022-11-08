@@ -3782,16 +3782,6 @@ const BehaviorScript bhvCarrySomethingHeld[] = {
     BREAK(),
 };
 
-const BehaviorScript bhvCarrySomethingDropped[] = {
-    BEGIN(OBJ_LIST_DEFAULT),
-    BREAK(),
-};
-
-const BehaviorScript bhvCarrySomethingThrown[] = {
-    BEGIN(OBJ_LIST_DEFAULT),
-    BREAK(),
-};
-
 const BehaviorScript bhvObjectBubble[] = {
     BEGIN(OBJ_LIST_UNIMPORTANT),
     OR_INT(oFlags, (OBJ_FLAG_MOVE_Y_WITH_TERMINAL_VEL | OBJ_FLAG_MOVE_XZ_USING_FVEL | OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE)),
