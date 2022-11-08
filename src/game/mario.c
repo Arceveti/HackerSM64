@@ -1913,7 +1913,11 @@ void init_mario_from_save_file(struct MarioState *m) {
     m->spawnInfo = &gPlayerSpawnInfos[0];
     m->statusForCamera = &gPlayerCameraState[0];
     m->marioBodyState = &gBodyStates[0];
-    m->controller = &gControllers[0];
+    if (gIsConsole && __osControllerTypes[1] == CONT_TYPE_GCN) {
+        m->controller = &gControllers[1];
+    } else {
+        m->controller = &gControllers[0];
+    }
     m->animList = &gMarioAnimsBuf;
 
     m->numCoins = 0;

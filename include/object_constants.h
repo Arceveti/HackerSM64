@@ -56,7 +56,7 @@ enum ObjFlags {
     OBJ_FLAG_OCCLUDE_SILHOUETTE                = BIT(20), // 0x00100000
     OBJ_FLAG_OPACITY_FROM_CAMERA_DIST          = BIT(21), // 0x00200000
     OBJ_FLAG_EMIT_LIGHT                        = BIT(22), // 0x00400000
-    OBJ_FLAG_UNUSED_23                         = BIT(23), // 0x00800000
+    OBJ_FLAG_PROCESS_OUTSIDE_ROOM              = BIT(23), // 0x00800000
     OBJ_FLAG_UNUSED_24                         = BIT(24), // 0x01000000
     OBJ_FLAG_UNUSED_25                         = BIT(25), // 0x02000000
     OBJ_FLAG_UNUSED_26                         = BIT(26), // 0x04000000
