@@ -2287,19 +2287,19 @@ s32 cur_obj_check_grabbed_mario(void) {
     return FALSE;
 }
 
-s32 sPlayerGrabReleaseState;
+s32 sPlayerGrabReleaseState = FALSE;
 
 s32 player_performed_grab_escape_action(void) {
     if (gPlayer1Controller->stickMag < 30.0f) {
         sPlayerGrabReleaseState = FALSE;
     }
 
-    if (sPlayerGrabReleaseState && (gPlayer1Controller->stickMag > 40.0f)) {
+    if (!sPlayerGrabReleaseState && (gPlayer1Controller->stickMag > 40.0f)) {
         sPlayerGrabReleaseState = TRUE;
         return TRUE;
     }
 
-    return (gPlayer1Controller->buttonPressed & (A_BUTTON | B_BUTTON | Z_TRIG));
+    return ((gPlayer1Controller->buttonPressed & (A_BUTTON | B_BUTTON | Z_TRIG)) != 0);
 }
 
 void cur_obj_unused_play_footstep_sound(s32 animFrame1, s32 animFrame2, s32 sound) {
