@@ -220,46 +220,45 @@ void osContGetReadDataEx(OSContPadEx* data) {
             s32 stick_x, stick_y, c_stick_x, c_stick_y;
             readformatgcn = *(__OSContGCNShortPollFormat*)ptr;
             data->errno = CHNL_ERR(readformatgcn);
-            if (data->errno != 0) {
+            if (data->errno == 0) {
+                if (!gGamecubeControllerCenters[i].initialized) {
+                    gGamecubeControllerCenters[i].initialized = TRUE;
+                    gGamecubeControllerCenters[i].stick_x   = readformatgcn.stick_x;
+                    gGamecubeControllerCenters[i].stick_y   = readformatgcn.stick_y;
+                    gGamecubeControllerCenters[i].c_stick_x = readformatgcn.c_stick_x;
+                    gGamecubeControllerCenters[i].c_stick_y = readformatgcn.c_stick_y;
+                }
+
+                stick_x = CLAMP_S8(((s32)readformatgcn.stick_x) - gGamecubeControllerCenters[i].stick_x);
+                stick_y = CLAMP_S8(((s32)readformatgcn.stick_y) - gGamecubeControllerCenters[i].stick_y);
+                data->stick_x = stick_x;
+                data->stick_y = stick_y;
+                c_stick_x = CLAMP_S8(((s32)readformatgcn.c_stick_x) - gGamecubeControllerCenters[i].c_stick_x);
+                c_stick_y = CLAMP_S8(((s32)readformatgcn.c_stick_y) - gGamecubeControllerCenters[i].c_stick_y);
+                data->c_stick_x = c_stick_x;
+                data->c_stick_y = c_stick_y;
+                data->button = __osTranslateGCNButtons(readformatgcn.button, c_stick_x, c_stick_y);
+                data->l_trig = readformatgcn.l_trig;
+                data->r_trig = readformatgcn.r_trig;
+            } else {
                 gGamecubeControllerCenters[i].initialized = FALSE;
-                continue;
             }
 
-            if (!gGamecubeControllerCenters[i].initialized) {
-                gGamecubeControllerCenters[i].initialized = TRUE;
-                gGamecubeControllerCenters[i].stick_x   = readformatgcn.stick_x;
-                gGamecubeControllerCenters[i].stick_y   = readformatgcn.stick_y;
-                gGamecubeControllerCenters[i].c_stick_x = readformatgcn.c_stick_x;
-                gGamecubeControllerCenters[i].c_stick_y = readformatgcn.c_stick_y;
-            }
-
-            stick_x = CLAMP_S8(((s32)readformatgcn.stick_x) - gGamecubeControllerCenters[i].stick_x);
-            stick_y = CLAMP_S8(((s32)readformatgcn.stick_y) - gGamecubeControllerCenters[i].stick_y);
-            data->stick_x = stick_x;
-            data->stick_y = stick_y;
-            c_stick_x = CLAMP_S8(((s32)readformatgcn.c_stick_x) - gGamecubeControllerCenters[i].c_stick_x);
-            c_stick_y = CLAMP_S8(((s32)readformatgcn.c_stick_y) - gGamecubeControllerCenters[i].c_stick_y);
-            data->c_stick_x = c_stick_x;
-            data->c_stick_y = c_stick_y;
-            data->button = __osTranslateGCNButtons(readformatgcn.button, c_stick_x, c_stick_y);
-            data->l_trig = readformatgcn.l_trig;
-            data->r_trig = readformatgcn.r_trig;
             ptr += sizeof(__OSContGCNShortPollFormat);
         } else {
             readformat = *(__OSContReadFormat*)ptr;
             data->errno = CHNL_ERR(readformat);
-            
-            if (data->errno != 0) {
-                continue;
+
+            if (data->errno == 0) {
+                data->stick_x = readformat.stick_x;
+                data->stick_y = readformat.stick_y;
+                data->button = readformat.button;
+                data->c_stick_x = 0;
+                data->c_stick_y = 0;
+                data->l_trig = 0;
+                data->r_trig = 0;
             }
 
-            data->stick_x = readformat.stick_x;
-            data->stick_y = readformat.stick_y;
-            data->button = readformat.button;
-            data->c_stick_x = 0;
-            data->c_stick_y = 0;
-            data->l_trig = 0;
-            data->r_trig = 0;
             ptr += sizeof(__OSContReadFormat);
         }
     }
@@ -304,7 +303,7 @@ static void __osPackReadData(void) {
             ptr += sizeof(__OSContReadFormat);
         }
     }
-    
+
     *ptr = CONT_CMD_END;
 }
 
@@ -399,8 +398,8 @@ void __osContGetInitDataEx(u8* pattern, OSContStatus* data) {
         requestHeader = *(__OSContRequesFormat*)ptr;
         data->error = CHNL_ERR(requestHeader);
         if (data->error == 0) {
-            data->type = requestHeader.typel << 8 | requestHeader.typeh;
-            
+            data->type = ((requestHeader.typel << 8) | requestHeader.typeh);
+
             // Check if the input type is a gamecube controller
             // Some mupen cores seem to send back a controller type of 0xFFFF if the core doesn't initialize the input plugin quickly enough,
             //   so check for that and set the input type as N64 controller if so.
@@ -412,7 +411,7 @@ void __osContGetInitDataEx(u8* pattern, OSContStatus* data) {
 
             data->status = requestHeader.status;
 
-            bits |= 1 << i;
+            bits |= (1 << i);
         }
     }
     *pattern = bits;
@@ -486,7 +485,7 @@ static void _MakeMotorData(int channel, OSPifRam *mdata) {
     ramreadformat.cmd = CONT_CMD_WRITE_PAK;
     ramreadformat.addrh = CONT_BLOCK_RUMBLE >> 3;
     ramreadformat.addrl = (u8)(__osContAddressCrc(CONT_BLOCK_RUMBLE) | (CONT_BLOCK_RUMBLE << 5));
-    
+
     if (channel != 0) {
         for (i = 0; i < channel; i++) {
             *ptr++ = CONT_CMD_REQUEST_STATUS;
@@ -510,7 +509,7 @@ s32 osMotorInitEx(OSMesgQueue *mq, OSPfs *pfs, int channel)
 
     if (__osControllerTypes[pfs->channel] != CONT_TYPE_GCN) {
         ret = __osPfsSelectBank(pfs, 0xFE);
-        
+
         if (ret == PFS_ERR_NEW_PACK) {
             ret = __osPfsSelectBank(pfs, 0x80);
         }
@@ -537,7 +536,7 @@ s32 osMotorInitEx(OSMesgQueue *mq, OSPfs *pfs, int channel)
         if (ret == PFS_ERR_NEW_PACK) {
             ret = PFS_ERR_CONTRFAIL;
         }
-        
+
         if (ret != 0) {
             return ret;
         }
@@ -546,11 +545,11 @@ s32 osMotorInitEx(OSMesgQueue *mq, OSPfs *pfs, int channel)
         if (ret == PFS_ERR_NEW_PACK) {
             ret = PFS_ERR_CONTRFAIL;
         }
-        
+
         if (ret != 0) {
             return ret;
         }
-        
+
         if (temp[31] != 0x80) {
             return PFS_ERR_DEVICE;
         }
