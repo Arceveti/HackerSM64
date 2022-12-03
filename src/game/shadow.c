@@ -176,6 +176,8 @@ s32 correct_lava_shadow_height(f32 *floorHeight) {
  * Uses environment alpha for shadow solidity.
  */
 static Gfx *shadow_display_list(s8 shadowType, Alpha solidity, s8 isDecal) {
+    const ColorRGB shadowColor = { 0x00, 0x00, 0x00 };
+
     u32 gfxCmds = (
         /*gSPDisplayList    */ 1 +
         /*gSPDisplayList    */ 1 +
@@ -193,7 +195,7 @@ static Gfx *shadow_display_list(s8 shadowType, Alpha solidity, s8 isDecal) {
 
     gSPDisplayList(gfx++, dl_shadow_begin);
     gSPDisplayList(gfx++, dl_shadow_shape);
-    gDPSetEnvColor(gfx++, 255, 255, 255, solidity);
+    gDPSetPrimColor(gfx++, 0, 0, shadowColor[0], shadowColor[1], shadowColor[2], solidity);
     gSPDisplayList(gfx++, dl_shadow_end);
     gSPEndDisplayList(gfx);
 
