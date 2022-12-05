@@ -92,7 +92,7 @@ enum LevelActs {
     ACT_4 = BIT(ACT_INDEX_4),
     ACT_5 = BIT(ACT_INDEX_5),
     ACT_6 = BIT(ACT_INDEX_6),
-    ALL_ACTS = (ACT_1 | ACT_2 | ACT_3 | ACT_4 | ACT_5 | ACT_6)
+    ALL_ACTS = 0xFF,
 };
 
 enum LevelCommandEvalOperation {
@@ -126,13 +126,6 @@ enum WarpCheckpointFlags {
 };
 
 #define WARP_DEST_LEVEL_NUM_MASK BITMASK(7)
-
-enum LevelCommandCreateWhirlpoolCondition {
-    WHIRLPOOL_COND_ALWAYS,
-    WHIRLPOOL_COND_BOWSER2_NOT_BEATEN,
-    WHIRLPOOL_COND_BOWSER2_BEATEN,
-    WHIRLPOOL_COND_AT_LEAST_SECOND_STAR
-};
 
 // Head defines
 enum GoddardScene {
@@ -459,8 +452,8 @@ enum GoddardScene {
     CMD_HH(unk6, unk8), \
     CMD_HH(unk10, 0x0000)
 
-#define WHIRLPOOL(index, condition, posX, posY, posZ, strength) \
-    CMD_BBBB(LEVEL_CMD_CREATE_WHIRLPOOL, 0x0C, index, condition), \
+#define WHIRLPOOL(index, acts, posX, posY, posZ, strength) \
+    CMD_BBBB(LEVEL_CMD_CREATE_WHIRLPOOL, 0x0C, index, acts), \
     CMD_HH(posX, posY), \
     CMD_HH(posZ, strength)
 
