@@ -92,7 +92,7 @@ enum LevelActs {
     ACT_4 = BIT(ACT_INDEX_4),
     ACT_5 = BIT(ACT_INDEX_5),
     ACT_6 = BIT(ACT_INDEX_6),
-    ALL_ACTS = 0xFF,
+    ALL_ACTS = -1,
 };
 
 enum LevelCommandEvalOperation {

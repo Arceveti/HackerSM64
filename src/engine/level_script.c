@@ -466,7 +466,7 @@ static void level_cmd_init_mario(void) {
 static void level_cmd_place_object(void) {
     if (
         sCurrAreaIndex != -1
-        && ((CMD_GET(u8, 2) & BIT(ACT_NUM_TO_INDEX(gCurrActNum))) || (CMD_GET(u8, 2) == ALL_ACTS))
+        && (CMD_GET(u8, 2) & BIT(ACT_NUM_TO_INDEX(gCurrActNum)))
     ) {
         ModelID16 model = CMD_GET(u32, 0x18);
         struct SpawnInfo *spawnInfo = alloc_only_pool_alloc(sLevelPool, sizeof(struct SpawnInfo));
@@ -600,7 +600,7 @@ static void level_cmd_create_whirlpool(void) {
     if (
         sCurrAreaIndex != -1
         && index < ARRAY_COUNT(gAreas[sCurrAreaIndex].whirlpools)
-        && ((CMD_GET(u8, 3) & BIT(ACT_NUM_TO_INDEX(gCurrActNum))) || (CMD_GET(u8, 3) == ALL_ACTS))
+        && (CMD_GET(u8, 3) & BIT(ACT_NUM_TO_INDEX(gCurrActNum)))
     ) {
         if ((whirlpool = gAreas[sCurrAreaIndex].whirlpools[index]) == NULL) {
             whirlpool = alloc_only_pool_alloc(sLevelPool, sizeof(struct Whirlpool));
