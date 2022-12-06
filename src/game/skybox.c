@@ -10,6 +10,7 @@
 #include "segment2.h"
 #include "sm64.h"
 #include "geo_commands.h"
+#include "level_commands.h"
 #include "color_presets.h"
 
 /**
