@@ -106,7 +106,7 @@ static void klepto_change_target(void) {
         f32 targetDist;
         f32 minTargetDist = F32_MAX;
 
-        for (i = 0; i < 3; i++) {
+        for (i = 0; i < ARRAY_COUNT(sKleptoTargetPositions); i++) {
             dx = gMarioObject->oPosX - sKleptoTargetPositions[i][0];
             dz = gMarioObject->oPosZ - sKleptoTargetPositions[i][2];
 
@@ -117,7 +117,7 @@ static void klepto_change_target(void) {
             }
         }
     } else {
-        newTarget = (random_u16() % 3);
+        newTarget = (random_u16() % ARRAY_COUNT(sKleptoTargetPositions));
     }
 
     o->oKleptoHomeYOffset  = 400 * absi(newTarget - o->oKleptoTargetNumber);

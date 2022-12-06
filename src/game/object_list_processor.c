@@ -511,7 +511,7 @@ void clear_objects(void) {
     gMarioObject = NULL;
     gMarioCurrentRoom = 0;
 
-    for (i = 0; i < 60; i++) {
+    for (i = 0; i < ARRAY_COUNT(gDoorAdjacentRooms); i++) {
         gDoorAdjacentRooms[i][0] = 0;
         gDoorAdjacentRooms[i][1] = 0;
     }
@@ -521,7 +521,7 @@ void clear_objects(void) {
     init_free_object_list();
     clear_object_lists(gObjectListArray);
 
-    for (i = 0; i < OBJECT_POOL_CAPACITY; i++) {
+    for (i = 0; i < ARRAY_COUNT(gObjectPool); i++) {
         obj_mark_for_deletion(&gObjectPool[i]);
         geo_reset_object_node(&gObjectPool[i].header.gfx);
     }

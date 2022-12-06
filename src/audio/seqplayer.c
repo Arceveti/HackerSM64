@@ -2680,7 +2680,7 @@ void init_sequence_players(void) {
     for (i = 0; i < ARRAY_COUNT(gSequenceChannels); i++) {
         gSequenceChannels[i].seqPlayer = NULL;
         gSequenceChannels[i].enabled = FALSE;
-        for (j = 0; j < LAYERS_MAX; j++) {
+        for (j = 0; j < ARRAY_COUNT(gSequenceChannels[i].layers); j++) {
             gSequenceChannels[i].layers[j] = NULL;
         }
     }
@@ -2692,8 +2692,8 @@ void init_sequence_players(void) {
         gSequenceLayers[i].enabled = FALSE;
     }
 
-    for (i = 0; i < SEQUENCE_PLAYERS; i++) {
-        for (j = 0; j < CHANNELS_MAX; j++) {
+    for (i = 0; i < ARRAY_COUNT(gSequencePlayers); i++) {
+        for (j = 0; j < ARRAY_COUNT(gSequencePlayers[i].channels); j++) {
             gSequencePlayers[i].channels[j] = &gSequenceChannelNone;
         }
 

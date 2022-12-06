@@ -157,7 +157,7 @@ enum MenuOption {
 extern struct GraphNode **gLoadedGraphNodes;
 extern struct SpawnInfo gPlayerSpawnInfos[];
 extern struct GraphNode *gGraphNodePointers[MODEL_ID_COUNT];
-extern struct Area gAreaData[];
+extern struct Area gAreaData[AREA_COUNT];
 extern struct WarpTransition gWarpTransition;
 extern s16 gCurrCourseNum;
 extern s16 gCurrActNum;

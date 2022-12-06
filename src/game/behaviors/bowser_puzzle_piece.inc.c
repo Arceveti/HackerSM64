@@ -105,7 +105,7 @@ void bhv_lll_bowser_puzzle_spawn_pieces(f32 pieceWidth) {
     f32 scale = (pieceWidth / 2.0f);
 
     // Spawn all 14 puzzle pieces.
-    for (i = 0; i < 14; i++) {
+    for (i = 0; i < ARRAY_COUNT(sBowserPuzzlePieces); i++) {
         bhv_lll_bowser_puzzle_spawn_piece(
             i,
             sBowserPuzzlePieces[i].model, bhvLllBowserPuzzlePiece,

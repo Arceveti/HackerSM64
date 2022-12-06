@@ -370,7 +370,7 @@ static void level_cmd_free_level_pool(void) {
     alloc_only_pool_resize(sLevelPool, sLevelPool->usedSpace);
     sLevelPool = NULL;
 
-    for (i = 0; i < AREA_COUNT; i++) {
+    for (i = 0; i < ARRAY_COUNT(gAreaData); i++) {
         if (gAreaData[i].terrainData != NULL) {
             alloc_surface_pools();
             break;

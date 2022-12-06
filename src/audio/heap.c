@@ -314,7 +314,7 @@ void puppyprint_get_allocated_pools(s32 *audioPoolList) {
 #endif
     };
 
-    for (i = 0, j = 0; j < NUM_AUDIO_POOLS; i += 2, j++) {
+    for (i = 0, j = 0; j < ARRAY_COUNT(pools); i += 2, j++) {
         audioPoolList[i + 0] = (s32) pools[j]->size;
         audioPoolList[i + 1] = (s32) (pools[j]->cur - pools[j]->start);
     }
@@ -990,12 +990,12 @@ void init_reverb_eu(void) {
     s32 i, j;
 
     // This is called 4 times for numReverbs to work at higher values. This does eat up some memory though.
-    for (j = 0; j < 4; j++) {
+    for (j = 0; j < ARRAY_COUNT(gSynthesisReverbs); j++) {
         gSynthesisReverbs[j].useReverb = 0;
 
         // Both left and right channels are allocated/cleared together, then separated based on the reverb window size
         if (!sAudioIsInitialized) {
-            gSynthesisReverbs[j].ringBuffer.left = soundAlloc(&gNotesAndBuffersPool, REVERB_WINDOW_SIZE_MAX * 4);
+            gSynthesisReverbs[j].ringBuffer.left = soundAlloc(&gNotesAndBuffersPool, (REVERB_WINDOW_SIZE_MAX * 4));
         }
     }
     gNumSynthesisReverbs = preset->numReverbs;
@@ -1385,7 +1385,7 @@ void audio_reset_session(void) {
     reset_bank_and_seq_load_status();
 
 #if defined(VERSION_JP) || defined(VERSION_US)
-    for (j = 0; j < 2; j++) {
+    for (j = 0; j < ARRAY_COUNT(gAudioCmdBuffers); j++) {
         gAudioCmdBuffers[j] = soundAlloc(&gNotesAndBuffersPool, ALIGN16(gMaxAudioCmds * sizeof(u64)));
     }
 #endif
@@ -1398,7 +1398,7 @@ void audio_reset_session(void) {
     // NOTE: Cannot be computed automatically in the audio heap define; approximation to be used instead
     gNoteSubsEu = soundAlloc(&gNotesAndBuffersPool, ALIGN16((gAudioBufferParameters.updatesPerFrame * gMaxSimultaneousNotes) * sizeof(struct NoteSubEu)));
 
-    for (j = 0; j != 2; j++) {
+    for (j = 0; j < ARRAY_COUNT(gAudioCmdBuffers); j++) {
         gAudioCmdBuffers[j] = soundAlloc(&gNotesAndBuffersPool, ALIGN16(gMaxAudioCmds * sizeof(u64)));
     }
 

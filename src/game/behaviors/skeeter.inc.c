@@ -27,7 +27,7 @@ struct SkeeterRelPos sSkeeterRelPositions[] = {
 static void skeeter_spawn_waves(void) {
     s32 i;
 
-    for (i = 0; i < 4; i++) {
+    for (i = 0; i < ARRAY_COUNT(sSkeeterRelPositions); i++) {
         spawn_object_relative_with_scale(0, sSkeeterRelPositions[i].relPosX, 0, sSkeeterRelPositions[i].relPosZ, 0.8f, o,
                                          MODEL_IDLE_WATER_WAVE, bhvSkeeterWave);
     }

@@ -111,7 +111,7 @@ void puppyprint_calculate_ram_usage(void) {
     void *temp[2];
     s32 i = 0;
 
-    for (i = 0; i < 5; i++) {
+    for (i = 0; i < ARRAY_COUNT(ramP); i++) {
         if (!ramP[i][0] || !ramP[i][1]) {
             continue;
         }
@@ -122,10 +122,10 @@ void puppyprint_calculate_ram_usage(void) {
 
     // These are a bit hacky, but what can ye do eh?
     // gEffectsMemoryPool is 0x4000, gObjectMemoryPool is 0x800. Epic C limitations mean I can't just sizeof their values :)
-    ramsizeSegment[5] = (EFFECTS_MEMORY_POOL + OBJECT_MEMORY_POOL
-                       + EFFECTS_MEMORY_POOL + OBJECT_MEMORY_POOL);
-    ramsizeSegment[6] = gTotalStaticSurfaceData + DYNAMIC_SURFACE_POOL_SIZE;
-    ramsizeSegment[7] = gAudioHeapSize;
+    ramsizeSegment[ARRAY_COUNT(ramP) + 0] = (EFFECTS_MEMORY_POOL + OBJECT_MEMORY_POOL
+                                           + EFFECTS_MEMORY_POOL + OBJECT_MEMORY_POOL);
+    ramsizeSegment[ARRAY_COUNT(ramP) + 1] = gTotalStaticSurfaceData + DYNAMIC_SURFACE_POOL_SIZE;
+    ramsizeSegment[ARRAY_COUNT(ramP) + 2] = gAudioHeapSize;
 }
 
 #ifdef PUPPYPRINT_DEBUG_CYCLES
@@ -255,7 +255,7 @@ void print_ram_overview(void) {
     render_blank_box(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, 0, 0, 0, 192);
     finish_blank_box();
 
-    for (i = 0; i <= NUM_TLB_SEGMENTS; i++) {
+    for (i = 0; i < ARRAY_COUNT(ramsizeSegment); i++) {
         if (drawn == 16) {
             x = 240;
             y =  16;
@@ -312,7 +312,7 @@ void print_audio_ram_overview(void) {
     puppyprint_get_allocated_pools(audioPoolSizes[0]);
 
     y += 24;
-    for (i = 0; i < NUM_AUDIO_POOLS; i++) {
+    for (i = 0; i < ARRAY_COUNT(audioPoolSizes); i++) {
         if (audioPoolSizes[i][0] == 0) {
             percentage = 1000;
         } else {
@@ -322,8 +322,8 @@ void print_audio_ram_overview(void) {
         sprintf(textBytes, "%s: %X / %X (%d.%d_)", audioPoolNames[i],
                 audioPoolSizes[i][1],
                 audioPoolSizes[i][0],
-                percentage / 10,
-                percentage % 10);
+                (percentage / 10),
+                (percentage % 10));
 
         print_set_envcolour(colourChart[i][0],
                             colourChart[i][1],
@@ -345,8 +345,8 @@ void print_audio_ram_overview(void) {
         sprintf(textBytes, "TOTAL AUDIO MEMORY: %X / %X (%d.%d_)",
                 totalMemory[1],
                 totalMemory[0],
-                percentage / 10,
-                percentage % 10);
+                (percentage / 10),
+                (percentage % 10));
     } else {
         sprintf(textBytes, "TOTAL AUDIO MEMORY: %X / %X (Incorrect!)",
                 totalMemory[1],

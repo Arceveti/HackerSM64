@@ -137,7 +137,7 @@ u32 get_mario_spawn_type(struct Object *obj) {
     s32 i;
     const BehaviorScript *behavior = virtual_to_segmented(SEGMENT_BEHAVIOR_DATA, obj->behavior);
 
-    for (i = 0; i < 20; i++) {
+    for (i = 0; i < ARRAY_COUNT(sWarpBhvSpawnTable); i++) {
         if (sWarpBhvSpawnTable[i] == behavior) {
             return sSpawnTypeFromWarpBhv[i];
         }
@@ -187,7 +187,7 @@ void clear_areas(void) {
     gWarpTransition.pauseRendering = FALSE;
     gMarioSpawnInfo->areaIndex = -1;
 
-    for (i = 0; i < AREA_COUNT; i++) {
+    for (i = 0; i < ARRAY_COUNT(gAreaData); i++) {
         gAreaData[i].index = i;
         gAreaData[i].flags = AREA_FLAG_UNLOAD;
         gAreaData[i].terrainType = TERRAIN_GRASS;
@@ -204,8 +204,9 @@ void clear_areas(void) {
         for (j = 0; j < ARRAY_COUNT(gAreaData[i].whirlpools); j++) {
             gAreaData[i].whirlpools[j] = NULL;
         }
-        gAreaData[i].dialog[0] = DIALOG_NONE;
-        gAreaData[i].dialog[1] = DIALOG_NONE;
+        for (j = 0; j < ARRAY_COUNT(gAreaData[i].dialog); j++) {
+            gAreaData[i].dialog[j] = DIALOG_NONE;
+        }
         gAreaData[i].musicSettingsPreset = SEQ_SETTINGS_PRESET_DEFAULT;
         gAreaData[i].musicSeqId = SEQ_SOUND_PLAYER;
     }
@@ -220,7 +221,7 @@ void clear_area_graph_nodes(void) {
         gWarpTransition.isActive = FALSE;
     }
 
-    for (i = 0; i < AREA_COUNT; i++) {
+    for (i = 0; i < ARRAY_COUNT(gAreaData); i++) {
         if (gAreaData[i].graphNode != NULL) {
             geo_call_global_function_nodes(&gAreaData[i].graphNode->node, GEO_CONTEXT_AREA_INIT);
             gAreaData[i].graphNode = NULL;

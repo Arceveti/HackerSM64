@@ -1106,7 +1106,7 @@ void func_sh_802f4a4c(s32 audioResetStatus) {
 
     alTbl = gAlTbl;
 
-    for (i = 0; i < 2; i++) {
+    for (i = 0; i < ARRAY_COUNT(D_SH_80343D00.arr); i++) {
         entry = &D_SH_80343D00.arr[i];
         switch (entry->state) {
             case 2:

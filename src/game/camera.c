@@ -3083,7 +3083,7 @@ void init_camera(struct Camera *c) {
     vec3_zero(sCastleEntranceOffset);
     vec3_zero(sPlayer2FocusOffset);
     update_mario_geometry_info(&sMarioGeometry);
-    for (i = 0; i < 32; i++) {
+    for (i = 0; i < ARRAY_COUNT(sCurCreditsSplinePos); i++) {
         sCurCreditsSplinePos[i].index = -1;
         sCurCreditsSplineFocus[i].index = -1;
     }
@@ -3092,7 +3092,7 @@ void init_camera(struct Camera *c) {
     sHandheldShakeInc = 0.f;
     sHandheldShakeTimer = 0.f;
     sHandheldShakeMag = 0;
-    for (i = 0; i < 4; i++) {
+    for (i = 0; i < ARRAY_COUNT(sHandheldShakeSpline); i++) {
         sHandheldShakeSpline[i].index = -1;
     }
     sHandheldShakePitch = 0;
@@ -3355,7 +3355,7 @@ s32 move_point_along_spline(Vec3f pos, struct CutsceneSplinePoint spline[], s16 
         return TRUE;
     }
 
-    for (i = 0; i < 4; i++) {
+    for (i = 0; i < ARRAY_COUNT(controlPoints); i++) {
         controlPoints[i][0] = spline[segment + i].point[0];
         controlPoints[i][1] = spline[segment + i].point[1];
         controlPoints[i][2] = spline[segment + i].point[2];
@@ -3516,7 +3516,7 @@ void shake_camera_handheld(Vec3f pos, Vec3f focus) {
             for (i = 0; i < 3; i++) {
                 vec3s_copy(sHandheldShakeSpline[i].point, sHandheldShakeSpline[i + 1].point);
             }
-            random_vec3s(sHandheldShakeSpline[3].point, sHandheldShakeMag, sHandheldShakeMag, sHandheldShakeMag / 2);
+            random_vec3s(sHandheldShakeSpline[3].point, sHandheldShakeMag, sHandheldShakeMag, (sHandheldShakeMag / 2));
             sHandheldShakeTimer -= 1.f;
 
             // Code dead, this is set to be 0 before it is used.
@@ -4452,7 +4452,7 @@ void handle_c_button_movement(struct Camera *c) {
 void clear_cutscene_vars(UNUSED struct Camera *c) {
     s32 i;
 
-    for (i = 0; i < 10; i++) {
+    for (i = 0; i < ARRAY_COUNT(sCutsceneVars); i++) {
         sCutsceneVars[i].unused1 = 0;
         vec3_zero(sCutsceneVars[i].point);
         vec3_zero(sCutsceneVars[i].unusedPoint);

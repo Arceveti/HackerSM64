@@ -1918,14 +1918,14 @@ void set_audio_muted(u8 muted) {
 void sound_init(void) {
     u8 i, j;
 
-    for (i = 0; i < SOUND_BANK_COUNT; i++) {
+    for (i = 0; i < ARRAY_COUNT(sSoundBanks); i++) {
         // Set each sound in the bank to STOPPED
-        for (j = 0; j < 40; j++) {
+        for (j = 0; j < ARRAY_COUNT(sSoundBanks[0]); j++) {
             sSoundBanks[i][j].soundStatus = SOUND_STATUS_STOPPED;
         }
 
         // Remove current sounds
-        for (j = 0; j < MAX_CHANNELS_PER_SOUND_BANK; j++) {
+        for (j = 0; j < ARRAY_COUNT(sCurrentSound[0]); j++) {
             sCurrentSound[i][j] = 0xff;
         }
 
@@ -1934,13 +1934,13 @@ void sound_init(void) {
         sNumSoundsInBank[i] = 0;
     }
 
-    for (i = 0; i < SOUND_BANK_COUNT; i++) {
+    for (i = 0; i < ARRAY_COUNT(sSoundBanks); i++) {
         // Set used list to empty
         sSoundBanks[i][0].prev = 0xff;
         sSoundBanks[i][0].next = 0xff;
 
         // Set free list to contain every sound slot
-        for (j = 1; j < 40 - 1; j++) {
+        for (j = 1; j < ARRAY_COUNT(sSoundBanks[0]) - 1; j++) {
             sSoundBanks[i][j].prev = j - 1;
             sSoundBanks[i][j].next = j + 1;
         }
@@ -1948,7 +1948,7 @@ void sound_init(void) {
         sSoundBanks[i][j].next = 0xff;
     }
 
-    for (j = 0; j < 3; j++) {
+    for (j = 0; j < ARRAY_COUNT(sChannelVolumeScaleFadeInfo); j++) {
         for (i = 0; i < CHANNELS_MAX; i++) {
             sChannelVolumeScaleFadeInfo[j][i].remainingFrames = 0;
         }

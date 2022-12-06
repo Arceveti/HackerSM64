@@ -176,7 +176,7 @@ void eu_process_audio_cmd(struct EuAudioCmd *cmd) {
             break;
 
         case 0xf1:
-            for (i = 0; i < 4; i++) {
+            for (i = 0; i < ARRAY_COUNT(gSequencePlayers); i++) {
                 gSequencePlayers[i].muted = TRUE;
                 gSequencePlayers[i].recalculateVolume = TRUE;
             }
@@ -194,7 +194,7 @@ void eu_process_audio_cmd(struct EuAudioCmd *cmd) {
                     }
                 }
             }
-            for (i = 0; i < 4; i++) {
+            for (i = 0; i < ARRAY_COUNT(gSequencePlayers); i++) {
                 gSequencePlayers[i].muted = FALSE;
                 gSequencePlayers[i].recalculateVolume = TRUE;
             }
