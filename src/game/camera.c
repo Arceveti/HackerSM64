@@ -3356,9 +3356,7 @@ s32 move_point_along_spline(Vec3f pos, struct CutsceneSplinePoint spline[], s16 
     }
 
     for (i = 0; i < ARRAY_COUNT(controlPoints); i++) {
-        controlPoints[i][0] = spline[segment + i].point[0];
-        controlPoints[i][1] = spline[segment + i].point[1];
-        controlPoints[i][2] = spline[segment + i].point[2];
+        vec3s_to_vec3f(controlPoints[i], spline[segment + i].point);
     }
     evaluate_cubic_spline(u, pos, controlPoints[0], controlPoints[1], controlPoints[2], controlPoints[3]);
 
@@ -6281,32 +6279,47 @@ void cap_switch_save(UNUSED s16 param) {
     save_file_do_save(SAVE_NUM_TO_INDEX(gCurrSaveFileNum));
 }
 
-void init_spline_point(struct CutsceneSplinePoint *splinePoint, s8 index, u8 speed, Vec3s point) {
+void copy_spline_point(struct CutsceneSplinePoint *splinePoint, s8 index, u8 speed, Vec3s point) {
     splinePoint->index = index;
     splinePoint->speed = speed;
     vec3s_copy(splinePoint->point, point);
 }
 
-// TODO: (Scrub C)
-void copy_spline_segment(struct CutsceneSplinePoint dst[], struct CutsceneSplinePoint src[]) {
-    s32 j = 0;
-    s32 i = 0;
+/**
+ * Copy up to 16 entries of a spline segment but extend the beginning and end.
+ * This is only used for the credits.
+ */
+void copy_spline_segment(struct CutsceneSplinePoint *dst, struct CutsceneSplinePoint *src, s32 size, s32 startExtend, s32 endExtend) {
+    s32 i;
 
-    init_spline_point(&dst[i], src[j].index, src[j].speed, src[j].point);
-    i++;
-    do {
-        do {
-            init_spline_point(&dst[i], src[j].index, src[j].speed, src[j].point);
-            i++;
-            j++;
-        } while (src[j].index != -1);
-    } while (j > 16);
+    // Extend the first point by duplicating the first point.
+    for (i = 0; i < startExtend; i++) {
+        copy_spline_point(dst, src->index, src->speed, src->point);
+        dst++;
+    }
 
-    // Create the end of the spline by duplicating the last point
-    init_spline_point(&dst[i + 0],  0, src[j].speed, src[j].point);
-    init_spline_point(&dst[i + 1],  0,            0, src[j].point);
-    init_spline_point(&dst[i + 2],  0,            0, src[j].point);
-    init_spline_point(&dst[i + 3], -1,            0, src[j].point);
+    // Copy the actual spline segment.
+    for (i = 0; i < size; i++) {
+        copy_spline_point(dst, src->index, src->speed, src->point);
+
+        if (src->index == -1) {
+            // Exit this loop, but don't end the segment yet.
+            dst->index = 0;
+            dst++;
+            break;
+        }
+        dst++;
+        src++;
+    }
+
+    // Extend the end of the spline by duplicating the last point with 0 speed.
+    for (i = 0; i < endExtend; i++) {
+        copy_spline_point(dst, 0, 0, src->point);
+        dst++;
+    }
+
+    // Set the terminator at the extended endpoint.
+    dst->index = -1;
 }
 
 /**
@@ -9095,8 +9108,8 @@ void cutscene_credits(struct Camera *c) {
             focus = sCcmOutsideCreditsSplineFocus;
     }
 
-    copy_spline_segment(sCurCreditsSplinePos, pos);
-    copy_spline_segment(sCurCreditsSplineFocus, focus);
+    copy_spline_segment(sCurCreditsSplinePos,   pos,   16, 1, 3);
+    copy_spline_segment(sCurCreditsSplineFocus, focus, 16, 1, 3);
     move_point_along_spline(c->pos,   sCurCreditsSplinePos,   &sCutsceneSplineSegment, &sCutsceneSplineSegmentProgress);
     move_point_along_spline(c->focus, sCurCreditsSplineFocus, &sCutsceneSplineSegment, &sCutsceneSplineSegmentProgress);
     player2_rotate_cam(c, -0x2000, 0x2000, -0x4000, 0x4000);
