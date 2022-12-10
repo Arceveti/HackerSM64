@@ -29,8 +29,6 @@ enum SoundMenuMode {
     SOUND_MENU_MODE_HEADSET
 };
 
-extern s8 gPaintingEjectSoundPlayed;
-
 void reset_volume(void);
 void raise_background_noise(s32 op);
 void lower_background_noise(s32 op);
@@ -38,7 +36,6 @@ void disable_background_sound(void);
 void enable_background_sound(void);
 void set_sound_mode(u16 soundMode);
 void play_menu_sounds(s16 soundMenuFlags);
-void play_painting_eject_sound(void);
 void play_infinite_stairs_music(void);
 void set_background_music(u16 a, u16 seqArgs, s16 fadeTimer);
 void fadeout_music(s16 fadeOutTime);
