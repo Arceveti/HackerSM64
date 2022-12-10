@@ -122,6 +122,7 @@ struct HudDisplay {
 
 extern struct HudDisplay gHudDisplay;
 extern s8 gNeverEnteredCastle;
+extern u8 g100CoinStarSpawned;
 
 enum HUDDisplayFlag {
     HUD_DISPLAY_NONE                  = 0x0,

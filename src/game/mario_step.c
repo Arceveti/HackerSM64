@@ -274,10 +274,9 @@ s32 stationary_ground_step(struct MarioState *m) {
     if (takeStep) {
         stepResult = perform_ground_step(m);
     } else {
-        // Hackersm64: this condition fixes potential downwarps
-        if (m->pos[1] <= (m->floorHeight + MARIO_HITBOX_HEIGHT)) {
-            m->pos[1] = m->floorHeight;
-        }
+        //! TODO - This is responsible for many stationary downwarps but is
+        // important for stuff like catching Bowser in midair, figure out a good way to fix
+        m->pos[1] = m->floorHeight;
 
         vec3f_copy(marioObj->header.gfx.pos, m->pos);
         vec3s_set(marioObj->header.gfx.angle, 0, m->faceAngle[1], 0);
@@ -408,7 +407,7 @@ s32 perform_ground_step(struct MarioState *m) {
 
 s32 is_ungrabbable_floor(struct Surface *floor) {
     return (floor == NULL
-#ifdef LEDGE_GRABS_CHECK_SLOPE_ANGLE
+#ifdef DONT_LEDGE_GRAB_STEEP_SLOPES
          || floor->normal.y < COS25 // TODO: Mario should still be able to ledge grab if floor is facing away.
          // TODO: check if floor is actually slippery.
 #endif

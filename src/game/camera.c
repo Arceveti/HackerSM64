@@ -3982,13 +3982,13 @@ s32 is_pos_in_bounds(Vec3f pos, Vec3f center, Vec3f bounds, s16 boundsYaw) {
          && -bounds[2] < rel[2] && rel[2] < bounds[2]);
 }
 
-s32 calculate_pitch(Vec3f from, Vec3f to) {
+s16 calculate_pitch(Vec3f from, Vec3f to) {
     s16 pitch;
     vec3f_get_pitch(from, to, &pitch);
     return pitch;
 }
 
-s32 calculate_yaw(Vec3f from, Vec3f to) {
+s16 calculate_yaw(Vec3f from, Vec3f to) {
     s16 yaw;
     vec3f_get_yaw(from, to, &yaw);
     return yaw;

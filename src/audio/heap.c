@@ -961,23 +961,7 @@ s32 audio_shut_down_and_reset_step(void) {
     }
     return (gAudioResetStatus < 3);
 }
-#else // !VERSION_EU || VERSION_SH)
-/**
- * Waits until a specified number of audio frames have been created
- */
-void wait_for_audio_frames(s32 frames) {
-    // VC emulator stubs this function because busy loops are not supported
-    // Technically we can put infinite loop that _looks_ like -O0 for emu but this is cleaner
-    //if (gIsVC) {
-        return;
-    //}
-    gAudioFrameCount = 0;
-    // Sound thread will update gAudioFrameCount
-    while (gAudioFrameCount < frames) {
-        // spin
-    }
-}
-#endif // !VERSION_EU || VERSION_SH)
+#endif // (VERSION_EU || VERSION_SH)
 
 u8 sAudioIsInitialized = FALSE;
 // Separate the reverb settings into their own func. Bit unstable currently, so still only runs at boot.
@@ -1149,22 +1133,33 @@ void init_reverb_us(s32 presetId) {
 #if defined(VERSION_JP) || defined(VERSION_US)
 void audio_reset_session(struct AudioSessionSettings *preset, s32 presetId) {
     if (sAudioIsInitialized) {
-        bzero(&gAiBuffers[0][0], (AIBUFFER_LEN * NUMAIBUFFERS));
-        persistent_pool_clear(&gSeqLoadedPool.persistent);
-        persistent_pool_clear(&gBankLoadedPool.persistent);
-        temporary_pool_clear(&gSeqLoadedPool.temporary);
-        temporary_pool_clear(&gBankLoadedPool.temporary);
-        reset_bank_and_seq_load_status();
+        if (gAudioLoadLock != AUDIO_LOCK_UNINITIALIZED) {
+            gAudioLoadLock = AUDIO_LOCK_LOADING;
 
-        init_reverb_us(presetId);
-        bzero(&gAiBuffers[0][0], (AIBUFFER_LEN * NUMAIBUFFERS));
-        gAudioFrameCount = 0;
-        if (!gIsVC) {
-            while (gAudioFrameCount < 1) {
-                // spin
+            if (!gIsVC) {
+                gAudioFrameCount = 0;
+                while (gAudioFrameCount < 1) {
+                    // spin
+                }
+            }
+
+            for (s32 i = 0; i < gMaxSimultaneousNotes; i++) {
+                gNotes[i].enabled = FALSE;
+            }
+
+            persistent_pool_clear(&gSeqLoadedPool.persistent);
+            persistent_pool_clear(&gBankLoadedPool.persistent);
+            temporary_pool_clear( &gSeqLoadedPool.temporary);
+            temporary_pool_clear( &gBankLoadedPool.temporary);
+            reset_bank_and_seq_load_status();
+
+            init_reverb_us(presetId);
+            bzero(&gAiBuffers[0][0], (AIBUFFER_LEN * NUMAIBUFFERS));
+
+            if (gAudioLoadLock != AUDIO_LOCK_UNINITIALIZED) {
+                gAudioLoadLock = AUDIO_LOCK_NOT_LOADING;
             }
         }
-        bzero(&gAiBuffers[0][0], (AIBUFFER_LEN * NUMAIBUFFERS));
         return;
     }
 

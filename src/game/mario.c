@@ -417,6 +417,7 @@ s32 mario_get_floor_class(struct MarioState *m) {
                 floorClass = SURFACE_CLASS_SLIPPERY;
                 break;
 
+            case SURFACE_SUPER_SLIPPERY:
             case SURFACE_VERY_SLIPPERY:
             case SURFACE_ICE:
             case SURFACE_HARD_VERY_SLIPPERY:
@@ -488,6 +489,7 @@ u32 mario_get_terrain_sound_addend(struct MarioState *m) {
                     floorSoundType = FLOOR_SOUND_TYPE_SLIPPERY;
                     break;
 
+                case SURFACE_SUPER_SLIPPERY:
                 case SURFACE_VERY_SLIPPERY:
                 case SURFACE_ICE:
                 case SURFACE_HARD_VERY_SLIPPERY:
@@ -518,6 +520,10 @@ u32 mario_get_terrain_sound_addend(struct MarioState *m) {
  * Determines if Mario is facing "downhill."
  */
 s32 mario_facing_downhill(struct MarioState *m, s32 turnYaw) {
+    // Forces Mario to do a belly slide rather than a butt slide when on a super slippery floor, no matter his angle, so that the player can't jump.
+    if (m->floor && m->floor->type == SURFACE_SUPER_SLIPPERY)
+        return FALSE;
+
     s16 faceAngleYaw = m->faceAngle[1];
 
     // This is never used in practice, as turnYaw is
@@ -540,15 +546,16 @@ u32 mario_floor_is_slippery(struct MarioState *m) {
         return FALSE;
     }
 
-    if ((m->area->terrainType & TERRAIN_MASK) == TERRAIN_SLIDE && m->floor->normal.y < COS1) {
+    if (((m->area->terrainType & TERRAIN_MASK) == TERRAIN_SLIDE && m->floor->normal.y < COS1)
+     || (m->floor->type == SURFACE_SUPER_SLIPPERY)) {
         return TRUE;
     }
 
     switch (mario_get_floor_class(m)) {
-        case SURFACE_VERY_SLIPPERY: normY = COS10; break;
-        case SURFACE_SLIPPERY:      normY = COS20; break;
-        default:                    normY = COS38; break;
-        case SURFACE_NOT_SLIPPERY:  normY = 0.0f;  break;
+        case SURFACE_CLASS_VERY_SLIPPERY: normY = COS10; break;
+        case SURFACE_CLASS_SLIPPERY:      normY = COS20; break;
+        default:                          normY = COS38; break;
+        case SURFACE_CLASS_NOT_SLIPPERY:  normY = 0.0f;  break;
     }
 
     return (m->floor->normal.y <= normY);
@@ -563,16 +570,16 @@ s32 mario_floor_is_slope(struct MarioState *m) {
         return FALSE;
     }
 
-    if ((m->area->terrainType & TERRAIN_MASK) == TERRAIN_SLIDE
-        && m->floor->normal.y < COS1) {
+    if (((m->area->terrainType & TERRAIN_MASK) == TERRAIN_SLIDE
+        && m->floor->normal.y < COS1) || (m->floor->type == SURFACE_SUPER_SLIPPERY)) {
         return TRUE;
     }
 
     switch (mario_get_floor_class(m)) {
-        case SURFACE_VERY_SLIPPERY: normY = COS5;  break;
-        case SURFACE_SLIPPERY:      normY = COS10; break;
-        default:                    normY = COS15; break;
-        case SURFACE_NOT_SLIPPERY:  normY = COS20; break;
+        case SURFACE_CLASS_VERY_SLIPPERY: normY = COS5;  break;
+        case SURFACE_CLASS_SLIPPERY:      normY = COS10; break;
+        default:                          normY = COS15; break;
+        case SURFACE_CLASS_NOT_SLIPPERY:  normY = COS20; break;
     }
 
     return (m->floor->normal.y <= normY);
@@ -587,6 +594,10 @@ s32 mario_floor_is_steep(struct MarioState *m) {
         return FALSE;
     }
 
+    if (m->floor->type == SURFACE_SUPER_SLIPPERY) {
+        return TRUE;
+    }
+
 #ifdef JUMP_KICK_FIX
     if (m->floor->type == SURFACE_NOT_SLIPPERY) {
         return FALSE;
@@ -599,10 +610,10 @@ s32 mario_floor_is_steep(struct MarioState *m) {
     // This does not matter in vanilla game practice.
     if (!mario_facing_downhill(m, FALSE)) {
         switch (mario_get_floor_class(m)) {
-            case SURFACE_VERY_SLIPPERY: normY = COS15; break;
-            case SURFACE_SLIPPERY:      normY = COS20; break;
-            default:                    normY = COS30; break;
-            case SURFACE_NOT_SLIPPERY:  normY = COS30; break;
+            case SURFACE_CLASS_VERY_SLIPPERY: normY = COS15; break;
+            case SURFACE_CLASS_SLIPPERY:      normY = COS20; break;
+            default:                          normY = COS30; break;
+            case SURFACE_CLASS_NOT_SLIPPERY:  normY = COS30; break;
         }
 
         return (m->floor->normal.y <= normY);
