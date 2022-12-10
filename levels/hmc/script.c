@@ -92,9 +92,9 @@ const LevelScript level_hmc_entry[] = {
     LOAD_MODEL_FROM_GEO(MODEL_HMC_RED_GRILLS,           hmc_geo_000530),
 
     AREA(/*index*/ 1, hmc_geo_000B90),
-        OBJECT(/*model*/ MODEL_PAINTING, /*pos*/  2989, -4485,  5135, /*angle*/ 270,   0, 0, /*behParam*/ PAINTING_ID(PAINTING_ID_HMC_COTMC, PAINTING_GROUP_HMC) << 16, /*beh*/ bhvPainting),
-        OBJECT(/*model*/ MODEL_NONE,     /*pos*/ -7152,  3161,  7181, /*angle*/   0, 135, 0, /*behParam*/              WARP_HMC_MAIN_ENTRY << 16, /*beh*/ bhvSpinAirborneWarp),
-        OBJECT(/*model*/ MODEL_NONE,     /*pos*/  3351, -4690,  4773, /*angle*/   0,   0, 0, /*behParam*/ (52 << 24) | WARP_HMC_TO_COTMC   << 16, /*beh*/ bhvWarp),
+        OBJECT(/*model*/ MODEL_PAINTING, /*pos*/  2989, -4485,  5135, /*angle*/ 270,   0, 0, /*behParam*/ ((PAINTING_ID_HMC_COTMC << 24) | (WARP_HMC_PAINTING_COTMC << 16)), /*beh*/ bhvPainting),
+        OBJECT(/*model*/ MODEL_NONE,     /*pos*/ -7152,  3161,  7181, /*angle*/   0, 135, 0, /*behParam*/ (             (WARP_HMC_MAIN_ENTRY << 16)), /*beh*/ bhvSpinAirborneWarp),
+        OBJECT(/*model*/ MODEL_NONE,     /*pos*/  3351, -4690,  4773, /*angle*/   0,   0, 0, /*behParam*/ ((52 << 24) | (WARP_HMC_TO_COTMC   << 16)), /*beh*/ bhvWarp),
         WARP_NODE(/*id*/ WARP_HMC_MAIN_ENTRY, /*destLevel*/ LEVEL_HMC,    /*destArea*/ 0x01, /*destNode*/ WARP_HMC_MAIN_ENTRY,                   /*flags*/ WARP_NO_CHECKPOINT),
         WARP_NODE(/*id*/ WARP_HMC_TO_COTMC,   /*destLevel*/ LEVEL_COTMC,  /*destArea*/ 0x01, /*destNode*/ WARP_COTMC_MAIN_ENTRY,                 /*flags*/ WARP_NO_CHECKPOINT),
         WARP_NODE(/*id*/ WARP_NODE_DEFAULT,   /*destLevel*/ LEVEL_CASTLE, /*destArea*/ 0x03, /*destNode*/ WARP_CASTLE_INSIDE_3_FROM_HMC_SUCCESS, /*flags*/ WARP_NO_CHECKPOINT),
