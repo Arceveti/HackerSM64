@@ -299,20 +299,9 @@ Gfx *create_skybox_facing_camera(s8 player, s8 background, f32 fov, Vec3f pos, V
     s8 colorIndex = 1;
 
 #ifdef ENABLE_VANILLA_LEVEL_SPECIFIC_CHECKS
-    // If the "Plunder in the Sunken Ship" star in JRB is not collected, make the sky darker and slightly green.
-    if (background == BACKGROUND_ABOVE_CLOUDS) {
-#ifdef JRB_ACT_SPECIFIC_MIST
-        if (gCurrActNum == ACT_INDEX_TO_NUM(ACT_INDEX_1))
-#else
-        if (!(save_file_get_star_flags(
-                SAVE_NUM_TO_INDEX(gCurrSaveFileNum),
-                COURSE_NUM_TO_INDEX(COURSE_JRB)
-            ) & STAR_FLAG_ACT_1)
-        )
-#endif
-        {
-            colorIndex = 0;
-        }
+    // For the "Plunder in the Sunken Ship" star in JRB, make the sky darker and slightly green.
+    if (background == BACKGROUND_ABOVE_CLOUDS && gCurrActNum == ACT_INDEX_TO_NUM(ACT_INDEX_1)) {
+        colorIndex = 0;
     }
 #endif
 

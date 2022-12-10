@@ -134,12 +134,12 @@ const LevelScript level_jrb_entry[] = {
     LOAD_MODEL_FROM_GEO(MODEL_JRB_FLOATING_PLATFORM,    jrb_geo_000948),
 
     AREA(/*index*/ 1, jrb_geo_000A18),
-        OBJECT(/*model*/ MODEL_NONE, /*pos*/ -6750, 2126, 1482, /*angle*/ 0, 90, 0, /*behParam*/ WARP_JRB_1_MAIN_ENTRY << 16, /*beh*/ bhvSpinAirborneWarp),
+        OBJECT(/*model*/ MODEL_NONE, /*pos*/ -6750, 2126, 1482, /*angle*/ 0, 90, 0, /*behParam*/ (WARP_JRB_1_MAIN_ENTRY << 16), /*beh*/ bhvSpinAirborneWarp),
         WARP_NODE(/*id*/ WARP_JRB_1_MAIN_ENTRY, /*destLevel*/ LEVEL_JRB,    /*destArea*/ 0x01, /*destNode*/ WARP_JRB_1_MAIN_ENTRY,                 /*flags*/ WARP_NO_CHECKPOINT),
         WARP_NODE(/*id*/ WARP_NODE_WARP_FLOOR,  /*destLevel*/ LEVEL_JRB,    /*destArea*/ 0x02, /*destNode*/ WARP_JRB_2_MAIN_ENTRY,                 /*flags*/ WARP_NO_CHECKPOINT),
         WARP_NODE(/*id*/ WARP_NODE_DEFAULT,     /*destLevel*/ LEVEL_CASTLE, /*destArea*/ 0x01, /*destNode*/ WARP_CASTLE_INSIDE_1_FROM_JRB_SUCCESS, /*flags*/ WARP_NO_CHECKPOINT),
         WARP_NODE(/*id*/ WARP_NODE_DEATH,       /*destLevel*/ LEVEL_CASTLE, /*destArea*/ 0x01, /*destNode*/ WARP_CASTLE_INSIDE_1_FROM_JRB_DEATH,   /*flags*/ WARP_NO_CHECKPOINT),
-        WHIRLPOOL(/*index*/ 0, /*acts*/ ACT_2 | ACT_3 | ACT_4 | ACT_5 | ACT_6, /*pos*/ 4979, -5222, 2482, /*strength*/ -30),
+        WHIRLPOOL(/*index*/ 0, /*acts*/ (ACT_2 | ACT_3 | ACT_4 | ACT_5 | ACT_6), /*pos*/ 4979, -5222, 2482, /*strength*/ -30),
         JUMP_LINK(script_func_local_1),
         JUMP_LINK(script_func_local_2),
         JUMP_LINK(script_func_local_3),
@@ -150,7 +150,7 @@ const LevelScript level_jrb_entry[] = {
     END_AREA(),
 
     AREA(/*index*/ 2, jrb_geo_000AFC),
-        OBJECT(/*model*/ MODEL_NONE, /*pos*/ 928, 1050, -1248, /*angle*/ 0, 180, 0, /*behParam*/ WARP_JRB_2_MAIN_ENTRY << 16, /*beh*/ bhvSwimmingWarp),
+        OBJECT(/*model*/ MODEL_NONE, /*pos*/ 928, 1050, -1248, /*angle*/ 0, 180, 0, /*behParam*/ (WARP_JRB_2_MAIN_ENTRY << 16), /*beh*/ bhvSwimmingWarp),
         WARP_NODE(/*id*/ WARP_JRB_2_MAIN_ENTRY, /*destLevel*/ LEVEL_JRB,    /*destArea*/ 0x02, /*destNode*/ WARP_JRB_1_MAIN_ENTRY,                 /*flags*/ WARP_NO_CHECKPOINT),
         WARP_NODE(/*id*/ WARP_NODE_DEFAULT,     /*destLevel*/ LEVEL_CASTLE, /*destArea*/ 0x01, /*destNode*/ WARP_CASTLE_INSIDE_1_FROM_JRB_SUCCESS, /*flags*/ WARP_NO_CHECKPOINT),
         WARP_NODE(/*id*/ WARP_NODE_DEATH,       /*destLevel*/ LEVEL_CASTLE, /*destArea*/ 0x01, /*destNode*/ WARP_CASTLE_INSIDE_1_FROM_JRB_DEATH,   /*flags*/ WARP_NO_CHECKPOINT),
