@@ -1877,6 +1877,8 @@ void init_mario(struct MarioState *m) {
     m->riddenObj = NULL;
     m->usedObj = NULL;
 
+    m->paintingObj = NULL;
+
     m->waterLevel = find_water_level(gMarioSpawnInfo->startPos[0], gMarioSpawnInfo->startPos[1], gMarioSpawnInfo->startPos[2]);
 
     m->area = gCurrentArea;
