@@ -646,7 +646,7 @@ s32 perform_air_quarter_step(struct MarioState *m, Vec3f intendedPos, u32 stepAr
         // Check if any walls are grabbable.
         grabbedWall = check_ledge_grab(m, &lowerWall, intendedPos, nextPos, ledgePos, &ledgeFloor);
 
-        if (grabbedWall != NULL && ledgeFloor != NULL && ledgePos != NULL) {
+        if (grabbedWall != NULL && ledgeFloor != NULL) {
             vec3f_copy(m->pos, ledgePos);
             set_mario_floor(m, floor, ledgePos[1]);
 

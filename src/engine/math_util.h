@@ -576,7 +576,7 @@ ALWAYS_INLINE void swl(void* addr, s32 val, const int offset) {
 #define F64_IS_NONZERO(x) ((*(int*)&(x)) & (BITMASK(11) << 52))
 
 // RNG
-u32 random_u16(void);
+u16 random_u16(void);
 f32 random_float(void);
 s32 random_sign(void);
 // Min/Max
