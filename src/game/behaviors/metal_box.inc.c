@@ -1,15 +1,15 @@
 // metal_box.inc.c
 
 struct ObjectHitbox sMetalBoxHitbox = {
-    /* interactType:      */ INTERACT_NONE,
-    /* downOffset:        */ 0,
-    /* damageOrCoinValue: */ 0,
-    /* health:            */ 1,
-    /* numLootCoins:      */ 0,
-    /* radius:            */ 220,
-    /* height:            */ 300,
-    /* hurtboxRadius:     */ 220,
-    /* hurtboxHeight:     */ 300,
+    .interactType      = INTERACT_NONE,
+    .downOffset        = 0,
+    .damageOrCoinValue = 0,
+    .health            = 1,
+    .numLootCoins      = 0,
+    .radius            = 220,
+    .height            = 300,
+    .hurtboxRadius     = 220,
+    .hurtboxHeight     = 300,
 };
 
 s32 check_if_moving_over_floor(f32 maxDist, f32 offset) {

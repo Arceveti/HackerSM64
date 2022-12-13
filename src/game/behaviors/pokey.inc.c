@@ -11,27 +11,27 @@
  * Hitbox for a single pokey body part.
  */
 static struct ObjectHitbox sPokeyBodyPartHitbox = {
-    /* interactType:      */ INTERACT_BOUNCE_TOP,
-    /* downOffset:        */ 10,
-    /* damageOrCoinValue: */ 2,
-    /* health:            */ 0,
-    /* numLootCoins:      */ 0,
-    /* radius:            */ 40,
-    /* height:            */ 20,
-    /* hurtboxRadius:     */ 20,
-    /* hurtboxHeight:     */ 20,
+    .interactType      = INTERACT_BOUNCE_TOP,
+    .downOffset        = 10,
+    .damageOrCoinValue = 2,
+    .health            = 0,
+    .numLootCoins      = 0,
+    .radius            = 40,
+    .height            = 20,
+    .hurtboxRadius     = 20,
+    .hurtboxHeight     = 20,
 };
 
 /**
  * Attack handlers for pokey body part.
  */
 static u8 sPokeyBodyPartAttackHandlers[] = {
-    /* ATTACK_PUNCH:                 */ ATTACK_HANDLER_KNOCKBACK,
-    /* ATTACK_KICK_OR_TRIP:          */ ATTACK_HANDLER_KNOCKBACK,
-    /* ATTACK_FROM_ABOVE:            */ ATTACK_HANDLER_SQUISHED,
-    /* ATTACK_GROUND_POUND_OR_TWIRL: */ ATTACK_HANDLER_SQUISHED,
-    /* ATTACK_FAST_ATTACK:           */ ATTACK_HANDLER_KNOCKBACK,
-    /* ATTACK_FROM_BELOW:            */ ATTACK_HANDLER_KNOCKBACK,
+    [ATTACK_PUNCH                 - 1] = ATTACK_HANDLER_KNOCKBACK,
+    [ATTACK_KICK_OR_TRIP          - 1] = ATTACK_HANDLER_KNOCKBACK,
+    [ATTACK_FROM_ABOVE            - 1] = ATTACK_HANDLER_SQUISHED,
+    [ATTACK_GROUND_POUND_OR_TWIRL - 1] = ATTACK_HANDLER_SQUISHED,
+    [ATTACK_FAST_ATTACK           - 1] = ATTACK_HANDLER_KNOCKBACK,
+    [ATTACK_FROM_BELOW            - 1] = ATTACK_HANDLER_KNOCKBACK,
 };
 
 /**

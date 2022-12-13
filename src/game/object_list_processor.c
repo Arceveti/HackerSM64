@@ -505,7 +505,7 @@ void spawn_objects_from_info(struct SpawnInfo *spawnInfo) {
 void clear_objects(void) {
     s32 i;
 
-    gTHIWaterDrained = 0;
+    gTHIWaterDrained = FALSE;
     gTimeStopState = TIME_STOP_FLAGS_NONE;
     gMarioObject = NULL;
     gMarioCurrentRoom = 0;

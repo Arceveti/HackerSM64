@@ -10,27 +10,27 @@
  * changed to INTERACT_SPINY_WALKING while walking.
  */
 static struct ObjectHitbox sSpinyHitbox = {
-    /* interactType:      */ INTERACT_MR_BLIZZARD,
-    /* downOffset:        */ 0,
-    /* damageOrCoinValue: */ 2,
-    /* health:            */ 0,
-    /* numLootCoins:      */ 0,
-    /* radius:            */ 80,
-    /* height:            */ 50,
-    /* hurtboxRadius:     */ 40,
-    /* hurtboxHeight:     */ 40,
+    .interactType      = INTERACT_MR_BLIZZARD,
+    .downOffset        = 0,
+    .damageOrCoinValue = 2,
+    .health            = 0,
+    .numLootCoins      = 0,
+    .radius            = 80,
+    .height            = 50,
+    .hurtboxRadius     = 40,
+    .hurtboxHeight     = 40,
 };
 
 /**
  * Attack handlers for spiny while walking.
  */
 static u8 sSpinyWalkAttackHandlers[] = {
-    /* ATTACK_PUNCH:                 */ ATTACK_HANDLER_KNOCKBACK,
-    /* ATTACK_KICK_OR_TRIP:          */ ATTACK_HANDLER_KNOCKBACK,
-    /* ATTACK_FROM_ABOVE:            */ ATTACK_HANDLER_NOP,
-    /* ATTACK_GROUND_POUND_OR_TWIRL: */ ATTACK_HANDLER_NOP,
-    /* ATTACK_FAST_ATTACK:           */ ATTACK_HANDLER_KNOCKBACK,
-    /* ATTACK_FROM_BELOW:            */ ATTACK_HANDLER_KNOCKBACK,
+    [ATTACK_PUNCH                 - 1] = ATTACK_HANDLER_KNOCKBACK,
+    [ATTACK_KICK_OR_TRIP          - 1] = ATTACK_HANDLER_KNOCKBACK,
+    [ATTACK_FROM_ABOVE            - 1] = ATTACK_HANDLER_NOP,
+    [ATTACK_GROUND_POUND_OR_TWIRL - 1] = ATTACK_HANDLER_NOP,
+    [ATTACK_FAST_ATTACK           - 1] = ATTACK_HANDLER_KNOCKBACK,
+    [ATTACK_FROM_BELOW            - 1] = ATTACK_HANDLER_KNOCKBACK,
 };
 
 /**

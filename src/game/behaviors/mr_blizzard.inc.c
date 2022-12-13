@@ -2,30 +2,30 @@
 
 // Mr. Blizzard hitbox
 struct ObjectHitbox sMrBlizzardHitbox = {
-    /* interactType:      */ INTERACT_MR_BLIZZARD,
-    /* downOffset:        */ 24,
-    /* damageOrCoinValue: */ 2,
-    /* health:            */ 99,
-    /* numLootCoins:      */ 3,
-    /* radius:            */ 65,
-    /* height:            */ 170,
-    /* hurtboxRadius:     */ 65,
-    /* hurtboxHeight:     */ 170,
+    .interactType      = INTERACT_MR_BLIZZARD,
+    .downOffset        = 24,
+    .damageOrCoinValue = 2,
+    .health            = 99,
+    .numLootCoins      = 3,
+    .radius            = 65,
+    .height            = 170,
+    .hurtboxRadius     = 65,
+    .hurtboxHeight     = 170,
 };
 
 static struct SpawnParticlesInfo sMrBlizzardParticlesInfo = {
-    /* behParam:        */ 0,
-    /* count:           */ 6,
-    /* model:           */ MODEL_WHITE_PARTICLE,
-    /* offsetY:         */ 0,
-    /* forwardVelBase:  */ 5,
-    /* forwardVelRange: */ 5,
-    /* velYBase:        */ 10,
-    /* velYRange:       */ 10,
-    /* gravity:         */ -3,
-    /* dragStrength:    */ 0,
-    /* sizeBase:        */ 3.0f,
-    /* sizeRange:       */ 5.0f,
+    .behParam        = 0,
+    .count           = 6,
+    .model           = MODEL_WHITE_PARTICLE,
+    .offsetY         = 0,
+    .forwardVelBase  = 5,
+    .forwardVelRange = 5,
+    .velYBase        = 10,
+    .velYRange       = 10,
+    .gravity         = -3,
+    .dragStrength    = 0,
+    .sizeBase        = 3.0f,
+    .sizeRange       = 5.0f,
 };
 
 // Mr. Blizzard particle spawner.
@@ -422,15 +422,15 @@ static void mr_blizzard_snowball_act_1(void) {
 
 // Snowball hitbox.
 struct ObjectHitbox sMrBlizzardSnowballHitbox = {
-    /* interactType:      */ INTERACT_MR_BLIZZARD,
-    /* downOffset:        */ 12,
-    /* damageOrCoinValue: */ 1,
-    /* health:            */ 99,
-    /* numLootCoins:      */ 0,
-    /* radius:            */ 30,
-    /* height:            */ 30,
-    /* hurtboxRadius:     */ 25,
-    /* hurtboxHeight:     */ 25,
+    .interactType      = INTERACT_MR_BLIZZARD,
+    .downOffset        = 12,
+    .damageOrCoinValue = 1,
+    .health            = 99,
+    .numLootCoins      = 0,
+    .radius            = 30,
+    .height            = 30,
+    .hurtboxRadius     = 25,
+    .hurtboxHeight     = 25,
 };
 
 /**

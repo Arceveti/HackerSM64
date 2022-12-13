@@ -1,38 +1,33 @@
 // flying_bookend_switch.inc.c
 
-struct BookSwitchPosition {
-    s16 relPosX;
-    s16 relPosY;
-};
-
 struct ObjectHitbox sFlyingBookendHitbox = {
-    /* interactType:      */ INTERACT_HIT_FROM_BELOW,
-    /* downOffset:        */ 0,
-    /* damageOrCoinValue: */ 2,
-    /* health:            */ 0,
-    /* numLootCoins:      */ -1,
-    /* radius:            */ 60,
-    /* height:            */ 30,
-    /* hurtboxRadius:     */ 40,
-    /* hurtboxHeight:     */ 30,
+    .interactType      = INTERACT_HIT_FROM_BELOW,
+    .downOffset        = 0,
+    .damageOrCoinValue = 2,
+    .health            = 0,
+    .numLootCoins      = -1,
+    .radius            = 60,
+    .height            = 30,
+    .hurtboxRadius     = 40,
+    .hurtboxHeight     = 30,
 };
 
-const struct BookSwitchPosition sBookSwitchPositions[] = {
+const Vec2s sBookSwitchPositions[] = {
     { 52, 150 },
     { 135,  3 },
     { -75, 78 },
 };
 
 struct ObjectHitbox sBookSwitchHitbox = {
-    /* interactType:      */ INTERACT_BREAKABLE,
-    /* downOffset:        */ 0,
-    /* damageOrCoinValue: */ 0,
-    /* health:            */ 99,
-    /* numLootCoins:      */ 0,
-    /* radius:            */ 20,
-    /* height:            */ 30,
-    /* hurtboxRadius:     */ 20,
-    /* hurtboxHeight:     */ 30,
+    .interactType      = INTERACT_BREAKABLE,
+    .downOffset        = 0,
+    .damageOrCoinValue = 0,
+    .health            = 99,
+    .numLootCoins      = 0,
+    .radius            = 20,
+    .height            = 30,
+    .hurtboxRadius     = 20,
+    .hurtboxHeight     = 30,
 };
 
 void flying_bookend_act_init(void) {
@@ -153,8 +148,8 @@ void bookshelf_manager_act_spawn_switches(void) {
     if (!(o->activeFlags & ACTIVE_FLAG_IN_DIFFERENT_ROOM)) {
         for (i = 0; i < ARRAY_COUNT(sBookSwitchPositions); i++) {
             spawn_object_relative(i,
-                sBookSwitchPositions[i].relPosX,
-                sBookSwitchPositions[i].relPosY,
+                sBookSwitchPositions[i][0],
+                sBookSwitchPositions[i][1],
                 0,
                 o, MODEL_BOOKEND, bhvBookSwitch
             );

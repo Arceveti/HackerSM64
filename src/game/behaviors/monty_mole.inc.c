@@ -102,18 +102,18 @@ void bhv_monty_mole_hole_update(void) {
 }
 
 static struct SpawnParticlesInfo sMontyMoleRiseFromGroundParticles = {
-    /* behParam:        */ 0,
-    /* count:           */ 3,
-    /* model:           */ MODEL_SAND_DUST,
-    /* offsetY:         */ 0,
-    /* forwardVelBase:  */ 4,
-    /* forwardVelRange: */ 4,
-    /* velYBase:        */ 10,
-    /* velYRange:       */ 15,
-    /* gravity:         */ -4,
-    /* dragStrength:    */ 0,
-    /* sizeBase:        */ 10.0f,
-    /* sizeRange:       */ 7.0f,
+    .behParam        = 0,
+    .count           = 3,
+    .model           = MODEL_SAND_DUST,
+    .offsetY         = 0,
+    .forwardVelBase  = 4,
+    .forwardVelRange = 4,
+    .velYBase        = 10,
+    .velYRange       = 15,
+    .gravity         = -4,
+    .dragStrength    = 0,
+    .sizeBase        = 10.0f,
+    .sizeRange       = 7.0f,
 };
 
 /**
@@ -317,15 +317,15 @@ static void monty_mole_act_jump_out_of_hole(void) {
  * Hitbox for monty mole.
  */
 static struct ObjectHitbox sMontyMoleHitbox = {
-    /* interactType:      */ INTERACT_BOUNCE_TOP,
-    /* downOffset:        */ 0,
-    /* damageOrCoinValue: */ 2,
-    /* health:            */ -1,
-    /* numLootCoins:      */ 0,
-    /* radius:            */ 70,
-    /* height:            */ 50,
-    /* hurtboxRadius:     */ 30,
-    /* hurtboxHeight:     */ 40,
+    .interactType      = INTERACT_BOUNCE_TOP,
+    .downOffset        = 0,
+    .damageOrCoinValue = 2,
+    .health            = -1,
+    .numLootCoins      = 0,
+    .radius            = 70,
+    .height            = 50,
+    .hurtboxRadius     = 30,
+    .hurtboxHeight     = 40,
 };
 
 /**
@@ -430,33 +430,33 @@ static void monty_mole_rock_act_held(void) {
  * Hitbox for monty mole rock.
  */
 static struct ObjectHitbox sMontyMoleRockHitbox = {
-    /* interactType:      */ INTERACT_MR_BLIZZARD,
-    /* downOffset:        */ 15,
-    /* damageOrCoinValue: */ 1,
-    /* health:            */ 99,
-    /* numLootCoins:      */ 0,
-    /* radius:            */ 30,
-    /* height:            */ 15,
-    /* hurtboxRadius:     */ 30,
-    /* hurtboxHeight:     */ 15,
+    .interactType      = INTERACT_MR_BLIZZARD,
+    .downOffset        = 15,
+    .damageOrCoinValue = 1,
+    .health            = 99,
+    .numLootCoins      = 0,
+    .radius            = 30,
+    .height            = 15,
+    .hurtboxRadius     = 30,
+    .hurtboxHeight     = 15,
 };
 
 /**
  * The particles that spawn when a monty mole rock breaks.
  */
 static struct SpawnParticlesInfo sMontyMoleRockBreakParticles = {
-    /* behParam:        */ 0,
-    /* count:           */ 2,
-    /* model:           */ MODEL_PEBBLE,
-    /* offsetY:         */ 10,
-    /* forwardVelBase:  */ 4,
-    /* forwardVelRange: */ 4,
-    /* velYBase:        */ 10,
-    /* velYRange:       */ 15,
-    /* gravity:         */ -4,
-    /* dragStrength:    */ 0,
-    /* sizeBase:        */ 8.0f,
-    /* sizeRange:       */ 4.0f,
+    .behParam        = 0,
+    .count           = 2,
+    .model           = MODEL_PEBBLE,
+    .offsetY         = 10,
+    .forwardVelBase  = 4,
+    .forwardVelRange = 4,
+    .velYBase        = 10,
+    .velYRange       = 15,
+    .gravity         = -4,
+    .dragStrength    = 0,
+    .sizeBase        = 8.0f,
+    .sizeRange       = 4.0f,
 };
 
 /**

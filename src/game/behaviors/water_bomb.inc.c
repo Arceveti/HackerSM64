@@ -13,15 +13,15 @@
  * bombs that are shot from cannons are intangible.
  */
 static struct ObjectHitbox sWaterBombHitbox = {
-    /* interactType:      */ INTERACT_MR_BLIZZARD,
-    /* downOffset:        */ 25,
-    /* damageOrCoinValue: */ 1,
-    /* health:            */ 99,
-    /* numLootCoins:      */ 0,
-    /* radius:            */ 80,
-    /* height:            */ 50,
-    /* hurtboxRadius:     */ 60,
-    /* hurtboxHeight:     */ 50,
+    .interactType      = INTERACT_MR_BLIZZARD,
+    .downOffset        = 25,
+    .damageOrCoinValue = 1,
+    .health            = 99,
+    .numLootCoins      = 0,
+    .radius            = 80,
+    .height            = 50,
+    .hurtboxRadius     = 60,
+    .hurtboxHeight     = 50,
 };
 
 /**
@@ -43,14 +43,12 @@ void bhv_water_bomb_spawner_update(void) {
 
             if (waterBomb != NULL) {
                 // Drop farther ahead of mario when he is moving faster
-                f32 waterBombDistToMario = 28.0f * gMarioStates[0].forwardVel + 100.0f;
+                f32 waterBombDistToMario = (28.0f * gMarioStates[0].forwardVel) + 100.0f;
 
                 waterBomb->oAction = WATER_BOMB_ACT_INIT;
 
-                waterBomb->oPosX =
-                    gMarioObject->oPosX + waterBombDistToMario * sins(gMarioObject->oMoveAngleYaw);
-                waterBomb->oPosZ =
-                    gMarioObject->oPosZ + waterBombDistToMario * coss(gMarioObject->oMoveAngleYaw);
+                waterBomb->oPosX = gMarioObject->oPosX + (waterBombDistToMario * sins(gMarioObject->oMoveAngleYaw));
+                waterBomb->oPosZ = gMarioObject->oPosZ + (waterBombDistToMario * coss(gMarioObject->oMoveAngleYaw));
 
                 spawn_object(waterBomb, MODEL_WATER_BOMB_SHADOW, bhvWaterBombShadow);
 
@@ -62,18 +60,18 @@ void bhv_water_bomb_spawner_update(void) {
 }
 
 static struct SpawnParticlesInfo sWaterBombExplodeParticles = {
-    /* behParam:        */ 0,
-    /* count:           */ 5,
-    /* model:           */ MODEL_BUBBLE,
-    /* offsetY:         */ 20,
-    /* forwardVelBase:  */ 20,
-    /* forwardVelRange: */ 60,
-    /* velYBase:        */ 10,
-    /* velYRange:       */ 10,
-    /* gravity:         */ -2,
-    /* dragStrength:    */ 0,
-    /* sizeBase:        */ 35.0f,
-    /* sizeRange:       */ 10.0f,
+    .behParam        = 0,
+    .count           = 5,
+    .model           = MODEL_BUBBLE,
+    .offsetY         = 20,
+    .forwardVelBase  = 20,
+    .forwardVelRange = 60,
+    .velYBase        = 10,
+    .velYRange       = 10,
+    .gravity         = -2,
+    .dragStrength    = 0,
+    .sizeBase        = 35.0f,
+    .sizeRange       = 10.0f,
 };
 
 /**
@@ -172,18 +170,18 @@ static void water_bomb_act_explode(void) {
 }
 
 static struct SpawnParticlesInfo sWaterBombCannonParticle = {
-    /* behParam:        */ 0,
-    /* count:           */ 1,
-    /* model:           */ MODEL_BUBBLE,
-    /* offsetY:         */ 236,
-    /* forwardVelBase:  */ 20,
-    /* forwardVelRange: */ 5,
-    /* velYBase:        */ 0,
-    /* velYRange:       */ 0,
-    /* gravity:         */ -2,
-    /* dragStrength:    */ 0,
-    /* sizeBase:        */ 20.0f,
-    /* sizeRange:       */ 5.0f,
+    .behParam        = 0,
+    .count           = 1,
+    .model           = MODEL_BUBBLE,
+    .offsetY         = 236,
+    .forwardVelBase  = 20,
+    .forwardVelRange = 5,
+    .velYBase        = 0,
+    .velYRange       = 0,
+    .gravity         = -2,
+    .dragStrength    = 0,
+    .sizeBase        = 20.0f,
+    .sizeRange       = 5.0f,
 };
 
 /**

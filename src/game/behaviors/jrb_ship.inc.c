@@ -1,15 +1,15 @@
 // jrb_ship.inc.c
 
 struct ObjectHitbox sSkullSlidingBoxHitbox = {
-    /* interactType:      */ INTERACT_DAMAGE,
-    /* downOffset:        */ 0,
-    /* damageOrCoinValue: */ 1,
-    /* health:            */ 1,
-    /* numLootCoins:      */ 0,
-    /* radius:            */ 130,
-    /* height:            */ 100,
-    /* hurtboxRadius:     */ 0,
-    /* hurtboxHeight:     */ 0,
+    .interactType      = INTERACT_DAMAGE,
+    .downOffset        = 0,
+    .damageOrCoinValue = 1,
+    .health            = 1,
+    .numLootCoins      = 0,
+    .radius            = 130,
+    .height            = 100,
+    .hurtboxRadius     = 0,
+    .hurtboxHeight     = 0,
 };
 
 void bhv_jrb_floating_ship_loop(void) {

@@ -1,20 +1,18 @@
 // snowman.inc.c
 
 static struct ObjectHitbox sRollingSphereHitbox = {
-    /* interactType:      */ INTERACT_DAMAGE,
-    /* downOffset:        */ 0,
-    /* damageOrCoinValue: */ 3,
-    /* health:            */ 0,
-    /* numLootCoins:      */ 0,
-    /* radius:            */ 210,
-    /* height:            */ 350,
-    /* hurtboxRadius:     */ 0,
-    /* hurtboxHeight:     */ 0,
+    .interactType      = INTERACT_DAMAGE,
+    .downOffset        = 0,
+    .damageOrCoinValue = 3,
+    .health            = 0,
+    .numLootCoins      = 0,
+    .radius            = 210,
+    .height            = 350,
+    .hurtboxRadius     = 0,
+    .hurtboxHeight     = 0,
 };
 
-static const Vec3f sSnowmanHeadPos = {
-    -4230.0f, -1344.0f, 1813.0f
-};
+static const Vec3f sSnowmanHeadPos = { -4230.0f, -1344.0f, 1813.0f }; //! Hardcoded position
 
 void bhv_snowmans_bottom_init(void) {
     vec3f_copy(&o->oHomeVec, &o->oPosVec);

@@ -27,16 +27,15 @@ struct LandingAction {
     u32 slideAction;
 };
 
-/*                                               numFrames, doubleJumpTimer,   verySteepAction,                   endAction,    aPressedAction,    offFloorAction,            slideAction, */
-struct LandingAction         sJumpLandAction = {         4,               5,      ACT_FREEFALL,          ACT_JUMP_LAND_STOP,   ACT_DOUBLE_JUMP,      ACT_FREEFALL,      ACT_BEGIN_SLIDING, };
-struct LandingAction     sFreefallLandAction = {         4,               5,      ACT_FREEFALL,      ACT_FREEFALL_LAND_STOP,   ACT_DOUBLE_JUMP,      ACT_FREEFALL,      ACT_BEGIN_SLIDING, };
-struct LandingAction     sSideFlipLandAction = {         4,               5,      ACT_FREEFALL,     ACT_SIDE_FLIP_LAND_STOP,   ACT_DOUBLE_JUMP,      ACT_FREEFALL,      ACT_BEGIN_SLIDING, };
-struct LandingAction     sHoldJumpLandAction = {         4,               5, ACT_HOLD_FREEFALL,     ACT_HOLD_JUMP_LAND_STOP,     ACT_HOLD_JUMP, ACT_HOLD_FREEFALL, ACT_HOLD_BEGIN_SLIDING, };
-struct LandingAction sHoldFreefallLandAction = {         4,               5, ACT_HOLD_FREEFALL, ACT_HOLD_FREEFALL_LAND_STOP,     ACT_HOLD_JUMP, ACT_HOLD_FREEFALL, ACT_HOLD_BEGIN_SLIDING, };
-struct LandingAction     sLongJumpLandAction = {         6,               5,      ACT_FREEFALL,     ACT_LONG_JUMP_LAND_STOP,     ACT_LONG_JUMP,      ACT_FREEFALL,      ACT_BEGIN_SLIDING, };
-struct LandingAction   sDoubleJumpLandAction = {         4,               5,      ACT_FREEFALL,   ACT_DOUBLE_JUMP_LAND_STOP,          ACT_JUMP,      ACT_FREEFALL,      ACT_BEGIN_SLIDING, };
-struct LandingAction   sTripleJumpLandAction = {         4,               0,      ACT_FREEFALL,   ACT_TRIPLE_JUMP_LAND_STOP, ACT_UNINITIALIZED,      ACT_FREEFALL,      ACT_BEGIN_SLIDING, };
-struct LandingAction     sBackflipLandAction = {         4,               0,      ACT_FREEFALL,      ACT_BACKFLIP_LAND_STOP,      ACT_BACKFLIP,      ACT_FREEFALL,      ACT_BEGIN_SLIDING, };
+struct LandingAction         sJumpLandAction = { .numFrames = 4, .doubleJumpTimer = 5, .verySteepAction =      ACT_FREEFALL, .endAction =          ACT_JUMP_LAND_STOP, .aPressedAction =   ACT_DOUBLE_JUMP, .offFloorAction =      ACT_FREEFALL, .slideAction =      ACT_BEGIN_SLIDING, };
+struct LandingAction     sFreefallLandAction = { .numFrames = 4, .doubleJumpTimer = 5, .verySteepAction =      ACT_FREEFALL, .endAction =      ACT_FREEFALL_LAND_STOP, .aPressedAction =   ACT_DOUBLE_JUMP, .offFloorAction =      ACT_FREEFALL, .slideAction =      ACT_BEGIN_SLIDING, };
+struct LandingAction     sSideFlipLandAction = { .numFrames = 4, .doubleJumpTimer = 5, .verySteepAction =      ACT_FREEFALL, .endAction =     ACT_SIDE_FLIP_LAND_STOP, .aPressedAction =   ACT_DOUBLE_JUMP, .offFloorAction =      ACT_FREEFALL, .slideAction =      ACT_BEGIN_SLIDING, };
+struct LandingAction     sHoldJumpLandAction = { .numFrames = 4, .doubleJumpTimer = 5, .verySteepAction = ACT_HOLD_FREEFALL, .endAction =     ACT_HOLD_JUMP_LAND_STOP, .aPressedAction =     ACT_HOLD_JUMP, .offFloorAction = ACT_HOLD_FREEFALL, .slideAction = ACT_HOLD_BEGIN_SLIDING, };
+struct LandingAction sHoldFreefallLandAction = { .numFrames = 4, .doubleJumpTimer = 5, .verySteepAction = ACT_HOLD_FREEFALL, .endAction = ACT_HOLD_FREEFALL_LAND_STOP, .aPressedAction =     ACT_HOLD_JUMP, .offFloorAction = ACT_HOLD_FREEFALL, .slideAction = ACT_HOLD_BEGIN_SLIDING, };
+struct LandingAction     sLongJumpLandAction = { .numFrames = 6, .doubleJumpTimer = 5, .verySteepAction =      ACT_FREEFALL, .endAction =     ACT_LONG_JUMP_LAND_STOP, .aPressedAction =     ACT_LONG_JUMP, .offFloorAction =      ACT_FREEFALL, .slideAction =      ACT_BEGIN_SLIDING, };
+struct LandingAction   sDoubleJumpLandAction = { .numFrames = 4, .doubleJumpTimer = 5, .verySteepAction =      ACT_FREEFALL, .endAction =   ACT_DOUBLE_JUMP_LAND_STOP, .aPressedAction =          ACT_JUMP, .offFloorAction =      ACT_FREEFALL, .slideAction =      ACT_BEGIN_SLIDING, };
+struct LandingAction   sTripleJumpLandAction = { .numFrames = 4, .doubleJumpTimer = 0, .verySteepAction =      ACT_FREEFALL, .endAction =   ACT_TRIPLE_JUMP_LAND_STOP, .aPressedAction = ACT_UNINITIALIZED, .offFloorAction =      ACT_FREEFALL, .slideAction =      ACT_BEGIN_SLIDING, };
+struct LandingAction     sBackflipLandAction = { .numFrames = 4, .doubleJumpTimer = 0, .verySteepAction =      ACT_FREEFALL, .endAction =      ACT_BACKFLIP_LAND_STOP, .aPressedAction =      ACT_BACKFLIP, .offFloorAction =      ACT_FREEFALL, .slideAction =      ACT_BEGIN_SLIDING, };
 
 Mat4 sFloorAlignMatrix[2];
 

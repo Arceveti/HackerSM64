@@ -7,19 +7,19 @@
 #endif
 
 static struct ObjectHitbox sBooGivingStarHitbox = {
-    /* interactType:      */ 0,
-    /* downOffset:        */ 0,
-    /* damageOrCoinValue: */ 3,
-    /* health:            */ 3,
-    /* numLootCoins:      */ 0,
-    /* radius:            */ 140,
-    /* height:            */ 80,
-    /* hurtboxRadius:     */ 40,
-    /* hurtboxHeight:     */ 60,
+    .interactType      = 0,
+    .downOffset        = 0,
+    .damageOrCoinValue = 3,
+    .health            = 3,
+    .numLootCoins      = 0,
+    .radius            = 140,
+    .height            = 80,
+    .hurtboxRadius     = 40,
+    .hurtboxHeight     = 60,
 };
 
 // Relative positions
-static const s16 sCourtyardBooTripletPositions[][3] = {
+static const Vec3s sCourtyardBooTripletPositions[] = {
     {    0,  50,    0 },
     {  210, 110,  210 },
     { -210,  70, -210 },
@@ -40,7 +40,7 @@ static s32 boo_should_be_stopped(void) {
         return !gMarioOnMerryGoRound;
     } else {
         return ((o->activeFlags & ACTIVE_FLAG_IN_DIFFERENT_ROOM)
-         || (o->oRoom == 10 && (gTimeStopState & TIME_STOP_MARIO_OPENED_DOOR)));
+         || (o->oRoom == 10 && (gTimeStopState & TIME_STOP_MARIO_OPENED_DOOR))); //! TODO: Vanilla level checks
     }
 }
 

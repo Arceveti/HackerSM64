@@ -1,15 +1,15 @@
 // klepto.inc.c
 
 static struct ObjectHitbox sKleptoHitbox = {
-    /* interactType:      */ INTERACT_HIT_FROM_BELOW,
-    /* downOffset:        */ 0,
-    /* damageOrCoinValue: */ 0,
-    /* health:            */ 1,
-    /* numLootCoins:      */ 0,
-    /* radius:            */ 160,
-    /* height:            */ 250,
-    /* hurtboxRadius:     */ 80,
-    /* hurtboxHeight:     */ 200,
+    .interactType      = INTERACT_HIT_FROM_BELOW,
+    .downOffset        = 0,
+    .damageOrCoinValue = 0,
+    .health            = 1,
+    .numLootCoins      = 0,
+    .radius            = 160,
+    .height            = 250,
+    .hurtboxRadius     = 80,
+    .hurtboxHeight     = 200,
 };
 
 static Vec3f sKleptoTargetPositions[] = {
@@ -18,7 +18,14 @@ static Vec3f sKleptoTargetPositions[] = {
     { -6200.0f, 1250.0f,  1150.0f },
 };
 
-static u8 sKleptoAttackHandlers[] = { 2, 2, 5, 5, 2, 2 };
+static u8 sKleptoAttackHandlers[] = {
+    [ATTACK_PUNCH                 - 1] = ATTACK_HANDLER_KNOCKBACK,
+    [ATTACK_KICK_OR_TRIP          - 1] = ATTACK_HANDLER_KNOCKBACK,
+    [ATTACK_FROM_ABOVE            - 1] = ATTACK_HANDLER_SET_SPEED_TO_ZERO,
+    [ATTACK_GROUND_POUND_OR_TWIRL - 1] = ATTACK_HANDLER_SET_SPEED_TO_ZERO,
+    [ATTACK_FAST_ATTACK           - 1] = ATTACK_HANDLER_KNOCKBACK,
+    [ATTACK_FROM_BELOW            - 1] = ATTACK_HANDLER_KNOCKBACK,
+};
 
 static void klepto_target_mario(void) {
     o->oKleptoDistanceToTarget = lateral_dist_between_objects(gMarioObject, o);

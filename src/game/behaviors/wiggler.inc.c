@@ -11,42 +11,42 @@
  * Hitbox for wiggler's non-head body parts.
  */
 static struct ObjectHitbox sWigglerBodyPartHitbox = {
-    /* interactType:      */ INTERACT_BOUNCE_TOP,
-    /* downOffset:        */ 0,
-    /* damageOrCoinValue: */ 3,
-    /* health:            */ 99, // never decreases
-    /* numLootCoins:      */ 0,
-    /* radius:            */ 20,
-    /* height:            */ 20,
-    /* hurtboxRadius:     */ 20,
-    /* hurtboxHeight:     */ 10,
+    .interactType      = INTERACT_BOUNCE_TOP,
+    .downOffset        = 0,
+    .damageOrCoinValue = 3,
+    .health            = 99, // never decreases
+    .numLootCoins      = 0,
+    .radius            = 20,
+    .height            = 20,
+    .hurtboxRadius     = 20,
+    .hurtboxHeight     = 10,
 };
 
 /**
  * Hitbox for wiggler's head.
  */
 static struct ObjectHitbox sWigglerHitbox = {
-    /* interactType:      */ INTERACT_BOUNCE_TOP,
-    /* downOffset:        */ 0,
-    /* damageOrCoinValue: */ 3,
-    /* health:            */ 4,
-    /* numLootCoins:      */ 0,
-    /* radius:            */ 60,
-    /* height:            */ 50,
-    /* hurtboxRadius:     */ 30,
-    /* hurtboxHeight:     */ 40,
+    .interactType      = INTERACT_BOUNCE_TOP,
+    .downOffset        = 0,
+    .damageOrCoinValue = 3,
+    .health            = 4,
+    .numLootCoins      = 0,
+    .radius            = 60,
+    .height            = 50,
+    .hurtboxRadius     = 30,
+    .hurtboxHeight     = 40,
 };
 
 /**
  * Attack handler for wiggler while in the walking action.
  */
 static u8 sWigglerAttackHandlers[] = {
-    /* ATTACK_PUNCH:                 */ ATTACK_HANDLER_KNOCKBACK,
-    /* ATTACK_KICK_OR_TRIP:          */ ATTACK_HANDLER_KNOCKBACK,
-    /* ATTACK_FROM_ABOVE:            */ ATTACK_HANDLER_SPECIAL_WIGGLER_JUMPED_ON,
-    /* ATTACK_GROUND_POUND_OR_TWIRL: */ ATTACK_HANDLER_SPECIAL_WIGGLER_JUMPED_ON,
-    /* ATTACK_FAST_ATTACK:           */ ATTACK_HANDLER_KNOCKBACK,
-    /* ATTACK_FROM_BELOW:            */ ATTACK_HANDLER_KNOCKBACK,
+    [ATTACK_PUNCH                 - 1] = ATTACK_HANDLER_KNOCKBACK,
+    [ATTACK_KICK_OR_TRIP          - 1] = ATTACK_HANDLER_KNOCKBACK,
+    [ATTACK_FROM_ABOVE            - 1] = ATTACK_HANDLER_SPECIAL_WIGGLER_JUMPED_ON,
+    [ATTACK_GROUND_POUND_OR_TWIRL - 1] = ATTACK_HANDLER_SPECIAL_WIGGLER_JUMPED_ON,
+    [ATTACK_FAST_ATTACK           - 1] = ATTACK_HANDLER_KNOCKBACK,
+    [ATTACK_FROM_BELOW            - 1] = ATTACK_HANDLER_KNOCKBACK,
 };
 
 /**

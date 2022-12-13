@@ -9,15 +9,15 @@
  * Hitbox for goomba.
  */
 static struct ObjectHitbox sGoombaHitbox = {
-    /* interactType:      */ INTERACT_BOUNCE_TOP,
-    /* downOffset:        */ 0,
-    /* damageOrCoinValue: */ 1,
-    /* health:            */ 0,
-    /* numLootCoins:      */ 1,
-    /* radius:            */ 72,
-    /* height:            */ 50,
-    /* hurtboxRadius:     */ 42,
-    /* hurtboxHeight:     */ 40,
+    .interactType      = INTERACT_BOUNCE_TOP,
+    .downOffset        = 0,
+    .damageOrCoinValue = 1,
+    .health            = 0,
+    .numLootCoins      = 1,
+    .radius            = 72,
+    .height            = 50,
+    .hurtboxRadius     = 42,
+    .hurtboxHeight     = 40,
 };
 
 /**
@@ -34,9 +34,9 @@ struct GoombaProperties {
  * Properties for regular, huge, and tiny goombas.
  */
 static struct GoombaProperties sGoombaProperties[] = {
-    { 1.5f, SOUND_OBJ_ENEMY_DEATH_HIGH, 4000, 1 },
-    { 3.5f, SOUND_OBJ_ENEMY_DEATH_LOW,  4000, 2 },
-    { 0.5f, SOUND_OBJ_ENEMY_DEATH_HIGH, 1500, 0 },
+    [GOOMBA_SIZE_REGULAR] = { .scale = 1.5f, .deathSound = SOUND_OBJ_ENEMY_DEATH_HIGH, .drawDistance = 4000, .damage = 1 },
+    [GOOMBA_SIZE_HUGE   ] = { .scale = 3.5f, .deathSound = SOUND_OBJ_ENEMY_DEATH_LOW,  .drawDistance = 4000, .damage = 2 },
+    [GOOMBA_SIZE_TINY   ] = { .scale = 0.5f, .deathSound = SOUND_OBJ_ENEMY_DEATH_HIGH, .drawDistance = 1500, .damage = 0 },
 };
 
 /**
@@ -45,21 +45,21 @@ static struct GoombaProperties sGoombaProperties[] = {
 static u8 sGoombaAttackHandlers[][6] = {
     // regular and tiny
     {
-        /* ATTACK_PUNCH:                 */ ATTACK_HANDLER_KNOCKBACK,
-        /* ATTACK_KICK_OR_TRIP:          */ ATTACK_HANDLER_KNOCKBACK,
-        /* ATTACK_FROM_ABOVE:            */ ATTACK_HANDLER_SQUISHED,
-        /* ATTACK_GROUND_POUND_OR_TWIRL: */ ATTACK_HANDLER_SQUISHED,
-        /* ATTACK_FAST_ATTACK:           */ ATTACK_HANDLER_KNOCKBACK,
-        /* ATTACK_FROM_BELOW:            */ ATTACK_HANDLER_KNOCKBACK,
+        [ATTACK_PUNCH                 - 1] = ATTACK_HANDLER_KNOCKBACK,
+        [ATTACK_KICK_OR_TRIP          - 1] = ATTACK_HANDLER_KNOCKBACK,
+        [ATTACK_FROM_ABOVE            - 1] = ATTACK_HANDLER_SQUISHED,
+        [ATTACK_GROUND_POUND_OR_TWIRL - 1] = ATTACK_HANDLER_SQUISHED,
+        [ATTACK_FAST_ATTACK           - 1] = ATTACK_HANDLER_KNOCKBACK,
+        [ATTACK_FROM_BELOW            - 1] = ATTACK_HANDLER_KNOCKBACK,
     },
     // huge
     {
-        /* ATTACK_PUNCH:                 */ ATTACK_HANDLER_SPECIAL_HUGE_GOOMBA_WEAKLY_ATTACKED,
-        /* ATTACK_KICK_OR_TRIP:          */ ATTACK_HANDLER_SPECIAL_HUGE_GOOMBA_WEAKLY_ATTACKED,
-        /* ATTACK_FROM_ABOVE:            */ ATTACK_HANDLER_SQUISHED,
-        /* ATTACK_GROUND_POUND_OR_TWIRL: */ ATTACK_HANDLER_SQUISHED_WITH_BLUE_COIN,
-        /* ATTACK_FAST_ATTACK:           */ ATTACK_HANDLER_SPECIAL_HUGE_GOOMBA_WEAKLY_ATTACKED,
-        /* ATTACK_FROM_BELOW:            */ ATTACK_HANDLER_SPECIAL_HUGE_GOOMBA_WEAKLY_ATTACKED,
+        [ATTACK_PUNCH                 - 1] = ATTACK_HANDLER_SPECIAL_HUGE_GOOMBA_WEAKLY_ATTACKED,
+        [ATTACK_KICK_OR_TRIP          - 1] = ATTACK_HANDLER_SPECIAL_HUGE_GOOMBA_WEAKLY_ATTACKED,
+        [ATTACK_FROM_ABOVE            - 1] = ATTACK_HANDLER_SQUISHED,
+        [ATTACK_GROUND_POUND_OR_TWIRL - 1] = ATTACK_HANDLER_SQUISHED_WITH_BLUE_COIN,
+        [ATTACK_FAST_ATTACK           - 1] = ATTACK_HANDLER_SPECIAL_HUGE_GOOMBA_WEAKLY_ATTACKED,
+        [ATTACK_FROM_BELOW            - 1] = ATTACK_HANDLER_SPECIAL_HUGE_GOOMBA_WEAKLY_ATTACKED,
     },
 };
 

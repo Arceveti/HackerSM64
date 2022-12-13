@@ -7,20 +7,20 @@ struct TripletButterflyActivationData {
 };
 
 static struct ObjectHitbox sTripletButterflyExplodeHitbox = {
-    /* interactType:      */ INTERACT_MR_BLIZZARD,
-    /* downOffset:        */ 50,
-    /* damageOrCoinValue: */ 2,
-    /* health:            */ 1,
-    /* numLootCoins:      */ 0,
-    /* radius:            */ 100,
-    /* height:            */ 50,
-    /* hurtboxRadius:     */ 100,
-    /* hurtboxHeight:     */ 50,
+    .interactType      = INTERACT_MR_BLIZZARD,
+    .downOffset        = 50,
+    .damageOrCoinValue = 2,
+    .health            = 1,
+    .numLootCoins      = 0,
+    .radius            = 100,
+    .height            = 50,
+    .hurtboxRadius     = 100,
+    .hurtboxHeight     = 50,
 };
 
 static struct TripletButterflyActivationData sTripletButterflyActivationData[] = {
-    { MODEL_BOWLING_BALL, NULL, 0.5f },
-    { MODEL_1UP, bhv1upWalking, 1.0f },
+    { .model = MODEL_BOWLING_BALL, .behavior = NULL,          .scale = 0.5f },
+    { .model = MODEL_1UP,          .behavior = bhv1upWalking, .scale = 1.0f },
 };
 
 static void triplet_butterfly_act_init(void) {
@@ -33,7 +33,7 @@ static void triplet_butterfly_act_init(void) {
                 spawn_object_relative(i, 0, 0, 0, o, MODEL_BUTTERFLY, bhvTripletButterfly);
             }
 
-            o->oTripletButterflySelectedButterfly = random_u16() % 3;
+            o->oTripletButterflySelectedButterfly = (random_u16() % 3);
         }
 
         //! TODO: Describe this glitch

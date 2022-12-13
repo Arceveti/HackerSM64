@@ -279,15 +279,15 @@ ObjActionFunc sMrIBodyActions[] = {
 };
 
 struct ObjectHitbox sMrIHitbox = {
-    /* interactType:      */ INTERACT_DAMAGE,
-    /* downOffset:        */ 0,
-    /* damageOrCoinValue: */ 2,
-    /* health:            */ 2,
-    /* numLootCoins:      */ 5,
-    /* radius:            */ 80,
-    /* height:            */ 150,
-    /* hurtboxRadius:     */ 0,
-    /* hurtboxHeight:     */ 0,
+    .interactType      = INTERACT_DAMAGE,
+    .downOffset        = 0,
+    .damageOrCoinValue = 2,
+    .health            = 2,
+    .numLootCoins      = 5,
+    .radius            = 80,
+    .height            = 150,
+    .hurtboxRadius     = 0,
+    .hurtboxHeight     = 0,
 };
 
 void bhv_mr_i_body_loop(void) {

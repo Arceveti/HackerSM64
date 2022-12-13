@@ -1,23 +1,18 @@
 // skeeter.inc.c
 
-struct SkeeterRelPos {
-    s16 relPosX;
-    s16 relPosZ;
-};
-
 struct ObjectHitbox sSkeeterHitbox = {
-    /* interactType:      */ INTERACT_BOUNCE_TOP,
-    /* downOffset:        */ 20,
-    /* damageOrCoinValue: */ 2,
-    /* health:            */ 0,
-    /* numLootCoins:      */ 3,
-    /* radius:            */ 180,
-    /* height:            */ 100,
-    /* hurtboxRadius:     */ 150,
-    /* hurtboxHeight:     */ 90,
+    .interactType      = INTERACT_BOUNCE_TOP,
+    .downOffset        = 20,
+    .damageOrCoinValue = 2,
+    .health            = 0,
+    .numLootCoins      = 3,
+    .radius            = 180,
+    .height            = 100,
+    .hurtboxRadius     = 150,
+    .hurtboxHeight     = 90,
 };
 
-struct SkeeterRelPos sSkeeterRelPositions[] = {
+Vec2s sSkeeterRelPositions[] = {
     { 0xFF7E, 0xFF42 },
     { 0x0082, 0xFF42 },
     { 0xFF4C, 0x0082 },
@@ -28,7 +23,7 @@ static void skeeter_spawn_waves(void) {
     s32 i;
 
     for (i = 0; i < ARRAY_COUNT(sSkeeterRelPositions); i++) {
-        spawn_object_relative_with_scale(0, sSkeeterRelPositions[i].relPosX, 0, sSkeeterRelPositions[i].relPosZ, 0.8f, o,
+        spawn_object_relative_with_scale(0, sSkeeterRelPositions[i][0], 0, sSkeeterRelPositions[i][1], 0.8f, o,
                                          MODEL_IDLE_WATER_WAVE, bhvSkeeterWave);
     }
 }

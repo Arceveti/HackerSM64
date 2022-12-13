@@ -1,27 +1,27 @@
 // bowser_flame.inc.c
 
 struct ObjectHitbox sGrowingBowserFlameHitbox = {
-    /* interactType:      */ INTERACT_FLAME,
-    /* downOffset:        */ 20,
-    /* damageOrCoinValue: */ 1,
-    /* health:            */ 0,
-    /* numLootCoins:      */ 0,
-    /* radius:            */ 10,
-    /* height:            */ 40,
-    /* hurtboxRadius:     */ 0,
-    /* hurtboxHeight:     */ 0,
+    .interactType      = INTERACT_FLAME,
+    .downOffset        = 20,
+    .damageOrCoinValue = 1,
+    .health            = 0,
+    .numLootCoins      = 0,
+    .radius            = 10,
+    .height            = 40,
+    .hurtboxRadius     = 0,
+    .hurtboxHeight     = 0,
 };
 
 struct ObjectHitbox sBowserFlameHitbox = {
-    /* interactType:      */ INTERACT_FLAME,
-    /* downOffset:        */ 0,
-    /* damageOrCoinValue: */ 1,
-    /* health:            */ 0,
-    /* numLootCoins:      */ 0,
-    /* radius:            */ 10,
-    /* height:            */ 40,
-    /* hurtboxRadius:     */ 0,
-    /* hurtboxHeight:     */ 0,
+    .interactType      = INTERACT_FLAME,
+    .downOffset        = 0,
+    .damageOrCoinValue = 1,
+    .health            = 0,
+    .numLootCoins      = 0,
+    .radius            = 10,
+    .height            = 40,
+    .hurtboxRadius     = 0,
+    .hurtboxHeight     = 0,
 };
 
 void bowser_flame_despawn(void) {

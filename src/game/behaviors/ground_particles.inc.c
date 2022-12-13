@@ -6,18 +6,18 @@ void bhv_pound_white_puffs_init(void) {
 }
 
 static struct SpawnParticlesInfo sGlobalMistParticles = {
-    /* behParam:        */ 3,
-    /* count:           */ 20,
-    /* model:           */ MODEL_MIST,
-    /* offsetY:         */ 20,
-    /* forwardVelBase:  */ 10,
-    /* forwardVelRange: */ 5,
-    /* velYBase:        */ 0,
-    /* velYRange:       */ 0,
-    /* gravity:         */ 0,
-    /* dragStrength:    */ 30,
-    /* sizeBase:        */ 30.0f,
-    /* sizeRange:       */ 1.5f,
+    .behParam        = 3,
+    .count           = 20,
+    .model           = MODEL_MIST,
+    .offsetY         = 20,
+    .forwardVelBase  = 10,
+    .forwardVelRange = 5,
+    .velYBase        = 0,
+    .velYRange       = 0,
+    .gravity         = 0,
+    .dragStrength    = 30,
+    .sizeBase        = 30.0f,
+    .sizeRange       = 1.5f,
 };
 
 void spawn_mist_from_global(void) {
@@ -25,18 +25,18 @@ void spawn_mist_from_global(void) {
 }
 
 static struct SpawnParticlesInfo sSandParticles = {
-    /* behParam:        */ 0,
-    /* count:           */ 5,
-    /* model:           */ MODEL_SAND_DUST,
-    /* offsetY:         */ 0,
-    /* forwardVelBase:  */ 0,
-    /* forwardVelRange: */ 20,
-    /* velYBase:        */ 20,
-    /* velYRange:       */ 0,
-    /* gravity:         */ 252,
-    /* dragStrength:    */ 30,
-    /* sizeBase:        */ 5.0f,
-    /* sizeRange:       */ 2.0f,
+    .behParam        = 0,
+    .count           = 5,
+    .model           = MODEL_SAND_DUST,
+    .offsetY         = 0,
+    .forwardVelBase  = 0,
+    .forwardVelRange = 20,
+    .velYBase        = 20,
+    .velYRange       = 0,
+    .gravity         = 252,
+    .dragStrength    = 30,
+    .sizeBase        = 5.0f,
+    .sizeRange       = 2.0f,
 };
 
 void bhv_ground_sand_init(void) {
@@ -60,18 +60,18 @@ void clear_particle_flags(u32 flags) {
 }
 
 static struct SpawnParticlesInfo sSnowParticles = {
-    /* behParam:        */ 0,
-    /* count:           */ 5,
-    /* model:           */ MODEL_WHITE_PARTICLE_DL,
-    /* offsetY:         */ 0,
-    /* forwardVelBase:  */ 0,
-    /* forwardVelRange: */ 20,
-    /* velYBase:        */ 20,
-    /* velYRange:       */ 0,
-    /* gravity:         */ 252,
-    /* dragStrength:    */ 30,
-    /* sizeBase:        */ 2.0f,
-    /* sizeRange:       */ 2.0f,
+    .behParam        = 0,
+    .count           = 5,
+    .model           = MODEL_WHITE_PARTICLE_DL,
+    .offsetY         = 0,
+    .forwardVelBase  = 0,
+    .forwardVelRange = 20,
+    .velYBase        = 20,
+    .velYRange       = 0,
+    .gravity         = 252,
+    .dragStrength    = 30,
+    .sizeBase        = 2.0f,
+    .sizeRange       = 2.0f,
 };
 
 void bhv_ground_snow_init(void) {

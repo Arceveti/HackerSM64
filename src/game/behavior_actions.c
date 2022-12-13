@@ -67,18 +67,18 @@
 
 // not in behavior file
 static struct SpawnParticlesInfo sMistParticles = {
-    /* behParam:        */ 2,
-    /* count:           */ 20,
-    /* model:           */ MODEL_MIST,
-    /* offsetY:         */ 0,
-    /* forwardVelBase:  */ 40,
-    /* forwardVelRange: */ 5,
-    /* velYBase:        */ 30,
-    /* velYRange:       */ 20,
-    /* gravity:         */ 252,
-    /* dragStrength:    */ 30,
-    /* sizeBase:        */ 330.0f,
-    /* sizeRange:       */ 10.0f,
+    .behParam        = 2,
+    .count           = 20,
+    .model           = MODEL_MIST,
+    .offsetY         = 0,
+    .forwardVelBase  = 40,
+    .forwardVelRange = 5,
+    .velYBase        = 30,
+    .velYRange       = 20,
+    .gravity         = 252,
+    .dragStrength    = 30,
+    .sizeBase        = 330.0f,
+    .sizeRange       = 10.0f,
 };
 
 // generate_wind_puffs/dust (something like that)
