@@ -51,24 +51,6 @@ ALIGNED16 Mat4 gMatStack[32];
 ALIGNED16 Mtx *gMatStackFixed[32];
 f32 sAspectRatio;
 
-/**
- * Animation nodes have state in global variables, so this struct captures
- * the animation state so a 'context switch' can be made when rendering the
- * held object.
- */
-struct GeoAnimState {
-    /*0x00*/ u8 type;
-    /*0x01*/ u8 enabled;
-    /*0x02*/ s16 frame;
-    /*0x04*/ f32 translationMultiplier;
-    /*0x08*/ AnimIndex *attribute;
-    /*0x0C*/ AnimValue *data;
-};
-
-// For some reason, this is a GeoAnimState struct, but the current state consists
-// of separate global variables. It won't match EU otherwise.
-struct GeoAnimState gGeoTempState;
-
 u8 gCurrAnimType;
 u8 gCurrAnimEnabled;
 s16 gCurrAnimFrame;
@@ -1252,12 +1234,12 @@ void geo_process_held_object(struct GraphNodeHeldObject *node) {
         }
 
         inc_mat_stack();
-        gGeoTempState.type = gCurrAnimType;
-        gGeoTempState.enabled = gCurrAnimEnabled;
-        gGeoTempState.frame = gCurrAnimFrame;
-        gGeoTempState.translationMultiplier = gCurrAnimTranslationMultiplier;
-        gGeoTempState.attribute = gCurrAnimAttribute;
-        gGeoTempState.data = gCurrAnimData;
+        u8 tempType = gCurrAnimType;
+        u8 tempEnabled = gCurrAnimEnabled;
+        s16 tempFrame = gCurrAnimFrame;
+        f32 tempTranslationMultiplier = gCurrAnimTranslationMultiplier;
+        AnimIndex *tempAttribute = gCurrAnimAttribute;
+        AnimValue *tempData = gCurrAnimData;
         gCurrAnimType = ANIM_TYPE_NONE;
         gCurGraphNodeHeldObject = (void *) node;
 
@@ -1267,12 +1249,12 @@ void geo_process_held_object(struct GraphNodeHeldObject *node) {
 
         geo_process_node_and_siblings(node->objNode->header.gfx.sharedChild);
         gCurGraphNodeHeldObject = NULL;
-        gCurrAnimType = gGeoTempState.type;
-        gCurrAnimEnabled = gGeoTempState.enabled;
-        gCurrAnimFrame = gGeoTempState.frame;
-        gCurrAnimTranslationMultiplier = gGeoTempState.translationMultiplier;
-        gCurrAnimAttribute = gGeoTempState.attribute;
-        gCurrAnimData = gGeoTempState.data;
+        gCurrAnimType = tempType;
+        gCurrAnimEnabled = tempEnabled;
+        gCurrAnimFrame = tempFrame;
+        gCurrAnimTranslationMultiplier = tempTranslationMultiplier;
+        gCurrAnimAttribute = tempAttribute;
+        gCurrAnimData = tempData;
         gMatStackIndex--;
     }
 
