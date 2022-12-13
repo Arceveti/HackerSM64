@@ -82,18 +82,14 @@ struct PowerMeterHUD {
     s16 y;
 };
 
-struct CameraHUD {
-    s16 status;
-};
-
 // Stores health segmented value defined by numHealthWedges
 // When the HUD is rendered this value is 8, full health.
 static s16 sPowerMeterStoredHealth;
 
 static struct PowerMeterHUD sPowerMeterHUD = {
-    POWER_METER_HIDDEN,
-    HUD_POWER_METER_X,
-    HUD_POWER_METER_HIDDEN_Y,
+    .animation = POWER_METER_HIDDEN,
+    .x = HUD_POWER_METER_X,
+    .y = HUD_POWER_METER_HIDDEN_Y,
 };
 
 // Power Meter timer that keeps counting when it's visible.
@@ -104,14 +100,14 @@ s32 sPowerMeterVisibleTimer = 0;
 #ifdef BREATH_METER
 static s16 sBreathMeterStoredValue;
 static struct PowerMeterHUD sBreathMeterHUD = {
-    BREATH_METER_HIDDEN,
-    HUD_BREATH_METER_X,
-    HUD_BREATH_METER_HIDDEN_Y,
+    .animation = BREATH_METER_HIDDEN,
+    .x = HUD_BREATH_METER_X,
+    .y = HUD_BREATH_METER_HIDDEN_Y,
 };
 s32 sBreathMeterVisibleTimer = 0;
 #endif
 
-static struct CameraHUD sCameraHUD = { CAM_STATUS_NONE };
+static s16 sCameraHUDStatus = CAM_STATUS_NONE;
 
 /**
  * Renders a rgba16 16x16 glyph texture from a table list.
@@ -523,7 +519,7 @@ void render_hud_timer(void) {
  * defined in update_camera_status.
  */
 void set_hud_camera_status(s16 status) {
-    sCameraHUD.status = status;
+    sCameraHUDStatus = status;
 }
 
 /**
@@ -535,14 +531,14 @@ void render_hud_camera_status(void) {
     s32 x = GFX_DIMENSIONS_RECT_FROM_RIGHT_EDGE(HUD_CAMERA_X);
     s32 y = 205;
 
-    if (sCameraHUD.status == CAM_STATUS_NONE) {
+    if (sCameraHUDStatus == CAM_STATUS_NONE) {
         return;
     }
 
     gSPDisplayList(gDisplayListHead++, dl_hud_img_begin);
     render_hud_tex_lut(x, y, (*cameraLUT)[GLYPH_CAM_CAMERA]);
 
-    switch (sCameraHUD.status & CAM_STATUS_MODE_GROUP) {
+    switch (sCameraHUDStatus & CAM_STATUS_MODE_GROUP) {
         case CAM_STATUS_MARIO:
             render_hud_tex_lut((x + 16), y, (*cameraLUT)[GLYPH_CAM_MARIO_HEAD]);
             break;
@@ -554,7 +550,7 @@ void render_hud_camera_status(void) {
             break;
     }
 
-    switch (sCameraHUD.status & CAM_STATUS_C_MODE_GROUP) {
+    switch (sCameraHUDStatus & CAM_STATUS_C_MODE_GROUP) {
         case CAM_STATUS_C_DOWN:
             render_hud_small_tex_lut((x + 4), (y + 16), (*cameraLUT)[GLYPH_CAM_ARROW_DOWN]);
             break;

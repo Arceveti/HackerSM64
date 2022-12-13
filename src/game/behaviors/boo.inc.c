@@ -71,7 +71,7 @@ void bhv_courtyard_boo_triplet_init(void) {
     } else
 #endif
     {
-        for (i = 0; i < 3; i++) {
+        for (i = 0; i < ARRAY_COUNT(sCourtyardBooTripletPositions); i++) {
             struct Object *boo = spawn_object_relative(BOO_BP_NORMAL,
                 sCourtyardBooTripletPositions[i][0],
                 sCourtyardBooTripletPositions[i][1],

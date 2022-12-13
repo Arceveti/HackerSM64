@@ -30,7 +30,7 @@ void bhv_treasure_chest_top_loop(void) {
                 if (parent->oTreasureChestAboveWater) {
                     play_sound(SOUND_GENERAL_OPEN_CHEST, o->header.gfx.cameraToObject);
                 } else {
-                    spawn_object_relative(0, 0, -80, 120, o, MODEL_BUBBLE, bhvWaterAirBubble);
+                    spawn_object_relative(OBJ_BP_NONE, 0, -80, 120, o, MODEL_BUBBLE, bhvWaterAirBubble);
                     play_sound(SOUND_GENERAL_OPEN_CHEST_WATER, o->header.gfx.cameraToObject);
                 }
             }
@@ -61,7 +61,7 @@ void bhv_treasure_chest_top_loop(void) {
 }
 
 void bhv_treasure_chest_bottom_init(void) {
-    spawn_object_relative(0, 0, 102, -77, o, MODEL_TREASURE_CHEST_LID, bhvTreasureChestTop);
+    spawn_object_relative(OBJ_BP_NONE, 0, 102, -77, o, MODEL_TREASURE_CHEST_LID, bhvTreasureChestTop);
     obj_set_hitbox(o, &sTreasureChestBottomHitbox);
 }
 
@@ -105,15 +105,15 @@ void bhv_treasure_chest_bottom_loop(void) {
 
 void spawn_treasure_chest(s8 param, s32 x, s32 y, s32 z, s16 yaw) {
     struct Object *chestBaseObj = spawn_object_abs_with_rot(o, 0, MODEL_TREASURE_CHEST_BASE,
-                                                            bhvTreasureChestBottom, x, y, z, 0, yaw, 0);
+                                                            bhvTreasureChestBottom, x, y, z, 0x0, yaw, 0x0);
     chestBaseObj->oBehParams2ndByte = param;
 }
 
 void bhv_treasure_chest_ship_init(void) {
-    spawn_treasure_chest(1, 400, -350, -2700, 0);
-    spawn_treasure_chest(2, 650, -350, -940, -0x6001);
-    spawn_treasure_chest(3, -550, -350, -770, 0x5FFF);
-    spawn_treasure_chest(4, 100, -350, -1700, 0);
+    spawn_treasure_chest(TREASURE_CHEST_BP_1,  400, -350, -2700,  0x0000);
+    spawn_treasure_chest(TREASURE_CHEST_BP_2,  650, -350,  -940, -0x6001);
+    spawn_treasure_chest(TREASURE_CHEST_BP_3, -550, -350,  -770,  0x5FFF);
+    spawn_treasure_chest(TREASURE_CHEST_BP_4,  100, -350, -1700,  0x0000);
     o->oTreasureChestNumOpenedChests = 1;
     o->oTreasureChestAboveWater = FALSE;
 }
@@ -177,10 +177,10 @@ void bhv_treasure_chest_jrb_loop(void) {
 }
 
 void bhv_treasure_chest_init(void) {
-    spawn_treasure_chest(1, -4500, -5119, 1300, -0x6001);
-    spawn_treasure_chest(2, -1800, -5119, 1050, 0x1FFF);
-    spawn_treasure_chest(3, -4500, -5119, -1100, 0x238E);
-    spawn_treasure_chest(4, -2400, -4607, 125, 0x3E93);
+    spawn_treasure_chest(TREASURE_CHEST_BP_1, -4500, -5119,  1300, -0x6001);
+    spawn_treasure_chest(TREASURE_CHEST_BP_2, -1800, -5119,  1050,  0x1FFF);
+    spawn_treasure_chest(TREASURE_CHEST_BP_3, -4500, -5119, -1100,  0x238E);
+    spawn_treasure_chest(TREASURE_CHEST_BP_4, -2400, -4607,   125,  0x3E93);
 
     o->oTreasureChestNumOpenedChests = 1;
     o->oTreasureChestAboveWater = FALSE;

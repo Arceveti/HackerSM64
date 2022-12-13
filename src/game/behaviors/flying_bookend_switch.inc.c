@@ -151,7 +151,7 @@ void bookshelf_manager_act_spawn_switches(void) {
     s32 i;
 
     if (!(o->activeFlags & ACTIVE_FLAG_IN_DIFFERENT_ROOM)) {
-        for (i = 0; i < 3; i++) {
+        for (i = 0; i < ARRAY_COUNT(sBookSwitchPositions); i++) {
             spawn_object_relative(i,
                 sBookSwitchPositions[i].relPosX,
                 sBookSwitchPositions[i].relPosY,
@@ -165,7 +165,7 @@ void bookshelf_manager_act_spawn_switches(void) {
 }
 
 void bookshelf_manager_act_check_activate(void) {
-    if (o->oBookSwitchManagerIsActive == FALSE) {
+    if (!o->oBookSwitchManagerIsActive) {
         if (obj_is_near_to_and_facing_mario(500.0f, 0x3000)) {
             o->oBookSwitchManagerIsActive = TRUE;
         }

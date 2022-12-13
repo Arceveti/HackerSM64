@@ -3496,25 +3496,24 @@ void set_handheld_shake(u8 mode) {
 void shake_camera_handheld(Vec3f pos, Vec3f focus) {
     s32 i;
     Vec3f shakeOffset;
-    Vec3f shakeSpline[4];
+    Vec3f shakeSpline[ARRAY_COUNT(sHandheldShakeSpline)];
     f32 dist;
     s16 pitch, yaw;
 
     if (sHandheldShakeMag == 0) {
         vec3_zero(shakeOffset);
     } else {
-        for (i = 0; i < 4; i++) {
+        for (i = 0; i < ARRAY_COUNT(sHandheldShakeSpline); i++) {
             vec3s_to_vec3f(shakeSpline[i], sHandheldShakeSpline[i].point);
         }
         evaluate_cubic_spline(sHandheldShakeTimer, shakeOffset, shakeSpline[0],
                               shakeSpline[1], shakeSpline[2], shakeSpline[3]);
         if (1.f <= (sHandheldShakeTimer += sHandheldShakeInc)) {
-            // The first 3 control points are always (0,0,0), so the random spline is always just a
-            // straight line
-            for (i = 0; i < 3; i++) {
+            // The first 3 control points are always (0,0,0), so the random spline is always just a straight line
+            for (i = 0; i < ARRAY_COUNT(sHandheldShakeSpline) - 1; i++) {
                 vec3s_copy(sHandheldShakeSpline[i].point, sHandheldShakeSpline[i + 1].point);
             }
-            random_vec3s(sHandheldShakeSpline[3].point, sHandheldShakeMag, sHandheldShakeMag, (sHandheldShakeMag / 2));
+            random_vec3s(sHandheldShakeSpline[ARRAY_COUNT(sHandheldShakeSpline) - 1].point, sHandheldShakeMag, sHandheldShakeMag, (sHandheldShakeMag / 2));
             sHandheldShakeTimer -= 1.f;
 
             // Code dead, this is set to be 0 before it is used.

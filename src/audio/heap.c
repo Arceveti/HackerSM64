@@ -862,9 +862,9 @@ UNUSED void func_eu_802e27e4_unused(f32 arg0, f32 arg1, u16 *arg2) {
 #endif // (VERSION_EU || VERSION_SH)
 
 #ifdef VERSION_SH
-void fill_zero_filter(s16 filter[]) {
+void fill_zero_filter(s16 filter[8]) {
     s32 i;
-    for (i = 0; i < 8; i++) {
+    for (i = 0; i < ARRAY_COUNT(filter); i++) {
         filter[i] = 0;
     }
 }
@@ -874,7 +874,7 @@ extern s16 unk_sh_data_4[15 * 8];
 void func_sh_802F0DE8(s16 filter[8], s32 arg1) {
     s32 i;
     s16 *ptr = &unk_sh_data_3[8 * (arg1 - 1)];
-    for (i = 0; i < 8; i++) {
+    for (i = 0; i < ARRAY_COUNT(filter); i++) {
         filter[i] = ptr[i];
     }
 }
@@ -882,7 +882,7 @@ void func_sh_802F0DE8(s16 filter[8], s32 arg1) {
 void func_sh_802F0E40(s16 filter[8], s32 arg1) { // Unused
     s32 i;
     s16 *ptr = &unk_sh_data_4[8 * (arg1 - 1)];
-    for (i = 0; i < 8; i++) {
+    for (i = 0; i < ARRAY_COUNT(filter); i++) {
         filter[i] = ptr[i];
     }
 }
@@ -897,7 +897,7 @@ void fill_filter(s16 filter[8], s32 arg1, s32 arg2) {
     }
     if (arg2 != 0) {
         ptr = &unk_sh_data_4[8 * (arg2 - 1)];
-        for (i = 0; i < 8; i++) {
+        for (i = 0; i < ARRAY_COUNT(filter); i++) {
             filter[i] += ptr[i];
         }
     }

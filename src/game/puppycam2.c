@@ -230,12 +230,12 @@ s32 puppycam_move_spline(struct sPuppySpline splinePos[], struct sPuppySpline sp
     }
     vec3s_to_vec3f(prevPos, gPuppyCam.pos);
 
-    for (i = 0; i < 4; i++) {
+    for (i = 0; i < ARRAY_COUNT(tempPoints); i++) {
         vec3s_to_vec3f(tempPoints[i], splinePos[gPuppyCam.splineIndex + i].pos);
     }
     puppycam_evaluate_spline(gPuppyCam.splineProgress, gPuppyCam.pos, tempPoints[0], tempPoints[1], tempPoints[2], tempPoints[3]);
     if (mode == PUPPYSPLINE_FOLLOW) {
-        for (i = 0; i < 4; i++) {
+        for (i = 0; i < ARRAY_COUNT(tempPoints); i++) {
             vec3s_to_vec3f(tempPoints[i], splineFocus[gPuppyCam.splineIndex + i].pos);
         }
         puppycam_evaluate_spline(gPuppyCam.splineProgress, gPuppyCam.focus, tempPoints[0], tempPoints[1], tempPoints[2], tempPoints[3]);
@@ -622,7 +622,10 @@ static void puppycam_input_hold_preset2(f32 ivX) {
 
 // Another alternative control scheme. This one aims to mimic the parallel camera scheme down to the last bit from the original game.
 static void puppycam_input_hold_preset3(void) {
-    f32 stickMag[2] = { gPlayer1Controller->rawStickX * 0.65f, gPlayer1Controller->rawStickY * 0.2f };
+    f32 stickMag[2] = {
+        (gPlayer1Controller->rawStickX * 0.65f),
+        (gPlayer1Controller->rawStickY * 0.2f )
+    };
     // Just in case it happens to be nonzero.
     gPuppyCam.yawAcceleration = 0;
 

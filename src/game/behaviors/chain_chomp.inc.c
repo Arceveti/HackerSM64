@@ -202,7 +202,7 @@ static void chain_chomp_sub_act_lunge(void) {
         }
 
         o->oChainChompMaxDistBetweenChainParts = o->oChainChompSignedMaxDistBetweenChainParts;
-        if ((gGlobalTimer & (2 - 1)) != 0) {
+        if ((gGlobalTimer % 2) != 0) {
             o->oChainChompMaxDistBetweenChainParts = -o->oChainChompSignedMaxDistBetweenChainParts;
         }
     }

@@ -33,7 +33,7 @@ void bhv_wind_loop(void) {
         obj_mark_for_deletion(o);
     }
 
-    o->oFaceAnglePitch += 4000.0f + 2000.0f * random_float();
-    o->oFaceAngleYaw += 4000.0f + 2000.0f * random_float();
+    o->oFaceAnglePitch += 4000.0f + (2000.0f * random_float());
+    o->oFaceAngleYaw   += 4000.0f + (2000.0f * random_float());
     cur_obj_move_using_fvel_and_gravity();
 }

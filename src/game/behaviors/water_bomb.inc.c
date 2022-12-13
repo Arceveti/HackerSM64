@@ -29,7 +29,7 @@ static struct ObjectHitbox sWaterBombHitbox = {
  * Spawn water bombs targeting mario when he comes in range.
  */
 void bhv_water_bomb_spawner_update(void) {
-    f32 spawnerRadius = 50 * GET_BPARAM2(o->oBehParams) + 200.0f;
+    f32 spawnerRadius = (50 * GET_BPARAM2(o->oBehParams)) + 200.0f;
     f32 latDistToMario = lateral_dist_between_objects(o, gMarioObject);
 
     // When mario is in range and a water bomb isn't already active
@@ -39,7 +39,7 @@ void bhv_water_bomb_spawner_update(void) {
             o->oWaterBombSpawnerTimeToSpawn--;
         } else {
             struct Object *waterBomb =
-                spawn_object_relative(0, 0, 2000, 0, o, MODEL_WATER_BOMB, bhvWaterBomb);
+                spawn_object_relative(OBJ_BP_NONE, 0, 2000, 0, o, MODEL_WATER_BOMB, bhvWaterBomb);
 
             if (waterBomb != NULL) {
                 // Drop farther ahead of mario when he is moving faster

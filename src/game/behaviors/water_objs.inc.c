@@ -9,7 +9,7 @@ void bhv_water_air_bubble_init(void) {
 
 void bhv_water_air_bubble_loop(void) {
     s32 i;
-    o->header.gfx.scale[0] = sins(o->oWaterObjScaleXAngle) * 0.5f + 4.0f;
+    o->header.gfx.scale[0] =  sins(o->oWaterObjScaleXAngle) * 0.5f + 4.0f;
     o->header.gfx.scale[1] = -sins(o->oWaterObjScaleXAngle) * 0.5f + 4.0f;
     o->oWaterObjScaleXAngle += 0x400;
 
@@ -52,7 +52,7 @@ void scale_bubble_random(void) {
 }
 
 void bhv_bubble_maybe_loop(void) {
-    o->oPosY += random_float() * 3.0f + 6.0f;
+    o->oPosY += random_float() *  3.0f + 6.0f;
     o->oPosX += random_float() * 10.0f - 5.0f;
     o->oPosZ += random_float() * 10.0f - 5.0f;
 
@@ -112,7 +112,7 @@ void bhv_small_bubbles_loop(void) {
 }
 
 void bhv_fish_group_loop(void) {
-    if ((gMarioCurrentRoom == 15 || gMarioCurrentRoom == 7) && (gGlobalTimer & 1)) {
+    if ((gMarioCurrentRoom == 15 || gMarioCurrentRoom == 7) && ((gGlobalTimer % 2) != 0)) {
         spawn_object(o, MODEL_WHITE_PARTICLE_SMALL, bhvSmallParticleBubbles);
     }
 }

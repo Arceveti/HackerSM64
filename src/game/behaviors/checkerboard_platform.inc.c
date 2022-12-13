@@ -7,8 +7,8 @@ struct CheckerBoardPlatformInitPosition {
 };
 
 struct CheckerBoardPlatformInitPosition sCheckerBoardPlatformInitPositions[] = {
-    { 145, { 0.7f, 1.5f, 0.7f },  7.0f },
-    { 235, { 1.2f, 2.0f, 1.2f }, 11.6f }
+    { .relPosZ = 145, .scale = { 0.7f, 1.5f, 0.7f }, .radius =  7.0f },
+    { .relPosZ = 235, .scale = { 1.2f, 2.0f, 1.2f }, .radius = 11.6f }
 };
 
 void bhv_checkerboard_elevator_group_init(void) {
@@ -23,7 +23,7 @@ void bhv_checkerboard_elevator_group_init(void) {
     s32 relativePosY = o->oBehParams2ndByte * 10;
     s32 type = GET_BPARAM1(o->oBehParams);
 
-    for (i = 0; i < 2; i++) {
+    for (i = 0; i < ARRAY_COUNT(sCheckerBoardPlatformInitPositions); i++) {
         if (i == 0) {
             relativePosZ = -sCheckerBoardPlatformInitPositions[type].relPosZ;
         } else {
@@ -94,7 +94,7 @@ void bhv_checkerboard_platform_loop(void) {
     o->oFaceAngleYaw = o->oMoveAngleYaw;
 
     if (o->oMoveAnglePitch != 0x0) {
-        f32 mul = ((o->oAngleVelPitch >= 0) ? 1.0f : -1.0f) * radius;
+        f32 mul = ((o->oAngleVelPitch >= 0x0) ? 1.0f : -1.0f) * radius;
         o->oForwardVel = mul * sins(o->oMoveAnglePitch);
         o->oVelY       = mul * coss(o->oMoveAnglePitch);
     }

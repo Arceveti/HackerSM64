@@ -1279,7 +1279,7 @@ void cur_obj_set_pos_to_home_and_stop(void) {
 
 void cur_obj_shake_y(f32 amount) {
     //! Technically could cause a bit of drift, but not much
-    if ((o->oTimer & (2 - 1)) == 0) {
+    if ((o->oTimer % 2) == 0) {
         o->oPosY += amount;
     } else {
         o->oPosY -= amount;
@@ -1849,7 +1849,7 @@ s32 cur_obj_is_mario_on_platform(void) {
 }
 
 s32 cur_obj_shake_y_until(s32 cycles, s32 amount) {
-    if ((o->oTimer & (2 - 1)) != 0) {
+    if ((o->oTimer % 2) != 0) {
         o->oPosY -= amount;
         // Return FALSE since o->oTimer can't be equal to (cycles * 2) if it is odd.
         return FALSE;
@@ -1857,7 +1857,7 @@ s32 cur_obj_shake_y_until(s32 cycles, s32 amount) {
         o->oPosY += amount;
     }
 
-    return (o->oTimer == cycles * 2);
+    return (o->oTimer == (cycles * 2));
 }
 
 void cur_obj_call_action_function(ObjActionFunc actionFunctions[]) {

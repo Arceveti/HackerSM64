@@ -7,19 +7,15 @@
  */
 
 /**
- * Struct with s16 values for a horizontal position.
- */
-struct LateralPosition {
-    s16 x;
-    s16 z;
-};
-
-/**
  * Array of positions for all coffins relative to their spawner.
  */
-struct LateralPosition coffinRelativePos[] = {
-    { 412, -150 }, { 762, -150 }, { 1112, -150 },
-    { 412,  150 }, { 762,  150 }, { 1112,  150 },
+Vec2s coffinRelativePos[] = {
+    {  412, -150 },
+    {  762, -150 },
+    { 1112, -150 },
+    {  412,  150 },
+    {  762,  150 },
+    { 1112,  150 },
 };
 
 /**
@@ -33,12 +29,12 @@ void bhv_coffin_spawner_loop(void) {
 
     if (o->oAction == COFFIN_SPAWNER_ACT_COFFINS_UNLOADED) {
         if (!(o->activeFlags & ACTIVE_FLAG_IN_DIFFERENT_ROOM)) {
-            for (i = 0; i < 6; i++) {
-                relativeX = coffinRelativePos[i].x;
-                relativeZ = coffinRelativePos[i].z;
+            for (i = 0; i < ARRAY_COUNT(coffinRelativePos); i++) {
+                relativeX = coffinRelativePos[i][0];
+                relativeZ = coffinRelativePos[i][1];
 
                 // Behavior param of 0 for all even i, 1 for all odd
-                coffin = spawn_object_relative((i & 0x1), relativeX, 0, relativeZ, o,
+                coffin = spawn_object_relative((i % 2), relativeX, 0, relativeZ, o,
                                                MODEL_BBH_WOODEN_TOMB, bhvCoffin);
 
                 // Never true, game would enter a while(1) before it could.
@@ -125,11 +121,11 @@ void coffin_act_stand_up(void) {
             o->oAction = COFFIN_ACT_IDLE;
             o->oFaceAngleRoll = 0x0;
         } else if (o->oTimer > 30) {
-            if ((gGlobalTimer & (4 - 1)) == 0) {
+            if ((gGlobalTimer % 4) == 0) {
                 cur_obj_play_sound_2(SOUND_GENERAL_ELEVATOR_MOVE_2);
             }
             // Shake the coffin while its standing
-            o->oFaceAngleRoll = (400 * (gGlobalTimer & (2 - 1))) - 200;
+            o->oFaceAngleRoll = (400 * (gGlobalTimer % 2)) - 200;
         }
 
         o->oAngleVelPitch = 0x0;

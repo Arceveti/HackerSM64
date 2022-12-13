@@ -261,7 +261,7 @@ void bhv_blue_flames_group_loop(void) {
     }
 
     if (o->oTimer < 16) {
-        if ((o->oTimer & (2 - 1)) == 0) {
+        if ((o->oTimer % 2) == 0) {
             for (i = 0; i < 3; i++) {
                 flame = spawn_object(o, MODEL_BLUE_FLAME, bhvFlameBouncing);
                 flame->oMoveAngleYaw += (i * DEGREES(120));

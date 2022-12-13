@@ -203,15 +203,15 @@ void print_string_array_info(const char **strArr) {
 
     if (!sDebugStringArrPrinted) {
         sDebugStringArrPrinted = TRUE;
-        for (i = 0; i < 8; i++) {
+        for (i = 0; i < ARRAY_COUNT(gDebugInfo[0]); i++) {
             // sDebugPage is assumed to be 4 or 5 here.
             print_debug_top_down_mapinfo(strArr[i], gDebugInfo[sDebugPage][i]);
         }
         // modify the cursor position so the cursor prints at the correct location.
         // this is equivalent to (sDebugSysCursor - 8)
-        set_text_array_x_y(0, -1 - (u32)(7 - sDebugSysCursor));
-        print_debug_top_down_mapinfo(strArr[8], 0); // print the cursor
-        set_text_array_x_y(0, 7 - sDebugSysCursor);
+        set_text_array_x_y(0, (-1 - (u32)(7 - sDebugSysCursor)));
+        print_debug_top_down_mapinfo(strArr[ARRAY_COUNT(gDebugInfo[0])], 0); // print the cursor
+        set_text_array_x_y(0, (7 - sDebugSysCursor));
     }
 }
 
@@ -450,15 +450,31 @@ void try_print_debug_mario_level_info(void) {
 void try_do_mario_debug_object_spawn(void) {
     if (sDebugPage == DEBUG_PAGE_STAGEINFO && gDebugInfo[DEBUG_PAGE_ENEMYINFO][7] == 1) {
         if (gPlayer1Controller->buttonPressed & R_JPAD) {
-            spawn_object_relative(0, 0, 100, 200, gCurrentObject, MODEL_KOOPA_SHELL, bhvKoopaShell);
+            spawn_object_relative(
+                OBJ_BP_NONE,
+                0, 100, 200,
+                gCurrentObject,
+                MODEL_KOOPA_SHELL,
+                bhvKoopaShell
+            );
         }
         if (gPlayer1Controller->buttonPressed & L_JPAD) {
-            spawn_object_relative(0, 0, 100, 200, gCurrentObject, MODEL_BREAKABLE_BOX_SMALL,
-                                  bhvJumpingBox);
+            spawn_object_relative(
+                BREAKABLE_BOX_BP_NO_COINS,
+                0, 100, 200,
+                gCurrentObject,
+                MODEL_BREAKABLE_BOX_SMALL,
+                bhvJumpingBox
+            );
         }
         if (gPlayer1Controller->buttonPressed & D_JPAD) {
-            spawn_object_relative(0, 0, 100, 200, gCurrentObject, MODEL_KOOPA_SHELL,
-                                  bhvKoopaShellUnderwater);
+            spawn_object_relative(
+                OBJ_BP_NONE,
+                0, 100, 200,
+                gCurrentObject,
+                MODEL_KOOPA_SHELL,
+                bhvKoopaShellUnderwater
+            );
         }
     }
 }

@@ -25,7 +25,7 @@ void bhv_beta_chest_bottom_init(void) {
     o->oMoveAngleYaw = 0x0;
 
     // Spawn the chest lid 97 units in the +Y direction and 77 units in the -Z direction.
-    spawn_object_relative(0, 0, 97, -77, o, MODEL_TREASURE_CHEST_LID, bhvBetaChestLid);
+    spawn_object_relative(OBJ_BP_NONE, 0, 97, -77, o, MODEL_TREASURE_CHEST_LID, bhvBetaChestLid);
 }
 
 /**
@@ -54,7 +54,7 @@ void bhv_beta_chest_lid_loop(void) {
         case BETA_CHEST_ACT_OPENING:
             if (o->oTimer == 0) {
                 // Spawn the bubble 80 units in the -Y direction and 120 units in the +Z direction.
-                spawn_object_relative(0, 0, -80, 120, o, MODEL_BUBBLE, bhvWaterAirBubble);
+                spawn_object_relative(OBJ_BP_NONE, 0, -80, 120, o, MODEL_BUBBLE, bhvWaterAirBubble);
                 play_sound(SOUND_GENERAL_OPEN_CHEST_WATER, o->header.gfx.cameraToObject);
             }
 

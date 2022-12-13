@@ -335,7 +335,7 @@ void bhv_1up_hidden_in_pole_spawner_loop(void) {
         s8 i;
         spawn_object_relative(2, 0, 50, 0, o, MODEL_1UP, bhvHidden1upInPole);
         for (i = 0; i < 2; i++) {
-            spawn_object_relative(0, 0, i * -200, 0, o, MODEL_NONE, bhvHidden1upInPoleTrigger);
+            spawn_object_relative(OBJ_BP_NONE, 0, (i * -200), 0, o, MODEL_NONE, bhvHidden1upInPoleTrigger);
         }
 
         obj_mark_for_deletion(o);

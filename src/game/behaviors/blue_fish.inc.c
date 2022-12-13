@@ -109,7 +109,7 @@ void bhv_tank_fish_group_loop(void) {
             if (gMarioCurrentRoom == 15 || gMarioCurrentRoom == 7) {
                 // spawns fifteen fish and moves them within 200.0f
                 for (i = 0; i < 15; i++) { //! TODO: Make this a param
-                    fish = spawn_object_relative(0, 300, 0, -200, o, MODEL_FISH, bhvBlueFish);
+                    fish = spawn_object_relative(OBJ_BP_NONE, 300, 0, -200, o, MODEL_FISH, bhvBlueFish);
                     obj_translate_xyz_random(fish, 200.0f);
                 }
 

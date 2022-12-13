@@ -91,9 +91,14 @@ static const Trajectory inside_castle_seg7_trajectory_mips_9[] = {
 
 // 0x07079068 - 0x07079090
 const Trajectory *const inside_castle_seg7_trajectory_mips[] = {
-    inside_castle_seg7_trajectory_mips_0, inside_castle_seg7_trajectory_mips_1,
-    inside_castle_seg7_trajectory_mips_2, inside_castle_seg7_trajectory_mips_3,
-    inside_castle_seg7_trajectory_mips_4, inside_castle_seg7_trajectory_mips_5,
-    inside_castle_seg7_trajectory_mips_6, inside_castle_seg7_trajectory_mips_7,
-    inside_castle_seg7_trajectory_mips_8, inside_castle_seg7_trajectory_mips_9,
+    inside_castle_seg7_trajectory_mips_0,
+    inside_castle_seg7_trajectory_mips_1,
+    inside_castle_seg7_trajectory_mips_2,
+    inside_castle_seg7_trajectory_mips_3,
+    inside_castle_seg7_trajectory_mips_4,
+    inside_castle_seg7_trajectory_mips_5,
+    inside_castle_seg7_trajectory_mips_6,
+    inside_castle_seg7_trajectory_mips_7,
+    inside_castle_seg7_trajectory_mips_8,
+    inside_castle_seg7_trajectory_mips_9,
 };

@@ -18,8 +18,8 @@ struct FerrisWheelProperties {
  * Properties for the ferris wheels in BitS and BitDW, respectively.
  */
 static const struct FerrisWheelProperties sFerrisWheelProperties[] = {
-    { bits_seg7_collision_0701ACAC,  bits_seg7_collision_0701AC28,  MODEL_BITS_BLUE_PLATFORM  },
-    { bitdw_seg7_collision_0700F7F0, bitdw_seg7_collision_0700F898, MODEL_BITDW_BLUE_PLATFORM },
+    { .axleCollision = bits_seg7_collision_0701ACAC,  .platformCollision = bits_seg7_collision_0701AC28,  .platformModel = MODEL_BITS_BLUE_PLATFORM  },
+    { .axleCollision = bitdw_seg7_collision_0700F7F0, .platformCollision = bitdw_seg7_collision_0700F898, .platformModel = MODEL_BITDW_BLUE_PLATFORM },
 };
 
 /**
