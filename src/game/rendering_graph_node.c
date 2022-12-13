@@ -78,83 +78,81 @@ AnimValue *gCurrAnimData;
 
 struct AllocOnlyPool *gDisplayListHeap;
 
-struct RenderModeContainer {
-    u32 modes[LAYER_COUNT];
+/* Rendermode settings for cycle 1 for all 8 or 13 layers. */
+struct RenderModeContainer renderModeTable_1Cycle[2] = { 
+    [RENDER_NO_ZB] = { {
+        [LAYER_FORCE                    ] = G_RM_OPA_SURF,
+        [LAYER_OPAQUE                   ] = G_RM_AA_OPA_SURF,
+        [LAYER_OPAQUE_INTER             ] = G_RM_AA_OPA_SURF,
+        [LAYER_OPAQUE_DECAL             ] = G_RM_AA_OPA_SURF,
+        [LAYER_ALPHA                    ] = G_RM_AA_TEX_EDGE,
+        [LAYER_ALPHA_DECAL              ] = (G_RM_AA_TEX_EDGE | ZMODE_DEC),
+#if SILHOUETTE
+        [LAYER_SILHOUETTE_OPAQUE        ] = G_RM_AA_OPA_SURF,
+        [LAYER_SILHOUETTE_ALPHA         ] = G_RM_AA_TEX_EDGE,
+        [LAYER_OCCLUDE_SILHOUETTE_OPAQUE] = G_RM_AA_OPA_SURF,
+        [LAYER_OCCLUDE_SILHOUETTE_ALPHA ] = G_RM_AA_TEX_EDGE,
+#endif
+        [LAYER_TRANSPARENT_DECAL        ] = G_RM_AA_XLU_SURF,
+        [LAYER_TRANSPARENT              ] = G_RM_AA_XLU_SURF,
+        [LAYER_TRANSPARENT_INTER        ] = G_RM_AA_XLU_SURF,
+    } },
+    [RENDER_ZB] = { {
+        [LAYER_FORCE                    ] = G_RM_ZB_OPA_SURF,
+        [LAYER_OPAQUE                   ] = G_RM_AA_ZB_OPA_SURF,
+        [LAYER_OPAQUE_INTER             ] = G_RM_AA_ZB_OPA_INTER,
+        [LAYER_OPAQUE_DECAL             ] = G_RM_AA_ZB_OPA_DECAL,
+        [LAYER_ALPHA                    ] = G_RM_AA_ZB_TEX_EDGE,
+        [LAYER_ALPHA_DECAL              ] = (G_RM_AA_ZB_TEX_EDGE | ZMODE_DEC),
+#if SILHOUETTE
+        [LAYER_SILHOUETTE_OPAQUE        ] = G_RM_AA_ZB_OPA_SURF,
+        [LAYER_SILHOUETTE_ALPHA         ] = G_RM_AA_ZB_TEX_EDGE,
+        [LAYER_OCCLUDE_SILHOUETTE_OPAQUE] = G_RM_AA_ZB_OPA_SURF,
+        [LAYER_OCCLUDE_SILHOUETTE_ALPHA ] = G_RM_AA_ZB_TEX_EDGE,
+#endif
+        [LAYER_TRANSPARENT_DECAL        ] = G_RM_AA_ZB_XLU_DECAL,
+        [LAYER_TRANSPARENT              ] = G_RM_AA_ZB_XLU_SURF,
+        [LAYER_TRANSPARENT_INTER        ] = G_RM_AA_ZB_XLU_INTER,
+    } }
 };
 
-/* Rendermode settings for cycle 1 for all 8 or 13 layers. */
-struct RenderModeContainer renderModeTable_1Cycle[2] = { { {
-        G_RM_OPA_SURF,                      // LAYER_FORCE
-        G_RM_AA_OPA_SURF,                   // LAYER_OPAQUE
-        G_RM_AA_OPA_SURF,                   // LAYER_OPAQUE_INTER
-        G_RM_AA_OPA_SURF,                   // LAYER_OPAQUE_DECAL
-        G_RM_AA_TEX_EDGE,                   // LAYER_ALPHA
-        G_RM_AA_TEX_EDGE | ZMODE_DEC,       // LAYER_ALPHA_DECAL
-#if SILHOUETTE
-        G_RM_AA_OPA_SURF,                   // LAYER_SILHOUETTE_OPAQUE
-        G_RM_AA_TEX_EDGE,                   // LAYER_SILHOUETTE_ALPHA
-        G_RM_AA_OPA_SURF,                   // LAYER_OCCLUDE_SILHOUETTE_OPAQUE
-        G_RM_AA_TEX_EDGE,                   // LAYER_OCCLUDE_SILHOUETTE_ALPHA
-#endif
-        G_RM_AA_XLU_SURF,                   // LAYER_TRANSPARENT_DECAL
-        G_RM_AA_XLU_SURF,                   // LAYER_TRANSPARENT
-        G_RM_AA_XLU_SURF,                   // LAYER_TRANSPARENT_INTER
-    } },
-    { {
-        /* z-buffered */
-        G_RM_ZB_OPA_SURF,                   // LAYER_FORCE
-        G_RM_AA_ZB_OPA_SURF,                // LAYER_OPAQUE
-        G_RM_AA_ZB_OPA_INTER,               // LAYER_OPAQUE_INTER
-        G_RM_AA_ZB_OPA_DECAL,               // LAYER_OPAQUE_DECAL
-        G_RM_AA_ZB_TEX_EDGE,                // LAYER_ALPHA
-        G_RM_AA_ZB_TEX_EDGE | ZMODE_DEC,    // LAYER_ALPHA_DECAL
-#if SILHOUETTE
-        G_RM_AA_ZB_OPA_SURF,                // LAYER_SILHOUETTE_OPAQUE
-        G_RM_AA_ZB_TEX_EDGE,                // LAYER_SILHOUETTE_ALPHA
-        G_RM_AA_ZB_OPA_SURF,                // LAYER_OCCLUDE_SILHOUETTE_OPAQUE
-        G_RM_AA_ZB_TEX_EDGE,                // LAYER_OCCLUDE_SILHOUETTE_ALPHA
-#endif
-        G_RM_AA_ZB_XLU_DECAL,               // LAYER_TRANSPARENT_DECAL
-        G_RM_AA_ZB_XLU_SURF,                // LAYER_TRANSPARENT
-        G_RM_AA_ZB_XLU_INTER,               // LAYER_TRANSPARENT_INTER
-    } } };
-
 /* Rendermode settings for cycle 2 for all 13 layers. */
-struct RenderModeContainer renderModeTable_2Cycle[2] = { { {
-        G_RM_OPA_SURF2,                     // LAYER_FORCE
-        G_RM_AA_OPA_SURF2,                  // LAYER_OPAQUE
-        G_RM_AA_OPA_SURF2,                  // LAYER_OPAQUE_INTER
-        G_RM_AA_OPA_SURF2,                  // LAYER_OPAQUE_DECAL
-        G_RM_AA_TEX_EDGE2,                  // LAYER_ALPHA
-        G_RM_AA_TEX_EDGE2 | ZMODE_DEC,      // LAYER_ALPHA_DECAL
+struct RenderModeContainer renderModeTable_2Cycle[2] = {
+    [RENDER_NO_ZB] = { {
+        [LAYER_FORCE                    ] = G_RM_OPA_SURF2,
+        [LAYER_OPAQUE                   ] = G_RM_AA_OPA_SURF2,
+        [LAYER_OPAQUE_INTER             ] = G_RM_AA_OPA_SURF2,
+        [LAYER_OPAQUE_DECAL             ] = G_RM_AA_OPA_SURF2,
+        [LAYER_ALPHA                    ] = G_RM_AA_TEX_EDGE2,
+        [LAYER_ALPHA_DECAL              ] = (G_RM_AA_TEX_EDGE2 | ZMODE_DEC),
 #if SILHOUETTE
-        G_RM_AA_OPA_SURF2,                  // LAYER_SILHOUETTE_OPAQUE
-        G_RM_AA_TEX_EDGE2,                  // LAYER_SILHOUETTE_ALPHA
-        G_RM_AA_OPA_SURF2,                  // LAYER_OCCLUDE_SILHOUETTE_OPAQUE
-        G_RM_AA_TEX_EDGE2,                  // LAYER_OCCLUDE_SILHOUETTE_ALPHA
+        [LAYER_SILHOUETTE_OPAQUE        ] = G_RM_AA_OPA_SURF2,
+        [LAYER_SILHOUETTE_ALPHA         ] = G_RM_AA_TEX_EDGE2,
+        [LAYER_OCCLUDE_SILHOUETTE_OPAQUE] = G_RM_AA_OPA_SURF2,
+        [LAYER_OCCLUDE_SILHOUETTE_ALPHA ] = G_RM_AA_TEX_EDGE2,
 #endif
-        G_RM_AA_XLU_SURF2,                  // LAYER_TRANSPARENT_DECAL
-        G_RM_AA_XLU_SURF2,                  // LAYER_TRANSPARENT
-        G_RM_AA_XLU_SURF2,                  // LAYER_TRANSPARENT_INTER
+        [LAYER_TRANSPARENT_DECAL        ] = G_RM_AA_XLU_SURF2,
+        [LAYER_TRANSPARENT              ] = G_RM_AA_XLU_SURF2,
+        [LAYER_TRANSPARENT_INTER        ] = G_RM_AA_XLU_SURF2,
     } },
-    { {
-        /* z-buffered */
-        G_RM_ZB_OPA_SURF2,                  // LAYER_FORCE
-        G_RM_AA_ZB_OPA_SURF2,               // LAYER_OPAQUE
-        G_RM_AA_ZB_OPA_INTER2,              // LAYER_OPAQUE_INTER
-        G_RM_AA_ZB_OPA_DECAL2,              // LAYER_OPAQUE_DECAL
-        G_RM_AA_ZB_TEX_EDGE2,               // LAYER_ALPHA
-        G_RM_AA_ZB_TEX_EDGE2 | ZMODE_DEC,   // LAYER_ALPHA_DECAL
+    [RENDER_ZB] = { {
+        [LAYER_FORCE                    ] = G_RM_ZB_OPA_SURF2,
+        [LAYER_OPAQUE                   ] = G_RM_AA_ZB_OPA_SURF2,
+        [LAYER_OPAQUE_INTER             ] = G_RM_AA_ZB_OPA_INTER2,
+        [LAYER_OPAQUE_DECAL             ] = G_RM_AA_ZB_OPA_DECAL2,
+        [LAYER_ALPHA                    ] = G_RM_AA_ZB_TEX_EDGE2,
+        [LAYER_ALPHA_DECAL              ] = (G_RM_AA_ZB_TEX_EDGE2 | ZMODE_DEC),
 #if SILHOUETTE
-        G_RM_AA_ZB_OPA_SURF2,               // LAYER_SILHOUETTE_OPAQUE
-        G_RM_AA_ZB_TEX_EDGE2,               // LAYER_SILHOUETTE_ALPHA
-        G_RM_AA_ZB_OPA_SURF2,               // LAYER_OCCLUDE_SILHOUETTE_OPAQUE
-        G_RM_AA_ZB_TEX_EDGE2,               // LAYER_OCCLUDE_SILHOUETTE_ALPHA
+        [LAYER_SILHOUETTE_OPAQUE        ] = G_RM_AA_ZB_OPA_SURF2,
+        [LAYER_SILHOUETTE_ALPHA         ] = G_RM_AA_ZB_TEX_EDGE2,
+        [LAYER_OCCLUDE_SILHOUETTE_OPAQUE] = G_RM_AA_ZB_OPA_SURF2,
+        [LAYER_OCCLUDE_SILHOUETTE_ALPHA ] = G_RM_AA_ZB_TEX_EDGE2,
 #endif
-        G_RM_AA_ZB_XLU_DECAL2,              // LAYER_TRANSPARENT_DECAL
-        G_RM_AA_ZB_XLU_SURF2,               // LAYER_TRANSPARENT
-        G_RM_AA_ZB_XLU_INTER2,              // LAYER_TRANSPARENT_INTER
-    } } };
+        [LAYER_TRANSPARENT_DECAL        ] = G_RM_AA_ZB_XLU_DECAL2,
+        [LAYER_TRANSPARENT              ] = G_RM_AA_ZB_XLU_SURF2,
+        [LAYER_TRANSPARENT_INTER        ] = G_RM_AA_ZB_XLU_INTER2,
+    } }
+};
 
 ALIGNED16 struct GraphNodeRoot        *gCurGraphNodeRoot       = NULL;
 ALIGNED16 struct GraphNodeMasterList  *gCurGraphNodeMasterList = NULL;
@@ -198,41 +196,111 @@ static const Gfx dl_silhouette_end[] = {
 struct RenderPhase {
     u8 startLayer;
     u8 endLayer;
-#ifdef OBJECTS_REJ
     u8 ucode;
-#endif
 };
 
-//     enum RenderPhases                         startLayer                      endLayer                        ucode
 static struct RenderPhase sRenderPhases[] = {
 #ifdef OBJECTS_REJ
  #if SILHOUETTE
     // Silhouette, .rej
-    /* RENDER_PHASE_ZEX_BEFORE_SILHOUETTE   */ { LAYER_FIRST,                    LAYER_LAST_BEFORE_SILHOUETTE,   GRAPH_NODE_UCODE_DEFAULT }, //  0 -  5, zex
-    /* RENDER_PHASE_REJ_ZB                  */ { LAYER_ZB_FIRST,                 LAYER_LAST_BEFORE_SILHOUETTE,   GRAPH_NODE_UCODE_REJ     }, //  1 -  5, rej
-    /* RENDER_PHASE_REJ_SILHOUETTE          */ { LAYER_SILHOUETTE_FIRST,         LAYER_SILHOUETTE_LAST,          GRAPH_NODE_UCODE_REJ     }, //  6 -  7, rej (silhouette)
-    /* RENDER_PHASE_REJ_NON_SILHOUETTE      */ { LAYER_SILHOUETTE_FIRST,         LAYER_SILHOUETTE_LAST,          GRAPH_NODE_UCODE_REJ     }, //  6 -  7, rej (non-silhouette)
-    /* RENDER_PHASE_REJ_OCCLUDE_SILHOUETTE  */ { LAYER_OCCLUDE_SILHOUETTE_FIRST, LAYER_OCCLUDE_SILHOUETTE_LAST,  GRAPH_NODE_UCODE_REJ     }, //  8 -  9, rej
-    /* RENDER_PHASE_ZEX_AFTER_SILHOUETTE    */ { LAYER_OCCLUDE_SILHOUETTE_FIRST, LAYER_LAST,                     GRAPH_NODE_UCODE_DEFAULT }, //  8 - 12, zex
-    /* RENDER_PHASE_REJ_NON_ZB              */ { LAYER_NON_ZB_FIRST,             LAYER_LAST,                     GRAPH_NODE_UCODE_REJ     }, // 10 - 12, rej
+    [RENDER_PHASE_ZEX_BEFORE_SILHOUETTE]   = { //  0 -  5, zex
+        .startLayer = LAYER_FIRST,
+        .endLayer   = LAYER_LAST_BEFORE_SILHOUETTE,
+        .ucode      = GRAPH_NODE_UCODE_DEFAULT
+    },
+    [RENDER_PHASE_REJ_ZB]                  = { //  1 -  5, rej
+        .startLayer = LAYER_ZB_FIRST,
+        .endLayer   = LAYER_LAST_BEFORE_SILHOUETTE,
+        .ucode      = GRAPH_NODE_UCODE_REJ
+    },
+    [RENDER_PHASE_REJ_SILHOUETTE]          = { //  6 -  7, rej (silhouette)
+        .startLayer = LAYER_SILHOUETTE_FIRST,
+        .endLayer   = LAYER_SILHOUETTE_LAST,
+        .ucode      = GRAPH_NODE_UCODE_REJ
+    },
+    [RENDER_PHASE_REJ_NON_SILHOUETTE]      = { //  6 -  7, rej (non-silhouette)
+        .startLayer = LAYER_SILHOUETTE_FIRST,
+        .endLayer   = LAYER_SILHOUETTE_LAST,
+        .ucode      = GRAPH_NODE_UCODE_REJ
+    },
+    [RENDER_PHASE_REJ_OCCLUDE_SILHOUETTE]  = { //  8 -  9, rej
+        .startLayer = LAYER_OCCLUDE_SILHOUETTE_FIRST,
+        .endLayer   = LAYER_OCCLUDE_SILHOUETTE_LAST,
+        .ucode      = GRAPH_NODE_UCODE_REJ
+    },
+    [RENDER_PHASE_ZEX_AFTER_SILHOUETTE]    = { //  8 - 12, zex
+        .startLayer = LAYER_OCCLUDE_SILHOUETTE_FIRST,
+        .endLayer   = LAYER_LAST,
+        .ucode      = GRAPH_NODE_UCODE_DEFAULT
+    },
+    [RENDER_PHASE_REJ_NON_ZB]              = { // 10 - 12, rej
+        .startLayer = LAYER_NON_ZB_FIRST,
+        .endLayer   = LAYER_LAST,
+        .ucode      = GRAPH_NODE_UCODE_REJ
+    },
  #else
     // No silhouette, .rej
-    /* RENDER_PHASE_ZEX_BG                  */ { LAYER_FIRST,                    LAYER_FIRST,                    GRAPH_NODE_UCODE_DEFAULT }, // 0 - 0, zex
-    /* RENDER_PHASE_REJ_ZB                  */ { LAYER_ZB_FIRST,                 LAYER_ZB_LAST,                  GRAPH_NODE_UCODE_REJ     }, // 1 - 5, rej
-    /* RENDER_PHASE_ZEX_ALL                 */ { LAYER_ZB_FIRST,                 LAYER_LAST,                     GRAPH_NODE_UCODE_DEFAULT }, // 1 - 8, zex
-    /* RENDER_PHASE_REJ_NON_ZB              */ { LAYER_NON_ZB_FIRST,             LAYER_LAST,                     GRAPH_NODE_UCODE_REJ     }, // 6 - 8, rej
+    [RENDER_PHASE_ZEX_BG]                  = { // 0 - 0, zex
+        .startLayer = LAYER_FIRST,
+        .endLayer   = LAYER_FIRST,
+        .ucode      = GRAPH_NODE_UCODE_DEFAULT
+    },
+    [RENDER_PHASE_REJ_ZB]                  = { // 1 - 5, rej
+        .startLayer = LAYER_ZB_FIRST,
+        .endLayer   = LAYER_ZB_LAST,
+        .ucode      = GRAPH_NODE_UCODE_REJ
+    },
+    [RENDER_PHASE_ZEX_ALL]                 = { // 1 - 8, zex
+        .startLayer = LAYER_ZB_FIRST,
+        .endLayer   = LAYER_LAST,
+        .ucode      = GRAPH_NODE_UCODE_DEFAULT
+    },
+    [RENDER_PHASE_REJ_NON_ZB]              = { // 6 - 8, rej
+        .startLayer = LAYER_NON_ZB_FIRST,
+        .endLayer   = LAYER_LAST,
+        .ucode      = GRAPH_NODE_UCODE_REJ
+    },
  #endif
 #else
  #if SILHOUETTE
     // Silhouette, no .rej
-    /* RENDER_PHASE_ZEX_BEFORE_SILHOUETTE   */ { LAYER_FIRST,                    LAYER_LAST_BEFORE_SILHOUETTE   }, //  0 -  5
-    /* RENDER_PHASE_ZEX_SILHOUETTE          */ { LAYER_SILHOUETTE_FIRST,         LAYER_SILHOUETTE_LAST          }, //  6 -  7 (silhouette)
-    /* RENDER_PHASE_ZEX_NON_SILHOUETTE      */ { LAYER_SILHOUETTE_FIRST,         LAYER_SILHOUETTE_LAST          }, //  6 -  7 (non-silhouette)
-    /* RENDER_PHASE_ZEX_OCCLUDE_SILHOUETTE  */ { LAYER_OCCLUDE_SILHOUETTE_FIRST, LAYER_OCCLUDE_SILHOUETTE_LAST  }, //  8 -  9
-    /* RENDER_PHASE_ZEX_AFTER_SILHOUETTE    */ { LAYER_NON_ZB_FIRST,             LAYER_LAST                     }, // 10 - 12
+    [RENDER_PHASE_ZEX_BEFORE_SILHOUETTE]   = { //  0 -  5
+        .startLayer = LAYER_FIRST,
+        .endLayer   = LAYER_LAST_BEFORE_SILHOUETTE,
+        .ucode      = GRAPH_NODE_UCODE_DEFAULT,
+    },
+
+    [RENDER_PHASE_ZEX_SILHOUETTE]          = { //  6 -  7 (silhouette)
+        .startLayer = LAYER_SILHOUETTE_FIRST,
+        .endLayer   = LAYER_SILHOUETTE_LAST,
+        .ucode      = GRAPH_NODE_UCODE_DEFAULT,
+    },
+
+    [RENDER_PHASE_ZEX_NON_SILHOUETTE]      = { //  6 -  7 (non-silhouette)
+        .startLayer = LAYER_SILHOUETTE_FIRST,
+        .endLayer   = LAYER_SILHOUETTE_LAST,
+        .ucode      = GRAPH_NODE_UCODE_DEFAULT,
+    },
+
+    [RENDER_PHASE_ZEX_OCCLUDE_SILHOUETTE]  = { //  8 -  9
+        .startLayer = LAYER_OCCLUDE_SILHOUETTE_FIRST,
+        .endLayer   = LAYER_OCCLUDE_SILHOUETTE_LAST,
+        .ucode      = GRAPH_NODE_UCODE_DEFAULT,
+    },
+
+    [RENDER_PHASE_ZEX_AFTER_SILHOUETTE]    = { // 10 - 12
+        .startLayer = LAYER_NON_ZB_FIRST,
+        .endLayer   = LAYER_LAST,
+        .ucode      = GRAPH_NODE_UCODE_DEFAULT,
+    },
+
  #else
     // No silhouette, no .rej
-    /* RENDER_PHASE_ZEX_ALL                 */ { LAYER_FIRST,                    LAYER_LAST                     }, // 0 - 8
+    [RENDER_PHASE_ZEX_ALL]                 = { // 0 - 8
+        .startLayer = LAYER_FIRST,
+        .endLayer   = LAYER_LAST,
+    },
+
  #endif
 #endif
 };
