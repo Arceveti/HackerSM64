@@ -108,9 +108,10 @@ void bhv_lll_bowser_puzzle_spawn_pieces(f32 pieceWidth) {
     for (i = 0; i < ARRAY_COUNT(sBowserPuzzlePieces); i++) {
         bhv_lll_bowser_puzzle_spawn_piece(
             i,
-            sBowserPuzzlePieces[i].model, bhvLllBowserPuzzlePiece,
-            sBowserPuzzlePieces[i].xOffset * scale,
-            sBowserPuzzlePieces[i].zOffset * scale
+            sBowserPuzzlePieces[i].model,
+            bhvLllBowserPuzzlePiece,
+            (sBowserPuzzlePieces[i].xOffset * scale),
+            (sBowserPuzzlePieces[i].zOffset * scale)
         );
     }
 
@@ -203,7 +204,7 @@ void bhv_lll_bowser_puzzle_piece_move(f32 xOffset, f32 zOffset) {
 
     // For the first LLL_BOWSER_PUZZLE_PIECE_SHAKE_TIME frames, shake the puzzle piece up and down.
     if (o->oTimer < LLL_BOWSER_PUZZLE_PIECE_SHAKE_TIME) {
-        if ((o->oTimer & (2 - 1)) != 0) {
+        if ((o->oTimer % 2) != 0) {
             o->oBowserPuzzlePieceOffsetY = -LLL_BOWSER_PUZZLE_PIECE_SHAKE_AMOUNT;
         }
     } else {
@@ -262,11 +263,11 @@ void bhv_lll_bowser_puzzle_piece_move_down(void) {
 }
 
 ObjActionFunc sBowserPuzzlePieceActions[] = {
-    bhv_lll_bowser_puzzle_piece_idle,
-    bhv_lll_bowser_puzzle_piece_move_left,
-    bhv_lll_bowser_puzzle_piece_move_right,
-    bhv_lll_bowser_puzzle_piece_move_up,
-    bhv_lll_bowser_puzzle_piece_move_down,
+    [BOWSER_PUZZLE_PIECE_ACT_IDLE ] = bhv_lll_bowser_puzzle_piece_idle,
+    [BOWSER_PUZZLE_PIECE_ACT_LEFT ] = bhv_lll_bowser_puzzle_piece_move_left,
+    [BOWSER_PUZZLE_PIECE_ACT_RIGHT] = bhv_lll_bowser_puzzle_piece_move_right,
+    [BOWSER_PUZZLE_PIECE_ACT_UP   ] = bhv_lll_bowser_puzzle_piece_move_up,
+    [BOWSER_PUZZLE_PIECE_ACT_DOWN ] = bhv_lll_bowser_puzzle_piece_move_down,
 };
 
 void bhv_lll_bowser_puzzle_piece_loop(void) {
