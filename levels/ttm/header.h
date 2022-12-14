@@ -71,7 +71,7 @@ extern const Gfx ttm_seg7_sub_dl_slide_painting_bottom[];
 extern const Gfx ttm_seg7_sub_dl_slide_painting_top[];
 extern const Gfx ttm_seg7_sub_dl_slide_painting_normal_begin[];
 extern const Gfx ttm_seg7_sub_dl_slide_painting_normal_end[];
-extern struct Painting ttm_slide_painting;
+extern struct PaintingImage ttm_slide_painting;
 extern const Gfx ttm_seg7_dl_07013430[];
 extern const Gfx ttm_seg7_dl_07013608[];
 extern const Collision ttm_seg7_collision_pitoune_2[];
