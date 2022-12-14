@@ -16,6 +16,7 @@ https://github.com/buu342/N64-UNFLoader
 #endif
 #include <stdarg.h>
 #include <string.h>
+#include "macros.h"
 
 
 
