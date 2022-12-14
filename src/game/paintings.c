@@ -187,7 +187,7 @@ void painting_generate_mesh(struct Object *obj, const PaintingData *vtxData, Pai
  */
 void painting_calculate_triangle_normals(const PaintingData *triangleData, PaintingData numTris, struct PaintingMeshVertex *paintingMesh, Vec3f *paintingTriNorms) {
     PaintingData i, j;
-    Vec3s vi; // Vertex indices
+    s16 vi[3]; // Vertex indices
     Vec3f vp[3]; // Vertex positions
 
     for (i = 0; i < numTris; i++) {
@@ -262,8 +262,10 @@ void painting_average_vertex_normals(const PaintingData *neighborTris, PaintingD
  * Creates a display list that draws the rippling painting, with 'img' mapped to the painting's mesh, using 'triangleMap'.
  *
  * If the triangleMap doesn't describe the whole mesh, then multiple calls are needed to draw the whole painting.
+ * 
+ * TODO: Automatically create seams between segments based on the image count.
  */
-Gfx *render_painting_segment(const Texture *img, s16 index, s16 imageCount, s16 tWidth, s16 tHeight, const PaintingData *triangleMap, Alpha alpha, struct PaintingMeshVertex *paintingMesh) {
+Gfx *render_painting_segment(const Texture *img, s16 index, s16 imageCount, s16 tWidth, s16 tHeight, struct PaintingMeshVertex *paintingMesh, const PaintingData *triangleMap, PaintingData numTris, Alpha alpha) {
     struct PaintingMeshVertex *currVtx = NULL;
     PaintingData group;
     PaintingData groupIndex;
@@ -272,13 +274,11 @@ Gfx *render_painting_segment(const Texture *img, s16 index, s16 imageCount, s16 
     PaintingData meshVtx;
     s16 tx, ty;
 
-    PaintingData mapTris = triangleMap[0];
-
     // We can fit VTX_PER_GRP vertices in the RSP's vertex buffer.
     // Group triangles by TRI_PER_GRP, with one remainder group.
-    PaintingData triGroups    = (mapTris / TRI_PER_GRP);
-    PaintingData remGroupTris = (mapTris % TRI_PER_GRP);
-    PaintingData numVtx       = (mapTris * 3); // 3 verts per tri
+    PaintingData triGroups    = (numTris / TRI_PER_GRP);
+    PaintingData remGroupTris = (numTris % TRI_PER_GRP);
+    PaintingData numVtx       = (numTris * 3); // 3 verts per tri
 
     Vtx *verts = alloc_display_list(numVtx * sizeof(Vtx));
     u32 gfxCmds = (
@@ -498,7 +498,7 @@ Gfx *dl_painting_rippling(const struct PaintingImage *paintingImage, struct Pain
     for (i = 0; i < imageCount; i++) {
         triangleMap = segmented_to_virtual(triangleMaps[i]);
         // Render a section of the painting.
-        gSPDisplayList(gfx++, render_painting_segment(tArray[i], i, imageCount, tWidth, tHeight, triangleMap, paintingImage->alpha, paintingMesh));
+        gSPDisplayList(gfx++, render_painting_segment(tArray[i], i, imageCount, tWidth, tHeight, paintingMesh, triangleMap, triangleMap[0], paintingImage->alpha));
     }
 
     gSPPopMatrix(gfx++, G_MTX_MODELVIEW);
@@ -769,7 +769,7 @@ void bhv_painting_init(void) {
 /// - LOOP -
 
 /**
- * Check for Mario entering the painting. Returns changed flags.
+ * Check for Mario entering the painting. Returns changed action.
  */
 s32 painting_update_mario_pos(struct Object *obj, Vec3f marioLocalPos) {
     struct MarioState *m = gMarioState;
