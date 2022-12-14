@@ -2972,7 +2972,7 @@ const Gfx dl_paintings_draw_ripples[] = {
 
 // 14A60: triangle mesh
 // 0x02014A60
-const PaintingData painting_data_mesh[] = {
+const PaintingData painting_data_vertices[] = {
     157, // numVtx
     // format:
     // 2D point (x, y), ripple (0 or 1)
@@ -3145,7 +3145,7 @@ const PaintingData painting_data_mesh[] = {
  *
  * Format:
  *      num neighbors, neighbor0, neighbor1, ...
- * The nth entry corresponds to the nth vertex in painting_data_mesh
+ * The nth entry corresponds to the nth vertex in painting_data_vertices
  */
 const PaintingData painting_data_mesh_neighbor_tris[] = {
 //     ID  num, neighbors...
