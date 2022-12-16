@@ -233,19 +233,19 @@ void profiler_print_times() {
             "RSP\t\t%d (%d%%)\n"
             " Gfx\t\t\t%d\n"
             " Audio\t\t\t%d\n",
-            1000000.0f / microseconds[PROFILER_TIME_FPS],
-            total_cpu, total_cpu / 333,
+            (1000000.0f / microseconds[PROFILER_TIME_FPS]),
+            total_cpu, (total_cpu / 333),
             microseconds[PROFILER_TIME_CONTROLLERS],
             microseconds[PROFILER_TIME_DYNAMIC],
             microseconds[PROFILER_TIME_MARIO],
             microseconds[PROFILER_TIME_BEHAVIOR_BEFORE_MARIO] + microseconds[PROFILER_TIME_BEHAVIOR_AFTER_MARIO],
             microseconds[PROFILER_TIME_GFX],
             microseconds[PROFILER_TIME_AUDIO] * 2, // audio is 60Hz, so double the average
-            max_rdp, max_rdp / 333,
+            max_rdp, (max_rdp / 333),
             microseconds[PROFILER_TIME_TMEM],
             microseconds[PROFILER_TIME_CMD],
             microseconds[PROFILER_TIME_PIPE],
-            total_rsp, total_rsp / 333,
+            total_rsp, (total_rsp / 333),
             microseconds[PROFILER_TIME_RSP_GFX],
             microseconds[PROFILER_TIME_RSP_AUDIO]
         );
