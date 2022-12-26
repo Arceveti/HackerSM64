@@ -631,8 +631,8 @@ void mtxf_lookat(Mat4 mtx, Vec3f from, Vec3f to, s16 roll) {
     dx *= invLength;
     dz *= invLength;
     f32 sr  = sins(roll);
-    col[1][1] = coss(roll);
     col[1][0] =  sr * dz;
+    col[1][1] = coss(roll);
     col[1][2] = -sr * dx;
     vec3f_diff(col[2], from, to); // to & from are swapped
     vec3f_normalize(col[2]);
@@ -645,9 +645,9 @@ void mtxf_lookat(Mat4 mtx, Vec3f from, Vec3f to, s16 roll) {
             mtx[j][i] = col[i][j];
         }
     }
-    mtx[3][0] = -vec3f_dot(from, col[0]);
-    mtx[3][1] = -vec3f_dot(from, col[1]);
-    mtx[3][2] = -vec3f_dot(from, col[2]);
+    for (i = 0; i < 3; i++) {
+        mtx[3][i] = -vec3f_dot(from, col[i]);
+    }
     MTXF_END(mtx);
 }
 

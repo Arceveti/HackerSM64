@@ -8,10 +8,10 @@
  * overwritten with one of the below delays after the first cycle.
  */
 static s16 sTTCMovingBarDelays[] = {
-    /* TTC_SPEED_SLOW    */ 55,
-    /* TTC_SPEED_FAST    */ 30,
-    /* TTC_SPEED_RANDOM  */ 55,
-    /* TTC_SPEED_STOPPED */ 0,
+    [TTC_SPEED_SLOW   ] = 55,
+    [TTC_SPEED_FAST   ] = 30,
+    [TTC_SPEED_RANDOM ] = 55,
+    [TTC_SPEED_STOPPED] = 0,
 };
 
 /**

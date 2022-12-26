@@ -20,16 +20,16 @@ static s16 sTTC2DRotatorSpeeds[] = {
  */
 static s16 sTTC2DRotatorTimeBetweenTurns[][4] = {
     {
-        /* TTC_SPEED_SLOW    */ 40,
-        /* TTC_SPEED_FAST    */ 10,
-        /* TTC_SPEED_RANDOM  */ 10,
-        /* TTC_SPEED_STOPPED */ 0,
+        [TTC_SPEED_SLOW   ] = 40,
+        [TTC_SPEED_FAST   ] = 10,
+        [TTC_SPEED_RANDOM ] = 10,
+        [TTC_SPEED_STOPPED] = 0,
     },
     {
-        /* TTC_SPEED_SLOW    */ 20,
-        /* TTC_SPEED_FAST    */ 5,
-        /* TTC_SPEED_RANDOM  */ 5,
-        /* TTC_SPEED_STOPPED */ 0,
+        [TTC_SPEED_SLOW   ] = 20,
+        [TTC_SPEED_FAST   ] = 5,
+        [TTC_SPEED_RANDOM ] = 5,
+        [TTC_SPEED_STOPPED] = 0,
     },
 };
 

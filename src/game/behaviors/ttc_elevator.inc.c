@@ -7,10 +7,10 @@
  * The speed on each setting.
  */
 static s8 sTTCElevatorSpeeds[] = {
-    /* TTC_SPEED_SLOW    */ 6,
-    /* TTC_SPEED_FAST    */ 10,
-    /* TTC_SPEED_RANDOM  */ 6,
-    /* TTC_SPEED_STOPPED */ 0,
+    [TTC_SPEED_SLOW   ] = 6,
+    [TTC_SPEED_FAST   ] = 10,
+    [TTC_SPEED_RANDOM ] = 6,
+    [TTC_SPEED_STOPPED] = 0,
 };
 
 /**

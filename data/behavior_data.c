@@ -257,7 +257,7 @@
 
 // Spawns a child object with the specified model and behavior, plus a behavior param.
 #define SPAWN_CHILD_WITH_PARAM(bhvParam, modelID, behavior) \
-    BC_B0H(BHV_CMD_SPAWN_CHILD_WITH_PARam, bhvParam), \
+    BC_B0H(BHV_CMD_SPAWN_CHILD_WITH_PARAM, bhvParam), \
     BC_W(modelID), \
     BC_PTR(behavior)
 
@@ -268,7 +268,7 @@
 
 // Sets the size of the object's cylindrical hitbox, and applies a downwards offset.
 #define SET_HITBOX_WITH_OFFSET(radius, height, downOffset) \
-    BC_B(BHV_CMD_SET_HITBOX_WITH_OFFSet), \
+    BC_B(BHV_CMD_SET_HITBOX_WITH_OFFSET), \
     BC_HH(radius, height), \
     BC_H(downOffset)
 

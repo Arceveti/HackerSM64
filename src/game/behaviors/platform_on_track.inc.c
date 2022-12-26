@@ -9,10 +9,10 @@
  * Collision models for the different types of platforms.
  */
 static Collision const *sPlatformOnTrackCollisionModels[] = {
-    /* PLATFORM_ON_TRACK_TYPE_CARPET    */ rr_seg7_collision_flying_carpet,
-    /* PLATFORM_ON_TRACK_TYPE_SKI_LIFT  */ ccm_seg7_collision_ropeway_lift,
-    /* PLATFORM_ON_TRACK_TYPE_CHECKERED */ checkerboard_platform_seg8_collision_platform,
-    /* PLATFORM_ON_TRACK_TYPE_GRATE     */ bitfs_seg7_collision_platform_on_track,
+    [PLATFORM_ON_TRACK_TYPE_CARPET   ] = rr_seg7_collision_flying_carpet,
+    [PLATFORM_ON_TRACK_TYPE_SKI_LIFT ] = ccm_seg7_collision_ropeway_lift,
+    [PLATFORM_ON_TRACK_TYPE_CHECKERED] = checkerboard_platform_seg8_collision_platform,
+    [PLATFORM_ON_TRACK_TYPE_GRATE    ] = bitfs_seg7_collision_platform_on_track,
 };
 
 /**

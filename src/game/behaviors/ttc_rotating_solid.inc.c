@@ -16,10 +16,10 @@ static Collision const *sTTCRotatingSolidCollisionModels[] = {
  * The number of frames to wait before rotating for the first time.
  */
 static u8 sTTCRotatingSolidInitialDelays[] = {
-    /* TTC_SPEED_SLOW    */ 120,
-    /* TTC_SPEED_FAST    */ 40,
-    /* TTC_SPEED_RANDOM  */ 0,
-    /* TTC_SPEED_STOPPED */ 0,
+    [TTC_SPEED_SLOW   ] = 120,
+    [TTC_SPEED_FAST   ] = 40,
+    [TTC_SPEED_RANDOM ] = 0,
+    [TTC_SPEED_STOPPED] = 0,
 };
 
 /**

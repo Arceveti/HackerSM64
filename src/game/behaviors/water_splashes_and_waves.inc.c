@@ -2,47 +2,62 @@
 
 // Water droplets from Mario jumping in a pool of water.
 struct WaterDropletParams sWaterSplashDropletParams = {
-    /* Flags */ WATER_DROPLET_FLAG_RAND_ANGLE,
-    /* Model */ MODEL_WHITE_PARTICLE_SMALL,
-    /* Behavior */ bhvWaterDroplet,
-    /* Unused (flag-specific) */ 0, 0,
-    /* Random fvel offset, scale */ 5.0f, 3.0f,
-    /* Random yvel offset, scale */ 30.0f, 20.0f,
-    /* Random size offset, scale */ 0.5f, 1.0f
+    .flags                = WATER_DROPLET_FLAG_RAND_ANGLE,
+    .model                = MODEL_WHITE_PARTICLE_SMALL,
+    .behavior             = bhvWaterDroplet,
+    .moveAngleRange       = 0, // Unused (flag-specific)
+    .moveRange            = 0, // Unused (flag-specific)
+    .randForwardVelOffset = 5.0f,
+    .randForwardVelScale  = 3.0f,
+    .randYVelOffset       = 30.0f,
+    .randYVelScale        = 20.0f,
+    .randSizeOffset       = 0.5f,
+    .randSizeScale        = 1.0f
 };
 
 // Water droplets from Mario jumping in shallow water.
 struct WaterDropletParams gShallowWaterSplashDropletParams = {
-    /* Flags */ WATER_DROPLET_FLAG_RAND_ANGLE | WATER_DROPLET_FLAG_SET_Y_TO_WATER_LEVEL,
-    /* Model */ MODEL_WHITE_PARTICLE_SMALL,
-    /* Behavior */ bhvWaterDroplet,
-    /* Unused (flag-specific) */ 0, 0,
-    /* Random fvel offset, scale */ 2.0f, 3.0f,
-    /* Random yvel offset, scale */ 20.0f, 20.0f,
-    /* Random size offset, scale */ 0.5f, 1.0f
+    .flags                = (WATER_DROPLET_FLAG_RAND_ANGLE | WATER_DROPLET_FLAG_SET_Y_TO_WATER_LEVEL),
+    .model                = MODEL_WHITE_PARTICLE_SMALL,
+    .behavior             = bhvWaterDroplet,
+    .moveAngleRange       = 0, // Unused (flag-specific)
+    .moveRange            = 0, // Unused (flag-specific)
+    .randForwardVelOffset = 2.0f,
+    .randForwardVelScale  = 3.0f,
+    .randYVelOffset       = 20.0f,
+    .randYVelScale        = 20.0f,
+    .randSizeOffset       = 0.5f,
+    .randSizeScale        = 1.0f
 };
 
 // The fish particle easter egg from Mario jumping in shallow water.
 struct WaterDropletParams sWaterDropletFishParams = {
-    /* Flags */ WATER_DROPLET_FLAG_RAND_ANGLE | WATER_DROPLET_FLAG_SET_Y_TO_WATER_LEVEL,
-    /* Model */ MODEL_FISH,
-    /* Behavior */ bhvWaterDroplet,
-    /* Unused (flag-specific) */ 0, 0,
-    /* Random fvel offset, scale */ 2.0f, 3.0f,
-    /* Random yvel offset, scale */ 20.0f, 20.0f,
-    /* Random size offset, scale */ 1.0f, 0.0f
+    .flags                = (WATER_DROPLET_FLAG_RAND_ANGLE | WATER_DROPLET_FLAG_SET_Y_TO_WATER_LEVEL),
+    .model                = MODEL_FISH,
+    .behavior             = bhvWaterDroplet,
+    .moveAngleRange       = 0, // Unused (flag-specific)
+    .moveRange            = 0, // Unused (flag-specific)
+    .randForwardVelOffset = 2.0f,
+    .randForwardVelScale  = 3.0f,
+    .randYVelOffset       = 20.0f,
+    .randYVelScale        = 20.0f,
+    .randSizeOffset       = 1.0f,
+    .randSizeScale        = 0.0f
 };
 
 // Water droplets from Mario running in shallow water.
 struct WaterDropletParams gShallowWaterWaveDropletParams = {
-    /* Flags */ WATER_DROPLET_FLAG_RAND_ANGLE_INCR_BACKWARD | WATER_DROPLET_FLAG_RAND_ANGLE | WATER_DROPLET_FLAG_SET_Y_TO_WATER_LEVEL,
-    /* Model */ MODEL_WHITE_PARTICLE_SMALL,
-    /* Behavior */ bhvWaterDroplet,
-    /* Move angle range */ 0x6000,
-    /* Unused (flag-specific) */ 0,
-    /* Random fvel offset, scale */ 2.0f, 8.0f,
-    /* Random yvel offset, scale */ 10.0f, 10.0f,
-    /* Random size offset, scale */ 0.5f, 1.0f
+    .flags                = (WATER_DROPLET_FLAG_RAND_ANGLE_INCR_BACKWARD | WATER_DROPLET_FLAG_RAND_ANGLE | WATER_DROPLET_FLAG_SET_Y_TO_WATER_LEVEL),
+    .model                = MODEL_WHITE_PARTICLE_SMALL,
+    .behavior             = bhvWaterDroplet,
+    .moveAngleRange       = 0x6000,
+    .moveRange            = 0, // Unused (flag-specific)
+    .randForwardVelOffset = 2.0f,
+    .randForwardVelScale  = 8.0f,
+    .randYVelOffset       = 10.0f,
+    .randYVelScale        = 10.0f,
+    .randSizeOffset       = 0.5f,
+    .randSizeScale        = 1.0f
 };
 
 void bhv_align_to_water(void) {

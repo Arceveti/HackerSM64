@@ -1244,7 +1244,7 @@ void geo_process_held_object(struct GraphNodeHeldObject *node) {
         gCurGraphNodeHeldObject = (void *) node;
 
         if (node->objNode->header.gfx.animInfo.curAnim != NULL) {
-            geo_set_animation_globals(&node->objNode->header.gfx.animInfo, (node->objNode->header.gfx.node.flags & GRAPH_RENDER_HAS_ANIMATION) != 0);
+            geo_set_animation_globals(&node->objNode->header.gfx.animInfo, ((node->objNode->header.gfx.node.flags & GRAPH_RENDER_HAS_ANIMATION) != 0));
         }
 
         geo_process_node_and_siblings(node->objNode->header.gfx.sharedChild);
@@ -1347,8 +1347,8 @@ void geo_process_root(struct GraphNodeRoot *node, Vp *b, Vp *c, s32 clearColor) 
 
         gMatStackIndex = 0;
         gCurrAnimType = ANIM_TYPE_NONE;
-        vec3s_set(viewport->vp.vtrans, (node->x     * 4), (node->y      * 4), 511);
-        vec3s_set(viewport->vp.vscale, (node->width * 4), (node->height * 4), 511);
+        vec3s_set(viewport->vp.vtrans, (node->x     * 4), (node->y      * 4), (512 - 1));
+        vec3s_set(viewport->vp.vscale, (node->width * 4), (node->height * 4), (512 - 1));
 
         if (b != NULL) {
             clear_framebuffer(clearColor);
