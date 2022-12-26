@@ -103,10 +103,11 @@ struct MovtexObject {
     /// Assumes the animated vertices are buffered and correct texture is set
     Gfx *triDl;
     // if the list does not have per-vertex colors, all vertices have these colors
-    Color r; /// red
-    Color g; /// green
-    Color b; /// blue
-    Alpha a; /// alpha
+    ColorRGBA color;
+    // Color r; /// red
+    // Color g; /// green
+    // Color b; /// blue
+    // Alpha a; /// alpha
     s32 layer; /// the drawing layer for this mesh
 };
 
@@ -208,51 +209,51 @@ extern Gfx    ssl_dl_pyramid_quicksand_pit_end[];
 struct MovtexObject gMovtexNonColored[] = {
     // Inside the pyramid there is a sand pathway with the 5 secrets on it.
     // pathway_front is the highest 'sand fall', pathway_floor is the horizontal sand stream and pathway_side is the lower 'sand fall'.
-    { MOVTEX_PYRAMID_SAND_PATHWAY_FRONT, TEX_PYRAMID_SAND_SSL,  8, ssl_movtex_tris_pyramid_sand_pathway_front, ssl_dl_pyramid_sand_pathway_begin,       ssl_dl_pyramid_sand_pathway_end,       ssl_dl_pyramid_sand_pathway_front_end, 0xff, 0xff, 0xff, 0xff, LAYER_TRANSPARENT_INTER },
-    { MOVTEX_PYRAMID_SAND_PATHWAY_FLOOR, TEX_PYRAMID_SAND_SSL,  8, ssl_movtex_tris_pyramid_sand_pathway_floor, ssl_dl_pyramid_sand_pathway_floor_begin, ssl_dl_pyramid_sand_pathway_floor_end, ssl_dl_pyramid_sand_pathway_front_end, 0xff, 0xff, 0xff, 0xff, LAYER_OPAQUE_INTER      },
-    { MOVTEX_PYRAMID_SAND_PATHWAY_SIDE,  TEX_PYRAMID_SAND_SSL,  6, ssl_movtex_tris_pyramid_sand_pathway_side,  ssl_dl_pyramid_sand_pathway_begin,       ssl_dl_pyramid_sand_pathway_end,       ssl_dl_pyramid_sand_pathway_side_end,  0xff, 0xff, 0xff, 0xff, LAYER_TRANSPARENT_INTER },
+    { .geoId = MOVTEX_PYRAMID_SAND_PATHWAY_FRONT, .textureId = TEX_PYRAMID_SAND_SSL, .vtx_count =  8, .movtexVerts = ssl_movtex_tris_pyramid_sand_pathway_front, .beginDl = ssl_dl_pyramid_sand_pathway_begin,       .endDl = ssl_dl_pyramid_sand_pathway_end,       .triDl = ssl_dl_pyramid_sand_pathway_front_end, .color = { 0xff, 0xff, 0xff, 0xff }, .layer = LAYER_TRANSPARENT_INTER },
+    { .geoId = MOVTEX_PYRAMID_SAND_PATHWAY_FLOOR, .textureId = TEX_PYRAMID_SAND_SSL, .vtx_count =  8, .movtexVerts = ssl_movtex_tris_pyramid_sand_pathway_floor, .beginDl = ssl_dl_pyramid_sand_pathway_floor_begin, .endDl = ssl_dl_pyramid_sand_pathway_floor_end, .triDl = ssl_dl_pyramid_sand_pathway_front_end, .color = { 0xff, 0xff, 0xff, 0xff }, .layer = LAYER_OPAQUE_INTER      },
+    { .geoId = MOVTEX_PYRAMID_SAND_PATHWAY_SIDE,  .textureId = TEX_PYRAMID_SAND_SSL, .vtx_count =  6, .movtexVerts = ssl_movtex_tris_pyramid_sand_pathway_side,  .beginDl = ssl_dl_pyramid_sand_pathway_begin,       .endDl = ssl_dl_pyramid_sand_pathway_end,       .triDl = ssl_dl_pyramid_sand_pathway_side_end,  .color = { 0xff, 0xff, 0xff, 0xff }, .layer = LAYER_TRANSPARENT_INTER },
     // The waterfall outside the castle
-    { MOVTEX_CASTLE_WATERFALL,           TEXTURE_WATER,        15, castle_grounds_movtex_tris_waterfall,       dl_waterbox_rgba16_begin,                dl_waterbox_end,                       castle_grounds_dl_waterfall,           0xff, 0xff, 0xff, 0xb4, LAYER_TRANSPARENT_INTER },
+    { .geoId = MOVTEX_CASTLE_WATERFALL,           .textureId = TEXTURE_WATER,        .vtx_count = 15, .movtexVerts = castle_grounds_movtex_tris_waterfall,       .beginDl = dl_waterbox_rgba16_begin,                .endDl = dl_waterbox_end,                       .triDl = castle_grounds_dl_waterfall,           .color = { 0xff, 0xff, 0xff, 0xb4 }, .layer = LAYER_TRANSPARENT_INTER },
     // Bowser in the Fire Sea has lava at 3 heights, lava_floor is the lowest and lava_second_section is the highest
-    { MOVTEX_BITFS_LAVA_FIRST,           TEXTURE_LAVA,          4, bitfs_movtex_tris_lava_first_section,       dl_waterbox_rgba16_begin,                dl_waterbox_end,                       bitfs_dl_lava_sections,                0xff, 0xff, 0xff, 0xff, LAYER_OPAQUE            },
-    { MOVTEX_BITFS_LAVA_SECOND,          TEXTURE_LAVA,          4, bitfs_movtex_tris_lava_second_section,      dl_waterbox_rgba16_begin,                dl_waterbox_end,                       bitfs_dl_lava_sections,                0xff, 0xff, 0xff, 0xb4, LAYER_TRANSPARENT       },
-    { MOVTEX_BITFS_LAVA_FLOOR,           TEXTURE_LAVA,          9, bitfs_movtex_tris_lava_floor,               dl_waterbox_rgba16_begin,                dl_waterbox_end,                       bitfs_dl_lava_floor,                   0xff, 0xff, 0xff, 0xb4, LAYER_TRANSPARENT       },
+    { .geoId = MOVTEX_BITFS_LAVA_FIRST,           .textureId = TEXTURE_LAVA,         .vtx_count =  4, .movtexVerts = bitfs_movtex_tris_lava_first_section,       .beginDl = dl_waterbox_rgba16_begin,                .endDl = dl_waterbox_end,                       .triDl = bitfs_dl_lava_sections,                .color = { 0xff, 0xff, 0xff, 0xff }, .layer = LAYER_OPAQUE            },
+    { .geoId = MOVTEX_BITFS_LAVA_SECOND,          .textureId = TEXTURE_LAVA,         .vtx_count =  4, .movtexVerts = bitfs_movtex_tris_lava_second_section,      .beginDl = dl_waterbox_rgba16_begin,                .endDl = dl_waterbox_end,                       .triDl = bitfs_dl_lava_sections,                .color = { 0xff, 0xff, 0xff, 0xb4 }, .layer = LAYER_TRANSPARENT       },
+    { .geoId = MOVTEX_BITFS_LAVA_FLOOR,           .textureId = TEXTURE_LAVA,         .vtx_count =  9, .movtexVerts = bitfs_movtex_tris_lava_floor,               .beginDl = dl_waterbox_rgba16_begin,                .endDl = dl_waterbox_end,                       .triDl = bitfs_dl_lava_floor,                   .color = { 0xff, 0xff, 0xff, 0xb4 }, .layer = LAYER_TRANSPARENT       },
     // Lava floor in Lethal Lava Land and the lava fall in the volcano
     //! Note that the lava floor in the volcano is actually a quad.
     // The quad collection index LLL_MOVTEX_VOLCANO_FLOOR_LAVA is actually (2 | MOVTEX_AREA_LLL), suggesting that the lava floor of LLL used to be a quad too, with index 1.
     // It was probably too large however, resulting in overflowing texture  coordinates or other artifacts, so they converted it to a movtex mesh with 9 vertices, subdividing the rectangle into 4 smaller ones.
-    { MOVTEX_LLL_LAVA_FLOOR,             TEXTURE_LAVA,          9, lll_movtex_tris_lava_floor,                 dl_waterbox_rgba16_begin,                dl_waterbox_end,                       lll_dl_lava_floor,                     0xff, 0xff, 0xff, 0xc8, LAYER_TRANSPARENT       },
-    { MOVTEX_VOLCANO_LAVA_FALL,          TEXTURE_LAVA,         16, lll_movtex_tris_lavafall_volcano,           dl_waterbox_rgba16_begin,                dl_waterbox_end,                       lll_dl_lavafall_volcano,               0xff, 0xff, 0xff, 0xb4, LAYER_TRANSPARENT_INTER },
+    { .geoId = MOVTEX_LLL_LAVA_FLOOR,             .textureId = TEXTURE_LAVA,         .vtx_count =  9, .movtexVerts = lll_movtex_tris_lava_floor,                 .beginDl = dl_waterbox_rgba16_begin,                .endDl = dl_waterbox_end,                       .triDl = lll_dl_lava_floor,                     .color = { 0xff, 0xff, 0xff, 0xc8 }, .layer = LAYER_TRANSPARENT       },
+    { .geoId = MOVTEX_VOLCANO_LAVA_FALL,          .textureId = TEXTURE_LAVA,         .vtx_count = 16, .movtexVerts = lll_movtex_tris_lavafall_volcano,           .beginDl = dl_waterbox_rgba16_begin,                .endDl = dl_waterbox_end,                       .triDl = lll_dl_lavafall_volcano,               .color = { 0xff, 0xff, 0xff, 0xb4 }, .layer = LAYER_TRANSPARENT_INTER },
     // Cavern of the metal Cap has a waterfall source above the switch platform, the stream, around the switch, and the waterfall that's the same as the one outside the castle. They are all part of the same mesh.
-    { MOVTEX_COTMC_WATER,                TEXTURE_WATER,        14, cotmc_movtex_tris_water,                    cotmc_dl_water_begin,                    cotmc_dl_water_end,                    cotmc_dl_water,                        0xff, 0xff, 0xff, 0xb4, LAYER_TRANSPARENT_INTER },
+    { .geoId = MOVTEX_COTMC_WATER,                .textureId = TEXTURE_WATER,        .vtx_count = 14, .movtexVerts = cotmc_movtex_tris_water,                    .beginDl = cotmc_dl_water_begin,                    .endDl = cotmc_dl_water_end,                    .triDl = cotmc_dl_water,                        .color = { 0xff, 0xff, 0xff, 0xb4 }, .layer = LAYER_TRANSPARENT_INTER },
     // Tall Tall mountain has water going from the top to the bottom of the mountain.
-    { MOVTEX_TTM_BEGIN_WATERFALL,        TEXTURE_WATER,         6, ttm_movtex_tris_begin_waterfall,            dl_waterbox_rgba16_begin,                dl_waterbox_end,                       ttm_dl_waterfall,                      0xff, 0xff, 0xff, 0xb4, LAYER_TRANSPARENT       },
-    { MOVTEX_TTM_END_WATERFALL,          TEXTURE_WATER,         6, ttm_movtex_tris_end_waterfall,              dl_waterbox_rgba16_begin,                dl_waterbox_end,                       ttm_dl_waterfall,                      0xff, 0xff, 0xff, 0xb4, LAYER_TRANSPARENT       },
-    { MOVTEX_TTM_BEGIN_PUDDLE_WATERFALL, TEXTURE_WATER,         4, ttm_movtex_tris_begin_puddle_waterfall,     dl_waterbox_rgba16_begin,                dl_waterbox_end,                       ttm_dl_bottom_waterfall,               0xff, 0xff, 0xff, 0xb4, LAYER_TRANSPARENT_INTER },
-    { MOVTEX_TTM_END_PUDDLE_WATERFALL,   TEXTURE_WATER,         4, ttm_movtex_tris_end_puddle_waterfall,       dl_waterbox_rgba16_begin,                dl_waterbox_end,                       ttm_dl_bottom_waterfall,               0xff, 0xff, 0xff, 0xb4, LAYER_TRANSPARENT_INTER },
-    { MOVTEX_TTM_PUDDLE_WATERFALL,       TEXTURE_WATER,         8, ttm_movtex_tris_puddle_waterfall,           dl_waterbox_rgba16_begin,                dl_waterbox_end,                       ttm_dl_puddle_waterfall,               0xff, 0xff, 0xff, 0xb4, LAYER_TRANSPARENT_INTER },
-    { 0x00000000,                        TEXTURE_WATER,         0, NULL,                                       NULL,                                    NULL,                                  NULL,                                  0x00, 0x00, 0x00, 0x00, LAYER_FORCE             },
+    { .geoId = MOVTEX_TTM_BEGIN_WATERFALL,        .textureId = TEXTURE_WATER,        .vtx_count =  6, .movtexVerts = ttm_movtex_tris_begin_waterfall,            .beginDl = dl_waterbox_rgba16_begin,                .endDl = dl_waterbox_end,                       .triDl = ttm_dl_waterfall,                      .color = { 0xff, 0xff, 0xff, 0xb4 }, .layer = LAYER_TRANSPARENT       },
+    { .geoId = MOVTEX_TTM_END_WATERFALL,          .textureId = TEXTURE_WATER,        .vtx_count =  6, .movtexVerts = ttm_movtex_tris_end_waterfall,              .beginDl = dl_waterbox_rgba16_begin,                .endDl = dl_waterbox_end,                       .triDl = ttm_dl_waterfall,                      .color = { 0xff, 0xff, 0xff, 0xb4 }, .layer = LAYER_TRANSPARENT       },
+    { .geoId = MOVTEX_TTM_BEGIN_PUDDLE_WATERFALL, .textureId = TEXTURE_WATER,        .vtx_count =  4, .movtexVerts = ttm_movtex_tris_begin_puddle_waterfall,     .beginDl = dl_waterbox_rgba16_begin,                .endDl = dl_waterbox_end,                       .triDl = ttm_dl_bottom_waterfall,               .color = { 0xff, 0xff, 0xff, 0xb4 }, .layer = LAYER_TRANSPARENT_INTER },
+    { .geoId = MOVTEX_TTM_END_PUDDLE_WATERFALL,   .textureId = TEXTURE_WATER,        .vtx_count =  4, .movtexVerts = ttm_movtex_tris_end_puddle_waterfall,       .beginDl = dl_waterbox_rgba16_begin,                .endDl = dl_waterbox_end,                       .triDl = ttm_dl_bottom_waterfall,               .color = { 0xff, 0xff, 0xff, 0xb4 }, .layer = LAYER_TRANSPARENT_INTER },
+    { .geoId = MOVTEX_TTM_PUDDLE_WATERFALL,       .textureId = TEXTURE_WATER,        .vtx_count =  8, .movtexVerts = ttm_movtex_tris_puddle_waterfall,           .beginDl = dl_waterbox_rgba16_begin,                .endDl = dl_waterbox_end,                       .triDl = ttm_dl_puddle_waterfall,               .color = { 0xff, 0xff, 0xff, 0xb4 }, .layer = LAYER_TRANSPARENT_INTER },
+    { .geoId = 0x00000000,                        .textureId = TEXTURE_WATER,        .vtx_count =  0, .movtexVerts = NULL,                                       .beginDl = NULL,                                    .endDl = NULL,                                  .triDl = NULL,                                  .color = { 0x00, 0x00, 0x00, 0x00 }, .layer = LAYER_FORCE             },
 };
 
 /**
  * MovtexObjects that have color attributes per vertex.
  */
 struct MovtexObject gMovtexColored[] = {
-    { MOVTEX_SSL_PYRAMID_SIDE,           TEX_QUICKSAND_SSL,    12, ssl_movtex_tris_pyramid_quicksand,          ssl_dl_quicksand_begin,                  ssl_dl_quicksand_end,                  ssl_dl_pyramid_quicksand,              0xff, 0xff, 0xff, 0xff, LAYER_OPAQUE            },
-    { MOVTEX_SSL_PYRAMID_CORNER,         TEX_QUICKSAND_SSL,    16, ssl_movtex_tris_pyramid_corners_quicksand,  ssl_dl_quicksand_begin,                  ssl_dl_quicksand_end,                  ssl_dl_pyramid_corners_quicksand,      0xff, 0xff, 0xff, 0xff, LAYER_OPAQUE            },
-    { MOVTEX_SSL_COURSE_EDGE,            TEX_QUICKSAND_SSL,    15, ssl_movtex_tris_sides_quicksand,            ssl_dl_quicksand_begin,                  ssl_dl_quicksand_end,                  ssl_dl_sides_quicksand,                0xff, 0xff, 0xff, 0xff, LAYER_OPAQUE            },
-    { MOVTEX_TREADMILL_BIG,              TEX_YELLOW_TRI_TTC,   12, ttc_movtex_tris_big_surface_treadmill,      ttc_dl_surface_treadmill_begin,          ttc_dl_surface_treadmill_end,          ttc_dl_surface_treadmill,              0xff, 0xff, 0xff, 0xff, LAYER_OPAQUE            },
-    { MOVTEX_TREADMILL_SMALL,            TEX_YELLOW_TRI_TTC,   12, ttc_movtex_tris_small_surface_treadmill,    ttc_dl_surface_treadmill_begin,          ttc_dl_surface_treadmill_end,          ttc_dl_surface_treadmill,              0xff, 0xff, 0xff, 0xff, LAYER_OPAQUE            },
-    { 0x00000000,                        TEXTURE_WATER,         0, NULL,                                       NULL,                                    NULL,                                  NULL,                                  0x00, 0x00, 0x00, 0x00, LAYER_FORCE             },
+    { .geoId = MOVTEX_SSL_PYRAMID_SIDE,           .textureId = TEX_QUICKSAND_SSL,    .vtx_count = 12, .movtexVerts = ssl_movtex_tris_pyramid_quicksand,          .beginDl = ssl_dl_quicksand_begin,                  .endDl = ssl_dl_quicksand_end,                  .triDl = ssl_dl_pyramid_quicksand,              .color = { 0xff, 0xff, 0xff, 0xff }, .layer = LAYER_OPAQUE            },
+    { .geoId = MOVTEX_SSL_PYRAMID_CORNER,         .textureId = TEX_QUICKSAND_SSL,    .vtx_count = 16, .movtexVerts = ssl_movtex_tris_pyramid_corners_quicksand,  .beginDl = ssl_dl_quicksand_begin,                  .endDl = ssl_dl_quicksand_end,                  .triDl = ssl_dl_pyramid_corners_quicksand,      .color = { 0xff, 0xff, 0xff, 0xff }, .layer = LAYER_OPAQUE            },
+    { .geoId = MOVTEX_SSL_COURSE_EDGE,            .textureId = TEX_QUICKSAND_SSL,    .vtx_count = 15, .movtexVerts = ssl_movtex_tris_sides_quicksand,            .beginDl = ssl_dl_quicksand_begin,                  .endDl = ssl_dl_quicksand_end,                  .triDl = ssl_dl_sides_quicksand,                .color = { 0xff, 0xff, 0xff, 0xff }, .layer = LAYER_OPAQUE            },
+    { .geoId = MOVTEX_TREADMILL_BIG,              .textureId = TEX_YELLOW_TRI_TTC,   .vtx_count = 12, .movtexVerts = ttc_movtex_tris_big_surface_treadmill,      .beginDl = ttc_dl_surface_treadmill_begin,          .endDl = ttc_dl_surface_treadmill_end,          .triDl = ttc_dl_surface_treadmill,              .color = { 0xff, 0xff, 0xff, 0xff }, .layer = LAYER_OPAQUE            },
+    { .geoId = MOVTEX_TREADMILL_SMALL,            .textureId = TEX_YELLOW_TRI_TTC,   .vtx_count = 12, .movtexVerts = ttc_movtex_tris_small_surface_treadmill,    .beginDl = ttc_dl_surface_treadmill_begin,          .endDl = ttc_dl_surface_treadmill_end,          .triDl = ttc_dl_surface_treadmill,              .color = { 0xff, 0xff, 0xff, 0xff }, .layer = LAYER_OPAQUE            },
+    { .geoId = 0x00000000,                        .textureId = TEXTURE_WATER,        .vtx_count =  0, .movtexVerts = NULL,                                       .beginDl = NULL,                                    .endDl = NULL,                                  .triDl = NULL,                                  .color = { 0x00, 0x00, 0x00, 0x00 }, .layer = LAYER_FORCE             },
 };
 
 /**
  * Treated identically to gMovtexColored.
  */
 struct MovtexObject gMovtexColored2[] = {
-    { MOVTEX_SSL_SAND_PIT_OUTSIDE,       TEX_QUICKSAND_SSL,     8, ssl_movtex_tris_quicksand_pit,              ssl_dl_quicksand_pit_begin,              ssl_dl_quicksand_pit_end,              ssl_dl_quicksand_pit,                  0xff, 0xff, 0xff, 0xff, LAYER_OPAQUE            },
-    { MOVTEX_SSL_SAND_PIT_PYRAMID,       TEX_PYRAMID_SAND_SSL,  8, ssl_movtex_tris_pyramid_quicksand_pit,      ssl_dl_pyramid_quicksand_pit_begin,      ssl_dl_pyramid_quicksand_pit_end,      ssl_dl_quicksand_pit,                  0xff, 0xff, 0xff, 0xff, LAYER_OPAQUE            },
-    { 0x00000000,                        TEXTURE_WATER,         0, NULL,                                       NULL,                                    NULL,                                  NULL,                                  0x00, 0x00, 0x00, 0x00, LAYER_FORCE             },
+    { .geoId = MOVTEX_SSL_SAND_PIT_OUTSIDE,       .textureId = TEX_QUICKSAND_SSL,    .vtx_count =  8, .movtexVerts = ssl_movtex_tris_quicksand_pit,              .beginDl = ssl_dl_quicksand_pit_begin,              .endDl = ssl_dl_quicksand_pit_end,              .triDl = ssl_dl_quicksand_pit,                  .color = { 0xff, 0xff, 0xff, 0xff }, .layer = LAYER_OPAQUE            },
+    { .geoId = MOVTEX_SSL_SAND_PIT_PYRAMID,       .textureId = TEX_PYRAMID_SAND_SSL, .vtx_count =  8, .movtexVerts = ssl_movtex_tris_pyramid_quicksand_pit,      .beginDl = ssl_dl_pyramid_quicksand_pit_begin,      .endDl = ssl_dl_pyramid_quicksand_pit_end,      .triDl = ssl_dl_quicksand_pit,                  .color = { 0xff, 0xff, 0xff, 0xff }, .layer = LAYER_OPAQUE            },
+    { .geoId = 0x00000000,                        .textureId = TEXTURE_WATER,        .vtx_count =  0, .movtexVerts = NULL,                                       .beginDl = NULL,                                    .endDl = NULL,                                  .triDl = NULL,                                  .color = { 0x00, 0x00, 0x00, 0x00 }, .layer = LAYER_FORCE             },
 };
 
 /**
@@ -517,56 +518,31 @@ extern Movtex ttm_movtex_puddle[];
  */
 Movtex *get_quad_collection_from_id(s32 id) {
     switch (id) {
-        case BBH_MOVTEX_MERRY_GO_ROUND_WATER_ENTRANCE:
-            return bbh_movtex_merry_go_round_water_entrance;
-        case BBH_MOVTEX_MERRY_GO_ROUND_WATER_SIDE:
-            return bbh_movtex_merry_go_round_water_side;
-        case CCM_MOVTEX_PENGUIN_PUDDLE_WATER:
-            return ccm_movtex_penguin_puddle_water;
-        case INSIDE_CASTLE_MOVTEX_GREEN_ROOM_WATER:
-            return inside_castle_movtex_green_room_water;
-        case INSIDE_CASTLE_MOVTEX_MOAT_WATER:
-            return inside_castle_movtex_moat_water;
-        case HMC_MOVTEX_DORRIE_POOL_WATER:
-            return hmc_movtex_dorrie_pool_water;
-        case HMC_MOVTEX_TOXIC_MAZE_MIST:
-            return hmc_movtex_toxic_maze_mist;
-        case SSL_MOVTEX_PUDDLE_WATER:
-            return ssl_movtex_puddle_water;
-        case SSL_MOVTEX_TOXBOX_QUICKSAND_MIST:
-            return ssl_movtex_toxbox_quicksand_mist;
-        case SL_MOVTEX_WATER:
-            return sl_movtex_water;
-        case WDW_MOVTEX_AREA1_WATER:
-            return wdw_movtex_area1_water;
-        case WDW_MOVTEX_AREA2_WATER:
-            return wdw_movtex_area2_water;
-        case JRB_MOVTEX_WATER:
-            return jrb_movtex_water;
-        case JRB_MOVTEX_INITIAL_MIST:
-            return jrb_movtex_initial_mist;
-        case JRB_MOVTEX_SUNKEN_SHIP_WATER:
-            return jrb_movtex_sunken_ship_water;
-        case THI_MOVTEX_AREA1_WATER:
-            return thi_movtex_area1_water;
-        case THI_MOVTEX_AREA2_WATER:
-            return thi_movtex_area2_water;
-        case CASTLE_GROUNDS_MOVTEX_WATER:
-            return castle_grounds_movtex_water;
-        case LLL_MOVTEX_VOLCANO_FLOOR_LAVA:
-            return lll_movtex_volcano_floor_lava;
-        case DDD_MOVTEX_AREA1_WATER:
-            return ddd_movtex_area1_water;
-        case DDD_MOVTEX_AREA2_WATER:
-            return ddd_movtex_area2_water;
-        case WF_MOVTEX_WATER:
-            return wf_movtex_water;
-        case CASTLE_COURTYARD_MOVTEX_STAR_STATUE_WATER:
-            return castle_courtyard_movtex_star_statue_water;
-        case TTM_MOVTEX_PUDDLE:
-            return ttm_movtex_puddle;
-        default:
-            return NULL;
+        case BBH_MOVTEX_MERRY_GO_ROUND_WATER_ENTRANCE:  return bbh_movtex_merry_go_round_water_entrance;
+        case BBH_MOVTEX_MERRY_GO_ROUND_WATER_SIDE:      return bbh_movtex_merry_go_round_water_side;
+        case CCM_MOVTEX_PENGUIN_PUDDLE_WATER:           return ccm_movtex_penguin_puddle_water;
+        case INSIDE_CASTLE_MOVTEX_GREEN_ROOM_WATER:     return inside_castle_movtex_green_room_water;
+        case INSIDE_CASTLE_MOVTEX_MOAT_WATER:           return inside_castle_movtex_moat_water;
+        case HMC_MOVTEX_DORRIE_POOL_WATER:              return hmc_movtex_dorrie_pool_water;
+        case HMC_MOVTEX_TOXIC_MAZE_MIST:                return hmc_movtex_toxic_maze_mist;
+        case SSL_MOVTEX_PUDDLE_WATER:                   return ssl_movtex_puddle_water;
+        case SSL_MOVTEX_TOXBOX_QUICKSAND_MIST:          return ssl_movtex_toxbox_quicksand_mist;
+        case SL_MOVTEX_WATER:                           return sl_movtex_water;
+        case WDW_MOVTEX_AREA1_WATER:                    return wdw_movtex_area1_water;
+        case WDW_MOVTEX_AREA2_WATER:                    return wdw_movtex_area2_water;
+        case JRB_MOVTEX_WATER:                          return jrb_movtex_water;
+        case JRB_MOVTEX_INITIAL_MIST:                   return jrb_movtex_initial_mist;
+        case JRB_MOVTEX_SUNKEN_SHIP_WATER:              return jrb_movtex_sunken_ship_water;
+        case THI_MOVTEX_AREA1_WATER:                    return thi_movtex_area1_water;
+        case THI_MOVTEX_AREA2_WATER:                    return thi_movtex_area2_water;
+        case CASTLE_GROUNDS_MOVTEX_WATER:               return castle_grounds_movtex_water;
+        case LLL_MOVTEX_VOLCANO_FLOOR_LAVA:             return lll_movtex_volcano_floor_lava;
+        case DDD_MOVTEX_AREA1_WATER:                    return ddd_movtex_area1_water;
+        case DDD_MOVTEX_AREA2_WATER:                    return ddd_movtex_area2_water;
+        case WF_MOVTEX_WATER:                           return wf_movtex_water;
+        case CASTLE_COURTYARD_MOVTEX_STAR_STATUE_WATER: return castle_courtyard_movtex_star_statue_water;
+        case TTM_MOVTEX_PUDDLE:                         return ttm_movtex_puddle;
+        default:                                        return NULL;
     }
 }
 
@@ -690,7 +666,7 @@ void update_moving_texture_offset(Movtex *movtexVerts, s32 attr) {
 void movtex_write_vertex_first(Vtx *vtx, Movtex *movtexVerts, struct MovtexObject *c, s8 attrLayout) {
     Vec3s pos;
     vec3s_copy(pos, &movtexVerts[MOVTEX_ATTR_POS_INDEX]);
-    u8 alpha = c->a;
+    u8 alpha = c->color[3];
     ColorRGB color;
     s16 s, t;
 
@@ -698,7 +674,7 @@ void movtex_write_vertex_first(Vtx *vtx, Movtex *movtexVerts, struct MovtexObjec
         case MOVTEX_LAYOUT_NOCOLOR:
             s = movtexVerts[MOVTEX_ATTR_NOCOLOR_S];
             t = movtexVerts[MOVTEX_ATTR_NOCOLOR_T];
-            make_vertex(vtx, 0, pos[0], pos[1], pos[2], s, t, c->r, c->g, c->b, alpha);
+            make_vertex(vtx, 0, pos[0], pos[1], pos[2], s, t, c->color[0], c->color[1], c->color[2], alpha);
             break;
         case MOVTEX_LAYOUT_COLORED:
             vec3_copy(color, &movtexVerts[MOVTEX_ATTR_RGB_INDEX]);
@@ -715,7 +691,7 @@ void movtex_write_vertex_first(Vtx *vtx, Movtex *movtexVerts, struct MovtexObjec
  * for their texture coordinates.
  */
 void movtex_write_vertex_index(Vtx *verts, s32 index, Movtex *movtexVerts, struct MovtexObject *d, s8 attrLayout) {
-    u8 alpha = d->a;
+    u8 alpha = d->color[3];
     Vec3s pos;
     s16 baseS, baseT;
     s16 s, t;
@@ -733,7 +709,7 @@ void movtex_write_vertex_index(Vtx *verts, s32 index, Movtex *movtexVerts, struc
             offT = movtexVerts[entryStart + MOVTEX_ATTR_NOCOLOR_T];
             s = baseS + ((offS * 32) * 32U);
             t = baseT + ((offT * 32) * 32U);
-            make_vertex(verts, index, pos[0], pos[1], pos[2], s, t, d->r, d->g, d->b, alpha);
+            make_vertex(verts, index, pos[0], pos[1], pos[2], s, t, d->color[0], d->color[1], d->color[2], alpha);
             break;
         case MOVTEX_LAYOUT_COLORED:
             entryStart = (index * 8);

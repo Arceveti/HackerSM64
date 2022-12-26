@@ -16,26 +16,24 @@ struct LllOctagonalMeshAction {
 
 // Path for big bullies platforms
 static struct LllOctagonalMeshAction gLllOctagonalMeshAction0[] = {
-    // instruction                time  moveAngle  forwardVel
-    { LLL_OCTMESH_LINEAR_MOVE,      30,    0x4000,          0 }, // 90 degrees
-    { LLL_OCTMESH_CHANGE_DIR,      220,       900,         30 },
-    { LLL_OCTMESH_CHANGE_DIR,       30,         0,        -30 },
-    { LLL_OCTMESH_LINEAR_MOVE,      30,   -0x4000,          0 }, // 90 degrees
-    { LLL_OCTMESH_CHANGE_DIR,      220,       900,         30 },
-    { LLL_OCTMESH_CHANGE_DIR,       30,         0,        -30 },
-    { LLL_OCTMESH_RESET,             0,         0,          0 }
+    { .instruction = LLL_OCTMESH_LINEAR_MOVE,    .time =  30, .moveAngle =  0x4000, .forwardVel =   0 }, // 90 degrees
+    { .instruction = LLL_OCTMESH_CHANGE_DIR,     .time = 220, .moveAngle =     900, .forwardVel =  30 },
+    { .instruction = LLL_OCTMESH_CHANGE_DIR,     .time =  30, .moveAngle =       0, .forwardVel = -30 },
+    { .instruction = LLL_OCTMESH_LINEAR_MOVE,    .time =  30, .moveAngle = -0x4000, .forwardVel =   0 }, // 90 degrees
+    { .instruction = LLL_OCTMESH_CHANGE_DIR,     .time = 220, .moveAngle =     900, .forwardVel =  30 },
+    { .instruction = LLL_OCTMESH_CHANGE_DIR,     .time =  30, .moveAngle =       0, .forwardVel = -30 },
+    { .instruction = LLL_OCTMESH_RESET,          .time =   0, .moveAngle =       0, .forwardVel =   0 }
 };
 
 // Path for rolling log
 static struct LllOctagonalMeshAction gLllOctagonalMeshAction1[] = {
-    // instruction                time  moveAngle  forwardVel
-    { LLL_OCTMESH_WAIT_FOR_MARIO,    0,         0,          0 },
-    { LLL_OCTMESH_CHANGE_DIR,      475,       900,         30 },
-    { LLL_OCTMESH_CHANGE_DIR,       30,         0,        -30 },
-    { LLL_OCTMESH_LINEAR_MOVE,      30,    0x8000,          0 }, // 180 degrees
-    { LLL_OCTMESH_CHANGE_DIR,      475,       900,         30 },
-    { LLL_OCTMESH_CHANGE_DIR,       30,         0,        -30 },
-    { LLL_OCTMESH_RESET,             0,         0,          0 }
+    { .instruction = LLL_OCTMESH_WAIT_FOR_MARIO, .time =   0, .moveAngle =       0, .forwardVel =   0 },
+    { .instruction = LLL_OCTMESH_CHANGE_DIR,     .time = 475, .moveAngle =     900, .forwardVel =  30 },
+    { .instruction = LLL_OCTMESH_CHANGE_DIR,     .time =  30, .moveAngle =       0, .forwardVel = -30 },
+    { .instruction = LLL_OCTMESH_LINEAR_MOVE,    .time =  30, .moveAngle =  0x8000, .forwardVel =   0 }, // 180 degrees
+    { .instruction = LLL_OCTMESH_CHANGE_DIR,     .time = 475, .moveAngle =     900, .forwardVel =  30 },
+    { .instruction = LLL_OCTMESH_CHANGE_DIR,     .time =  30, .moveAngle =       0, .forwardVel = -30 },
+    { .instruction = LLL_OCTMESH_RESET,          .time =   0, .moveAngle =       0, .forwardVel =   0 }
 };
 
 // picked by oBehParams2ndByte

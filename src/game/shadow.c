@@ -23,8 +23,8 @@
  * An array consisting of all the hardcoded rectangle shadows in the game.
  */
 static const ShadowRectangle sShadowRectangles[2] = {
-    { 7.2f, 4.6f, TRUE }, // Spindel
-    { 4.0f, 3.6f, TRUE }, // Whomp
+    { .scaleX = 7.2f, .scaleZ = 4.6f, .scaleWithDistance = TRUE }, // Spindel
+    { .scaleX = 4.0f, .scaleZ = 3.6f, .scaleWithDistance = TRUE }, // Whomp
 };
 
 /**

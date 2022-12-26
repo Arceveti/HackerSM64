@@ -2558,9 +2558,9 @@ static s32 act_credits_cutscene(struct MarioState *m) {
         sEndCutsceneVp.vp.vscale[0] = (SCREEN_WIDTH  * 2) - width;
         sEndCutsceneVp.vp.vscale[1] = (SCREEN_HEIGHT * 2) - height;
         sEndCutsceneVp.vp.vtrans[0] =
-            ((gCurrCreditsEntry->actNum & BIT(4)) ? width  : -width ) * 56 / 100 + (SCREEN_WIDTH  * 2);
+            (((gCurrCreditsEntry->actNum & BIT(4)) ? width  : -width ) * 56 / 100) + (SCREEN_WIDTH  * 2);
         sEndCutsceneVp.vp.vtrans[1] =
-            ((gCurrCreditsEntry->actNum & BIT(5)) ? height : -height) * 66 / 100 + (SCREEN_HEIGHT * 2);
+            (((gCurrCreditsEntry->actNum & BIT(5)) ? height : -height) * 66 / 100) + (SCREEN_HEIGHT * 2);
 
         override_viewport_and_clip(&sEndCutsceneVp, 0, 0, 0, 0);
     }
