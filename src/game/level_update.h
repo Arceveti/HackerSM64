@@ -74,11 +74,14 @@ enum MarioSpawnType {
 struct CreditsEntry {
     /*0x00*/ u8 levelNum;
     /*0x01*/ u8 areaIndex;
-    /*0x02*/ u8 actNum;
-    /*0x03*/ s8 marioAngle;
+    /*0x03*/ u8 actNum;
     /*0x04*/ Vec3s marioPos;
-    /*0x0C*/ const char **string;
-};
+    /*0x0A*/ s16 marioAngle;
+    /*0x0C*/ s16 yawVel;
+    /*0x0E*/ u8 isTop   : 1;
+    /*0x0F*/ u8 isRight : 1;
+    /*0x10*/ const char **string;
+}; /*0x14*/
 
 extern struct CreditsEntry *gCurrCreditsEntry;
 
@@ -91,12 +94,12 @@ extern void (*sTransitionUpdate)(s16 *);
 extern void load_language_text(void);
 
 struct WarpDest {
-    u8 type;
-    u8 levelNum;
-    u8 areaIdx;
-    u8 nodeId;
-    u32 arg;
-};
+    /*0x00*/ u8 type;
+    /*0x01*/ u8 levelNum;
+    /*0x02*/ u8 areaIdx;
+    /*0x03*/ u8 nodeId;
+    /*0x04*/ u32 arg;
+}; /*0x08*/
 
 extern struct WarpDest sWarpDest;
 
@@ -116,9 +119,9 @@ struct HudDisplay {
     /*0x0A*/ s16 flags;
     /*0x0C*/ u16 timer;
 #ifdef BREATH_METER
-             u16 breath;
+    /*0x0E*/  u16 breath;
 #endif
-};
+}; /*0x10*/
 
 extern struct HudDisplay gHudDisplay;
 extern s8 gNeverEnteredCastle;

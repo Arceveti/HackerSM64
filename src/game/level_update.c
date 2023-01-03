@@ -104,29 +104,29 @@ const char *credits20[] = { "1EXECUTIVE PRODUCER", "HIROSHI YAMAUCHI" };
 
 
 struct CreditsEntry sCreditsSequence[] = {
-    { .levelNum = LEVEL_CASTLE_GROUNDS, .areaIndex = 1, .actNum =    1, .marioAngle = -128, .marioPos = {     0,  8000,     0 }, .string = NULL      },
-    { .levelNum = LEVEL_BOB,            .areaIndex = 1, .actNum =    1, .marioAngle =  117, .marioPos = {   713,  3918, -3889 }, .string = credits01 },
-    { .levelNum = LEVEL_WF,             .areaIndex = 1, .actNum =   50, .marioAngle =   46, .marioPos = {   347,  5376,   326 }, .string = credits02 },
-    { .levelNum = LEVEL_JRB,            .areaIndex = 1, .actNum =   18, .marioAngle =   22, .marioPos = {  3800, -4840,  2727 }, .string = credits03 },
-    { .levelNum = LEVEL_CCM,            .areaIndex = 2, .actNum =   34, .marioAngle =   25, .marioPos = { -5464,  6656, -6575 }, .string = credits04 },
-    { .levelNum = LEVEL_BBH,            .areaIndex = 1, .actNum =    1, .marioAngle =   60, .marioPos = {   257,  1922,  2580 }, .string = credits05 },
-    { .levelNum = LEVEL_HMC,            .areaIndex = 1, .actNum =  -15, .marioAngle =  123, .marioPos = { -6469,  1616, -6054 }, .string = credits06 },
-    { .levelNum = LEVEL_THI,            .areaIndex = 3, .actNum =   17, .marioAngle =  -32, .marioPos = {   508,  1024,  1942 }, .string = credits07 },
-    { .levelNum = LEVEL_LLL,            .areaIndex = 2, .actNum =   33, .marioAngle =  124, .marioPos = {   -73,    82, -1467 }, .string = credits08 },
-    { .levelNum = LEVEL_SSL,            .areaIndex = 1, .actNum =   65, .marioAngle =   98, .marioPos = { -5906,  1024, -2576 }, .string = credits09 },
-    { .levelNum = LEVEL_DDD,            .areaIndex = 1, .actNum =   50, .marioAngle =   47, .marioPos = { -4884, -4607,  -272 }, .string = credits10 },
-    { .levelNum = LEVEL_SL,             .areaIndex = 1, .actNum =   17, .marioAngle =  -34, .marioPos = {  1925,  3328,   563 }, .string = credits11 },
-    { .levelNum = LEVEL_WDW,            .areaIndex = 1, .actNum =   33, .marioAngle =  105, .marioPos = {  -537,  1850,  1818 }, .string = credits12 },
-    { .levelNum = LEVEL_TTM,            .areaIndex = 1, .actNum =    2, .marioAngle =  -33, .marioPos = {  2613,   313,  1074 }, .string = credits13 },
-    { .levelNum = LEVEL_THI,            .areaIndex = 1, .actNum =   51, .marioAngle =   54, .marioPos = { -2609,   512,   856 }, .string = credits14 },
-    { .levelNum = LEVEL_TTC,            .areaIndex = 1, .actNum =   17, .marioAngle =  -72, .marioPos = { -1304,   -71,  -967 }, .string = credits15 },
-    { .levelNum = LEVEL_RR,             .areaIndex = 1, .actNum =   33, .marioAngle =   64, .marioPos = {  1565,  1024,  -148 }, .string = credits16 },
-    { .levelNum = LEVEL_SA,             .areaIndex = 1, .actNum =    1, .marioAngle =   24, .marioPos = { -1050, -1330, -1559 }, .string = credits17 },
-    { .levelNum = LEVEL_COTMC,          .areaIndex = 1, .actNum =   49, .marioAngle =  -16, .marioPos = {  -254,   415, -6045 }, .string = credits18 },
-    { .levelNum = LEVEL_DDD,            .areaIndex = 2, .actNum = -111, .marioAngle =  -64, .marioPos = {  3948,  1185,  -104 }, .string = credits19 },
-    { .levelNum = LEVEL_CCM,            .areaIndex = 1, .actNum =   33, .marioAngle =   31, .marioPos = {  3169, -4607,  5240 }, .string = credits20 },
-    { .levelNum = LEVEL_CASTLE_GROUNDS, .areaIndex = 1, .actNum =    1, .marioAngle = -128, .marioPos = {     0,   906, -1200 }, .string = NULL      },
-    { .levelNum = LEVEL_NONE,           .areaIndex = 0, .actNum =    1, .marioAngle =    0, .marioPos = {     0,     0,     0 }, .string = NULL      },
+    { .levelNum = LEVEL_CASTLE_GROUNDS, .areaIndex = 1, .actNum = 1, .marioPos = {     0,  8000,     0 }, .marioAngle = 0x8000, .yawVel = 0x0000, .isTop = FALSE, .isRight = FALSE, .string = NULL      },
+    { .levelNum = LEVEL_BOB,            .areaIndex = 1, .actNum = 1, .marioPos = {   713,  3918, -3889 }, .marioAngle = 0x7500, .yawVel = 0x0000, .isTop = FALSE, .isRight = FALSE, .string = credits01 },
+    { .levelNum = LEVEL_WF,             .areaIndex = 1, .actNum = 2, .marioPos = {   347,  5376,   326 }, .marioAngle = 0x2E00, .yawVel = 0x0000, .isTop =  TRUE, .isRight =  TRUE, .string = credits02 },
+    { .levelNum = LEVEL_JRB,            .areaIndex = 1, .actNum = 2, .marioPos = {  3800, -4840,  2727 }, .marioAngle = 0x1600, .yawVel = 0x0000, .isTop = FALSE, .isRight =  TRUE, .string = credits03 },
+    { .levelNum = LEVEL_CCM,            .areaIndex = 2, .actNum = 2, .marioPos = { -5464,  6656, -6575 }, .marioAngle = 0x1900, .yawVel = 0x0000, .isTop =  TRUE, .isRight = FALSE, .string = credits04 },
+    { .levelNum = LEVEL_BBH,            .areaIndex = 1, .actNum = 1, .marioPos = {   257,  1922,  2580 }, .marioAngle = 0x3C00, .yawVel = 0x0000, .isTop = FALSE, .isRight = FALSE, .string = credits05 },
+    { .levelNum = LEVEL_HMC,            .areaIndex = 1, .actNum = 1, .marioPos = { -6469,  1616, -6054 }, .marioAngle = 0x7B00, .yawVel = 0xC000, .isTop =  TRUE, .isRight =  TRUE, .string = credits06 },
+    { .levelNum = LEVEL_THI,            .areaIndex = 3, .actNum = 1, .marioPos = {   508,  1024,  1942 }, .marioAngle = 0xE000, .yawVel = 0x0000, .isTop = FALSE, .isRight =  TRUE, .string = credits07 },
+    { .levelNum = LEVEL_LLL,            .areaIndex = 2, .actNum = 1, .marioPos = {   -73,    82, -1467 }, .marioAngle = 0x7C00, .yawVel = 0x0000, .isTop =  TRUE, .isRight = FALSE, .string = credits08 },
+    { .levelNum = LEVEL_SSL,            .areaIndex = 1, .actNum = 1, .marioPos = { -5906,  1024, -2576 }, .marioAngle = 0x6200, .yawVel = 0x4000, .isTop = FALSE, .isRight = FALSE, .string = credits09 },
+    { .levelNum = LEVEL_DDD,            .areaIndex = 1, .actNum = 2, .marioPos = { -4884, -4607,  -272 }, .marioAngle = 0x2F00, .yawVel = 0x0000, .isTop =  TRUE, .isRight =  TRUE, .string = credits10 },
+    { .levelNum = LEVEL_SL,             .areaIndex = 1, .actNum = 1, .marioPos = {  1925,  3328,   563 }, .marioAngle = 0xDE00, .yawVel = 0x0000, .isTop = FALSE, .isRight =  TRUE, .string = credits11 },
+    { .levelNum = LEVEL_WDW,            .areaIndex = 1, .actNum = 1, .marioPos = {  -537,  1850,  1818 }, .marioAngle = 0x6900, .yawVel = 0x0000, .isTop =  TRUE, .isRight = FALSE, .string = credits12 },
+    { .levelNum = LEVEL_TTM,            .areaIndex = 1, .actNum = 2, .marioPos = {  2613,   313,  1074 }, .marioAngle = 0xDF00, .yawVel = 0x0000, .isTop = FALSE, .isRight = FALSE, .string = credits13 },
+    { .levelNum = LEVEL_THI,            .areaIndex = 1, .actNum = 3, .marioPos = { -2609,   512,   856 }, .marioAngle = 0x3600, .yawVel = 0x0000, .isTop =  TRUE, .isRight =  TRUE, .string = credits14 },
+    { .levelNum = LEVEL_TTC,            .areaIndex = 1, .actNum = 1, .marioPos = { -1304,   -71,  -967 }, .marioAngle = 0xB800, .yawVel = 0x0000, .isTop = FALSE, .isRight =  TRUE, .string = credits15 },
+    { .levelNum = LEVEL_RR,             .areaIndex = 1, .actNum = 1, .marioPos = {  1565,  1024,  -148 }, .marioAngle = 0x4000, .yawVel = 0x0000, .isTop =  TRUE, .isRight = FALSE, .string = credits16 },
+    { .levelNum = LEVEL_SA,             .areaIndex = 1, .actNum = 1, .marioPos = { -1050, -1330, -1559 }, .marioAngle = 0x1800, .yawVel = 0x0000, .isTop = FALSE, .isRight = FALSE, .string = credits17 },
+    { .levelNum = LEVEL_COTMC,          .areaIndex = 1, .actNum = 1, .marioPos = {  -254,   415, -6045 }, .marioAngle = 0xF000, .yawVel = 0x0000, .isTop =  TRUE, .isRight =  TRUE, .string = credits18 },
+    { .levelNum = LEVEL_DDD,            .areaIndex = 2, .actNum = 1, .marioPos = {  3948,  1185,  -104 }, .marioAngle = 0xC000, .yawVel = 0xC000, .isTop = FALSE, .isRight = FALSE, .string = credits19 },
+    { .levelNum = LEVEL_CCM,            .areaIndex = 1, .actNum = 1, .marioPos = {  3169, -4607,  5240 }, .marioAngle = 0x1F00, .yawVel = 0x0000, .isTop =  TRUE, .isRight = FALSE, .string = credits20 },
+    { .levelNum = LEVEL_CASTLE_GROUNDS, .areaIndex = 1, .actNum = 1, .marioPos = {     0,   906, -1200 }, .marioAngle = 0x8000, .yawVel = 0x0000, .isTop = FALSE, .isRight = FALSE, .string = NULL      },
+    { .levelNum = LEVEL_NONE,           .areaIndex = 0, .actNum = 1, .marioPos = {     0,     0,     0 }, .marioAngle = 0x0000, .yawVel = 0x0000, .isTop = FALSE, .isRight = FALSE, .string = NULL      },
 };
 
 struct MarioState gMarioStates[1];
@@ -439,7 +439,7 @@ void warp_credits(void) {
 
     vec3s_copy(gPlayerSpawnInfos[0].startPos, gCurrCreditsEntry->marioPos);
 
-    vec3s_set(gPlayerSpawnInfos[0].startAngle, 0, (0x100 * gCurrCreditsEntry->marioAngle), 0);
+    vec3s_set(gPlayerSpawnInfos[0].startAngle, 0x0, gCurrCreditsEntry->marioAngle, 0x0);
 
     gPlayerSpawnInfos[0].areaIndex = sWarpDest.areaIdx;
 
@@ -808,7 +808,7 @@ void initiate_delayed_warp(void) {
                     sound_banks_disable(SEQ_PLAYER_SFX, SOUND_BANKS_ALL);
 
                     gCurrCreditsEntry++;
-                    gCurrActNum = (gCurrCreditsEntry->actNum & BITMASK(3));
+                    gCurrActNum = gCurrCreditsEntry->actNum;
                     if ((gCurrCreditsEntry + 1)->levelNum == LEVEL_NONE) {
                         destWarpNode = WARP_NODE_CREDITS_END;
                     } else {
