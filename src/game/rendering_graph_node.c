@@ -646,15 +646,15 @@ void setup_global_light() {
     bcopy(&defaultLight, curLight, sizeof(Lights1));
 
 #ifdef WORLDSPACE_LIGHTING
-    curLight->l->l.dir[0] = (s8)(globalLightDirection[0]);
-    curLight->l->l.dir[1] = (s8)(globalLightDirection[1]);
-    curLight->l->l.dir[2] = (s8)(globalLightDirection[2]);
+    for (s32 i = 0; i < 3; i++) {
+        curLight->l->l.dir[i] = (s8)(globalLightDirection[i]);
+    }
 #else
     Vec3f transformedLightDirection;
     linear_mtxf_transpose_mul_vec3f(gCameraTransform, transformedLightDirection, globalLightDirection);
-    curLight->l->l.dir[0] = (s8)(transformedLightDirection[0]);
-    curLight->l->l.dir[1] = (s8)(transformedLightDirection[1]);
-    curLight->l->l.dir[2] = (s8)(transformedLightDirection[2]);
+    for (s32 i = 0; i < 3; i++) {
+        curLight->l->l.dir[i] = (s8)(transformedLightDirection[i]);
+    }
 #endif
 
     gSPSetLights1(gDisplayListHead++, (*curLight));
@@ -786,9 +786,10 @@ void geo_process_z_offset(struct GraphNodeZOffset *node) {
         vec3f_diff(dirFromCamera, gMatStack[gMatStackIndex][3], gCurGraphNodeCamera->pos);
         vec3f_normalize(dirFromCamera);
 
-        gMatStack[gMatStackIndex][3][0] += dirFromCamera[0] * zOffset;
-        gMatStack[gMatStackIndex][3][1] += dirFromCamera[1] * zOffset;
-        gMatStack[gMatStackIndex][3][2] += dirFromCamera[2] * zOffset;
+        f32 *pos = gMatStack[gMatStackIndex][3];
+        for (s32 i = 0; i < 3; i++) {
+            *pos++ += dirFromCamera[i] * zOffset;
+        }
     }
 
     mtxf_copy(gMatStack[gMatStackIndex + 1], gMatStack[gMatStackIndex]);
@@ -943,7 +944,7 @@ void geo_set_animation_globals(struct AnimInfo *node, s32 hasAnimation) {
     }
 
     gCurrAnimFrame = node->animFrame;
-    gCurrAnimEnabled = (anim->flags & ANIM_FLAG_DISABLED) == 0;
+    gCurrAnimEnabled = (!(anim->flags & ANIM_FLAG_DISABLED));
     gCurrAnimAttribute = segmented_to_virtual((void *) anim->index);
     gCurrAnimData = segmented_to_virtual((void *) anim->values);
 
@@ -1109,10 +1110,14 @@ s32 obj_is_in_view(struct GraphNodeObject *node) {
     f32 min = (-hScreenEdge - cullingRadius);
 
     // Check whether the object is horizontally in view
-    if (node->cameraToObject[0] > max || node->cameraToObject[0] < min) return FALSE;
+    if (node->cameraToObject[0] > max || node->cameraToObject[0] < min) {
+        return FALSE;
+    }
 #ifdef VERTICAL_CULLING
     // Check whether the object is vertically in view
-    if (node->cameraToObject[1] > max || node->cameraToObject[1] < min) return FALSE;
+    if (node->cameraToObject[1] > max || node->cameraToObject[1] < min) {
+        return FALSE;
+    }
 #endif
 
     return TRUE;
@@ -1168,7 +1173,7 @@ void geo_process_object(struct Object *node) {
 
         // FIXME: correct types
         if (node->header.gfx.animInfo.curAnim != NULL) {
-            geo_set_animation_globals(&node->header.gfx.animInfo, (node->header.gfx.node.flags & GRAPH_RENDER_HAS_ANIMATION) != 0);
+            geo_set_animation_globals(&node->header.gfx.animInfo, ((node->header.gfx.node.flags & GRAPH_RENDER_HAS_ANIMATION) != 0));
         }
 
         if (obj_is_in_view(&node->header.gfx)) {
