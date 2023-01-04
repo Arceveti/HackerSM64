@@ -1163,15 +1163,15 @@ void geo_process_object(struct Object *node) {
             mtxf_scale_vec3f(gMatStack[gMatStackIndex + 1], gMatStack[gMatStackIndex + 1], node->header.gfx.scale);
         }
 
-        node->header.gfx.throwMatrix = &gMatStack[++gMatStackIndex];
+        node->header.gfx.throwMatrix = &gMatStack[gMatStackIndex + 1];
         linear_mtxf_mul_vec3f_and_translate(gCameraTransform, node->header.gfx.cameraToObject, (*node->header.gfx.throwMatrix)[3]);
 
         // FIXME: correct types
         if (node->header.gfx.animInfo.curAnim != NULL) {
             geo_set_animation_globals(&node->header.gfx.animInfo, (node->header.gfx.node.flags & GRAPH_RENDER_HAS_ANIMATION) != 0);
         }
+
         if (obj_is_in_view(&node->header.gfx)) {
-            gMatStackIndex--;
             inc_mat_stack();
 
             if (node->header.gfx.sharedChild != NULL) {
@@ -1189,9 +1189,10 @@ void geo_process_object(struct Object *node) {
             if (node->header.gfx.node.children != NULL) {
                 geo_process_node_and_siblings(node->header.gfx.node.children);
             }
+
+            gMatStackIndex--;
         }
 
-        gMatStackIndex--;
         gCurrAnimType = ANIM_TYPE_NONE;
         node->header.gfx.throwMatrix = NULL;
     }
