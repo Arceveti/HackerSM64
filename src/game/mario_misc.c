@@ -313,17 +313,17 @@ static Gfx *make_gfx_mario_alpha(struct GraphNodeGenerated *node, s16 alpha) {
     if (alpha == 255) {
         node->fnNode.node.drawingLayer = LAYER_OPAQUE;
         gfxCmds = (
-            /*gDPSetEnvColor    */ 1 +
-            /*gSPEndDisplayList */ 1
+            GFX_ALLOC(gDPSetEnvColor        ) +
+            GFX_ALLOC(gSPEndDisplayList     )
         );
         gfxHead = alloc_display_list(gfxCmds * sizeof(*gfxHead));
         gfx = gfxHead;
     } else {
         node->fnNode.node.drawingLayer = LAYER_TRANSPARENT;
         gfxCmds = (
-            /*gDPSetAlphaCompare*/ 1 +
-            /*gDPSetEnvColor    */ 1 +
-            /*gSPEndDisplayList */ 1
+            GFX_ALLOC(gDPSetAlphaCompare    ) +
+            GFX_ALLOC(gDPSetEnvColor        ) +
+            GFX_ALLOC(gSPEndDisplayList     )
         );
         gfxHead = alloc_display_list(gfxCmds * sizeof(*gfxHead));
         gfx = gfxHead;
@@ -646,9 +646,9 @@ Gfx *geo_mirror_mario_backface_culling(s32 callContext, struct GraphNode *node, 
 
     if (callContext == GEO_CONTEXT_RENDER && gCurGraphNodeObject == &gMirrorMario) {
         u32 gfxCmds = (
-            /*gSPClearGeometryMode  */ 1 +
-            /*gSPSetGeometryMode    */ 1 +
-            /*gSPEndDisplayList     */ 1
+            GFX_ALLOC(gSPClearGeometryMode  ) +
+            GFX_ALLOC(gSPSetGeometryMode    ) +
+            GFX_ALLOC(gSPEndDisplayList     )
         );
         gfx = alloc_display_list(gfxCmds * sizeof(*gfx));
 

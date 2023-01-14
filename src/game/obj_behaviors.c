@@ -91,8 +91,8 @@ Gfx UNUSED *geo_obj_transparency_something(s32 callContext, struct GraphNode *no
         }
 
         u32 gfxCmds = (
-            /*gDPSetEnvColor    */ 1 +
-            /*gSPEndDisplayList */ 1
+            GFX_ALLOC(gDPSetEnvColor    ) +
+            GFX_ALLOC(gSPEndDisplayList )
         );
         gfxHead = alloc_display_list(gfxCmds * sizeof(Gfx));
         gfx = gfxHead;

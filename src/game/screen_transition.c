@@ -250,22 +250,22 @@ Gfx *render_cannon_circle_base(void) {
     Vtx *verts = alloc_display_list(4 * sizeof(*verts));
 #endif
     u32 gfxCmds = (
-        /*gSPDisplayList        */ 1 +
-        /*gDPSetCombineMode     */ 1 +
-        /*gDPSetTextureFilter   */ 1 +
-        /*gDPLoadTextureBlock   */ 7 +
-        /*gSPTexture            */ 1 +
-        /*gSPVertex             */ 1 +
-        /*gSPDisplayList        */ 1 +
-        /*gSPTexture            */ 1 +
+        GFX_ALLOC(gSPDisplayList        ) +
+        GFX_ALLOC(gDPSetCombineMode     ) +
+        GFX_ALLOC(gDPSetTextureFilter   ) +
+        GFX_ALLOC(gDPLoadTextureBlock   ) +
+        GFX_ALLOC(gSPTexture            ) +
+        GFX_ALLOC(gSPVertex             ) +
+        GFX_ALLOC(gSPDisplayList        ) +
+        GFX_ALLOC(gSPTexture            ) +
 #ifdef WIDESCREEN
-        /*gDPSetCombineMode     */ 1 +
-        /*gSPVertex             */ 1 +
-        /*gSP2Triangles         */ 1 +
-        /*gSP2Triangles         */ 1 +
+        GFX_ALLOC(gDPSetCombineMode     ) +
+        GFX_ALLOC(gSPVertex             ) +
+        GFX_ALLOC(gSP2Triangles         ) +
+        GFX_ALLOC(gSP2Triangles         ) +
 #endif
-        /*gSPDisplayList        */ 1 +
-        /*gSPEndDisplayList     */ 1
+        GFX_ALLOC(gSPDisplayList        ) +
+        GFX_ALLOC(gSPEndDisplayList     )
     );
     Gfx *dlist = alloc_display_list(gfxCmds * sizeof(*dlist));
     Gfx *g = dlist;

@@ -340,14 +340,14 @@ Gfx *envfx_update_snow(s32 snowMode, Vec3s marioPos, Vec3s camFrom, Vec3s camTo)
     Vec3s vertex3 = {  5,  5,  0 };
 
     u32 gfxCmds = (
-        /*gSPDisplayList*/ 1 +
+        GFX_ALLOC(gSPDisplayList    ) +
         (sSnowParticleCount * (
-            /*gSP2Triangles*/ 1 +
-            /*gSP2Triangles*/ 1 +
-            /*gSP1Triangle*/ 1
+            GFX_ALLOC(gSP2Triangles     ) +
+            GFX_ALLOC(gSP2Triangles     ) +
+            GFX_ALLOC(gSP1Triangle      )
         )) +
-        /*gSPDisplayList*/ 1 +
-        /*gSPEndDisplayList*/ 1
+        GFX_ALLOC(gSPDisplayList    ) +
+        GFX_ALLOC(gSPEndDisplayList )
     );
     Gfx *gfxStart = (Gfx *) alloc_display_list(gfxCmds * sizeof(Gfx));
     Gfx *gfx = gfxStart;

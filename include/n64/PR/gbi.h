@@ -22,6 +22,7 @@
 
 #include <PR/ultratypes.h>
 #include <config.h>
+#include "gbi_cmd_alloc.h"
 
 /*
  * Converts texel coordinates to S and T values

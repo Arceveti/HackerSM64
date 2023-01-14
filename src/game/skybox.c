@@ -255,16 +255,16 @@ void *create_skybox_ortho_matrix(s8 player) {
  */
 Gfx *init_skybox_display_list(s8 player, s8 background, s8 colorIndex) {
     u32 gfxCmds = (
-        /*gSPDisplayList    */ 1 +
-        /*gSPMatrix         */ 1 +
-        /*gSPDisplayList    */ 1 +
+        GFX_ALLOC(gSPDisplayList    ) +
+        GFX_ALLOC(gSPMatrix         ) +
+        GFX_ALLOC(gSPDisplayList    ) +
         (sqr(3 * SKYBOX_SIZE) * (
-            /*gLoadBlockTexture */ 5 +
-            /*gSPVertex         */ 1 +
-            /*gSPDisplayList    */ 1
+            GFX_ALLOC(gLoadBlockTexture ) +
+            GFX_ALLOC(gSPVertex         ) +
+            GFX_ALLOC(gSPDisplayList    )
         )) +
-        /*gSPDisplayList    */ 1 +
-        /*gSPEndDisplayList */ 1
+        GFX_ALLOC(gSPDisplayList    ) +
+        GFX_ALLOC(gSPEndDisplayList )
     );
     void *skybox = alloc_display_list(gfxCmds * sizeof(Gfx));
     Gfx *dlist = skybox;

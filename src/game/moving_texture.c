@@ -379,16 +379,16 @@ Gfx *movtex_gen_from_quad(s16 y, struct MovtexQuad *quad) {
 
     if (textureId == gMovetexLastTextureId) {
         gfxCmds = (
-            /*gSPVertex         */ 1 +
-            /*gSPDisplayList    */ 1 +
-            /*gSPEndDisplayList */ 1
+            GFX_ALLOC(gSPVertex         ) +
+            GFX_ALLOC(gSPDisplayList    ) +
+            GFX_ALLOC(gSPEndDisplayList )
         );
     } else {
         gfxCmds = (
-            /*gLoadBlockTexture */ 5 +
-            /*gSPVertex         */ 1 +
-            /*gSPDisplayList    */ 1 +
-            /*gSPEndDisplayList */ 1
+            GFX_ALLOC(gLoadBlockTexture ) +
+            GFX_ALLOC(gSPVertex         ) +
+            GFX_ALLOC(gSPDisplayList    ) +
+            GFX_ALLOC(gSPEndDisplayList )
         );
     }
 
@@ -443,9 +443,9 @@ Gfx *movtex_gen_from_quad_array(s16 y, void *quadArrSegmented) {
     Movtex numLists = quadArr[0];
     u32 gfxCmds = (
         (numLists * (
-            /*gSPDisplayList    */ 1
+            GFX_ALLOC(gSPDisplayList    )
         )) +
-        /*gSPEndDisplayList */ 1
+        GFX_ALLOC(gSPEndDisplayList )
     );
     Gfx *gfxHead = alloc_display_list(gfxCmds * sizeof(*gfxHead));
     Gfx *gfx = gfxHead;
@@ -586,12 +586,12 @@ Gfx *geo_movtex_draw_water_regions(s32 callContext, struct GraphNode *node, UNUS
         }
         numWaterBoxes = gEnvironmentRegions[0];
         u32 gfxCmds = (
-            /*gSPDisplayList    */ 1 +
+            GFX_ALLOC(gSPDisplayList    ) +
             (numWaterBoxes * (
-                /*gSPDisplayList    */ 1
+                GFX_ALLOC(gSPDisplayList    )
             )) +
-            /*gSPDisplayList    */ 1 +
-            /*gSPEndDisplayList */ 1
+            GFX_ALLOC(gSPDisplayList    ) +
+            GFX_ALLOC(gSPEndDisplayList )
         );
         gfxHead = alloc_display_list(gfxCmds * sizeof(*gfxHead));
         if (gfxHead == NULL) {
@@ -733,12 +733,12 @@ void movtex_write_vertex_index(Vtx *verts, s32 index, Movtex *movtexVerts, struc
 Gfx *movtex_gen_list(Movtex *movtexVerts, struct MovtexObject *movtexList, s8 attrLayout) {
     Vtx *verts = alloc_display_list(movtexList->vtx_count * sizeof(*verts));
     u32 gfxCmds = (
-        /*gSPDisplayList    */ 1 +
-        /*gLoadBlockTexture */ 5 +
-        /*gSPVertex         */ 1 +
-        /*gSPDisplayList    */ 1 +
-        /*gSPDisplayList    */ 1 +
-        /*gSPEndDisplayList */ 1
+        GFX_ALLOC(gSPDisplayList    ) +
+        GFX_ALLOC(gLoadBlockTexture ) +
+        GFX_ALLOC(gSPVertex         ) +
+        GFX_ALLOC(gSPDisplayList    ) +
+        GFX_ALLOC(gSPDisplayList    ) +
+        GFX_ALLOC(gSPEndDisplayList )
     );
     Gfx *gfxHead = alloc_display_list(gfxCmds * sizeof(*gfxHead));
     Gfx *gfx = gfxHead;

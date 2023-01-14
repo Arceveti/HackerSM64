@@ -1869,8 +1869,8 @@ Gfx *geo_bits_bowser_coloring(s32 callContext, struct GraphNode *node, UNUSED s3
         graphNode->fnNode.node.drawingLayer = ((obj->oOpacity == 255) ? LAYER_OPAQUE : LAYER_TRANSPARENT);
 
         u32 gfxCmds = (
-            /*gSPClearGeometryMode  */ 1 +
-            /*gSPEndDisplayList     */ 1
+            GFX_ALLOC(gSPClearGeometryMode  ) +
+            GFX_ALLOC(gSPEndDisplayList     )
         );
         Gfx *gfx = gfxHead = alloc_display_list(gfxCmds * sizeof(Gfx));
 

@@ -35,8 +35,8 @@ Gfx *geo_envfx_main(s32 callContext, struct GraphNode *node, Mat4 mtxf) {
             if (particleList != NULL) {
                 Mtx *mtx = alloc_display_list(sizeof(*mtx));
                 u32 gfxCmds = (
-                    /*gSPMatrix     */ 1 +
-                    /*gSPBranchList */ 1
+                    GFX_ALLOC(gSPMatrix     ) +
+                    GFX_ALLOC(gSPBranchList )
                 );
                 gfx = alloc_display_list(gfxCmds * sizeof(*gfx));
                 mtxf_to_mtx(mtx, mtxf);

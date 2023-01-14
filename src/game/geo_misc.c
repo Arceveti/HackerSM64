@@ -76,8 +76,8 @@ Gfx *geo_exec_inside_castle_light(s32 callContext, struct GraphNode *node, UNUSE
         s32 flags = save_file_get_flags();
         if (gHudDisplay.stars >= NUM_STARS_REQUIRED_FOR_WING_CAP_LIGHT && !(flags & SAVE_FLAG_HAVE_WING_CAP)) {
             u32 gfxCmds = (
-                /*gSPDisplayList    */ 1 +
-                /*gSPEndDisplayList */ 1
+                GFX_ALLOC(gSPDisplayList    ) +
+                GFX_ALLOC(gSPEndDisplayList )
             );
             displayList = alloc_display_list(gfxCmds * sizeof(*displayList));
 
@@ -135,13 +135,13 @@ Gfx *geo_exec_flying_carpet_create(s32 callContext, struct GraphNode *node, UNUS
     if (callContext == GEO_CONTEXT_RENDER) {
         verts = alloc_display_list(NUM_FLYING_CARPET_VERTICES * sizeof(*verts));
         u32 gfxCmds = (
-            /*gSPDisplayList    */ 1 +
-            /*gSPVertex         */ 1 +
-            /*gSPDisplayList    */ 1 +
-            /*gSPVertex         */ 1 +
-            /*gSPDisplayList    */ 1 +
-            /*gSPDisplayList    */ 1 +
-            /*gSPEndDisplayList */ 1
+            GFX_ALLOC(gSPDisplayList    ) +
+            GFX_ALLOC(gSPVertex         ) +
+            GFX_ALLOC(gSPDisplayList    ) +
+            GFX_ALLOC(gSPVertex         ) +
+            GFX_ALLOC(gSPDisplayList    ) +
+            GFX_ALLOC(gSPDisplayList    ) +
+            GFX_ALLOC(gSPEndDisplayList )
         );
         displayList = alloc_display_list(gfxCmds * sizeof(*displayList));
         displayListHead = displayList;
@@ -201,9 +201,9 @@ Gfx *geo_exec_cake_end_screen(s32 callContext, struct GraphNode *node, UNUSED Ma
 
     if (callContext == GEO_CONTEXT_RENDER) {
         u32 gfxCmds = (
-            /*gSPDisplayList    */ 1 +
-            /*gSPDisplayList    */ 1 +
-            /*gSPEndDisplayList */ 1
+            GFX_ALLOC(gSPDisplayList    ) +
+            GFX_ALLOC(gSPDisplayList    ) +
+            GFX_ALLOC(gSPEndDisplayList )
         );
         displayList = alloc_display_list(gfxCmds * sizeof(*displayList));
         displayListHead = displayList;

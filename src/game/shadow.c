@@ -179,11 +179,11 @@ static Gfx *shadow_display_list(s8 shadowType, Alpha solidity, s8 isDecal) {
     const ColorRGB shadowColor = { 0x00, 0x00, 0x00 };
 
     u32 gfxCmds = (
-        /*gSPDisplayList    */ 1 +
-        /*gSPDisplayList    */ 1 +
-        /*gDPSetEnvColor    */ 1 +
-        /*gSPDisplayList    */ 1 +
-        /*gSPEndDisplayList */ 1
+        GFX_ALLOC(gSPDisplayList    ) +
+        GFX_ALLOC(gSPDisplayList    ) +
+        GFX_ALLOC(gDPSetEnvColor    ) +
+        GFX_ALLOC(gSPDisplayList    ) +
+        GFX_ALLOC(gSPEndDisplayList )
     );
     Gfx *gfxHead = alloc_display_list(gfxCmds * sizeof(Gfx));
     if (gfxHead == NULL) {

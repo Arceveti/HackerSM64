@@ -285,16 +285,16 @@ Gfx *render_painting_segment(const Texture *img, s16 index, s16 imageCount, s16 
 
     Vtx *verts = alloc_display_list(numVtx * sizeof(Vtx));
     u32 gfxCmds = (
-        /*gLoadBlockTexture */ 5 +
+        GFX_ALLOC(gLoadBlockTexture ) +
         (triGroups * (
-            /*gSPVertex         */ 1 +
-            /*gSPDisplayList    */ 1
+            GFX_ALLOC(gSPVertex         ) +
+            GFX_ALLOC(gSPDisplayList    )
         )) +
-        /*gSPVertex         */ 1 +
+        GFX_ALLOC(gSPVertex         ) +
         (remGroupTris * (
-            /*gSP1Triangle      */ 1
+            GFX_ALLOC(gSP1Triangle      )
         )) +
-        /*gSPEndDisplayList */ 1
+        GFX_ALLOC(gSPEndDisplayList )
     );
     Gfx *dlist = alloc_display_list(gfxCmds * sizeof(Gfx));
     Gfx *gfx = dlist;
@@ -404,8 +404,8 @@ Gfx *render_painting_segment(const Texture *img, s16 index, s16 imageCount, s16 
  */
 Gfx *painting_model_view_transform(const struct PaintingImage *paintingImage) {
     u32 gfxCmds = (
-        /*gSPMatrix         */ 1 +
-        /*gSPEndDisplayList */ 1
+        GFX_ALLOC(gSPMatrix         ) +
+        GFX_ALLOC(gSPEndDisplayList )
     );
     Gfx *dlist = alloc_display_list(gfxCmds * sizeof(Gfx));
     Gfx *gfx = dlist;
@@ -465,16 +465,16 @@ Gfx *dl_painting_rippling(const struct PaintingImage *paintingImage, struct Pain
     s32 isEnvMap = (paintingImage->textureType == PAINTING_TYPE_ENV_MAP);
 
     u32 gfxCmds = (
-        /*gSPDisplayList    */ 1 +
-        /*gSPDisplayList    */ 1 +
-        /*gDPSetTile        */ 1 +
-        /*gDPSetTileSize    */ 1 +
+        GFX_ALLOC(gSPDisplayList    ) +
+        GFX_ALLOC(gSPDisplayList    ) +
+        GFX_ALLOC(gDPSetTile        ) +
+        GFX_ALLOC(gDPSetTileSize    ) +
         (imageCount * (
-            /*gSPDisplayList    */ 1
+            GFX_ALLOC(gSPDisplayList    )
         )) +
-        /*gSPPopMatrix      */ 1 +
-        /*gSPDisplayList    */ 1 +
-        /*gSPEndDisplayList */ 1
+        GFX_ALLOC(gSPPopMatrix      ) +
+        GFX_ALLOC(gSPDisplayList    ) +
+        GFX_ALLOC(gSPEndDisplayList )
     );
     Gfx *dlist = alloc_display_list(gfxCmds * sizeof(Gfx));
     Gfx *gfx = dlist;
@@ -548,21 +548,21 @@ Gfx *dl_painting_not_rippling(const struct PaintingImage *paintingImage) {
     s16 imageCount = paintingImage->imageCount;
     s32 shaded = paintingImage->shaded;
     u32 gfxCmds = (
-        /*gSPDisplayList        */ 1 +
-        /*gSPVertex             */ 1 +
-        /*gDPSetTile            */ 1 +
-        /*gDPSetTileSize        */ 1 +
+        GFX_ALLOC(gSPDisplayList    ) +
+        GFX_ALLOC(gSPVertex         ) +
+        GFX_ALLOC(gDPSetTile        ) +
+        GFX_ALLOC(gDPSetTileSize    ) +
         (imageCount * (
-            /*gDPSetTextureImage    */ 1 +
-            /*gDPLoadSync           */ 1 +
-            /*gDPLoadBlock          */ 1 +
-            /*gSP2Triangles         */ 1
+            GFX_ALLOC(gDPSetTextureImage) +
+            GFX_ALLOC(gDPLoadSync       ) +
+            GFX_ALLOC(gDPLoadBlock      ) +
+            GFX_ALLOC(gSP2Triangles     )
         )) +
-        /*gSPDisplayList        */ 1 +
+        GFX_ALLOC(gSPDisplayList    ) +
         (!shaded * (
-            /*gSPSetGeometryMode    */ 1
+            GFX_ALLOC(gSPSetGeometryMode)
         )) +
-        /*gSPEndDisplayList     */ 1
+        GFX_ALLOC(gSPEndDisplayList )
     );
     Gfx *dlist = alloc_display_list(gfxCmds * sizeof(Gfx));
     Gfx *gfx = dlist;
@@ -660,10 +660,10 @@ Gfx *dl_painting_not_rippling(const struct PaintingImage *paintingImage) {
 Gfx *display_painting_not_rippling(struct Object *obj) {
     const struct PaintingImage *paintingImage = obj->oPaintingImage;
     u32 gfxCmds = (
-        /*gSPDisplayList    */ 1 +
-        /*gSPDisplayList    */ 1 +
-        /*gSPPopMatrix      */ 1 +
-        /*gSPEndDisplayList */ 1
+        GFX_ALLOC(gSPDisplayList    ) +
+        GFX_ALLOC(gSPDisplayList    ) +
+        GFX_ALLOC(gSPPopMatrix      ) +
+        GFX_ALLOC(gSPEndDisplayList )
     );
     Gfx *dlist = alloc_display_list(gfxCmds * sizeof(Gfx));
     Gfx *gfx = dlist;

@@ -26,6 +26,8 @@ extern Gfx *geo_exec_flying_carpet_timer_update(s32 callContext, struct GraphNod
 extern Gfx *geo_exec_flying_carpet_create(s32 callContext, struct GraphNode *node, UNUSED Mat4 mtx);
 extern Gfx *geo_exec_cake_end_screen(s32 callContext, struct GraphNode *node, UNUSED Mat4 mtx);
 
+#define _ALLOC_CMD_gLoadBlockTexture			5
+
 #define gLoadBlockTexture(dl, width, height, format, image)                                                  \
 {                                                                                                            \
     gDPSetTextureImage((dl), (format), G_IM_SIZ_16b, 1, (image));                                            \
