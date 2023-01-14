@@ -46,10 +46,10 @@ Gfx *geo_intro_super_mario_64_logo(s32 callContext, struct GraphNode *node, UNUS
         graphNode->drawingLayer = LAYER_OPAQUE;
         Mtx *scaleMat = alloc_display_list(sizeof(*scaleMat));
         u32 gfxCmds = (
-            /*gSPMatrix         */ 1 +
-            /*gSPDisplayList    */ 1 +
-            /*gSPPopMatrix      */ 1 +
-            /*gSPEndDisplayList */ 1
+            GFX_ALLOC(gSPMatrix         ) +
+            GFX_ALLOC(gSPDisplayList    ) +
+            GFX_ALLOC(gSPPopMatrix      ) +
+            GFX_ALLOC(gSPEndDisplayList )
         );
         dl = alloc_display_list(gfxCmds * sizeof(*dl));
         dlIter = dl;
@@ -93,11 +93,11 @@ Gfx *geo_intro_tm_copyright(s32 callContext, struct GraphNode *node, UNUSED void
         sTmCopyrightAlpha = 0;
     } else if (callContext == GEO_CONTEXT_RENDER) { // draw
         u32 gfxCmds = (
-            /*gSPDisplayList    */ 1 +
-            /*gDPSetEnvColor    */ 1 +
-            /*gDPSetRenderMode  */ 1 +
-            /*gSPDisplayList    */ 1 +
-            /*gSPEndDisplayList */ 1
+            GFX_ALLOC(gSPDisplayList    ) +
+            GFX_ALLOC(gDPSetEnvColor    ) +
+            GFX_ALLOC(gDPSetRenderMode  ) +
+            GFX_ALLOC(gSPDisplayList    ) +
+            GFX_ALLOC(gSPEndDisplayList )
         );
         dl = alloc_display_list(gfxCmds * sizeof(*dl));
         dlIter = dl;
@@ -161,31 +161,31 @@ static const Texture *const *textureTables[] = {
 static Gfx *intro_backdrop_one_image(s32 index, const s8 *backgroundTable) {
     Mtx *mtx = alloc_display_list(sizeof(*mtx));
     u32 gfxCmds = (
-        /*gSPMatrix             */ 1 +
-        /*gSPDisplayList        */ 1 +
+        GFX_ALLOC(gSPMatrix             ) +
+        GFX_ALLOC(gSPDisplayList        ) +
         (4 * (
-            /*gDPLoadTextureBlock   */ 7 +
-            /*gSPDisplayList        */ 1
+            GFX_ALLOC(gDPLoadTextureBlock   ) +
+            GFX_ALLOC(gSPDisplayList        )
         )) +
-        /*gSPPopMatrix          */ 1 +
-        /*gSPEndDisplayList     */ 1
+        GFX_ALLOC(gSPPopMatrix          ) +
+        GFX_ALLOC(gSPEndDisplayList     )
     );
-    Gfx *displayList = alloc_display_list(gfxCmds * sizeof(*displayList));
-    Gfx *displayListIter = displayList;
+    Gfx *dl = alloc_display_list(gfxCmds * sizeof(*dl));
+    Gfx *dlIter = dl;
     const Texture *const *vIntroBgTable = segmented_to_virtual(textureTables[backgroundTable[index]]);
     s32 i;
 
     guTranslate(mtx, xCoords[index], yCoords[index], 0.0f);
-    gSPMatrix(displayListIter++, mtx, (G_MTX_MODELVIEW | G_MTX_LOAD | G_MTX_PUSH));
-    gSPDisplayList(displayListIter++, &title_screen_bg_dl_0A000118);
+    gSPMatrix(dlIter++, mtx, (G_MTX_MODELVIEW | G_MTX_LOAD | G_MTX_PUSH));
+    gSPDisplayList(dlIter++, &title_screen_bg_dl_0A000118);
     for (i = 0; i < ARRAY_COUNT(introBackgroundDlRows); i++) {
-        gDPLoadTextureBlock(displayListIter++, vIntroBgTable[i], G_IM_FMT_RGBA, G_IM_SIZ_16b, 80, 20, 0,
+        gDPLoadTextureBlock(dlIter++, vIntroBgTable[i], G_IM_FMT_RGBA, G_IM_SIZ_16b, 80, 20, 0,
                             G_TX_CLAMP, G_TX_CLAMP, 7, 6, G_TX_NOLOD, G_TX_NOLOD)
-        gSPDisplayList(displayListIter++, introBackgroundDlRows[i]);
+        gSPDisplayList(dlIter++, introBackgroundDlRows[i]);
     }
-    gSPPopMatrix(displayListIter++, G_MTX_MODELVIEW);
-    gSPEndDisplayList(displayListIter);
-    return displayList;
+    gSPPopMatrix(dlIter++, G_MTX_MODELVIEW);
+    gSPEndDisplayList(dlIter);
+    return dl;
 }
 
 static const s8 introBackgroundIndexTable[] = {
@@ -207,13 +207,13 @@ Gfx *geo_intro_regular_backdrop(s32 callContext, struct GraphNode *node, UNUSED 
 
     if (callContext == GEO_CONTEXT_RENDER) { // draw
         u32 gfxCmds = (
-            /*gSPDisplayList    */ 1 +
-            /*gSPDisplayList    */ 1 +
+            GFX_ALLOC(gSPDisplayList    ) +
+            GFX_ALLOC(gSPDisplayList    ) +
             (ARRAY_COUNT(introBackgroundIndexTable) * (
-                /*gSPDisplayList    */ 1
+                GFX_ALLOC(gSPDisplayList    )
             )) +
-            /*gSPDisplayList    */ 1 +
-            /*gSPEndDisplayList */ 1
+            GFX_ALLOC(gSPDisplayList    ) +
+            GFX_ALLOC(gSPEndDisplayList )
         );
         dl = alloc_display_list(gfxCmds * sizeof(*dl));
         dlIter = dl;
@@ -258,13 +258,13 @@ Gfx *geo_intro_gameover_backdrop(s32 callContext, struct GraphNode *node, UNUSED
         }
     } else { // draw
         u32 gfxCmds = (
-            /*gSPDisplayList    */ 1 +
-            /*gSPDisplayList    */ 1 +
+            GFX_ALLOC(gSPDisplayList    ) +
+            GFX_ALLOC(gSPDisplayList    ) +
             (ARRAY_COUNT(gameOverBackgroundTable) * (
-                /*gSPDisplayList    */ 1
+                GFX_ALLOC(gSPDisplayList    )
             )) +
-            /*gSPDisplayList    */ 1 +
-            /*gSPEndDisplayList */ 1
+            GFX_ALLOC(gSPDisplayList    ) +
+            GFX_ALLOC(gSPEndDisplayList )
         );
         dl = alloc_display_list(gfxCmds * sizeof(*dl));
         dlIter = dl;
@@ -346,13 +346,13 @@ Gfx *intro_draw_face(RGBA16 *image, s32 imageW, s32 imageH) {
     Gfx *dlIter;
 
     u32 gfxCmds = (
-        /*gSPDisplayList        */ 1 +
-        /*gDPLoadTextureBlock   */ 7 +
+        GFX_ALLOC(gSPDisplayList        ) +
+        GFX_ALLOC(gDPLoadTextureBlock   ) +
         (((6 * 8) - 8) * (
-            /*gSPTextureRectangle   */ 3
+            GFX_ALLOC(gSPTextureRectangle   )
         )) +
-        /*gSPDisplayList        */ 1 +
-        /*gSPEndDisplayList     */ 1
+        GFX_ALLOC(gSPDisplayList        ) +
+        GFX_ALLOC(gSPEndDisplayList     )
     );
     Gfx *dl = alloc_display_list(gfxCmds * sizeof(Gfx));
 
@@ -472,8 +472,8 @@ Gfx *geo_intro_rumble_pak_graphic(s32 callContext, struct GraphNode *node, UNUSE
         }
         if (backgroundTileSix == INTRO_BACKGROUND_SUPER_MARIO) {
             u32 gfxCmds = (
-                /*gSPDisplayList    */ 1 +
-                /*gSPEndDisplayList */ 1
+                GFX_ALLOC(gSPDisplayList    ) +
+                GFX_ALLOC(gSPEndDisplayList )
             );
             dl = alloc_display_list(gfxCmds * sizeof(*dl));
             if (dl != NULL) {
