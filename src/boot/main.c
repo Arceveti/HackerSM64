@@ -461,7 +461,7 @@ void change_vi(OSViMode *mode, int width, int height){
     mode->comRegs.width = width;
     mode->comRegs.xScale = ((width * 512) / 320);
     if (height > 240) {
-        mode->comRegs.ctrl |= 0x40;
+        mode->comRegs.ctrl |= (1 << 6);
         mode->fldRegs[0].origin = (width * 2);
         mode->fldRegs[1].origin = (width * 4);
         mode->fldRegs[0].yScale = (0x2000000 | ((height * 1024) / 240));
@@ -494,20 +494,18 @@ void get_audio_frequency(void) {
  */
 void thread1_idle(UNUSED void *arg) {
     osCreateViManager(OS_PRIORITY_VIMGR);
-    switch (osTvType) {
-        case OS_TV_NTSC:
-            // NTSC
-            VI = osViModeNtscLan1;
-            break;
-        case OS_TV_MPAL:
-            // MPAL
-            VI = osViModeMpalLan1;
-            break;
-        case OS_TV_PAL:
-            // PAL
-            VI = osViModePalLan1;
-            break;
-    }
+    const OSViMode *osVIModes[] = {
+#if (RESOLUTION_MULTIPLIER >= 2)
+        [OS_TV_PAL ] = &osViModePalHan1,
+        [OS_TV_NTSC] = &osViModeNtscHan1,
+        [OS_TV_MPAL] = &osViModeMpalHan1,
+#else
+        [OS_TV_PAL ] = &osViModePalLan1,
+        [OS_TV_NTSC] = &osViModeNtscLan1,
+        [OS_TV_MPAL] = &osViModeMpalLan1,
+#endif
+    };
+    VI = *osVIModes[osTvType];
     get_audio_frequency();
     change_vi(&VI, SCREEN_WIDTH, SCREEN_HEIGHT);
     osViSetMode(&VI);
@@ -515,7 +513,7 @@ void thread1_idle(UNUSED void *arg) {
     osViSetSpecialFeatures(OS_VI_DITHER_FILTER_ON);
     osViSetSpecialFeatures(OS_VI_GAMMA_OFF);
     osCreatePiManager(OS_PRIORITY_PIMGR, &gPIMesgQueue, gPIMesgBuf, ARRAY_COUNT(gPIMesgBuf));
-    create_thread(&gMainThread, THREAD_3_MAIN, thread3_main, NULL, gThread3Stack + 0x2000, 100);
+    create_thread(&gMainThread, THREAD_3_MAIN, thread3_main, NULL, (gThread3Stack + 0x2000), 100);
     osStartThread(&gMainThread);
 
     osSetThreadPri(NULL, 0);
@@ -528,7 +526,7 @@ void thread1_idle(UNUSED void *arg) {
 
 // Clear RAM on boot
 void ClearRAM(void) {
-    bzero(_mainSegmentEnd, (size_t)osMemSize - (size_t)OS_K0_TO_PHYSICAL(_mainSegmentEnd));
+    bzero(_mainSegmentEnd, ((size_t)osMemSize - (size_t)OS_K0_TO_PHYSICAL(_mainSegmentEnd)));
 }
 
 #ifdef ISVPRINT
@@ -553,6 +551,6 @@ void main_func(void) {
 #ifdef ISVPRINT
     osInitialize_fakeisv();
 #endif
-    create_thread(&gIdleThread, THREAD_1_IDLE, thread1_idle, NULL, gIdleThreadStack + 0x800, 100);
+    create_thread(&gIdleThread, THREAD_1_IDLE, thread1_idle, NULL, (gIdleThreadStack + 0x800), 100);
     osStartThread(&gIdleThread);
 }

@@ -5,22 +5,22 @@
 
 // 0x0A000000 - 0x0A000100
 static const Vtx title_screen_bg_vertex_0A000000[] = {
-    {{{     0,     60,     -1}, 0, {     0,    608}, {0xff, 0xff, 0xff, 0xff}}},
-    {{{    80,     60,     -1}, 0, {  2528,    608}, {0xff, 0xff, 0xff, 0xff}}},
-    {{{    80,     80,     -1}, 0, {  2528,      0}, {0xff, 0xff, 0xff, 0xff}}},
-    {{{     0,     80,     -1}, 0, {     0,      0}, {0xff, 0xff, 0xff, 0xff}}},
-    {{{     0,     40,     -1}, 0, {     0,    608}, {0xff, 0xff, 0xff, 0xff}}},
-    {{{    80,     40,     -1}, 0, {  2528,    608}, {0xff, 0xff, 0xff, 0xff}}},
-    {{{    80,     60,     -1}, 0, {  2528,      0}, {0xff, 0xff, 0xff, 0xff}}},
-    {{{     0,     60,     -1}, 0, {     0,      0}, {0xff, 0xff, 0xff, 0xff}}},
-    {{{     0,     20,     -1}, 0, {     0,    608}, {0xff, 0xff, 0xff, 0xff}}},
-    {{{    80,     20,     -1}, 0, {  2528,    608}, {0xff, 0xff, 0xff, 0xff}}},
-    {{{    80,     40,     -1}, 0, {  2528,      0}, {0xff, 0xff, 0xff, 0xff}}},
-    {{{     0,     40,     -1}, 0, {     0,      0}, {0xff, 0xff, 0xff, 0xff}}},
-    {{{     0,      0,     -1}, 0, {     0,    608}, {0xff, 0xff, 0xff, 0xff}}},
-    {{{    80,      0,     -1}, 0, {  2528,    608}, {0xff, 0xff, 0xff, 0xff}}},
-    {{{    80,     20,     -1}, 0, {  2528,      0}, {0xff, 0xff, 0xff, 0xff}}},
-    {{{     0,     20,     -1}, 0, {     0,      0}, {0xff, 0xff, 0xff, 0xff}}},
+    {{{ ( 0 * RESOLUTION_MULTIPLIER), (60 * RESOLUTION_MULTIPLIER),     -1}, 0, {               0, ((20 - 1) << 5)}, {0xff, 0xff, 0xff, 0xff}}},
+    {{{ (80 * RESOLUTION_MULTIPLIER), (60 * RESOLUTION_MULTIPLIER),     -1}, 0, { ((80 - 1) << 5), ((20 - 1) << 5)}, {0xff, 0xff, 0xff, 0xff}}},
+    {{{ (80 * RESOLUTION_MULTIPLIER), (80 * RESOLUTION_MULTIPLIER),     -1}, 0, { ((80 - 1) << 5),               0}, {0xff, 0xff, 0xff, 0xff}}},
+    {{{ ( 0 * RESOLUTION_MULTIPLIER), (80 * RESOLUTION_MULTIPLIER),     -1}, 0, {               0,               0}, {0xff, 0xff, 0xff, 0xff}}},
+    {{{ ( 0 * RESOLUTION_MULTIPLIER), (40 * RESOLUTION_MULTIPLIER),     -1}, 0, {               0, ((20 - 1) << 5)}, {0xff, 0xff, 0xff, 0xff}}},
+    {{{ (80 * RESOLUTION_MULTIPLIER), (40 * RESOLUTION_MULTIPLIER),     -1}, 0, { ((80 - 1) << 5), ((20 - 1) << 5)}, {0xff, 0xff, 0xff, 0xff}}},
+    {{{ (80 * RESOLUTION_MULTIPLIER), (60 * RESOLUTION_MULTIPLIER),     -1}, 0, { ((80 - 1) << 5),               0}, {0xff, 0xff, 0xff, 0xff}}},
+    {{{ ( 0 * RESOLUTION_MULTIPLIER), (60 * RESOLUTION_MULTIPLIER),     -1}, 0, {               0,               0}, {0xff, 0xff, 0xff, 0xff}}},
+    {{{ ( 0 * RESOLUTION_MULTIPLIER), (20 * RESOLUTION_MULTIPLIER),     -1}, 0, {               0, ((20 - 1) << 5)}, {0xff, 0xff, 0xff, 0xff}}},
+    {{{ (80 * RESOLUTION_MULTIPLIER), (20 * RESOLUTION_MULTIPLIER),     -1}, 0, { ((80 - 1) << 5), ((20 - 1) << 5)}, {0xff, 0xff, 0xff, 0xff}}},
+    {{{ (80 * RESOLUTION_MULTIPLIER), (40 * RESOLUTION_MULTIPLIER),     -1}, 0, { ((80 - 1) << 5),               0}, {0xff, 0xff, 0xff, 0xff}}},
+    {{{ ( 0 * RESOLUTION_MULTIPLIER), (40 * RESOLUTION_MULTIPLIER),     -1}, 0, {               0,               0}, {0xff, 0xff, 0xff, 0xff}}},
+    {{{ ( 0 * RESOLUTION_MULTIPLIER), ( 0 * RESOLUTION_MULTIPLIER),     -1}, 0, {               0, ((20 - 1) << 5)}, {0xff, 0xff, 0xff, 0xff}}},
+    {{{ (80 * RESOLUTION_MULTIPLIER), ( 0 * RESOLUTION_MULTIPLIER),     -1}, 0, { ((80 - 1) << 5), ((20 - 1) << 5)}, {0xff, 0xff, 0xff, 0xff}}},
+    {{{ (80 * RESOLUTION_MULTIPLIER), (20 * RESOLUTION_MULTIPLIER),     -1}, 0, { ((80 - 1) << 5),               0}, {0xff, 0xff, 0xff, 0xff}}},
+    {{{ ( 0 * RESOLUTION_MULTIPLIER), (20 * RESOLUTION_MULTIPLIER),     -1}, 0, {               0,               0}, {0xff, 0xff, 0xff, 0xff}}},
 };
 
 // 0x0A000100 - 0x0A000118

@@ -39,10 +39,20 @@
 #define BORDER_HEIGHT_EMULATOR 0
 
 /**
+ * !EXPERIMENTAL!
+ * This should be either 1 or 2.
+ * 1 = 240p (Default)
+ * 2 = 420i
+ * NOTE: DISABLE_AA is recommended for performance.
+ * NOTE: Some UI elements don't render correctly.
+ */
+#define RESOLUTION_MULTIPLIER 1
+
+/**
  * Screen Size Defines.
  */
-#define SCREEN_WIDTH  320
-#define SCREEN_HEIGHT 240
+#define SCREEN_WIDTH  (320 * RESOLUTION_MULTIPLIER)
+#define SCREEN_HEIGHT (240 * RESOLUTION_MULTIPLIER)
 
 /**
  * Don't change these.

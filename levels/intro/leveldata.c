@@ -3320,38 +3320,38 @@ const Gfx intro_seg7_dl_main_logo[] = {
 // 0x0700B420 - 0x0700B460
 static const Vtx intro_seg7_vertex_copyright[] = {
 #ifdef INTRO_CREDIT
-    {{{    80,     60,     -1}, 0, {     0,      0}, {0x00, 0xff, 0xf7, 0xff}}}, // 0
-    {{{   240,     60,     -1}, 0, {256<<5,      0}, {0x00, 0xff, 0xf7, 0xff}}}, // 1
+    {{{ ( 80 * RESOLUTION_MULTIPLIER), ( 60 * RESOLUTION_MULTIPLIER),     -1}, 0, {     0,      0}, {0x00, 0xff, 0xf7, 0xff}}}, // 0
+    {{{ (240 * RESOLUTION_MULTIPLIER), ( 60 * RESOLUTION_MULTIPLIER),     -1}, 0, {256<<5,      0}, {0x00, 0xff, 0xf7, 0xff}}}, // 1
 
-    {{{    80,     48,     -1}, 0, {     0,  16<<5}, {0x00, 0xff, 0xff, 0xff}}}, // 2
-    {{{   240,     48,     -1}, 0, {256<<5,  16<<5}, {0x00, 0xff, 0xff, 0xff}}}, // 3
+    {{{ ( 80 * RESOLUTION_MULTIPLIER), ( 48 * RESOLUTION_MULTIPLIER),     -1}, 0, {     0,  16<<5}, {0x00, 0xff, 0xff, 0xff}}}, // 2
+    {{{ (240 * RESOLUTION_MULTIPLIER), ( 48 * RESOLUTION_MULTIPLIER),     -1}, 0, {256<<5,  16<<5}, {0x00, 0xff, 0xff, 0xff}}}, // 3
 
-    {{{    80,     36,     -1}, 0, {     0,  32<<5}, {0x00, 0x7f, 0xff, 0xff}}}, // 4
-    {{{   240,     36,     -1}, 0, {256<<5,  32<<5}, {0x00, 0x7f, 0xff, 0xff}}}, // 5
+    {{{ ( 80 * RESOLUTION_MULTIPLIER), ( 36 * RESOLUTION_MULTIPLIER),     -1}, 0, {     0,  32<<5}, {0x00, 0x7f, 0xff, 0xff}}}, // 4
+    {{{ (240 * RESOLUTION_MULTIPLIER), ( 36 * RESOLUTION_MULTIPLIER),     -1}, 0, {256<<5,  32<<5}, {0x00, 0x7f, 0xff, 0xff}}}, // 5
 #else
-    {{{    96,     58,     -1}, 0, {     0,      0}, {0xff, 0xff, 0xff, 0xff}}}, // 0
-    {{{   224,     58,     -1}, 0, {128<<5,      0}, {0xff, 0xff, 0xff, 0xff}}}, // 1
-    {{{    96,     42,     -1}, 0, {     0,  16<<5}, {0xff, 0xff, 0xff, 0xff}}}, // 2
-    {{{   224,     42,     -1}, 0, {128<<5,  16<<5}, {0xff, 0xff, 0xff, 0xff}}}, // 3
+    {{{ ( 96 * RESOLUTION_MULTIPLIER), ( 58 * RESOLUTION_MULTIPLIER),     -1}, 0, {     0,      0}, {0xff, 0xff, 0xff, 0xff}}}, // 0
+    {{{ (224 * RESOLUTION_MULTIPLIER), ( 58 * RESOLUTION_MULTIPLIER),     -1}, 0, {128<<5,      0}, {0xff, 0xff, 0xff, 0xff}}}, // 1
+    {{{ ( 96 * RESOLUTION_MULTIPLIER), ( 42 * RESOLUTION_MULTIPLIER),     -1}, 0, {     0,  16<<5}, {0xff, 0xff, 0xff, 0xff}}}, // 2
+    {{{ (224 * RESOLUTION_MULTIPLIER), ( 42 * RESOLUTION_MULTIPLIER),     -1}, 0, {128<<5,  16<<5}, {0xff, 0xff, 0xff, 0xff}}}, // 3
 #endif
 };
 
 // 0x0700B460 - 0x0700B4A0
 static const Vtx intro_seg7_vertex_trademark[] = {
 #ifdef INTRO_CREDIT
-    {{{   268,    192,     -1}, 0, {     0,      0}, {0x00, 0xff, 0xf7, 0xff}}}, // 0
-    {{{   284,    192,     -1}, 0, { 64<<5,      0}, {0x00, 0xff, 0xf7, 0xff}}}, // 1
+    {{{ (268 * RESOLUTION_MULTIPLIER), (192 * RESOLUTION_MULTIPLIER),     -1}, 0, {     0,      0}, {0x00, 0xff, 0xf7, 0xff}}}, // 0
+    {{{ (284 * RESOLUTION_MULTIPLIER), (192 * RESOLUTION_MULTIPLIER),     -1}, 0, { 64<<5,      0}, {0x00, 0xff, 0xf7, 0xff}}}, // 1
 
-    {{{   268,    184,     -1}, 0, {     0,  32<<5}, {0x00, 0xff, 0xff, 0xff}}}, // 2
-    {{{   284,    184,     -1}, 0, { 64<<5,  32<<5}, {0x00, 0xff, 0xff, 0xff}}}, // 3
+    {{{ (268 * RESOLUTION_MULTIPLIER), (184 * RESOLUTION_MULTIPLIER),     -1}, 0, {     0,  32<<5}, {0x00, 0xff, 0xff, 0xff}}}, // 2
+    {{{ (284 * RESOLUTION_MULTIPLIER), (184 * RESOLUTION_MULTIPLIER),     -1}, 0, { 64<<5,  32<<5}, {0x00, 0xff, 0xff, 0xff}}}, // 3
 
-    {{{   268,    176,     -1}, 0, {     0,  64<<5}, {0x00, 0x7f, 0xff, 0xff}}}, // 4
-    {{{   284,    176,     -1}, 0, { 64<<5,  64<<5}, {0x00, 0x7f, 0xff, 0xff}}}, // 5
+    {{{ (268 * RESOLUTION_MULTIPLIER), (176 * RESOLUTION_MULTIPLIER),     -1}, 0, {     0,  64<<5}, {0x00, 0x7f, 0xff, 0xff}}}, // 4
+    {{{ (284 * RESOLUTION_MULTIPLIER), (176 * RESOLUTION_MULTIPLIER),     -1}, 0, { 64<<5,  64<<5}, {0x00, 0x7f, 0xff, 0xff}}}, // 5
 #else
-    {{{   268,    196,     -1}, 0, {     0,      0}, {0xff, 0xff, 0xff, 0xff}}}, // 0
-    {{{   284,    196,     -1}, 0, {   544,      0}, {0xff, 0xff, 0xff, 0xff}}}, // 1
-    {{{   268,    180,     -1}, 0, {     0,    512}, {0xff, 0xff, 0xff, 0xff}}}, // 2
-    {{{   284,    180,     -1}, 0, {   544,    512}, {0xff, 0xff, 0xff, 0xff}}}, // 3
+    {{{ (268 * RESOLUTION_MULTIPLIER), (196 * RESOLUTION_MULTIPLIER),     -1}, 0, {     0,      0}, {0xff, 0xff, 0xff, 0xff}}}, // 0
+    {{{ (284 * RESOLUTION_MULTIPLIER), (196 * RESOLUTION_MULTIPLIER),     -1}, 0, { 17<<5,      0}, {0xff, 0xff, 0xff, 0xff}}}, // 1
+    {{{ (268 * RESOLUTION_MULTIPLIER), (180 * RESOLUTION_MULTIPLIER),     -1}, 0, {     0,  16<<5}, {0xff, 0xff, 0xff, 0xff}}}, // 2
+    {{{ (284 * RESOLUTION_MULTIPLIER), (180 * RESOLUTION_MULTIPLIER),     -1}, 0, { 17<<5,  16<<5}, {0xff, 0xff, 0xff, 0xff}}}, // 3
 #endif
 };
 

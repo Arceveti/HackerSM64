@@ -1113,8 +1113,8 @@ void handle_controller_cursor_input(void) {
     sCursorPos[1] += rawStickY / 8;
 
     // Stop cursor from going offscreen
-    sCursorPos[0] = CLAMP(sCursorPos[0], -132, 132);
-    sCursorPos[1] = CLAMP(sCursorPos[1],  -90,  90);
+    sCursorPos[0] = CLAMP(sCursorPos[0], (-132 * RESOLUTION_MULTIPLIER), (132 * RESOLUTION_MULTIPLIER));
+    sCursorPos[1] = CLAMP(sCursorPos[1], ( -90 * RESOLUTION_MULTIPLIER), ( 90 * RESOLUTION_MULTIPLIER));
 
     if (sCursorClickingTimer == 0) {
         handle_cursor_button_input();

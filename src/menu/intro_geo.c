@@ -132,8 +132,8 @@ static const Gfx *introBackgroundDlRows[] = {
     title_screen_bg_dl_0A000178
 };
 
-#define INTRO_BG_WIDTH  80
-#define INTRO_BG_HEIGHT 80
+#define INTRO_BG_WIDTH  (80 * RESOLUTION_MULTIPLIER)
+#define INTRO_BG_HEIGHT (80 * RESOLUTION_MULTIPLIER)
 
 // intro screen background texture X offsets
 static const float xCoords[] = {
@@ -326,8 +326,8 @@ static const s8 sFaceToggleOrder[] = {
 
 s8 sFaceCounter = 0;
 
-#define FACE_EASTER_EGG_WIDTH  40
-#define FACE_EASTER_EGG_HEIGHT 40
+#define FACE_EASTER_EGG_WIDTH  (40 * RESOLUTION_MULTIPLIER)
+#define FACE_EASTER_EGG_HEIGHT (40 * RESOLUTION_MULTIPLIER)
 
 void intro_gen_face_texrect(Gfx **dlIter) {
     s32 x, y;
