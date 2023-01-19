@@ -1506,7 +1506,7 @@ void print_peach_letter_message(void) {
  * Formed by four triangles.
  */
 void render_hud_cannon_reticle(void) {
-    create_dl_translation_matrix(MENU_MTX_PUSH, 160.0f, 120.0f, 0);
+    create_dl_translation_matrix(MENU_MTX_PUSH, SCREEN_CENTER_X, SCREEN_CENTER_Y, 0);
 
     gDPSetEnvColor(gDisplayListHead++, 50, 50, 50, 180);
     create_dl_translation_matrix(MENU_MTX_PUSH, -20.0f, -8.0f, 0);

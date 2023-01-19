@@ -2607,10 +2607,10 @@ static const Mtx matrix_identity = {
 static const Mtx matrix_fullscreen = {
     {
 #ifndef GBI_FLOATS
-        {                               0x00000000, 0x00000000,                                0x00000000, 0x00000000 },
-        {                               0x00000000, 0xffff0000,                                0xffffffff, 0xffff0001 },
-        { (((65536 * 2 / SCREEN_WIDTH) << 16) | 0), 0x00000000, ((0 << 16) | (65536 * 2 / SCREEN_HEIGHT)), 0x00000000 },
-        {                               0x00000000, 0x00000000,                                0x00000000, 0x00000000 },
+        {                                 0x00000000, 0x00000000,                                  0x00000000, 0x00000000 },
+        {                                 0x00000000, 0xffff0000,                                  0xffffffff, 0xffff0001 },
+        { ((((65536 * 2) / SCREEN_WIDTH) << 16) | 0), 0x00000000, ((0 << 16) | ((65536 * 2) / SCREEN_HEIGHT)), 0x00000000 },
+        {                                 0x00000000, 0x00000000,                                  0x00000000, 0x00000000 },
 #else
         { (2.0f / SCREEN_WIDTH),                   0.0f,  0.0f, 0.0f },
         {                  0.0f, (2.0f / SCREEN_HEIGHT),  0.0f, 0.0f },

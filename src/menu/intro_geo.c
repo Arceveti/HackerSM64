@@ -132,18 +132,21 @@ static const Gfx *introBackgroundDlRows[] = {
     title_screen_bg_dl_0A000178
 };
 
+#define INTRO_BG_WIDTH  80
+#define INTRO_BG_HEIGHT 80
+
 // intro screen background texture X offsets
 static const float xCoords[] = {
-    0, 80, 160, 240,
-    0, 80, 160, 240,
-    0, 80, 160, 240,
+    (INTRO_BG_WIDTH  * 0), (INTRO_BG_WIDTH  * 1), (INTRO_BG_WIDTH  * 2), (INTRO_BG_WIDTH  * 3), 
+    (INTRO_BG_WIDTH  * 0), (INTRO_BG_WIDTH  * 1), (INTRO_BG_WIDTH  * 2), (INTRO_BG_WIDTH  * 3), 
+    (INTRO_BG_WIDTH  * 0), (INTRO_BG_WIDTH  * 1), (INTRO_BG_WIDTH  * 2), (INTRO_BG_WIDTH  * 3), 
 };
 
 // intro screen background texture Y offsets
 static const float yCoords[] = {
-    160, 160, 160, 160,
-     80,  80,  80,  80,
-      0,   0,   0,   0,
+    (INTRO_BG_HEIGHT * 2), (INTRO_BG_HEIGHT * 2), (INTRO_BG_HEIGHT * 2), (INTRO_BG_HEIGHT * 2), 
+    (INTRO_BG_HEIGHT * 1), (INTRO_BG_HEIGHT * 1), (INTRO_BG_HEIGHT * 1), (INTRO_BG_HEIGHT * 1), 
+    (INTRO_BG_HEIGHT * 0), (INTRO_BG_HEIGHT * 0), (INTRO_BG_HEIGHT * 0), (INTRO_BG_HEIGHT * 0), 
 };
 
 // table that points to either the "Super Mario 64" or "Game Over" tables
@@ -238,7 +241,9 @@ static s8 gameOverBackgroundTable[] = {
 
 // order of tiles that are flipped from "Game Over" to "Super Mario 64"
 static const s8 flipOrder[] = {
-    0, 1, 2, 3, 7, 11, 10, 9, 8, 4, 5, 6
+     0,  1,  2,  3,
+     7, 11, 10,  9,
+     8,  4,  5,  6,
 };
 
 /**
@@ -321,6 +326,9 @@ static const s8 sFaceToggleOrder[] = {
 
 s8 sFaceCounter = 0;
 
+#define FACE_EASTER_EGG_WIDTH  40
+#define FACE_EASTER_EGG_HEIGHT 40
+
 void intro_gen_face_texrect(Gfx **dlIter) {
     s32 x, y;
 
@@ -328,10 +336,10 @@ void intro_gen_face_texrect(Gfx **dlIter) {
         for (x = 0; x < 8; x++) {
             if (sFaceVisible[(y * 8) + x] != 0) {
                 gSPTextureRectangle((*dlIter)++,
-                    ( (x * 40)       << 2),
-                    ( (y * 40)       << 2),
-                    (((x * 40) + 39) << 2),
-                    (((y * 40) + 39) << 2),
+                    ( (x * FACE_EASTER_EGG_WIDTH )                                 << 2),
+                    ( (y * FACE_EASTER_EGG_HEIGHT)                                 << 2),
+                    (((x * FACE_EASTER_EGG_WIDTH ) + (FACE_EASTER_EGG_WIDTH  - 1)) << 2),
+                    (((y * FACE_EASTER_EGG_HEIGHT) + (FACE_EASTER_EGG_HEIGHT - 1)) << 2),
                     0,
                     0, 0,
                     (4 << 10),
@@ -432,17 +440,17 @@ Gfx *geo_intro_face_easter_egg(s32 callContext, struct GraphNode *node, UNUSED v
             }
         } else {
             sFaceVisible[sFaceToggleOrder[sFaceCounter++]] ^= 1;
-            if (sFaceCounter >= 40) {
+            if (sFaceCounter >= ARRAY_COUNT(sFaceToggleOrder)) {
                 sFaceCounter = 0;
             }
         }
 
         // Draw while the first or last face is visible.
         if (sFaceVisible[0] == 1 || sFaceVisible[17] == 1) {
-            RGBA16 *image = intro_sample_framebuffer(40, 40, 2, 2, 120, 80);
+            RGBA16 *image = intro_sample_framebuffer(FACE_EASTER_EGG_WIDTH, FACE_EASTER_EGG_HEIGHT, 2, 2, 120, 80);
             if (image != NULL) {
                 genNode->fnNode.node.drawingLayer = LAYER_OPAQUE;
-                dl = intro_draw_face(image, 40, 40);
+                dl = intro_draw_face(image, FACE_EASTER_EGG_WIDTH, FACE_EASTER_EGG_HEIGHT);
             }
         }
     }
@@ -487,5 +495,4 @@ Gfx *geo_intro_rumble_pak_graphic(s32 callContext, struct GraphNode *node, UNUSE
     }
     return dl;
 }
-
 #endif

@@ -82,8 +82,8 @@ u8 sSpawnTypeFromWarpBhv[] = {
 };
 
 Vp gViewport = { {
-    { 640, 480, 511, 0 },
-    { 640, 480, 511, 0 },
+    { (SCREEN_WIDTH * 2), (SCREEN_HEIGHT * 2), (512 - 1), 0 },
+    { (SCREEN_WIDTH * 2), (SCREEN_HEIGHT * 2), (512 - 1), 0 },
 } };
 
 #if MULTILANG
@@ -390,7 +390,7 @@ void render_game(void) {
         gSPViewport(dlHead++, VIRTUAL_TO_PHYSICAL(&gViewport));
 
         gDPSetScissor(dlHead++, G_SC_NON_INTERLACE, 0, gBorderHeight, SCREEN_WIDTH,
-                      SCREEN_HEIGHT - gBorderHeight);
+                      (SCREEN_HEIGHT - gBorderHeight));
 
         gDisplayListHead = dlHead;
 
@@ -401,7 +401,7 @@ void render_game(void) {
         do_cutscene_handler();
         print_displaying_credits_entry();
         gDPSetScissor(gDisplayListHead++, G_SC_NON_INTERLACE, 0, gBorderHeight, SCREEN_WIDTH,
-                      SCREEN_HEIGHT - gBorderHeight);
+                      (SCREEN_HEIGHT - gBorderHeight));
         gMenuOptSelectIndex = render_menus_and_dialogs();
 
         if (gMenuOptSelectIndex != 0) {
@@ -412,7 +412,7 @@ void render_game(void) {
             make_viewport_clip_rect(gViewportClip);
         } else {
             gDPSetScissor(gDisplayListHead++, G_SC_NON_INTERLACE, 0, gBorderHeight, SCREEN_WIDTH,
-                          SCREEN_HEIGHT - gBorderHeight);
+                          (SCREEN_HEIGHT - gBorderHeight));
         }
 
         if (gWarpTransition.isActive) {

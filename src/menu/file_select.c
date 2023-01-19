@@ -284,8 +284,8 @@ void beh_yellow_background_menu_loop(void) {
  */
 s32 check_clicked_button(s16 x, s16 y, f32 depth) {
     f32 a = 52.4213f;
-    f32 newX = ((f32) x * 160.0f) / (a * depth);
-    f32 newY = ((f32) y * 120.0f) / (a * 3 / 4 * depth);
+    f32 newX = ((f32)x * (f32)SCREEN_CENTER_X) / (a * depth);
+    f32 newY = ((f32)y * (f32)SCREEN_CENTER_Y) / (a * 3 / 4 * depth);
     s16 maxX = newX + 25.0f;
     s16 minX = newX - 25.0f;
     s16 maxY = newY + 21.0f;
@@ -1130,8 +1130,8 @@ void print_menu_cursor(void) {
     handle_controller_cursor_input();
     create_dl_translation_matrix(
         MENU_MTX_PUSH,
-        ((sCursorPos[0] + 160) -  5),
-        ((sCursorPos[1] + 120) - 25),
+        ((sCursorPos[0] + SCREEN_CENTER_X) -  5),
+        ((sCursorPos[1] + SCREEN_CENTER_Y) - 25),
         0.0f
     );
     Gfx *dlHead = gDisplayListHead;

@@ -157,10 +157,10 @@ void parse_width_field(const char *str, s32 *srcIndex, u8 *width, s8 *zeroPad) {
 
     // Sum the digits to calculate the total width.
     for (i = 0; i < digitsLen - 1; i++) {
-        *width = *width + digits[i] * ((digitsLen - i - 1) * 10);
+        *width += (digits[i] * (((digitsLen - i) - 1) * 10));
     }
 
-    *width = *width + digits[digitsLen - 1];
+    *width += digits[digitsLen - 1];
 }
 
 /**
@@ -338,7 +338,7 @@ void clip_to_bounds(s32 *x, s32 *y) {
  */
 void render_textrect(s32 x, s32 y, s32 pos) {
     s32 rectBaseX = x + (pos * 12);
-    s32 rectBaseY = 224 - y;
+    s32 rectBaseY = (TEXRECT_MAX_Y + 4) - y; // 224
     s32 rectX;
     s32 rectY;
 
@@ -348,8 +348,8 @@ void render_textrect(s32 x, s32 y, s32 pos) {
 #endif
     rectX = rectBaseX;
     rectY = rectBaseY;
-    gSPTextureRectangle(gDisplayListHead++, rectX << 2, rectY << 2, (rectX + 15) << 2,
-                        (rectY + 15) << 2, G_TX_RENDERTILE, 0, 0, 4 << 10, 1 << 10);
+    gSPTextureRectangle(gDisplayListHead++, (rectX << 2), (rectY << 2), ((rectX + 15) << 2),
+                        ((rectY + 15) << 2), G_TX_RENDERTILE, 0, 0, (4 << 10), (1 << 10));
 }
 
 /**
@@ -375,7 +375,7 @@ void render_text_labels(void) {
 
     guOrtho(mtx, 0.0f, SCREEN_WIDTH, 0.0f, SCREEN_HEIGHT, -10.0f, 10.0f, 1.0f);
     gSPPerspNormalize((Gfx *) (dlHead++), 0xFFFF);
-    gSPMatrix(dlHead++, VIRTUAL_TO_PHYSICAL(mtx), G_MTX_PROJECTION | G_MTX_LOAD | G_MTX_NOPUSH);
+    gSPMatrix(dlHead++, VIRTUAL_TO_PHYSICAL(mtx), (G_MTX_PROJECTION | G_MTX_LOAD | G_MTX_NOPUSH));
     gSPDisplayList(dlHead++, dl_hud_img_begin);
 
     gDisplayListHead = dlHead;
@@ -393,7 +393,7 @@ void render_text_labels(void) {
                     render_textrect(sTextLabels[i]->x, sTextLabels[i]->y, j);
 
                     add_glyph_texture(GLYPH_UMLAUT);
-                    render_textrect(sTextLabels[i]->x, sTextLabels[i]->y + 3, j);
+                    render_textrect(sTextLabels[i]->x, (sTextLabels[i]->y + 3), j);
                 } else {
                     add_glyph_texture(glyphIndex);
                     render_textrect(sTextLabels[i]->x, sTextLabels[i]->y, j);

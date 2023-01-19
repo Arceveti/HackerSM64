@@ -145,16 +145,16 @@ void load_tex_transition_vertex(Vtx *verts, s8 fadeTimer, struct WarpTransitionD
                    s16 texTransRadius, s8 transTexType) {
     switch (transTexType) {
         case TRANS_TYPE_MIRROR:
-            make_tex_transition_vertex(verts, 0, fadeTimer, transData, centerTransX, centerTransY, -texTransRadius, -texTransRadius, -31,  63);
-            make_tex_transition_vertex(verts, 1, fadeTimer, transData, centerTransX, centerTransY,  texTransRadius, -texTransRadius,  31,  63);
-            make_tex_transition_vertex(verts, 2, fadeTimer, transData, centerTransX, centerTransY,  texTransRadius,  texTransRadius,  31,   0);
-            make_tex_transition_vertex(verts, 3, fadeTimer, transData, centerTransX, centerTransY, -texTransRadius,  texTransRadius, -31,   0);
+            make_tex_transition_vertex(verts, 0, fadeTimer, transData, centerTransX, centerTransY, -texTransRadius, -texTransRadius, -(32 - 1),  (64 - 1));
+            make_tex_transition_vertex(verts, 1, fadeTimer, transData, centerTransX, centerTransY,  texTransRadius, -texTransRadius,  (32 - 1),  (64 - 1));
+            make_tex_transition_vertex(verts, 2, fadeTimer, transData, centerTransX, centerTransY,  texTransRadius,  texTransRadius,  (32 - 1),         0);
+            make_tex_transition_vertex(verts, 3, fadeTimer, transData, centerTransX, centerTransY, -texTransRadius,  texTransRadius, -(32 - 1),         0);
             break;
         case TRANS_TYPE_CLAMP:
-            make_tex_transition_vertex(verts, 0, fadeTimer, transData, centerTransX, centerTransY, -texTransRadius, -texTransRadius,   0,  63);
-            make_tex_transition_vertex(verts, 1, fadeTimer, transData, centerTransX, centerTransY,  texTransRadius, -texTransRadius,  63,  63);
-            make_tex_transition_vertex(verts, 2, fadeTimer, transData, centerTransX, centerTransY,  texTransRadius,  texTransRadius,  63,   0);
-            make_tex_transition_vertex(verts, 3, fadeTimer, transData, centerTransX, centerTransY, -texTransRadius,  texTransRadius,   0,   0);
+            make_tex_transition_vertex(verts, 0, fadeTimer, transData, centerTransX, centerTransY, -texTransRadius, -texTransRadius,         0,  (64 - 1));
+            make_tex_transition_vertex(verts, 1, fadeTimer, transData, centerTransX, centerTransY,  texTransRadius, -texTransRadius,  (64 - 1),  (64 - 1));
+            make_tex_transition_vertex(verts, 2, fadeTimer, transData, centerTransX, centerTransY,  texTransRadius,  texTransRadius,  (64 - 1),         0);
+            make_tex_transition_vertex(verts, 3, fadeTimer, transData, centerTransX, centerTransY, -texTransRadius,  texTransRadius,         0,         0);
             break;
     }
     make_tex_transition_vertex(verts, 4, fadeTimer, transData, centerTransX, centerTransY, -2000, -2000, 0, 0);
@@ -271,10 +271,10 @@ Gfx *render_cannon_circle_base(void) {
     Gfx *g = dlist;
 
     if (verts != NULL && dlist != NULL) {
-        make_vertex(verts, 0,            0,             0, -1, -1152, 1824, 0, 0, 0, 255);
-        make_vertex(verts, 1, SCREEN_WIDTH,             0, -1,  1152, 1824, 0, 0, 0, 255);
-        make_vertex(verts, 2, SCREEN_WIDTH, SCREEN_HEIGHT, -1,  1152,  192, 0, 0, 0, 255);
-        make_vertex(verts, 3,            0, SCREEN_HEIGHT, -1, -1152,  192, 0, 0, 0, 255);
+        make_vertex(verts, 0,            0,             0, -1, -(36 << 5), (57 << 5), 0, 0, 0, 255);
+        make_vertex(verts, 1, SCREEN_WIDTH,             0, -1,  (36 << 5), (57 << 5), 0, 0, 0, 255);
+        make_vertex(verts, 2, SCREEN_WIDTH, SCREEN_HEIGHT, -1,  (36 << 5), ( 6 << 5), 0, 0, 0, 255);
+        make_vertex(verts, 3,            0, SCREEN_HEIGHT, -1, -(36 << 5), ( 6 << 5), 0, 0, 0, 255);
 
 #ifdef WIDESCREEN
         // Render black rectangles outside the 4:3 area.

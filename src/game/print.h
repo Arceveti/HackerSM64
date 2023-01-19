@@ -2,11 +2,12 @@
 #define PRINT_H
 
 #include <PR/ultratypes.h>
+#include "config.h"
 
 #define TEXRECT_MIN_X 10
-#define TEXRECT_MAX_X 300
+#define TEXRECT_MAX_X (SCREEN_WIDTH  - 20) // 300
 #define TEXRECT_MIN_Y 5
-#define TEXRECT_MAX_Y 220
+#define TEXRECT_MAX_Y (SCREEN_HEIGHT - 20) // 220
 
 enum PrintfGlyphs {
     GLYPH_SPACE           = -1,
