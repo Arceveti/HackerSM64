@@ -665,12 +665,13 @@ static f32 get_optimal_collision_distance(struct Object *obj) {
 }
 #endif
 
+static TerrainData sVertexData[600];
+
 /**
  * Transform an object's vertices, reload them, and render the object.
  */
 void load_object_collision_model(void) {
     struct Object *obj = gCurrentObject;
-    TerrainData vertexData[600];
 
     TerrainData *collisionData = obj->collisionData;
     f32 marioDist = obj->oDistanceToMario;
@@ -720,11 +721,11 @@ void load_object_collision_model(void) {
         && !(obj->activeFlags & ACTIVE_FLAG_IN_DIFFERENT_ROOM)
     ) {
         collisionData++;
-        transform_object_vertices(&collisionData, vertexData, obj);
+        transform_object_vertices(&collisionData, sVertexData, obj);
 
         // TERRAIN_LOAD_CONTINUE acts as an "end" to the terrain data.
         while (*collisionData != TERRAIN_LOAD_CONTINUE) {
-            load_object_surfaces(&collisionData, vertexData, obj, TRUE);
+            load_object_surfaces(&collisionData, sVertexData, obj, TRUE);
         }
     }
     obj->header.gfx.node.flags = COND_BIT(obj->header.gfx.node.flags, GRAPH_RENDER_ACTIVE, (marioDist < drawDist));
@@ -738,7 +739,7 @@ void load_object_collision_model(void) {
  */
 void load_object_static_model(void) {
     struct Object *obj = gCurrentObject;
-    TerrainData vertexData[600];
+
     TerrainData *collisionData = obj->collisionData;
     u32 surfacePoolData;
 
@@ -749,11 +750,11 @@ void load_object_static_model(void) {
     gSurfacesAllocated = gNumStaticSurfaces;
 
     collisionData++;
-    transform_object_vertices(&collisionData, vertexData, obj);
+    transform_object_vertices(&collisionData, sVertexData, obj);
 
     // TERRAIN_LOAD_CONTINUE acts as an "end" to the terrain data.
     while (*collisionData != TERRAIN_LOAD_CONTINUE) {
-        load_object_surfaces(&collisionData, vertexData, obj, FALSE);
+        load_object_surfaces(&collisionData, sVertexData, obj, FALSE);
     }
 
     surfacePoolData = (uintptr_t)gCurrStaticSurfacePoolEnd - (uintptr_t)gCurrStaticSurfacePool;
