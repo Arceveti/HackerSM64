@@ -208,6 +208,9 @@ void clear_areas(void) {
         }
         gAreaData[i].musicSettingsPreset = SEQ_SETTINGS_PRESET_DEFAULT;
         gAreaData[i].musicSeqId = SEQ_SOUND_PLAYER;
+#ifdef BETTER_REVERB
+        gAreaData[i].betterReverbPreset = 0;
+#endif
     }
 }
 

@@ -325,7 +325,6 @@ u8 sMaxChannelsForSoundBank[SOUND_BANK_COUNT] = { 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 }
 
 f32 gGlobalSoundSource[3] = { 0.0f, 0.0f, 0.0f };
 u8 sSoundBankDisabled[16] = { 0 };
-u8 sSoundModeSettings = 0; // higher bits = sound mode, lower bits = preset ID
 u8 sHasStartedFadeOut = FALSE;
 u16 sSoundBanksThatLowerBackgroundMusic = 0;
 u8 sBackgroundMusicMaxTargetVolume = TARGET_VOLUME_UNSET;
@@ -2484,9 +2483,9 @@ void play_toads_jingle(void) {
 /**
  * Called from threads: thread5_game_loop
  */
-void sound_reset(u8 presetId) {
-    if (presetId >= SEQ_SETTINGS_PRESET_COUNT) {
-        presetId = SEQ_SETTINGS_PRESET_DEFAULT;
+void sound_reset(u8 reverbPresetId) {
+    if (reverbPresetId >= SEQ_SETTINGS_PRESET_COUNT) {
+        reverbPresetId = SEQ_SETTINGS_PRESET_DEFAULT;
     }
     sGameLoopTicked = 0;
     disable_all_sequence_players();
@@ -2495,26 +2494,16 @@ void sound_reset(u8 presetId) {
     sequence_channel_op_u32(SEQUENCE_CHANNEL_ARGS(0xF2, SEQ_PLAYER_LEVEL, 0, 0), 0);
 #endif
 #if defined(VERSION_JP) || defined(VERSION_US)
-    audio_reset_session(&gAudioSessionPresets[0], presetId);
+    audio_reset_session(reverbPresetId);
 #else
-    audio_reset_session_eu(presetId);
+    audio_reset_session_eu(reverbPresetId);
 #endif
     osWritebackDCacheAll();
-    if (presetId != 7) {
+    if (reverbPresetId != 7) {
         preload_sequence(SEQ_EVENT_SOLVE_PUZZLE,        (PRELOAD_BANKS | PRELOAD_SEQUENCE));
         preload_sequence(SEQ_EVENT_PEACH_MESSAGE,       (PRELOAD_BANKS | PRELOAD_SEQUENCE));
         preload_sequence(SEQ_EVENT_CUTSCENE_STAR_SPAWN, (PRELOAD_BANKS | PRELOAD_SEQUENCE));
     }
     seq_player_play_sequence(SEQ_PLAYER_SFX, SEQ_SOUND_PLAYER, 0);
-    sSoundModeSettings = (sSoundModeSettings & 0xf0) + presetId;
-    gSoundMode = (sSoundModeSettings >> 4);
     sHasStartedFadeOut = FALSE;
-}
-
-/**
- * Called from threads: thread5_game_loop
- */
-void audio_set_sound_mode(u8 soundMode) {
-    sSoundModeSettings = (sSoundModeSettings & 0xf) + (soundMode << 4);
-    gSoundMode = soundMode;
 }
