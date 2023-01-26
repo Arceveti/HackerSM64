@@ -10041,7 +10041,7 @@ u8 sZoomOutAreaMasks[] = {
     ZOOMOUT_AREA_MASK(0,0,0,0, 0,0,0,0), // Unused         | Unused
 };
 
-STATIC_ASSERT(ARRAY_COUNT(sZoomOutAreaMasks) - 1 == LEVEL_MAX / 2, "Make sure you edit sZoomOutAreaMasks when adding / removing courses.");
+STATIC_ASSERT(((ARRAY_COUNT(sZoomOutAreaMasks) - 1) == (LEVEL_MAX / 2)), "Make sure you edit sZoomOutAreaMasks when adding / removing courses.");
 
 /*
  * credits spline paths.

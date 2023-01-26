@@ -2428,7 +2428,7 @@ enum animIDsHauntedChair {
 };
 
 /* Fire Piranha Plant */
-enum oBehParam2ndByteFirePiranhaPlant {
+enum oBehParams2ndByteFirePiranhaPlant {
     FIRE_PIRANHA_PLANT_BP_NORMAL,
     FIRE_PIRANHA_PLANT_BP_THI,
 };
