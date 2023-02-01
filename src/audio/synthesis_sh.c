@@ -202,7 +202,7 @@ u64 *synthesis_resample_and_mix_reverb(u64 *cmd, s32 bufLen, s16 reverbIndex, s1
         aMix(cmd++, 0x8000 + gSynthesisReverbs[reverbIndex].reverbGain, DMEM_ADDR_WET_LEFT_CH, DMEM_ADDR_WET_LEFT_CH, DEFAULT_LEN_2CH);
     } else {
         startPad = (item->startPos & 0x7) * 2;
-        paddedLengthA = ALIGN(startPad + item->lengthA, 16);
+        paddedLengthA = ALIGN16(startPad + item->lengthA);
 
         cmd = synthesis_load_reverb_ring_buffer(cmd, DMEM_ADDR_RESAMPLED, (item->startPos - startPad / 2), DEFAULT_LEN_1CH, reverbIndex);
         if (item->lengthB != 0) {
@@ -537,9 +537,9 @@ u64 *synthesis_process_note(s32 noteIndex, struct NoteSubEu *noteSubEu, struct N
                         }
 
                         a3 = ((uintptr_t)v0_2 & 0xf);
-                        aligned = ALIGN((t0 * unk_s6) + 16, 16);
+                        aligned = ALIGN16((t0 * unk_s6) + 16);
                         addr = ((DMEM_ADDR_COMPRESSED_ADPCM_DATA - aligned) & BITMASK(16));
-                        aLoadBuffer(cmd++, VIRTUAL_TO_PHYSICAL2(v0_2 - a3), addr, ALIGN((t0 * unk_s6) + 16, 16));
+                        aLoadBuffer(cmd++, VIRTUAL_TO_PHYSICAL2(v0_2 - a3), addr, ALIGN16((t0 * unk_s6) + 16][][[[[[[]][]]]]]));
                     } else {
                         s0 = 0;
                         a3 = 0;
@@ -553,13 +553,13 @@ u64 *synthesis_process_note(s32 noteIndex, struct NoteSubEu *noteSubEu, struct N
                     if (nAdpcmSamplesProcessed == 0) {
                         switch (audioBookSample->codec) {
                             case CODEC_ADPCM:
-                                aligned = ALIGN((t0 * unk_s6) + 16, 16);
+                                aligned = ALIGN16((t0 * unk_s6) + 16);
                                 addr = ((DMEM_ADDR_COMPRESSED_ADPCM_DATA - aligned) & BITMASK(16));
                                 aSetBuffer(cmd++, 0, addr + a3, DMEM_ADDR_UNCOMPRESSED_NOTE, (s0 * 2));
                                 aADPCMdec(cmd++, flags, VIRTUAL_TO_PHYSICAL2(synthesisState->synthesisBuffers->adpcmdecState));
                                 break;
                             case CODEC_S8:
-                                aligned = ALIGN((t0 * unk_s6) + 16, 16);
+                                aligned = ALIGN16((t0 * unk_s6) + 16);
                                 addr = ((DMEM_ADDR_COMPRESSED_ADPCM_DATA - aligned) & BITMASK(16));
                                 aSetBuffer(cmd++, 0, addr + a3, DMEM_ADDR_UNCOMPRESSED_NOTE, (s0 * 2));
                                 aS8Dec(cmd++, flags, VIRTUAL_TO_PHYSICAL2(synthesisState->synthesisBuffers->adpcmdecState));
@@ -567,16 +567,16 @@ u64 *synthesis_process_note(s32 noteIndex, struct NoteSubEu *noteSubEu, struct N
                         }
                         sp130 = s2 * 2;
                     } else {
-                        s5Aligned = ALIGN(s5 + 16, 16);
+                        s5Aligned = ALIGN16(s5 + 16);
                         switch (audioBookSample->codec) {
                             case CODEC_ADPCM:
-                                aligned = ALIGN((t0 * unk_s6) + 16, 16);
+                                aligned = ALIGN16((t0 * unk_s6) + 16);
                                 addr = ((DMEM_ADDR_COMPRESSED_ADPCM_DATA - aligned) & BITMASK(16));
                                 aSetBuffer(cmd++, 0, addr + a3, DMEM_ADDR_UNCOMPRESSED_NOTE + s5Aligned, (s0 * 2));
                                 aADPCMdec(cmd++, flags, VIRTUAL_TO_PHYSICAL2(synthesisState->synthesisBuffers->adpcmdecState));
                                 break;
                             case CODEC_S8:
-                                aligned = ALIGN((t0 * unk_s6) + 16, 16);
+                                aligned = ALIGN16((t0 * unk_s6) + 16);
                                 addr = ((DMEM_ADDR_COMPRESSED_ADPCM_DATA - aligned) & BITMASK(16));
                                 aSetBuffer(cmd++, 0, addr + a3, DMEM_ADDR_UNCOMPRESSED_NOTE + s5Aligned, (s0 * 2));
                                 aS8Dec(cmd++, flags, VIRTUAL_TO_PHYSICAL2(synthesisState->synthesisBuffers->adpcmdecState));
@@ -626,7 +626,7 @@ u64 *synthesis_process_note(s32 noteIndex, struct NoteSubEu *noteSubEu, struct N
                 case 2:
                     switch (curPart) {
                         case 0:
-                            aDownsampleHalf(cmd++, ALIGN(samplesLenAdjusted / 2, 8), DMEM_ADDR_UNCOMPRESSED_NOTE + sp130, DMEM_ADDR_RESAMPLED);
+                            aDownsampleHalf(cmd++, ALIGN8(samplesLenAdjusted / 2), DMEM_ADDR_UNCOMPRESSED_NOTE + sp130, DMEM_ADDR_RESAMPLED);
                             resampledTempLen = samplesLenAdjusted;
                             noteSamplesDmemAddrBeforeResampling = DMEM_ADDR_RESAMPLED;
                             if (noteSubEu->finished) {
@@ -634,7 +634,7 @@ u64 *synthesis_process_note(s32 noteIndex, struct NoteSubEu *noteSubEu, struct N
                             }
                             break;
                         case 1:
-                            aDownsampleHalf(cmd++, ALIGN(samplesLenAdjusted / 2, 8), DMEM_ADDR_UNCOMPRESSED_NOTE + sp130, resampledTempLen + DMEM_ADDR_RESAMPLED);
+                            aDownsampleHalf(cmd++, ALIGN8(samplesLenAdjusted / 2), DMEM_ADDR_UNCOMPRESSED_NOTE + sp130, resampledTempLen + DMEM_ADDR_RESAMPLED);
                             break;
                     }
             }
@@ -848,7 +848,7 @@ u64 *note_apply_headset_pan_effects(u64 *cmd, struct NoteSubEu *noteSubEu, struc
 
         if (prevPanShift != 0) {
             aLoadBuffer(cmd++, VIRTUAL_TO_PHYSICAL2(note->synthesisBuffers->panSamplesBuffer),
-                        DMEM_ADDR_NOTE_PAN_TEMP, ALIGN(prevPanShift, 16));
+                        DMEM_ADDR_NOTE_PAN_TEMP, ALIGN16(prevPanShift));
             aDMEMMove(cmd++, DMEM_ADDR_TEMP, DMEM_ADDR_NOTE_PAN_TEMP + prevPanShift, bufLen + panShift - prevPanShift);
         } else {
             aDMEMMove(cmd++, DMEM_ADDR_TEMP, DMEM_ADDR_NOTE_PAN_TEMP, bufLen + panShift);
@@ -863,7 +863,7 @@ u64 *note_apply_headset_pan_effects(u64 *cmd, struct NoteSubEu *noteSubEu, struc
     if (panShift) {
         // Save excessive samples for next iteration
         aSaveBuffer(cmd++, DMEM_ADDR_NOTE_PAN_TEMP + bufLen,
-                    VIRTUAL_TO_PHYSICAL2(note->synthesisBuffers->panSamplesBuffer), ALIGN(panShift, 16));
+                    VIRTUAL_TO_PHYSICAL2(note->synthesisBuffers->panSamplesBuffer), ALIGN16(panShift));
     }
 
     aAddMixer(cmd++, DMEM_ADDR_NOTE_PAN_TEMP, dest, ((bufLen + BITMASK(6)) & (BITMASK(10) << 2)));

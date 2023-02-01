@@ -42,23 +42,30 @@
 
 // Use Og when compiling the function.
 #ifdef __GNUC__
-#define OPTIMIZE_OG inline __attribute__((optimize("Og")))
+#define OPTIMIZE_OG __attribute__((optimize("Og")))
 #else
-#define OPTIMIZE_OG inline
+#define OPTIMIZE_OG 
 #endif
 
 // Use Os when compiling the function.
 #ifdef __GNUC__
-#define OPTIMIZE_OS inline __attribute__((optimize("Os")))
+#define OPTIMIZE_OS __attribute__((optimize("Os")))
 #else
-#define OPTIMIZE_OS inline
+#define OPTIMIZE_OS 
 #endif
 
 // Use Ofast when compiling the function.
 #ifdef __GNUC__
-#define OPTIMIZE_OFAST inline __attribute__((optimize("Ofast")))
+#define OPTIMIZE_OFAST __attribute__((optimize("Ofast")))
 #else
-#define OPTIMIZE_OFAST inline
+#define OPTIMIZE_OFAST 
+#endif
+
+// Ignore 4-byte alignment in structs.
+#ifdef __GNUC__
+#define PACKED __attribute__((packed))
+#else
+#define PACKED 
 #endif
 
 // Align to 4-byte boundary.
@@ -100,7 +107,7 @@
 #define ALIGN(VAL_, ALIGNMENT_) (((VAL_) + ((ALIGNMENT_) - 1)) & ~((ALIGNMENT_) - 1))
 #endif
 
-// round up to the next multiple.
+// Round up to the next multiple.
 #define ALIGN4(val)  ALIGN((val),  4)
 #define ALIGN8(val)  ALIGN((val),  8)
 #define ALIGN16(val) ALIGN((val), 16)
@@ -108,20 +115,20 @@
 #define ALIGN64(val) ALIGN((val), 64)
 
 #ifndef NO_SEGMENTED_MEMORY
-// convert a virtual address to physical.
-#define VIRTUAL_TO_PHYSICAL(addr)   ((uintptr_t)(addr) & BITMASK(29))
+// Convert a virtual address to physical.
+#define VIRTUAL_TO_PHYSICAL(addr)   ((uintptr_t)(addr) & 0x1FFFFFFF)
 
-// convert a physical address to virtual.
+// Convert a physical address to virtual.
 #define PHYSICAL_TO_VIRTUAL(addr)   ((uintptr_t)(addr) | 0x80000000)
 
-// another way of converting virtual to physical
+// Another way of converting virtual to physical.
 #define VIRTUAL_TO_PHYSICAL2(addr)  ((u8 *)(addr) - 0x80000000U)
-#else
-// no conversion needed other than cast.
+#else // NO_SEGMENTED_MEMORY
+// No conversion needed other than cast.
 #define VIRTUAL_TO_PHYSICAL(addr)   ((uintptr_t)(addr))
 #define PHYSICAL_TO_VIRTUAL(addr)   ((uintptr_t)(addr))
 #define VIRTUAL_TO_PHYSICAL2(addr)  ((void *)(addr))
-#endif
+#endif // NO_SEGMENTED_MEMORY
 
 // Static (compile-time) assertions.
 #ifdef __GNUC__

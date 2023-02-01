@@ -4,6 +4,7 @@
 #include <PR/ultratypes.h>
 
 #include "internal.h"
+#include "data.h"
 
 enum SoundLoadStatus {
     SOUND_LOAD_STATUS_NOT_LOADED,
@@ -123,8 +124,8 @@ extern struct Unk1Pool gUnkPool1;
 extern struct UnkPool gUnkPool2;
 extern struct UnkPool gUnkPool3;
 #endif
-extern u8 gBankLoadStatus[64];
-extern u8 gSeqLoadStatus[256];
+extern u8 gBankLoadStatus[MAX_NUM_SOUNDBANKS];
+extern u8 gSeqLoadStatus[0x100];
 extern volatile u8 gAudioResetStatus;
 extern u8 gAudioResetPresetIdToLoad;
 
