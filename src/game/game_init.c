@@ -121,7 +121,6 @@ const Gfx init_rdp[] = {
     gsDPSetRenderMode(G_RM_OPA_SURF, G_RM_OPA_SURF2),
     gsDPSetColorDither(G_CD_MAGICSQ),
     gsDPSetCycleType(G_CYC_FILL),
-
     gsDPSetAlphaDither(G_AD_PATTERN),
     gsSPEndDisplayList(),
 };
@@ -135,11 +134,7 @@ const Gfx init_rsp[] = {
     gsSPClearGeometryMode(G_CULL_FRONT | G_FOG | G_LIGHTING | G_TEXTURE_GEN | G_TEXTURE_GEN_LINEAR | G_LOD),
     gsSPSetGeometryMode(G_SHADE | G_SHADING_SMOOTH | G_CULL_BACK | G_LIGHTING),
     gsSPTexture(0, 0, 0, G_TX_RENDERTILE, G_OFF),
-
-    // Failing to set the clip ratio will result in warped triangles in F3DEX2:
-    // https://jrra.zone/n64/doc/n64man/gsp/gSPClipRatio.htm
-    gsSPClipRatio(FRUSTRATIO_1),
-
+    gsSPClipRatio(FRUSTRATIO_2),
     gsSPEndDisplayList(),
 };
 
