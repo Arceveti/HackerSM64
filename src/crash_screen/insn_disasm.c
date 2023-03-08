@@ -320,7 +320,7 @@ static const RGBA32 sDisasmColors[] = {
     [DISASM_COLOR_OFFSET   ] = COLOR_RGBA32_CRASH_FUNCTION_NAME_2,
 };
 
-static char insn_as_string[CHAR_BUFFER_SIZE];
+static char insn_as_string[CHAR_BUFFER_SIZE] = "";
 
 static char fmt_to_char(InsnData insn) {
     switch (insn.i.rs) {
@@ -392,7 +392,7 @@ char *insn_disasm(InsnData insn, u32 isPC) {
 #ifdef INCLUDE_DEBUG_MAP
     char *fname = NULL;
 #endif
-    char insn_name[10];
+    char insn_name[10] = "";
 
     bzero(insn_as_string, sizeof(insn_as_string));
     bzero(insn_name, sizeof(insn_name));

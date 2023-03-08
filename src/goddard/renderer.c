@@ -2080,10 +2080,10 @@ void set_Vtx_norm_buf(struct GdVec3f *norm) {
 /* 24FF80 -> 24FFDC; orig name: func_801A17B0 */
 void set_gd_mtx_parameters(s32 params) {
     switch (params) {
-        case G_MTX_PROJECTION | G_MTX_MUL | G_MTX_PUSH:
+        case (G_MTX_PROJECTION | G_MTX_MUL | G_MTX_PUSH):
             sMtxParamType = G_MTX_PROJECTION;
             break;
-        case G_MTX_MODELVIEW | G_MTX_LOAD | G_MTX_PUSH:
+        case (G_MTX_MODELVIEW | G_MTX_LOAD | G_MTX_PUSH):
             sMtxParamType = G_MTX_MODELVIEW;
             break;
     }
@@ -2771,9 +2771,8 @@ void set_active_view(struct ObjView *v) {
  * Unused - called by func_801A520C
  */
 void func_801A4918(void) {
-    f32 x;     // c
-    f32 y;     // 8
-    u32 ydiff; // 4
+    f32 x, y;
+    u32 ydiff;
 
     if (sHandView == NULL || sMenuView == NULL) {
         return;

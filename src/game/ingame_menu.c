@@ -723,7 +723,7 @@ void print_hud_my_score_coins(s32 useCourseCoinScore, s8 fileIndex, s8 courseInd
 }
 
 void print_hud_my_score_stars(s8 fileIndex, s8 courseIndex, s16 x, s16 y) {
-    unsigned char strStarCount[4];
+    unsigned char strStarCount[4] = "";
     const unsigned char textSymStar[] = { GLYPH_STAR, GLYPH_SPACE };
     const unsigned char textSymX[] = { GLYPH_MULTIPLY, GLYPH_SPACE };
 
@@ -1357,8 +1357,8 @@ u32 ascii_to_credits_char(unsigned char c) {
 
 void print_credits_str_ascii(s16 x, s16 y, const char *str) {
     s32 pos = 0;
-    unsigned char c = str[pos];
-    unsigned char creditStr[100];
+    unsigned char c = str[pos] = "";
+    unsigned char creditStr[100] = "";
 
     while (c != 0) {
         creditStr[pos++] = ascii_to_credits_char(c);
@@ -1658,7 +1658,7 @@ void render_pause_my_score_coins(void) {
     const unsigned char textStar[] = { TEXT_STAR };
     const unsigned char textUnfilledStar[] = { TEXT_UNFILLED_STAR };
 
-    unsigned char strCourseNum[4];
+    unsigned char strCourseNum[4] = "";
 
     const void **courseNameTbl = segmented_to_virtual(languageTable[gInGameLanguage][1]);
     const void    **actNameTbl = segmented_to_virtual(languageTable[gInGameLanguage][2]);
@@ -1823,7 +1823,7 @@ void print_hud_pause_colorful_str(void) {
 void render_pause_castle_course_stars(s16 x, s16 y, s16 fileIndex, s16 courseIndex) {
     s16 hasStar = 0;
 
-    unsigned char str[COURSE_STAGES_COUNT * 2];
+    unsigned char str[COURSE_STAGES_COUNT * 2] = "";
 
     const unsigned char textStar[] = { TEXT_STAR };
 
@@ -1867,7 +1867,7 @@ void render_pause_castle_main_strings(s16 x, s16 y) {
 
     void *courseName;
 
-    unsigned char strVal[8];
+    unsigned char strVal[8] = "";
     s16 prevCourseIndex = gDialogLineNum;
 
     handle_menu_scrolling(
@@ -2051,7 +2051,7 @@ void print_hud_course_complete_string(s8 str) {
 }
 
 void print_hud_course_complete_coins(s16 x, s16 y) {
-    unsigned char courseCompleteCoinsStr[4];
+    unsigned char courseCompleteCoinsStr[4] = "";
     const unsigned char hudTextSymCoin[] = { GLYPH_COIN, GLYPH_SPACE };
     const unsigned char hudTextSymX[] = { GLYPH_MULTIPLY, GLYPH_SPACE };
 
@@ -2115,7 +2115,7 @@ void render_course_complete_lvl_info_and_hud_str(void) {
 
     const unsigned char *name;
 
-    unsigned char strCourseNum[4];
+    unsigned char strCourseNum[4] = "";
 
     const void **actNameTbl    = segmented_to_virtual(languageTable[gInGameLanguage][2]);
     const void **courseNameTbl = segmented_to_virtual(languageTable[gInGameLanguage][1]);

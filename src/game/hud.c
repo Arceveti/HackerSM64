@@ -64,7 +64,7 @@ void print_fps(s32 x, s32 y) {
 #else
     f32 fps = calculate_and_update_fps();
 #endif
-    char text[14];
+    char text[14] = "";
 
     sprintf(text, "FPS %2.2f", fps);
 #ifdef PUPPYPRINT

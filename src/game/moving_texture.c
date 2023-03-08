@@ -12,7 +12,6 @@
 #include "engine/math_util.h"
 #include "engine/surface_collision.h"
 #include "geo_misc.h"
-#include "rendering_graph_node.h"
 #include "object_list_processor.h"
 
 /**

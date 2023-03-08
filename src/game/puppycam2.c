@@ -330,7 +330,7 @@ void puppycam_print_text(s32 x, s32 y, unsigned char *str, s32 col) {
 // Options menu
 void puppycam_display_options() {
     s32 i = 0;
-    unsigned char newstring[32];
+    unsigned char newstring[32] = "";
     s32 scroll;
     s32 scrollpos;
     u32 var; // should be s16, but gives a build warning otherwise?

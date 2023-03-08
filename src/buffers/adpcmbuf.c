@@ -16,7 +16,7 @@
 
 /*
  * Buffer for audio records (ADPCM data) read from the HVQM2 data.
- * (Note) Please locate at a 16byte aligned address with the spec file. 
+ * (Note) Please locate at a 16byte aligned address with the spec file.
  */
 ALIGNED16 u8 adpcmbuf[AUDIO_RECORD_SIZE_MAX];
 

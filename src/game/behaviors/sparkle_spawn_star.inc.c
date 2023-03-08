@@ -55,7 +55,7 @@ void spawned_star_set_target_above_mario(void) {
         }
     }
 
-    o->oPosY = o->oHomeY; 
+    o->oPosY = o->oHomeY;
     f32 lateralDist;
     vec3f_get_lateral_dist(&o->oPosVec, &o->oHomeVec, &lateralDist);
 
@@ -81,7 +81,7 @@ void bhv_spawned_star_loop(void) {
             o->activeFlags |= ACTIVE_FLAG_INITIATED_TIME_STOP;
             o->oAngleVelYaw = 0x800;
             if (o->oBehParams2ndByte == SPAWN_STAR_POS_CUTSCENE_BP_SPAWN_AT_MARIO) {
-                spawned_star_set_target_above_mario();             
+                spawned_star_set_target_above_mario();
             } else {
                 set_y_home_to_pos();
             }

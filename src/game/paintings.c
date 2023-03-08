@@ -265,7 +265,7 @@ void painting_average_vertex_normals(struct PaintingNeighborTris *neighborTris, 
  * Creates a display list that draws the rippling painting, with 'img' mapped to the painting's mesh, using 'triangleMap'.
  *
  * If the triangleMap doesn't describe the whole mesh, then multiple calls are needed to draw the whole painting.
- * 
+ *
  * TODO: Automatically create seams between segments based on the image count.
  */
 Gfx *render_painting_segment(const Texture *img, s16 index, s16 imageCount, s16 tWidth, s16 tHeight, struct PaintingMeshVertex *paintingMesh, const PaintingData *triangleMap, PaintingData numTris, Alpha alpha) {

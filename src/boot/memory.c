@@ -21,6 +21,7 @@
 #endif
 #include "game/puppyprint.h"
 
+
 struct MainPoolState {
     u32 freeSpace;
     struct MainPoolBlock *listHeadL;

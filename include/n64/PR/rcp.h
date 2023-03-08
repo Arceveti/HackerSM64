@@ -532,7 +532,7 @@ The Indy development board use cartridge domain 1:
 /* 
  * VI video timing (R/W): [ 7: 0] horizontal sync width in pixels, 
  *			  [15: 8] color burst width in pixels,
- *                        [19:16] vertical sync width in half lines,   
+ *                        [19:16] vertical sync width in half lines,
  *			  [29:20] start of color burst in pixels from h-sync
  */
 #define VI_BURST_REG		(VI_BASE_REG+0x14)	

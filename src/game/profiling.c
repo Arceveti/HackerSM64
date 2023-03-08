@@ -184,7 +184,7 @@ u32 profiler_get_rdp_microseconds() {
 
 void profiler_print_times() {
     u32 microseconds[PROFILER_TIME_COUNT];
-    char text_buffer[196];
+    char text_buffer[196] = "";
 
     update_fps_timer();
     update_total_timer();

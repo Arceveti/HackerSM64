@@ -4,7 +4,6 @@
 #include <PR/ultratypes.h>
 #include <PR/gbi.h>
 
-#include "macros.h"
 #include "types.h"
 
 enum TextureTransitionID {

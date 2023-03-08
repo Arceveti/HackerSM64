@@ -44,19 +44,19 @@ struct AudioSessionSettingsEU gAudioSessionPresets[] = {
 #ifdef BETTER_REVERB
 // Each entry represents an array of variable audio buffer sizes / delays for each respective filter.
 u32 delaysArr[][NUM_ALLPASS] = {
-    { /* 0 */ 
+    { /* 0 */
         4, 4, 4,
         4, 4, 4,
         4, 4, 4,
         4, 4, 4
     },
-    { /* 1 */ 
+    { /* 1 */
         1080, 1352, 1200,
         1200, 1232, 1432,
         1384, 1048, 1352,
          928, 1504, 1512,
     },
-    { /* 2 */ 
+    { /* 2 */
         1384, 1352, 1048,
          928, 1512, 1504,
         1080, 1200, 1352,

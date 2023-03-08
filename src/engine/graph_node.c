@@ -593,7 +593,7 @@ void geo_call_global_function_nodes_helper(struct GraphNode *graphNode, s32 call
     do {
         asFnNode = (struct FnGraphNode *) curNode;
         type = curNode->type;
-        
+
         // Whether the type's corresponding struct has a FnGraphNode fnNode struct.
         if (type == GRAPH_NODE_TYPE_PERSPECTIVE
          || type == GRAPH_NODE_TYPE_SWITCH_CASE

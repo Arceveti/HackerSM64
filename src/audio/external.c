@@ -60,7 +60,7 @@ s32 gAudioErrorFlags2 = 0;
 #else
 s32 gAudioErrorFlags = 0;
 #endif
-s32 sGameLoopTicked = 0;
+s32 sGameLoopTicked = FALSE;
 
 // Dialog sounds
 // The US difference is the sound for DIALOG_037 ("I win! You lose! Ha ha ha ha!
@@ -559,9 +559,9 @@ extern void func_sh_802F64C8(void);
  * Called from threads: thread5_game_loop
  */
 void maybe_tick_game_sound(void) {
-    if (sGameLoopTicked != 0) {
+    if (sGameLoopTicked) {
         update_game_sound();
-        sGameLoopTicked = 0;
+        sGameLoopTicked = FALSE;
     }
  #ifdef VERSION_EU
     func_802ad7a0();
@@ -640,9 +640,9 @@ struct SPTask *create_next_audio_frame_task(void) {
         gAiBufferLengths[index] = gSamplesPerFrameTarget + SAMPLES_TO_OVERPRODUCE;
     }
 
-    if (sGameLoopTicked != 0) {
+    if (sGameLoopTicked) {
         update_game_sound();
-        sGameLoopTicked = 0;
+        sGameLoopTicked = FALSE;
     }
 
     // For the function to match we have to preserve some arbitrary variable
@@ -1163,7 +1163,7 @@ static u32 get_sound_reverb(UNUSED u8 bank, UNUSED u8 soundIndex, u8 channelInde
  * Called from threads: thread5_game_loop
  */
 void audio_signal_game_loop_tick(void) {
-    sGameLoopTicked = 1;
+    sGameLoopTicked = TRUE;
 #if defined(VERSION_EU) || defined(VERSION_SH)
     maybe_tick_game_sound();
 #endif
@@ -2487,7 +2487,7 @@ void sound_reset(u8 reverbPresetId) {
     if (reverbPresetId >= SEQ_SETTINGS_PRESET_COUNT) {
         reverbPresetId = SEQ_SETTINGS_PRESET_DEFAULT;
     }
-    sGameLoopTicked = 0;
+    sGameLoopTicked = FALSE;
     disable_all_sequence_players();
     sound_init();
 #ifdef VERSION_SH

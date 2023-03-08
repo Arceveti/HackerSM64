@@ -1071,7 +1071,7 @@ void init_reverb_us(s32 presetId) {
     }
 
     reverbFilterCount -= reverbFilterCount % 3;
-    
+
     if (reverbFilterCount > NUM_ALLPASS) {
         reverbFilterCount = NUM_ALLPASS;
     } else if (reverbFilterCount < 3) {

@@ -711,7 +711,7 @@ s32 level_trigger_warp(struct MarioState *m, s32 warpOp) {
 #else
                         sSourceWarpNodeId = WARP_NODE_DEATH;
 #endif
-                    }                    
+                    }
                 }
 
                 sDelayedWarpTimer = 20;

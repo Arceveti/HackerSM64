@@ -1136,22 +1136,20 @@ void print_menu_cursor(void) {
     );
     Gfx *dlHead = gDisplayListHead;
     // Get the right graphic to use for the cursor.
-    if (sCursorClickingTimer == 0) {
-        // Idle
-        gSPDisplayList(dlHead++, dl_menu_idle_hand);
-    }
     if (sCursorClickingTimer != 0) {
         // Grabbing
         gSPDisplayList(dlHead++, dl_menu_grabbing_hand);
-        gSPPopMatrix(dlHead++, G_MTX_MODELVIEW);
-    }
-    if (sCursorClickingTimer != 0) {
+
         sCursorClickingTimer++; // This is a very strange way to implement a timer? It counts up and
                                 // then resets to 0 instead of just counting down to 0.
         if (sCursorClickingTimer == 5) {
             sCursorClickingTimer = 0;
         }
+    } else {
+        // Idle
+        gSPDisplayList(dlHead++, dl_menu_idle_hand);
     }
+    gSPPopMatrix(dlHead++, G_MTX_MODELVIEW);
     gDisplayListHead = dlHead;
 }
 
@@ -1198,7 +1196,7 @@ s32 update_text_fade_out(void) {
  * If a save doesn't exist, print "NEW" instead.
  */
 void print_save_file_star_count(s8 fileIndex, s16 x, s16 y) {
-    unsigned char starCountText[4];
+    unsigned char starCountText[4] = "";
     s8 offset = 0;
 
     if (save_file_exists(fileIndex)) {
@@ -1754,7 +1752,7 @@ const unsigned char textStarX[] = { TEXT_STAR_X };
  * Prints castle secret stars collected in a score menu save file.
  */
 void print_score_file_castle_secret_stars(s8 fileIndex, s16 x, s16 y) {
-    unsigned char secretStarsText[20];
+    unsigned char secretStarsText[20] = "";
     // Print "[star] x"
     print_menu_generic_string(x, y, textStarX);
     // Print number of castle secret stars
@@ -1777,7 +1775,7 @@ void print_score_file_castle_secret_stars(s8 fileIndex, s16 x, s16 y) {
  * Prints course coins collected in a score menu save file.
  */
 void print_score_file_course_coin_score(s8 fileIndex, s16 courseIndex, s16 x, s16 y) {
-    unsigned char coinScoreText[20];
+    unsigned char coinScoreText[20] = "";
     u8 stars = save_file_get_star_flags(fileIndex, courseIndex);
     const unsigned char textCoinX[] = { TEXT_COIN_X };
     const unsigned char textStar[] = { TEXT_STAR };
@@ -1818,7 +1816,7 @@ void print_score_file_course_coin_score(s8 fileIndex, s16 courseIndex, s16 x, s1
  */
 void print_score_file_star_score(s8 fileIndex, s16 courseIndex, s16 x, s16 y) {
     s16 i = 0;
-    unsigned char starScoreText[19];
+    unsigned char starScoreText[19] = "";
     u8 stars = save_file_get_star_flags(fileIndex, courseIndex);
     s8 starCount = save_file_get_course_star_count(fileIndex, courseIndex);
     // Don't count 100 coin star

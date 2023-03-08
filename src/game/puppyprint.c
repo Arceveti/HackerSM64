@@ -247,7 +247,7 @@ s8 nameTable = sizeof(ramNames) / NUM_TLB_SEGMENTS;
 
 void print_ram_overview(void) {
     s32 i = 0;
-    char textBytes[32];
+    char textBytes[32] = "";
     s32 x = 80;
     s32 y = 16;
     s32 drawn = 0;
@@ -297,7 +297,7 @@ const char *audioPoolNames[NUM_AUDIO_POOLS] = {
 };
 
 void print_audio_ram_overview(void) {
-    char textBytes[128];
+    char textBytes[128] = "";
     const s32 x = 16;
     s32 y = 16;
     s32 i = 0;
@@ -392,7 +392,7 @@ const char benchNames[][32] = {
 };
 
 void print_which_benchmark(void) {
-    char textBytes[40];
+    char textBytes[40] = "";
 
     prepare_blank_box();
     render_blank_box((SCREEN_CENTER_X - 50), 115, (SCREEN_CENTER_X + 50), 160, 0, 0, 0, 255);
@@ -409,7 +409,7 @@ static char *write_to_buf(char *buffer, const char *data, size_t size) {
 
 void append_puppyprint_log(const char *str, ...) {
     s32 i;
-    char textBytes[255];
+    char textBytes[255] = "";
 
     memset(textBytes, 0, sizeof(textBytes));
     va_list arguments;
@@ -449,7 +449,7 @@ void print_console_log(void) {
 #endif
 
 void puppyprint_render_collision(void) {
-    char textBytes[200];
+    char textBytes[200] = "";
 
     sprintf(textBytes, "Static Pool Size: 0x%X#Dynamic Pool Size: 0x%X#Dynamic Pool Used: 0x%X#Surfaces Allocated: %d#Nodes Allocated: %d", gTotalStaticSurfaceData, DYNAMIC_SURFACE_POOL_SIZE,(uintptr_t)gDynamicSurfacePoolEnd - (uintptr_t)gDynamicSurfacePool,
             gSurfacesAllocated, gSurfaceNodesAllocated);
@@ -493,7 +493,7 @@ void print_basic_profiling(void) {
     u32 cpuTime;
     u32 rspTime;
     u32 rdpTime;
-    char textBytes[90];
+    char textBytes[90] = "";
     print_fps(16, 16);
 #ifdef PUPPYPRINT_DEBUG_CYCLES
     cpuTime = profiler_get_cpu_cycles();
@@ -516,7 +516,7 @@ void print_basic_profiling(void) {
 }
 
 void puppyprint_render_standard(void) {
-    char textBytes[80];
+    char textBytes[80] = "";
 
     sprintf(textBytes, "OBJ: %d/%d", gObjectCounter, OBJECT_POOL_CAPACITY);
     print_small_text((SCREEN_WIDTH - 16), 16, textBytes, PRINT_TEXT_ALIGN_RIGHT, PRINT_ALL, FONT_OUTLINE);

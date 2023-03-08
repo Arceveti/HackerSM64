@@ -61,7 +61,7 @@ AnimValue *gCurrAnimData;
 struct AllocOnlyPool *gDisplayListHeap;
 
 /* Rendermode settings for cycle 1 for all 8 or 13 layers. */
-struct RenderModeContainer renderModeTable_1Cycle[2] = { 
+struct RenderModeContainer renderModeTable_1Cycle[2] = {
     [RENDER_NO_ZB] = { {
         [LAYER_FORCE                    ] = G_RM_OPA_SURF,
         [LAYER_OPAQUE                   ] = G_RM_AA_OPA_SURF,
@@ -176,10 +176,10 @@ static const Gfx dl_silhouette_end[] = {
 #endif
 
 struct RenderPhase {
-    u8 startLayer;
-    u8 endLayer;
-    u8 ucode;
-};
+    /*0x00*/ u8 startLayer;
+    /*0x01*/ u8 endLayer;
+    /*0x02*/ u8 ucode;
+}; /*0x03*/
 
 static struct RenderPhase sRenderPhases[] = {
 #ifdef OBJECTS_REJ
@@ -281,6 +281,7 @@ static struct RenderPhase sRenderPhases[] = {
     [RENDER_PHASE_ZEX_ALL]                 = { // 0 - 8
         .startLayer = LAYER_FIRST,
         .endLayer   = LAYER_LAST,
+        .ucode      = GRAPH_NODE_UCODE_DEFAULT,
     },
 
  #endif
@@ -352,7 +353,7 @@ void geo_process_master_list_sub(struct GraphNodeMasterList *node) {
         // Get the render phase information.
         renderPhase = &sRenderPhases[phaseIndex];
         startLayer = renderPhase->startLayer;
-        endLayer   = renderPhase->endLayer;
+        endLayer = renderPhase->endLayer;
 #ifdef OBJECTS_REJ
         if (ucode != renderPhase->ucode) {
             ucode = renderPhase->ucode;
@@ -634,7 +635,9 @@ void geo_process_switch(struct GraphNodeSwitchCase *node) {
 Mat4 gCameraTransform;
 
 Lights1 defaultLight = gdSPDefLights1(
-    0x3F, 0x3F, 0x3F, 0xFF, 0xFF, 0xFF, 0x00, 0x00, 0x00
+    0x3F, 0x3F, 0x3F,
+    0xFF, 0xFF, 0xFF,
+    0x00, 0x00, 0x00
 );
 
 Vec3f globalLightDirection = {
@@ -857,7 +860,7 @@ void geo_process_background(struct GraphNodeBackground *node) {
         gDPSetCycleType(gfx++, G_CYC_FILL);
         gDPSetFillColor(gfx++, node->background);
         gDPFillRectangle(gfx++, GFX_DIMENSIONS_RECT_FROM_LEFT_EDGE(0), gBorderHeight,
-                         (GFX_DIMENSIONS_RECT_FROM_RIGHT_EDGE(0) - 1), (SCREEN_HEIGHT - gBorderHeight - 1));
+                         (GFX_DIMENSIONS_RECT_FROM_RIGHT_EDGE(0) - 1), ((SCREEN_HEIGHT - gBorderHeight) - 1));
         gDPPipeSync(gfx++);
         gDPSetCycleType(gfx++, G_CYC_1CYCLE);
         gSPEndDisplayList(gfx++);
@@ -1349,8 +1352,8 @@ void geo_process_root(struct GraphNodeRoot *node, Vp *b, Vp *c, s32 clearColor) 
 
         gMatStackIndex = 0;
         gCurrAnimType = ANIM_TYPE_NONE;
-        vec3s_set(viewport->vp.vtrans, (node->x     * 4), (node->y      * 4), (512 - 1));
-        vec3s_set(viewport->vp.vscale, (node->width * 4), (node->height * 4), (512 - 1));
+        vec3s_set(viewport->vp.vtrans, (node->x     * 4), (node->y      * 4), (G_MAXZ / 2));
+        vec3s_set(viewport->vp.vscale, (node->width * 4), (node->height * 4), (G_MAXZ / 2));
 
         if (b != NULL) {
             clear_framebuffer(clearColor);

@@ -263,7 +263,7 @@ static char *write_to_buf(char *buffer, const char *data, size_t size) {
 }
 
 u32 crash_screen_print(u32 startX, u32 startY, const char *fmt, ...) {
-    char buf[CHAR_BUFFER_SIZE];
+    char buf[CHAR_BUFFER_SIZE] = "";
     bzero(&buf, sizeof(buf));
 
     va_list args;

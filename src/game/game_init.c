@@ -172,8 +172,8 @@ void init_z_buffer(s32 resetZB) {
 
     gDPSetFillColor(dlHead++, ((GPACK_ZDZ(G_MAXFBZ, 0) << 16) | GPACK_ZDZ(G_MAXFBZ, 0)));
 
-    gDPFillRectangle(dlHead++, 0, gBorderHeight, SCREEN_WIDTH - 1,
-                     SCREEN_HEIGHT - 1 - gBorderHeight);
+    gDPFillRectangle(dlHead++, 0, gBorderHeight, (SCREEN_WIDTH - 1),
+                     ((SCREEN_HEIGHT - gBorderHeight) - 1));
 
     gDisplayListHead = dlHead;
 }
@@ -190,7 +190,7 @@ void select_framebuffer(void) {
     gDPSetColorImage(dlHead++, G_IM_FMT_RGBA, G_IM_SIZ_16b, SCREEN_WIDTH,
                      gPhysicalFramebuffers[sRenderingFramebuffer]);
     gDPSetScissor(dlHead++, G_SC_NON_INTERLACE, 0, gBorderHeight, SCREEN_WIDTH,
-                  SCREEN_HEIGHT - gBorderHeight);
+                  (SCREEN_HEIGHT - gBorderHeight));
 
     gDisplayListHead = dlHead;
 }

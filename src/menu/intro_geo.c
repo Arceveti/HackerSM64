@@ -137,16 +137,16 @@ static const Gfx *introBackgroundDlRows[] = {
 
 // intro screen background texture X offsets
 static const float xCoords[] = {
-    (INTRO_BG_WIDTH  * 0), (INTRO_BG_WIDTH  * 1), (INTRO_BG_WIDTH  * 2), (INTRO_BG_WIDTH  * 3), 
-    (INTRO_BG_WIDTH  * 0), (INTRO_BG_WIDTH  * 1), (INTRO_BG_WIDTH  * 2), (INTRO_BG_WIDTH  * 3), 
-    (INTRO_BG_WIDTH  * 0), (INTRO_BG_WIDTH  * 1), (INTRO_BG_WIDTH  * 2), (INTRO_BG_WIDTH  * 3), 
+    (INTRO_BG_WIDTH  * 0), (INTRO_BG_WIDTH  * 1), (INTRO_BG_WIDTH  * 2), (INTRO_BG_WIDTH  * 3),
+    (INTRO_BG_WIDTH  * 0), (INTRO_BG_WIDTH  * 1), (INTRO_BG_WIDTH  * 2), (INTRO_BG_WIDTH  * 3),
+    (INTRO_BG_WIDTH  * 0), (INTRO_BG_WIDTH  * 1), (INTRO_BG_WIDTH  * 2), (INTRO_BG_WIDTH  * 3),
 };
 
 // intro screen background texture Y offsets
 static const float yCoords[] = {
-    (INTRO_BG_HEIGHT * 2), (INTRO_BG_HEIGHT * 2), (INTRO_BG_HEIGHT * 2), (INTRO_BG_HEIGHT * 2), 
-    (INTRO_BG_HEIGHT * 1), (INTRO_BG_HEIGHT * 1), (INTRO_BG_HEIGHT * 1), (INTRO_BG_HEIGHT * 1), 
-    (INTRO_BG_HEIGHT * 0), (INTRO_BG_HEIGHT * 0), (INTRO_BG_HEIGHT * 0), (INTRO_BG_HEIGHT * 0), 
+    (INTRO_BG_HEIGHT * 2), (INTRO_BG_HEIGHT * 2), (INTRO_BG_HEIGHT * 2), (INTRO_BG_HEIGHT * 2),
+    (INTRO_BG_HEIGHT * 1), (INTRO_BG_HEIGHT * 1), (INTRO_BG_HEIGHT * 1), (INTRO_BG_HEIGHT * 1),
+    (INTRO_BG_HEIGHT * 0), (INTRO_BG_HEIGHT * 0), (INTRO_BG_HEIGHT * 0), (INTRO_BG_HEIGHT * 0),
 };
 
 // table that points to either the "Super Mario 64" or "Game Over" tables
@@ -428,9 +428,7 @@ Gfx *geo_intro_face_easter_egg(s32 callContext, struct GraphNode *node, UNUSED v
     s32 i;
 
     if (callContext != GEO_CONTEXT_RENDER) {
-        for (i = 0; i < ARRAY_COUNT(sFaceVisible); i++) {
-            sFaceVisible[i] = 0;
-        }
+        bzero(sFaceVisible, sizeof(sFaceVisible));
     } else if (callContext == GEO_CONTEXT_RENDER) {
         if (sFaceCounter == 0) {
             if (gPlayer1Controller->buttonPressed & Z_TRIG) {

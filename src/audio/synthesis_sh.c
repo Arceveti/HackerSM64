@@ -533,13 +533,13 @@ u64 *synthesis_process_note(s32 noteIndex, struct NoteSubEu *noteSubEu, struct N
                             v0_2 = sp84 + (temp * unk_s6) + sampleAddr;
                         } else {
                             v0_2 = dma_sample_data((uintptr_t)(sp84 + (temp * unk_s6) + sampleAddr),
-                                    ALIGN((t0 * unk_s6) + 16, 16), flags, &synthesisState->sampleDmaIndex, audioBookSample->medium);
+                                    ALIGN16((t0 * unk_s6) + 16), flags, &synthesisState->sampleDmaIndex, audioBookSample->medium);
                         }
 
                         a3 = ((uintptr_t)v0_2 & 0xf);
                         aligned = ALIGN16((t0 * unk_s6) + 16);
                         addr = ((DMEM_ADDR_COMPRESSED_ADPCM_DATA - aligned) & BITMASK(16));
-                        aLoadBuffer(cmd++, VIRTUAL_TO_PHYSICAL2(v0_2 - a3), addr, ALIGN16((t0 * unk_s6) + 16][][[[[[[]][]]]]]));
+                        aLoadBuffer(cmd++, VIRTUAL_TO_PHYSICAL2(v0_2 - a3), addr, ALIGN16((t0 * unk_s6) + 16));
                     } else {
                         s0 = 0;
                         a3 = 0;
