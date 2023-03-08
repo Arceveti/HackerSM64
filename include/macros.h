@@ -44,21 +44,21 @@
 #ifdef __GNUC__
 #define OPTIMIZE_OG __attribute__((optimize("Og")))
 #else
-#define OPTIMIZE_OG 
+#define OPTIMIZE_OG
 #endif
 
 // Use Os when compiling the function.
 #ifdef __GNUC__
 #define OPTIMIZE_OS __attribute__((optimize("Os")))
 #else
-#define OPTIMIZE_OS 
+#define OPTIMIZE_OS
 #endif
 
 // Use Ofast when compiling the function.
 #ifdef __GNUC__
 #define OPTIMIZE_OFAST __attribute__((optimize("Ofast")))
 #else
-#define OPTIMIZE_OFAST 
+#define OPTIMIZE_OFAST
 #endif
 
 // Ignore 4-byte alignment in structs.

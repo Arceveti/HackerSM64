@@ -425,7 +425,6 @@ RGBA16 *intro_sample_framebuffer(s32 imageW, s32 imageH, s32 sampleW, s32 sample
 Gfx *geo_intro_face_easter_egg(s32 callContext, struct GraphNode *node, UNUSED void *context) {
     struct GraphNodeGenerated *genNode = (struct GraphNodeGenerated *)node;
     Gfx *dl = NULL;
-    s32 i;
 
     if (callContext != GEO_CONTEXT_RENDER) {
         bzero(sFaceVisible, sizeof(sFaceVisible));

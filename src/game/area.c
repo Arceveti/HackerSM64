@@ -61,30 +61,38 @@ s16 gCurrLevelNum = LEVEL_MIN;
 /*
  * The following two tables are used in get_mario_spawn_type() to determine spawn type
  * from warp behavior.
- * When looping through sWarpBhvSpawnTable, if the behavior function in the table matches
+ * When looping through sWarpSpawnTypes, if the behavior function in the table matches
  * the spawn behavior executed, the index of that behavior is used with sSpawnTypeFromWarpBhv
 */
-
-const BehaviorScript *sWarpBhvSpawnTable[] = {
-    bhvDoorWarp,                bhvStar,                   bhvExitPodiumWarp,          bhvWarp,
-    bhvWarpPipe,                bhvFadingWarp,             bhvInstantActiveWarp,       bhvAirborneWarp,
-    bhvHardAirKnockBackWarp,    bhvSpinAirborneCircleWarp, bhvDeathWarp,               bhvSpinAirborneWarp,
-    bhvFlyingWarp,              bhvSwimmingWarp,           bhvPaintingStarCollectWarp, bhvPaintingDeathWarp,
-    bhvAirborneStarCollectWarp, bhvAirborneDeathWarp,      bhvLaunchStarCollectWarp,   bhvLaunchDeathWarp,
+struct WarpSpawnType sWarpSpawnTypes[] = {
+    { .behavior = bhvDoorWarp,                .spawnType = MARIO_SPAWN_DOOR_WARP              },
+    { .behavior = bhvStar,                    .spawnType = MARIO_SPAWN_IDLE                   },
+    { .behavior = bhvExitPodiumWarp,          .spawnType = MARIO_SPAWN_PIPE                   },
+    { .behavior = bhvWarp,                    .spawnType = MARIO_SPAWN_PIPE                   },
+    { .behavior = bhvWarpPipe,                .spawnType = MARIO_SPAWN_PIPE                   },
+    { .behavior = bhvFadingWarp,              .spawnType = MARIO_SPAWN_TELEPORT               },
+    { .behavior = bhvInstantActiveWarp,       .spawnType = MARIO_SPAWN_INSTANT_ACTIVE         },
+    { .behavior = bhvAirborneWarp,            .spawnType = MARIO_SPAWN_AIRBORNE               },
+    { .behavior = bhvHardAirKnockBackWarp,    .spawnType = MARIO_SPAWN_HARD_AIR_KNOCKBACK     },
+    { .behavior = bhvSpinAirborneCircleWarp,  .spawnType = MARIO_SPAWN_SPIN_AIRBORNE_CIRCLE   },
+    { .behavior = bhvDeathWarp,               .spawnType = MARIO_SPAWN_DEATH                  },
+    { .behavior = bhvSpinAirborneWarp,        .spawnType = MARIO_SPAWN_SPIN_AIRBORNE          },
+    { .behavior = bhvFlyingWarp,              .spawnType = MARIO_SPAWN_FLYING                 },
+    { .behavior = bhvSwimmingWarp,            .spawnType = MARIO_SPAWN_SWIMMING               },
+    { .behavior = bhvPaintingStarCollectWarp, .spawnType = MARIO_SPAWN_PAINTING_STAR_COLLECT  },
+    { .behavior = bhvPaintingDeathWarp,       .spawnType = MARIO_SPAWN_PAINTING_DEATH         },
+    { .behavior = bhvAirborneStarCollectWarp, .spawnType = MARIO_SPAWN_AIRBORNE_STAR_COLLECT  },
+    { .behavior = bhvAirborneDeathWarp,       .spawnType = MARIO_SPAWN_AIRBORNE_DEATH         },
+    { .behavior = bhvLaunchStarCollectWarp,   .spawnType = MARIO_SPAWN_LAUNCH_STAR_COLLECT    },
+    { .behavior = bhvLaunchDeathWarp,         .spawnType = MARIO_SPAWN_LAUNCH_DEATH           },
 };
 
-u8 sSpawnTypeFromWarpBhv[] = {
-    MARIO_SPAWN_DOOR_WARP,             MARIO_SPAWN_IDLE,                 MARIO_SPAWN_PIPE,                  MARIO_SPAWN_PIPE,
-    MARIO_SPAWN_PIPE,                  MARIO_SPAWN_TELEPORT,             MARIO_SPAWN_INSTANT_ACTIVE,        MARIO_SPAWN_AIRBORNE,
-    MARIO_SPAWN_HARD_AIR_KNOCKBACK,    MARIO_SPAWN_SPIN_AIRBORNE_CIRCLE, MARIO_SPAWN_DEATH,                 MARIO_SPAWN_SPIN_AIRBORNE,
-    MARIO_SPAWN_FLYING,                MARIO_SPAWN_SWIMMING,             MARIO_SPAWN_PAINTING_STAR_COLLECT, MARIO_SPAWN_PAINTING_DEATH,
-    MARIO_SPAWN_AIRBORNE_STAR_COLLECT, MARIO_SPAWN_AIRBORNE_DEATH,       MARIO_SPAWN_LAUNCH_STAR_COLLECT,   MARIO_SPAWN_LAUNCH_DEATH,
+Vp gViewport = {
+    .vp = {
+        .vscale = { (SCREEN_WIDTH * 2), (SCREEN_HEIGHT * 2), (G_MAXZ / 2), 0 },
+        .vtrans = { (SCREEN_WIDTH * 2), (SCREEN_HEIGHT * 2), (G_MAXZ / 2), 0 },
+    }
 };
-
-Vp gViewport = { {
-    { (SCREEN_WIDTH * 2), (SCREEN_HEIGHT * 2), (512 - 1), 0 },
-    { (SCREEN_WIDTH * 2), (SCREEN_HEIGHT * 2), (512 - 1), 0 },
-} };
 
 #if MULTILANG
 const char *gNoControllerMsg[] = {
@@ -137,9 +145,9 @@ u32 get_mario_spawn_type(struct Object *obj) {
     s32 i;
     const BehaviorScript *behavior = virtual_to_segmented(SEGMENT_BEHAVIOR_DATA, obj->behavior);
 
-    for (i = 0; i < ARRAY_COUNT(sWarpBhvSpawnTable); i++) {
-        if (sWarpBhvSpawnTable[i] == behavior) {
-            return sSpawnTypeFromWarpBhv[i];
+    for (i = 0; i < ARRAY_COUNT(sWarpSpawnTypes); i++) {
+        if (sWarpSpawnTypes[i].behavior == behavior) {
+            return sWarpSpawnTypes[i].spawnType;
         }
     }
 

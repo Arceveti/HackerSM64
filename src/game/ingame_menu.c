@@ -1357,7 +1357,7 @@ u32 ascii_to_credits_char(unsigned char c) {
 
 void print_credits_str_ascii(s16 x, s16 y, const char *str) {
     s32 pos = 0;
-    unsigned char c = str[pos] = "";
+    unsigned char c = str[pos];
     unsigned char creditStr[100] = "";
 
     while (c != 0) {

@@ -7,12 +7,17 @@
 #include "camera.h"
 #include "engine/graph_node.h"
 
+struct WarpSpawnType {
+    /*0x00*/ const BehaviorScript *behavior;
+    /*0x04*/ u32 spawnType;
+}; /*0x08*/
+
 struct WarpNode {
-    /*00*/ u8 id;
-    /*01*/ u8 destLevel;
-    /*02*/ u8 destArea;
-    /*03*/ u8 destNode;
-};
+    /*0x00*/ u8 id;
+    /*0x01*/ u8 destLevel;
+    /*0x02*/ u8 destArea;
+    /*0x03*/ u8 destNode;
+}; /*0x04*/
 
 struct ObjectWarpNode {
     /*0x00*/ struct WarpNode node;
