@@ -47,25 +47,24 @@ extern Vec3s gVec3sOne;
 #define COS85   0.087155743f
 #define COS90   0.0f
 
-/*
- * The sine and cosine tables overlap, but "#define gCosineTable (gSineTable +
- * 0x400)" doesn't give expected codegen; gSineTable and gCosineTable need to
- * be different symbols for code to match. Most likely the tables were placed
- * adjacent to each other, and gSineTable cut short, such that reads overflow
- * into gCosineTable.
- *
- * These kinds of out of bounds reads are undefined behavior, and break on
- * e.g. GCC (which doesn't place the tables next to each other, and probably
- * exploits array sizes for range analysis-based optimizations as well).
- * Thus, for non-IDO compilers we use the standard-compliant version.
- */
+
+// Trig functions
+
 extern const f32 gSineTable[];
 #define gCosineTable (gSineTable + 0x400)
 
 #define sins(x) gSineTable[  (u16) (x) >> 4]
 #define coss(x) gCosineTable[(u16) (x) >> 4]
-#define tans(x) (sins(x) / coss(x))
-#define cots(x) (coss(x) / sins(x))
+
+#define tans(x) ({          \
+    __auto_type _x = (x);     \
+    sins(_x) / coss(_x);    \
+})
+#define cots(x) ({          \
+    __auto_type _x = (x);     \
+    coss(_x) / sins(_x);    \
+})
+
 #define atans(x) gArctanTable[(s32)((((x) * 1024) + 0.5f))] // is this correct? used for atan2_lookup
 
 #define RAD_PER_DEG (M_PI / 180.0f)
@@ -86,9 +85,31 @@ extern const f32 gSineTable[];
 
 #define signum_positive(x) ((x < 0) ? -1 : 1)
 
-// #define min(a, b) MIN((a), (b)) // ((a) < (b) ? (a) : (b))
-// #define max(a, b) MAX((a), (b)) // ((a) > (b) ? (a) : (b))
-#define CLAMP(x, low, high)  (((x) > (high)) ? (high) : (((x) < (low)) ? (low) : (x)))
+#undef MIN
+#define MIN(a, b) ({        \
+    __auto_type _a = (a);   \
+    __auto_type _b = (b);   \
+    (_a < _b) ? _a : _b;    \
+})
+
+#undef MAX
+#define MAX(a, b) ({        \
+    __auto_type _a = (a);   \
+    __auto_type _b = (b);   \
+    (_a > _b) ? _a : _b;    \
+})
+
+#define ABS(x) ({           \
+    __auto_type = (x);      \
+    (_x > 0) ? _x : -_x;    \
+})
+
+#define CLAMP(x, low, high)  ({ \
+    __auto_type _x    = (x);    \
+    __auto_type _low  = (low);  \
+    __auto_type _high = (high); \
+    (((_x) > (_high)) ? (_high) : (((_x) < (_low)) ? (_low) : (_x))); \
+})
 
 // from limits.h
 #define S8_MAX __SCHAR_MAX__
@@ -161,9 +182,18 @@ extern const f32 gSineTable[];
 
 /// Make vector 'dest' the cross product of vectors a and b.
 #define vec3_cross(dst, a, b) do {                      \
-    (dst)[0] = (((a)[1] * (b)[2]) - ((a)[2] * (b)[1])); \
-    (dst)[1] = (((a)[2] * (b)[0]) - ((a)[0] * (b)[2])); \
-    (dst)[2] = (((a)[0] * (b)[1]) - ((a)[1] * (b)[0])); \
+    __auto_type _x1 = (a)[0];                           \
+    __auto_type _y1 = (a)[1];                           \
+    __auto_type _z1 = (a)[2];                           \
+    __auto_type _x2 = (b)[0];                           \
+    __auto_type _y2 = (b)[1];                           \
+    __auto_type _z2 = (b)[2];                           \
+    __auto_type _x = ((_y1 * _z2) - (_z1 * _y2));       \
+    __auto_type _y = ((_z1 * _x2) - (_x1 * _z2));       \
+    __auto_type _z = ((_x1 * _y2) - (_y1 * _x2));       \
+    (dst)[0] = _x;                                      \
+    (dst)[1] = _y;                                      \
+    (dst)[2] = _z;                                      \
 } while (0)
 
 /**
@@ -207,25 +237,40 @@ extern const f32 gSineTable[];
     (dst)[1] = (y);                         \
 } while (0)
 #define vec3_set(dst, x, y, z) do {         \
-    vec2_set((dst), (x), (y));              \
+    (dst)[0] = (x);                         \
+    (dst)[1] = (y);                         \
     (dst)[2] = (z);                         \
 } while (0)
 #define vec4_set(dst, x, y, z, w) do {      \
-    vec3_set((dst), (x), (y), (z));         \
+    (dst)[0] = (x);                         \
+    (dst)[1] = (y);                         \
+    (dst)[2] = (z);                         \
     (dst)[3] = (w);                         \
 } while (0)
 
 #define vec2_copy(dst, src) do {            \
-    (dst)[0] = (src)[0];                    \
-    (dst)[1] = (src)[1];                    \
+    typeof((src)[0]) _x = (src)[0];         \
+    typeof((src)[1]) _y = (src)[1];         \
+    (dst)[0] = _x;                          \
+    (dst)[1] = _y;                          \
 } while (0)
 #define vec3_copy(dst, src) do {            \
-    vec2_copy((dst), (src));                \
-    (dst)[2] = (src)[2];                    \
+    typeof((src)[0]) _x = (src)[0];         \
+    typeof((src)[1]) _y = (src)[1];         \
+    typeof((src)[2]) _z = (src)[2];         \
+    (dst)[0] = _x;                          \
+    (dst)[1] = _y;                          \
+    (dst)[2] = _z;                          \
 } while (0)
 #define vec4_copy(dst, src) do {            \
-    vec3_copy((dst), (src));                \
-    (dst)[3] = (src)[3];                    \
+    typeof((src)[0]) _x = (src)[0];         \
+    typeof((src)[1]) _y = (src)[1];         \
+    typeof((src)[2]) _z = (src)[2];         \
+    typeof((src)[3]) _w = (src)[3];         \
+    (dst)[0] = _x;                          \
+    (dst)[1] = _y;                          \
+    (dst)[2] = _z;                          \
+    (dst)[3] = _w;                          \
 } while (0)
 
 #define vec3_copy_y_off(dst, src, y) do {   \
@@ -239,11 +284,14 @@ extern const f32 gSineTable[];
     (dst)[1] = roundf((src)[1]);            \
 } while (0)
 #define vec3_copy_roundf(dst, src) do {     \
-    vec2_copy_roundf((dst), (src));         \
+    (dst)[0] = roundf((src)[0]);            \
+    (dst)[1] = roundf((src)[1]);            \
     (dst)[2] = roundf((src)[2]);            \
 } while (0)
 #define vec4_copy_roundf(dst, src) do {     \
-    vec3_copy_roundf((dst), (src));         \
+    (dst)[0] = roundf((src)[0]);            \
+    (dst)[1] = roundf((src)[1]);            \
+    (dst)[2] = roundf((src)[2]);            \
     (dst)[3] = roundf((src)[3]);            \
 } while (0)
 
@@ -274,11 +322,14 @@ extern const f32 gSineTable[];
     (dst)[1] = -(src)[1];                   \
 } while (0)
 #define vec3_copy_negative(dst, src) do {   \
-    vec2_copy_negative((dst), (src));       \
+    (dst)[0] = -(src)[0];                   \
+    (dst)[1] = -(src)[1];                   \
     (dst)[2] = -(src)[2];                   \
 } while (0)
 #define vec4_copy_negative(dst, src) do {   \
-    vec3_copy_negative((dst), (src));       \
+    (dst)[0] = -(src)[0];                   \
+    (dst)[1] = -(src)[1];                   \
+    (dst)[2] = -(src)[2];                   \
     (dst)[3] = -(src)[3];                   \
 } while (0)
 
@@ -287,11 +338,14 @@ extern const f32 gSineTable[];
     (dst)[1] = ((src1)[1] + (src2)[1]);     \
 } while (0)
 #define vec3_sum(dst, src1, src2) do {      \
-    vec2_sum((dst), (src1), (src2));        \
+    (dst)[0] = ((src1)[0] + (src2)[0]);     \
+    (dst)[1] = ((src1)[1] + (src2)[1]);     \
     (dst)[2] = ((src1)[2] + (src2)[2]);     \
 } while (0)
 #define vec4_sum(dst, src1, src2) do {      \
-    vec3_sum((dst), (src1), (src2));        \
+    (dst)[0] = ((src1)[0] + (src2)[0]);     \
+    (dst)[1] = ((src1)[1] + (src2)[1]);     \
+    (dst)[2] = ((src1)[2] + (src2)[2]);     \
     (dst)[3] = ((src1)[3] + (src2)[3]);     \
 } while (0)
 
@@ -304,11 +358,14 @@ extern const f32 gSineTable[];
     (dst)[1] = ((src)[1] + (x));            \
 } while (0)
 #define vec3_sum_val(dst, src, x) do {      \
-    vec2_sum_val((dst), (src), (x));        \
+    (dst)[0] = ((src)[0] + (x));            \
+    (dst)[1] = ((src)[1] + (x));            \
     (dst)[2] = ((src)[2] + (x));            \
 } while (0)
 #define vec4_sum_val(dst, src, x) do {      \
-    vec3_sum_val((dst), (src), (x));        \
+    (dst)[0] = ((src)[0] + (x));            \
+    (dst)[1] = ((src)[1] + (x));            \
+    (dst)[2] = ((src)[2] + (x));            \
     (dst)[3] = ((src)[2] + (x));            \
 } while (0)
 
@@ -321,11 +378,14 @@ extern const f32 gSineTable[];
     (dst)[1] = ((src1)[1] - (src2)[1]);     \
 } while (0)
 #define vec3_diff(dst, src1, src2) do {     \
-    vec2_diff((dst), (src1), (src2));       \
+    (dst)[0] = ((src1)[0] - (src2)[0]);     \
+    (dst)[1] = ((src1)[1] - (src2)[1]);     \
     (dst)[2] = ((src1)[2] - (src2)[2]);     \
 } while (0)
 #define vec4_diff(dst, src1, src2) do {     \
-    vec3_diff((dst), (src1), (src2));       \
+    (dst)[0] = ((src1)[0] - (src2)[0]);     \
+    (dst)[1] = ((src1)[1] - (src2)[1]);     \
+    (dst)[2] = ((src1)[2] - (src2)[2]);     \
     (dst)[3] = ((src1)[3] - (src2)[3]);     \
 } while (0)
 
@@ -338,11 +398,14 @@ extern const f32 gSineTable[];
     (dst)[1] = ((src)[1] - (x));            \
 } while (0)
 #define vec3_diff_val(dst, src, x) do {     \
-    vec2_diff_val((dst), (src), (x));       \
+    (dst)[0] = ((src)[0] - (x));            \
+    (dst)[1] = ((src)[1] - (x));            \
     (dst)[2] = ((src)[2] - (x));            \
 } while (0)
 #define vec4_diff_val(dst, src, x) do {     \
-    vec3_diff_val((dst), (src), (x));       \
+    (dst)[0] = ((src)[0] - (x));            \
+    (dst)[1] = ((src)[1] - (x));            \
+    (dst)[2] = ((src)[2] - (x));            \
     (dst)[3] = ((src)[3] - (x));            \
 } while (0)
 
@@ -355,11 +418,14 @@ extern const f32 gSineTable[];
     (dst)[1] = ((src1)[1] * (src2)[1]);     \
 } while (0)
 #define vec3_prod(dst, src1, src2) do {     \
-    vec2_prod((dst), (src1), (src2));       \
+    (dst)[0] = ((src1)[0] * (src2)[0]);     \
+    (dst)[1] = ((src1)[1] * (src2)[1]);     \
     (dst)[2] = ((src1)[2] * (src2)[2]);     \
 } while (0)
 #define vec4_prod(dst, src1, src2) do {     \
-    vec3_prod((dst), (src1), (src2));       \
+    (dst)[0] = ((src1)[0] * (src2)[0]);     \
+    (dst)[1] = ((src1)[1] * (src2)[1]);     \
+    (dst)[2] = ((src1)[2] * (src2)[2]);     \
     (dst)[3] = ((src1)[3] * (src2)[3]);     \
 } while (0)
 
@@ -372,11 +438,14 @@ extern const f32 gSineTable[];
     (dst)[1] = ((src)[1] * (x));            \
 } while (0)
 #define vec3_prod_val(dst, src, x) do {     \
-    vec2_prod_val((dst), (src), (x));       \
+    (dst)[0] = ((src)[0] * (x));            \
+    (dst)[1] = ((src)[1] * (x));            \
     (dst)[2] = ((src)[2] * (x));            \
 } while (0)
 #define vec4_prod_val(dst, src, x) do {     \
-    vec3_prod_val((dst), (src), (x));       \
+    (dst)[0] = ((src)[0] * (x));            \
+    (dst)[1] = ((src)[1] * (x));            \
+    (dst)[2] = ((src)[2] * (x));            \
     (dst)[3] = ((src)[3] * (x));            \
 } while (0)
 
@@ -389,11 +458,14 @@ extern const f32 gSineTable[];
     (dst)[1] = ((src1)[1] / (src2)[1]);     \
 } while (0)
 #define vec3_quot(dst, src1, src2) do {     \
-    vec2_quot((dst), (src1), (src2));       \
+    (dst)[0] = ((src1)[0] / (src2)[0]);     \
+    (dst)[1] = ((src1)[1] / (src2)[1]);     \
     (dst)[2] = ((src1)[2] / (src2)[2]);     \
 } while (0)
 #define vec4_quot(dst, src1, src2) do {     \
-    vec3_quot((dst), (src1), (src2));       \
+    (dst)[0] = ((src1)[0] / (src2)[0]);     \
+    (dst)[1] = ((src1)[1] / (src2)[1]);     \
+    (dst)[2] = ((src1)[2] / (src2)[2]);     \
     (dst)[3] = ((src1)[3] / (src2)[3]);     \
 } while (0)
 
@@ -406,11 +478,14 @@ extern const f32 gSineTable[];
     (dst)[1] = ((src)[1] / (x));            \
 } while (0)
 #define vec3_quot_val(dst, src, x) do {     \
-    vec2_quot_val((dst), (src), (x));       \
+    (dst)[0] = ((src)[0] / (x));            \
+    (dst)[1] = ((src)[1] / (x));            \
     (dst)[2] = ((src)[2] / (x));            \
 } while (0)
 #define vec4_quot_val(dst, src, x) do {     \
-    vec3_quot_val((dst), (src), (x));       \
+    (dst)[0] = ((src)[0] / (x));            \
+    (dst)[1] = ((src)[1] / (x));            \
+    (dst)[2] = ((src)[2] / (x));            \
     (dst)[3] = ((src)[3] / (x));            \
 } while (0)
 
@@ -485,12 +560,10 @@ ALWAYS_INLINE s32 roundf(f32 in) {
 #define round_float(in) roundf(in)
 
 
-/// Type-agnostic ternary for absolute value
-#define ABS(x)  (((x) > 0) ? (x) : -(x))
 /// Absolute value of a float value
 ALWAYS_INLINE f32 absf(f32 in) {
     f32 out;
-    __asm__("abs.s %0,%1" : "=f" (out) : "f" (in));
+    __asm__("abs.s %0,%1" : "=f" (out) : "f" (in)); //? __builtin_fabsf(x)
     return out;
 }
 /// Absolute value of an integer value
