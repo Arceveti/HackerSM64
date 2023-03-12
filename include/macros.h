@@ -65,7 +65,7 @@
 #ifdef __GNUC__
 #define PACKED __attribute__((packed))
 #else
-#define PACKED 
+#define PACKED
 #endif
 
 // Align to 4-byte boundary.

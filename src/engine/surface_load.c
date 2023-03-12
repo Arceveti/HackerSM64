@@ -484,6 +484,7 @@ u32 get_area_terrain_size(TerrainData *data) {
  * boxes (water, gas, JRB fog).
  */
 void load_area_terrain(s32 index, TerrainData *data, RoomData *surfaceRooms, MacroObject *macroObjects) {
+    PUPPYPRINT_GET_SNAPSHOT();
     s32 terrainLoadType;
     TerrainData *vertexData = NULL;
     u32 surfacePoolData;
@@ -536,12 +537,14 @@ void load_area_terrain(s32 index, TerrainData *data, RoomData *surfaceRooms, Mac
 
     gNumStaticSurfaceNodes = gSurfaceNodesAllocated;
     gNumStaticSurfaces = gSurfacesAllocated;
+    profiler_collision_update(first);
 }
 
 /**
  * If not in time stop, clear the surface partitions.
  */
 void clear_dynamic_surfaces(void) {
+    PUPPYPRINT_GET_SNAPSHOT();
     if (!(gTimeStopState & TIME_STOP_ACTIVE)) {
         gSurfacesAllocated = gNumStaticSurfaces;
         gSurfaceNodesAllocated = gNumStaticSurfaceNodes;
@@ -556,6 +559,7 @@ void clear_dynamic_surfaces(void) {
         sNumCellsUsed = 0;
         sClearAllCells = FALSE;
     }
+    profiler_collision_update(first);
 }
 
 /**
@@ -681,6 +685,7 @@ static TerrainData sVertexData[600];
  * Transform an object's vertices, reload them, and render the object.
  */
 void load_object_collision_model(void) {
+    PUPPYPRINT_GET_SNAPSHOT();
     struct Object *obj = gCurrentObject;
 
     TerrainData *collisionData = obj->collisionData;
@@ -738,16 +743,20 @@ void load_object_collision_model(void) {
             load_object_surfaces(&collisionData, sVertexData, obj, TRUE);
         }
     }
+
     obj->header.gfx.node.flags = COND_BIT(obj->header.gfx.node.flags, GRAPH_RENDER_ACTIVE, (marioDist < drawDist));
 
     obj->oCollisionDistance = colDist;
     obj->oDrawingDistance = drawDist;
+
+    profiler_collision_update(first);
 }
 
 /**
  * Transform an object's vertices and add them to the static surface pool.
  */
 void load_object_static_model(void) {
+    PUPPYPRINT_GET_SNAPSHOT();
     struct Object *obj = gCurrentObject;
 
     TerrainData *collisionData = obj->collisionData;
@@ -773,4 +782,5 @@ void load_object_static_model(void) {
 
     gNumStaticSurfaceNodes = gSurfaceNodesAllocated;
     gNumStaticSurfaces = gSurfacesAllocated;
+    profiler_collision_update(first);
 }

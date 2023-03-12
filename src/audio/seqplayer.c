@@ -2613,6 +2613,7 @@ void sequence_player_process_sequence(struct SequencePlayer *seqPlayer) {
 // This runs 240 times per second.
 void process_sequences(UNUSED s32 iterationsRemaining) {
     s32 i;
+
     for (i = 0; i < SEQUENCE_PLAYERS; i++) {
         if (gSequencePlayers[i].enabled) {
             //! functionally equivalent ifdef, but compiles differently
@@ -2625,8 +2626,13 @@ void process_sequences(UNUSED s32 iterationsRemaining) {
 #endif
         }
     }
+
 #if defined(VERSION_JP) || defined(VERSION_US)
+    AUDIO_PROFILER_SWITCH(PROFILER_TIME_SUB_AUDIO_SEQUENCES_SCRIPT, PROFILER_TIME_SUB_AUDIO_SEQUENCES_RECLAIM);
     reclaim_notes();
+    AUDIO_PROFILER_SWITCH(PROFILER_TIME_SUB_AUDIO_SEQUENCES_RECLAIM, PROFILER_TIME_SUB_AUDIO_SEQUENCES_PROCESSING);
+#else
+    AUDIO_PROFILER_SWITCH(PROFILER_TIME_SUB_AUDIO_SEQUENCES_SCRIPT, PROFILER_TIME_SUB_AUDIO_SEQUENCES_PROCESSING);
 #endif
     process_notes();
 }

@@ -1904,7 +1904,7 @@ s32 is_mario_in_room(void) {
         ) {
             return MARIO_INSIDE_ROOM;
         }
-        
+
         return MARIO_OUTSIDE_ROOM;
     }
 

@@ -535,11 +535,15 @@ void clear_objects(void) {
  * Update spawner and surface objects.
  */
 void update_terrain_objects(void) {
+    PROFILER_GET_SNAPSHOT_TYPE(PROFILER_DELTA_COLLISION);
     gObjectCounter = update_objects_in_list(&gObjectLists[OBJ_LIST_SPAWNER]);
-    profiler_update(PROFILER_TIME_SPAWNER);
+    profiler_update(PROFILER_TIME_SPAWNER, (profiler_get_delta(PROFILER_DELTA_COLLISION) - first));
 
+#ifdef PUPPYPRINT_DEBUG
+    first = profiler_get_delta(PROFILER_DELTA_COLLISION);
+#endif
     gObjectCounter += update_objects_in_list(&gObjectLists[OBJ_LIST_SURFACE]);
-    profiler_update(PROFILER_TIME_DYNAMIC);
+    profiler_update(PROFILER_TIME_DYNAMIC, (profiler_get_delta(PROFILER_DELTA_COLLISION) - first));
 
     // If the dynamic surface pool has overflowed, throw an error.
     ASSERT((uintptr_t)gDynamicSurfacePoolEnd <= ((uintptr_t)gDynamicSurfacePool + DYNAMIC_SURFACE_POOL_SIZE), "Dynamic surface pool size exceeded");
@@ -554,12 +558,13 @@ void update_non_terrain_objects(void) {
     s32 i;
 
     for (i = 2; (listIndex = sObjectListUpdateOrder[i]) != -1; i++) {
+        PROFILER_GET_SNAPSHOT_TYPE(PROFILER_DELTA_COLLISION);
         if (listIndex == OBJ_LIST_PLAYER) {
-            profiler_update(PROFILER_TIME_BEHAVIOR_BEFORE_MARIO);
+            profiler_update(PROFILER_TIME_BEHAVIOR_BEFORE_MARIO, (profiler_get_delta(PROFILER_DELTA_COLLISION) - first));
         }
         gObjectCounter += update_objects_in_list(&gObjectLists[listIndex]);
         if (listIndex == OBJ_LIST_PLAYER) {
-            profiler_update(PROFILER_TIME_MARIO);
+            profiler_update(PROFILER_TIME_MARIO, (profiler_get_delta(PROFILER_DELTA_COLLISION) - first));
         }
     }
 }
@@ -631,6 +636,9 @@ void update_objects(void) {
     // Update all other objects that haven't been updated yet
     update_non_terrain_objects();
 
+    // Take a snapshot of the current collision processing time.
+    UNUSED u32 firstPoint = profiler_get_delta(PROFILER_DELTA_COLLISION);
+
     // Unload any objects that have been deactivated
     unload_deactivated_objects();
 
@@ -644,6 +652,6 @@ void update_objects(void) {
     gTimeStopState = COND_BIT(gTimeStopState, TIME_STOP_ACTIVE, (gTimeStopState & TIME_STOP_ENABLED));
 
     gPrevFrameObjectCount = gObjectCounter;
-
-    profiler_update(PROFILER_TIME_BEHAVIOR_AFTER_MARIO);
+    // Set the recorded behaviour time, minus the difference between the snapshotted collision time and the actual collision time.
+    profiler_update(PROFILER_TIME_BEHAVIOR_AFTER_MARIO, (profiler_get_delta(PROFILER_DELTA_COLLISION) - firstPoint));
 }
