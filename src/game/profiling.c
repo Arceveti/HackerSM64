@@ -180,46 +180,46 @@ static void update_rdp_timers() {
     }
 
     buffer_update(&all_profiling_data[PROFILER_TIME_TMEM], tmem, profile_buffer_index);
-    buffer_update(&all_profiling_data[PROFILER_TIME_CMD], cmd, profile_buffer_index);
+    buffer_update(&all_profiling_data[PROFILER_TIME_CMD ], cmd,  profile_buffer_index);
     buffer_update(&all_profiling_data[PROFILER_TIME_PIPE], pipe, profile_buffer_index);
 }
 
 float profiler_get_fps() {
-    return (1000000.0f * PROFILING_BUFFER_SIZE) / (OS_CYCLES_TO_USEC(all_profiling_data[PROFILER_TIME_FPS].total));
+    return ((1000000.0f * PROFILING_BUFFER_SIZE) / (OS_CYCLES_TO_USEC(all_profiling_data[PROFILER_TIME_FPS].total)));
 }
 
 u32 profiler_get_cpu_cycles() {
-    u32 cpu_normal_time = all_profiling_data[PROFILER_TIME_TOTAL].total / PROFILING_BUFFER_SIZE;
-    u32 cpu_audio_time = all_profiling_data[PROFILER_TIME_AUDIO].total / PROFILING_BUFFER_SIZE;
-    return cpu_normal_time + cpu_audio_time * 2;
+    u32 cpu_normal_time = (all_profiling_data[PROFILER_TIME_TOTAL].total / PROFILING_BUFFER_SIZE);
+    u32 cpu_audio_time  = (all_profiling_data[PROFILER_TIME_AUDIO].total / PROFILING_BUFFER_SIZE);
+    return (cpu_normal_time + (cpu_audio_time * 2));
 }
 
 u32 profiler_get_rsp_cycles() {
-    u32 rsp_graphics_time = all_profiling_data[PROFILER_TIME_RSP_GFX].total / PROFILING_BUFFER_SIZE;
-    u32 rsp_audio_time = all_profiling_data[PROFILER_TIME_RSP_AUDIO].total / PROFILING_BUFFER_SIZE;
+    u32 rsp_graphics_time = (all_profiling_data[PROFILER_TIME_RSP_GFX  ].total / PROFILING_BUFFER_SIZE);
+    u32 rsp_audio_time    = (all_profiling_data[PROFILER_TIME_RSP_AUDIO].total / PROFILING_BUFFER_SIZE);
     return rsp_graphics_time + rsp_audio_time;
 }
 
 u32 profiler_get_rdp_cycles() {
     u32 rdp_pipe_cycles = all_profiling_data[PROFILER_TIME_PIPE].total;
     u32 rdp_tmem_cycles = all_profiling_data[PROFILER_TIME_TMEM].total;
-    u32 rdp_cmd_cycles = all_profiling_data[PROFILER_TIME_CMD].total;
+    u32 rdp_cmd_cycles  = all_profiling_data[PROFILER_TIME_CMD ].total;
 
     u32 rdp_max_cycles = MAX(MAX(rdp_pipe_cycles, rdp_tmem_cycles), rdp_cmd_cycles);
 
-    return rdp_max_cycles / PROFILING_BUFFER_SIZE;
+    return (rdp_max_cycles / PROFILING_BUFFER_SIZE);
 }
 
 u32 profiler_get_cpu_microseconds() {
     u32 cpu_normal_time = OS_CYCLES_TO_USEC(all_profiling_data[PROFILER_TIME_TOTAL].total / PROFILING_BUFFER_SIZE);
-    u32 cpu_audio_time = OS_CYCLES_TO_USEC(all_profiling_data[PROFILER_TIME_AUDIO].total / PROFILING_BUFFER_SIZE);
-    return cpu_normal_time + cpu_audio_time * 2;
+    u32 cpu_audio_time  = OS_CYCLES_TO_USEC(all_profiling_data[PROFILER_TIME_AUDIO].total / PROFILING_BUFFER_SIZE);
+    return (cpu_normal_time + (cpu_audio_time * 2));
 }
 
 u32 profiler_get_rsp_microseconds() {
-    u32 rsp_graphics_time = OS_CYCLES_TO_USEC(all_profiling_data[PROFILER_TIME_RSP_GFX].total / PROFILING_BUFFER_SIZE);
-    u32 rsp_audio_time = OS_CYCLES_TO_USEC(all_profiling_data[PROFILER_TIME_RSP_AUDIO].total / PROFILING_BUFFER_SIZE);
-    return rsp_graphics_time + rsp_audio_time;
+    u32 rsp_graphics_time = OS_CYCLES_TO_USEC(all_profiling_data[PROFILER_TIME_RSP_GFX  ].total / PROFILING_BUFFER_SIZE);
+    u32 rsp_audio_time    = OS_CYCLES_TO_USEC(all_profiling_data[PROFILER_TIME_RSP_AUDIO].total / PROFILING_BUFFER_SIZE);
+    return (rsp_graphics_time + rsp_audio_time);
 }
 
 u32 profiler_get_rdp_microseconds() {
@@ -264,8 +264,8 @@ void profiler_print_times() {
         }
 
         // audio time is removed from the main thread profiling, so add it back here
-        u32 total_cpu = microseconds[PROFILER_TIME_TOTAL] + microseconds[PROFILER_TIME_AUDIO] * 2;
-        u32 total_rsp = microseconds[PROFILER_TIME_RSP_GFX] + microseconds[PROFILER_TIME_RSP_AUDIO];
+        u32 total_cpu = (microseconds[PROFILER_TIME_TOTAL  ] + (microseconds[PROFILER_TIME_AUDIO] * 2));
+        u32 total_rsp = (microseconds[PROFILER_TIME_RSP_GFX] + microseconds[PROFILER_TIME_RSP_AUDIO]);
         u32 max_rdp = MAX(MAX(microseconds[PROFILER_TIME_TMEM], microseconds[PROFILER_TIME_CMD]), microseconds[PROFILER_TIME_PIPE]);
 
         sprintf(text_buffer,

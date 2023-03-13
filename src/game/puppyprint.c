@@ -74,22 +74,6 @@ u32 gPPSegScroll = 0;
 u32 gMiscMem = 0;
 struct CallCounter gPuppyCallCounter;
 
-#define NUM_RAM_CHARS 32
-
-// Another epic lookup table, for text this time.
-const char ramNames[][NUM_RAM_CHARS] = {
-    "Buffers",
-    "Main",
-    "Engine",
-    "Framebuffers",
-    "ZBuffer",
-    "Goddard",
-    "Pools",
-    "Collision",
-    "Misc",
-    "Audio Heap"
-};
-
 enum RamNames {
     RAM_BUFFERS,
     RAM_MAIN,
@@ -100,49 +84,67 @@ enum RamNames {
     RAM_POOLS,
     RAM_COLLISION,
     RAM_MISC,
-    RAM_AUDIO
+    RAM_AUDIO,
+};
+
+#define NUM_RAM_CHARS 32
+
+// Another epic lookup table, for text this time.
+const char ramNames[][NUM_RAM_CHARS] = {
+    [RAM_BUFFERS     ] = "Buffers",
+    [RAM_MAIN        ] = "Main",
+    [RAM_ENGINE      ] = "Engine",
+    [RAM_FRAMEBUFFERS] = "Framebuffers",
+    [RAM_ZBUFFER     ] = "ZBuffer",
+    [RAM_GODDARD     ] = "Goddard",
+    [RAM_POOLS       ] = "Pools",
+    [RAM_COLLISION   ] = "Collision",
+    [RAM_MISC        ] = "Misc",
+    [RAM_AUDIO       ] = "Audio Heap"
 };
 
 const char segNames[][NUM_RAM_CHARS] = {
-    "HUD",
-    "Common1 GFX",
-    "Group0 GFX",
-    "GroupA GFX",
-    "GroupB GFX",
-    "Level GFX",
-    "Common0 GFX",
-    "Textures",
-    "Skybox",
-    "Effects",
-    "GroupA Geo",
-    "GroupB Geo",
-    "Level Geo",
-    "Common0 Geo",
-    "Entry",
-    "Mario Anims",
-    "Demos",
-    "Bhv Scripts",
-    "Menu",
-    "Level Scripts",
-    "Common1 Geo",
-    "Group0 Geo",
-    "",
-    "Languages"
+    [SEGMENT_MAIN               ] = "Main",
+    [SEGMENT_RENDER             ] = "Render",
+    [SEGMENT_SEGMENT2           ] = "HUD",
+    [SEGMENT_COMMON1_YAY0       ] = "Common1 GFX",
+    [SEGMENT_GROUP0_YAY0        ] = "Group0 GFX",
+    [SEGMENT_GROUPA_YAY0        ] = "GroupA GFX",
+    [SEGMENT_GROUPB_YAY0        ] = "GroupB GFX",
+    [SEGMENT_LEVEL_DATA         ] = "Level GFX",
+    [SEGMENT_COMMON0_YAY0       ] = "Common0 GFX",
+    [SEGMENT_TEXTURE            ] = "Textures",
+    [SEGMENT_SKYBOX             ] = "Skybox",
+    [SEGMENT_EFFECT_YAY0        ] = "Effects",
+    [SEGMENT_GROUPA_GEO         ] = "GroupA Geo",
+    [SEGMENT_GROUPB_GEO         ] = "GroupB Geo",
+    [SEGMENT_LEVEL_SCRIPT       ] = "Level Geo",
+    [SEGMENT_COMMON0_GEO        ] = "Common0 Geo",
+    [SEGMENT_LEVEL_ENTRY        ] = "Entry",
+    [SEGMENT_MARIO_ANIMS        ] = "Mario Anims",
+    [SEGMENT_UNKNOWN_18         ] = "Demos",
+    [SEGMENT_BEHAVIOR_DATA      ] = "Bhv Scripts",
+    [SEGMENT_MENU_INTRO         ] = "Menu",
+    [SEGMENT_GLOBAL_LEVEL_SCRIPT] = "Level Scripts",
+    [SEGMENT_COMMON1_GEO        ] = "Common1 Geo",
+    [SEGMENT_GROUP0_GEO         ] = "Group0 Geo",
+    [SEGMENT_DEMO_INPUTS        ] = "Demo Inputs",
+    [SEGMENT_EU_TRANSLATION     ] = "Languages",
 };
 
 const s8 nameTable = sizeof(ramNames) / NUM_RAM_CHARS;
 
 void puppyprint_calculate_ram_usage(void) {
-    ramsizeSegment[RAM_BUFFERS] = (u32)&_buffersSegmentBssEnd - (u32)&_buffersSegmentBssStart - gAudioHeapSize;
-    ramsizeSegment[RAM_MAIN] = (u32)&_mainSegmentEnd - (u32)&_mainSegmentStart;
-    ramsizeSegment[RAM_ENGINE] = (u32)&_engineSegmentEnd - (u32)&_engineSegmentStart;
+    ramsizeSegment[RAM_BUFFERS     ] = (u32)&_buffersSegmentBssEnd - (u32)&_buffersSegmentBssStart - gAudioHeapSize;
+    ramsizeSegment[RAM_MAIN        ] = (u32)&_mainSegmentEnd - (u32)&_mainSegmentStart;
+    ramsizeSegment[RAM_ENGINE      ] = (u32)&_engineSegmentEnd - (u32)&_engineSegmentStart;
     ramsizeSegment[RAM_FRAMEBUFFERS] = (u32)&_framebuffersSegmentBssEnd - (u32)&_framebuffersSegmentBssStart;
-    ramsizeSegment[RAM_ZBUFFER] = (u32)&_zbufferSegmentBssEnd - (u32)&_zbufferSegmentBssStart;
-    ramsizeSegment[RAM_GODDARD] = (u32)&_goddardSegmentEnd - (u32)&_goddardSegmentStart;
-    ramsizeSegment[RAM_POOLS] = gPoolMem;
-    ramsizeSegment[RAM_COLLISION] = ((u32) gCurrStaticSurfacePoolEnd - (u32) gCurrStaticSurfacePool) + ((u32) gDynamicSurfacePoolEnd - (u32) gDynamicSurfacePool);
-    ramsizeSegment[RAM_MISC] = gMiscMem;
-    ramsizeSegment[RAM_AUDIO] = gAudioHeapSize;
+    ramsizeSegment[RAM_ZBUFFER     ] = (u32)&_zbufferSegmentBssEnd - (u32)&_zbufferSegmentBssStart;
+    ramsizeSegment[RAM_GODDARD     ] = (u32)&_goddardSegmentEnd - (u32)&_goddardSegmentStart;
+    ramsizeSegment[RAM_POOLS       ] = gPoolMem;
+    ramsizeSegment[RAM_COLLISION   ] = ((u32) gCurrStaticSurfacePoolEnd - (u32) gCurrStaticSurfacePool) + ((u32) gDynamicSurfacePoolEnd - (u32) gDynamicSurfacePool);
+    ramsizeSegment[RAM_MISC        ] = gMiscMem;
+    ramsizeSegment[RAM_AUDIO       ] = gAudioHeapSize;
 }
 
 #ifdef PUPPYPRINT_DEBUG_CYCLES
@@ -150,7 +152,8 @@ void puppyprint_calculate_ram_usage(void) {
     #define RDP_CYCLE_CONV(x) (x)
 #else
     #define CYCLE_CONV OS_CYCLES_TO_USEC
-    #define RDP_CYCLE_CONV(x) ((10 * (x)) / 625) // 62.5 million cycles per frame
+    // 62.5 million cycles per frame
+    #define RDP_CYCLE_CONV(x) ((10 * (x)) / 625)
 #endif
 
 // RGB colour lookup table for colouring all the funny ram prints.
@@ -185,7 +188,7 @@ ColorRGB colourChart[NUM_TLB_SEGMENTS + 1] = {
     { 216, 191, 216 },
     { 244, 164,  96 },
     { 176, 196, 222 },
-    { 255, 255, 255 }
+    { 255, 255, 255 },
 };
 
 void swap(int* xp, int* yp) {
@@ -205,7 +208,6 @@ void sort_numbers(s32 *values, u8 *values2) {
 
     // One by one move boundary of unsorted subarray
     for (i = 0; i < NUM_TLB_SEGMENTS; i++) {
-
         if (values[i] == 0) {
             continue;
         }
@@ -231,7 +233,7 @@ void set_segment_memory_printout(u32 segment, u32 amount) {
 void print_ram_overview(void) {
     char textBytes[64];
     s32 y = 56;
-    f32 ramSize = RAM_END - 0x80000000;
+    const f32 ramSize = (RAM_END - RAM_START);
     s32 tempNums[32];
     u8 tempPos[32] = {0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31};
     prepare_blank_box();
@@ -245,37 +247,37 @@ void print_ram_overview(void) {
     print_set_envcolour(255, 255, 255, 255);
     sprintf(textBytes, "Total:");
     print_small_text_light(24, (16 - gPPSegScroll), textBytes, PRINT_TEXT_ALIGN_LEFT, PRINT_ALL, FONT_DEFAULT);
-    sprintf(textBytes, "0x%06X", (RAM_END - 0x80000000));
+    sprintf(textBytes, "0x%06X", ramSize);
     print_small_text_light((SCREEN_WIDTH / 2), (16 - gPPSegScroll), textBytes, PRINT_TEXT_ALIGN_CENTRE, PRINT_ALL, FONT_DEFAULT);
     sprintf(textBytes, "0x%X", mempool);
     print_small_text_light((SCREEN_WIDTH - 24), (16 - gPPSegScroll), textBytes, PRINT_TEXT_ALIGN_RIGHT, PRINT_ALL, FONT_DEFAULT);
     sprintf(textBytes, "Used:");
-    print_small_text_light(24, 28- gPPSegScroll, textBytes, PRINT_TEXT_ALIGN_LEFT, PRINT_ALL, FONT_DEFAULT);
-    sprintf(textBytes, "0x%06X", (RAM_END - 0x80000000) - (main_pool_available() - 0x400));
-    print_small_text_light(SCREEN_WIDTH/2, 28 - gPPSegScroll, textBytes, PRINT_TEXT_ALIGN_CENTRE, PRINT_ALL, FONT_DEFAULT);
-    sprintf(textBytes, "(%2.3f%%)", 100.0f - (((f32)(main_pool_available() - 0x400) / (f32)(RAM_END - 0x80000000)) * 100));
-    print_small_text_light(SCREEN_WIDTH - 24, 28 - gPPSegScroll, textBytes, PRINT_TEXT_ALIGN_RIGHT, PRINT_ALL, FONT_DEFAULT);
+    print_small_text_light(24, (28 - gPPSegScroll), textBytes, PRINT_TEXT_ALIGN_LEFT, PRINT_ALL, FONT_DEFAULT);
+    sprintf(textBytes, "0x%06X", (ramSize - (main_pool_available() - 0x400)));
+    print_small_text_light((SCREEN_WIDTH / 2), (28 - gPPSegScroll), textBytes, PRINT_TEXT_ALIGN_CENTRE, PRINT_ALL, FONT_DEFAULT);
+    sprintf(textBytes, "(%2.3f%%)", (100.0f - (((f32)(main_pool_available() - 0x400) / ramSize) * 100)));
+    print_small_text_light((SCREEN_WIDTH - 24), (28 - gPPSegScroll), textBytes, PRINT_TEXT_ALIGN_RIGHT, PRINT_ALL, FONT_DEFAULT);
     sprintf(textBytes, "Free:");
-    print_small_text_light(24, 40 - gPPSegScroll, textBytes, PRINT_TEXT_ALIGN_LEFT, PRINT_ALL, FONT_DEFAULT);
+    print_small_text_light(24, (40 - gPPSegScroll), textBytes, PRINT_TEXT_ALIGN_LEFT, PRINT_ALL, FONT_DEFAULT);
     sprintf(textBytes, "0x%X", (main_pool_available() - 0x400));
-    print_small_text_light(SCREEN_WIDTH/2, 40 - gPPSegScroll, textBytes, PRINT_TEXT_ALIGN_CENTRE, PRINT_ALL, FONT_DEFAULT);
-    sprintf(textBytes, "(%2.3f%%)", (((f32)(main_pool_available() - 0x400) / (f32)(RAM_END - 0x80000000)) * 100));
-    print_small_text_light(SCREEN_WIDTH - 24, 40 - gPPSegScroll, textBytes, PRINT_TEXT_ALIGN_RIGHT, PRINT_ALL, FONT_DEFAULT);
+    print_small_text_light((SCREEN_WIDTH / 2), (40 - gPPSegScroll), textBytes, PRINT_TEXT_ALIGN_CENTRE, PRINT_ALL, FONT_DEFAULT);
+    sprintf(textBytes, "(%2.3f%%)", (((f32)(main_pool_available() - 0x400) / ramSize) * 100));
+    print_small_text_light((SCREEN_WIDTH - 24), (40 - gPPSegScroll), textBytes, PRINT_TEXT_ALIGN_RIGHT, PRINT_ALL, FONT_DEFAULT);
     for (u8 i = 0; i < NUM_TLB_SEGMENTS; i++) {
         if (tempNums[i] == 0) {
             continue;
         }
-        if (y - gPPSegScroll > 0 && y - gPPSegScroll < SCREEN_HEIGHT) {
+        if (((y - gPPSegScroll) > 0) && ((y - gPPSegScroll) < SCREEN_HEIGHT)) {
             if (tempPos[i] < nameTable) {
                 sprintf(textBytes, "%s:", ramNames[tempPos[i]]);
             } else {
-                sprintf(textBytes, "%s:", segNames[tempPos[i] - nameTable]);
+                sprintf(textBytes, "%s:", (segNames[tempPos[i] - nameTable]));
             }
-            print_small_text_light(24, y - gPPSegScroll, textBytes, PRINT_TEXT_ALIGN_LEFT, PRINT_ALL, FONT_DEFAULT);
+            print_small_text_light(24, (y - gPPSegScroll), textBytes, PRINT_TEXT_ALIGN_LEFT, PRINT_ALL, FONT_DEFAULT);
             sprintf(textBytes, "0x%X", tempNums[i]);
-            print_small_text_light(SCREEN_WIDTH/2, y - gPPSegScroll, textBytes, PRINT_TEXT_ALIGN_CENTRE, PRINT_ALL, FONT_DEFAULT);
-            sprintf(textBytes, "(%2.3f%%)", ((f32)tempNums[i] / ramSize) * 100.0f);
-            print_small_text_light(SCREEN_WIDTH - 24, y - gPPSegScroll, textBytes, PRINT_TEXT_ALIGN_RIGHT, PRINT_ALL, FONT_DEFAULT);
+            print_small_text_light((SCREEN_WIDTH / 2), (y - gPPSegScroll), textBytes, PRINT_TEXT_ALIGN_CENTRE, PRINT_ALL, FONT_DEFAULT);
+            sprintf(textBytes, "(%2.3f%%)", (((f32)tempNums[i] / ramSize) * 100.0f));
+            print_small_text_light((SCREEN_WIDTH - 24), (y - gPPSegScroll), textBytes, PRINT_TEXT_ALIGN_RIGHT, PRINT_ALL, FONT_DEFAULT);
         }
         y += 12;
     }
@@ -306,18 +308,18 @@ static const char *audioBenchmarkNames[PROFILER_TIME_SUB_AUDIO_END - PROFILER_TI
     "Audio Update:\t\t\t\t  "
 };
 
-STATIC_ASSERT(ARRAY_COUNT(audioBenchmarkNames) == PROFILER_TIME_SUB_AUDIO_END - PROFILER_TIME_SUB_AUDIO_START, "audioBenchmarkNames has incorrect number of entries!");
+STATIC_ASSERT((ARRAY_COUNT(audioBenchmarkNames) == (PROFILER_TIME_SUB_AUDIO_END - PROFILER_TIME_SUB_AUDIO_START)), "audioBenchmarkNames has incorrect number of entries!");
 #endif
 
 static void print_audio_ram_overview(s32 x, char *textBytes) {
     s32 percentage = 0;
-    s32 y = SCREEN_HEIGHT - 6;
+    s32 y = (SCREEN_HEIGHT - 6);
     s32 totalMemory[2] = { 0, 0 };
     s32 audioPoolSizes[NUM_AUDIO_POOLS][2];
 
     puppyprint_get_allocated_pools(audioPoolSizes[0]);
 
-    for (s8 i = NUM_AUDIO_POOLS - 1; i >= 0; i--) {
+    for (s8 i = (NUM_AUDIO_POOLS - 1); i >= 0; i--) {
         y -= 12;
 
         if (audioPoolSizes[i][0] == 0) {
@@ -329,8 +331,8 @@ static void print_audio_ram_overview(s32 x, char *textBytes) {
         sprintf(textBytes, "  %s%X / %X (%d.%d%%)", audioPoolNames[i],
                 audioPoolSizes[i][1],
                 audioPoolSizes[i][0],
-                percentage / 10,
-                percentage % 10);
+                (percentage / 10),
+                (percentage % 10));
 
         print_set_envcolour(colourChart[i][0],
                             colourChart[i][1],
@@ -351,8 +353,8 @@ static void print_audio_ram_overview(s32 x, char *textBytes) {
         sprintf(textBytes, "TOTAL AUDIO MEMORY:\t\t%X / %X (%d.%d%%)",
                 totalMemory[1],
                 totalMemory[0],
-                percentage / 10,
-                percentage % 10);
+                (percentage / 10),
+                (percentage % 10));
     } else {
         sprintf(textBytes, "TOTAL AUDIO MEMORY:\t\t%X / %X (Incorrect!)",
                 totalMemory[1],
@@ -375,9 +377,9 @@ static void print_audio_overview(void) {
     render_blank_box(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, 64, 64, 64, 95);
     finish_blank_box();
 
-    us = OS_CYCLES_TO_USEC(all_profiling_data[PROFILER_TIME_AUDIO].total / PROFILING_BUFFER_SIZE) * 2;
-    percentInt = us / 33;
-    percentDec = percentInt % 10;
+    us = (OS_CYCLES_TO_USEC(all_profiling_data[PROFILER_TIME_AUDIO].total / PROFILING_BUFFER_SIZE) * 2);
+    percentInt = (us / 33);
+    percentDec = (percentInt % 10);
     percentInt /= 10;
 
     sprintf(textBytes, "TOTAL AUDIO CPU:\t\t%d (%d.%d%%)", us, percentInt, percentDec);
@@ -389,11 +391,11 @@ static void print_audio_overview(void) {
     for (s32 i = 0; i < ARRAY_COUNT(audioBenchmarkNames); i++) {
         y += 12;
 
-        us = OS_CYCLES_TO_USEC(all_profiling_data[PROFILER_TIME_SUB_AUDIO_START + i].total / PROFILING_BUFFER_SIZE) * 2;
+        us = (OS_CYCLES_TO_USEC(all_profiling_data[PROFILER_TIME_SUB_AUDIO_START + i].total / PROFILING_BUFFER_SIZE) * 2);
 
         if (audioBenchmarkNames[i][0] != ' ') {
-            percentInt = us / 33;
-            percentDec = percentInt % 10;
+            percentInt = (us / 33);
+            percentDec = (percentInt % 10);
             percentInt /= 10;
             sprintf(textBytes, "  %s%d (%d.%d%%)", audioBenchmarkNames[i], us, percentInt, percentDec);
         } else {
@@ -417,7 +419,7 @@ static void print_audio_overview(void) {
 char consoleLogTable[LOG_BUFFER_SIZE][255];
 
 static char *write_to_buf(char *buffer, const char *data, size_t size) {
-    return (char *) memcpy(buffer, data, size) + size;
+    return ((char *) memcpy(buffer, data, size) + size);
 }
 
 void append_puppyprint_log(const char *str, ...) {
@@ -468,7 +470,7 @@ void puppyprint_render_collision(void) {
     DYNAMIC_SURFACE_POOL_SIZE,
     (uintptr_t)gDynamicSurfacePoolEnd - (uintptr_t)gDynamicSurfacePool,
     gSurfacesAllocated, gSurfaceNodesAllocated);
-    print_small_text_light(SCREEN_WIDTH-16, 60, textBytes, PRINT_TEXT_ALIGN_RIGHT, PRINT_ALL, 1);
+    print_small_text_light((SCREEN_WIDTH - 16), 60, textBytes, PRINT_TEXT_ALIGN_RIGHT, PRINT_ALL, 1);
 
 #ifdef VISUAL_DEBUG
     print_small_text_light(160, (SCREEN_HEIGHT - 42), "Use the dpad to toggle visual collision modes", PRINT_TEXT_ALIGN_CENTRE, PRINT_ALL, FONT_OUTLINE);
@@ -510,7 +512,7 @@ void puppyprint_render_standard(void) {
             gPuppyCallCounter.collision_water,
             gPuppyCallCounter.collision_raycast
     );
-    print_small_text_light(SCREEN_WIDTH-16, 32, textBytes, PRINT_TEXT_ALIGN_RIGHT, PRINT_ALL, FONT_OUTLINE);
+    print_small_text_light((SCREEN_WIDTH - 16), 32, textBytes, PRINT_TEXT_ALIGN_RIGHT, PRINT_ALL, FONT_OUTLINE);
 }
 
 void puppyprint_render_minimal(void) {
@@ -523,7 +525,7 @@ void render_coverage_map(void) {
     gDPSetPrimDepth(gDisplayListHead++, 0xFFFF, 0xFFFF);
     gDPSetDepthSource(gDisplayListHead++, G_ZS_PRIM);
     gDPSetRenderMode(gDisplayListHead++, G_RM_VISCVG, G_RM_VISCVG2);
-    gDPFillRectangle(gDisplayListHead++, 0,0, SCREEN_WIDTH-1, SCREEN_HEIGHT-1);
+    gDPFillRectangle(gDisplayListHead++, 0, 0, (SCREEN_WIDTH - 1), (SCREEN_HEIGHT - 1));
 }
 
 void puppycamera_debug_view(void) {
@@ -583,16 +585,16 @@ void puppyprint_level_select_menu(void) {
             continue;
         }
         if ((u32) sLevelSelectOption == i) {
-            sprintf(textBytes, "%s - %d", sLevelNames[i], sLevelSelectOptionArea + 1);
+            sprintf(textBytes, "%s - %d", sLevelNames[i], (sLevelSelectOptionArea + 1));
             print_set_envcolour(0xFF, 0x40, 0x40, 0xFF);
-        } else if ((u32) gCurrLevelNum-1 == i) {
+        } else if (((u32) gCurrLevelNum - 1) == i) {
             sprintf(textBytes, "%s", sLevelNames[i]);
             print_set_envcolour(0xFF, 0xFF, 0x40, 0xFF);
         } else {
             sprintf(textBytes, "%s", sLevelNames[i]);
             print_set_envcolour(0xFF, 0xFF, 0xFF, 0xFF);
         }
-        print_small_text_light(SCREEN_WIDTH/2, (SCREEN_HEIGHT/2) - 40 + posY, textBytes, PRINT_TEXT_ALIGN_CENTRE, PRINT_ALL, FONT_DEFAULT);
+        print_small_text_light((SCREEN_WIDTH / 2), (((SCREEN_HEIGHT / 2) - 40) + posY), textBytes, PRINT_TEXT_ALIGN_CENTRE, PRINT_ALL, FONT_DEFAULT);
     }
 }
 
@@ -619,8 +621,8 @@ void puppyprint_render_general_vars(void) {
             gMarioCurrentRoom,
             objParams,
             gLastWarpID
-    );
-    print_small_text_light(SCREEN_WIDTH - 16, 36, textBytes, PRINT_TEXT_ALIGN_RIGHT, PRINT_ALL, FONT_OUTLINE);
+           );
+    print_small_text_light((SCREEN_WIDTH - 16), 36, textBytes, PRINT_TEXT_ALIGN_RIGHT, PRINT_ALL, FONT_OUTLINE);
 
 #ifndef ENABLE_CREDITS_BENCHMARK
     // Very little point printing useless info if Mario doesn't even exist.
@@ -636,26 +638,26 @@ void puppyprint_render_general_vars(void) {
             (u32)(gMarioState->action & ACT_ID_MASK),
             (u32)(floorType),
             (s32)(gMarioState->waterLevel)
-            );
+        );
         print_small_text_light(16, 36, textBytes, PRINT_TEXT_ALIGN_LEFT, PRINT_ALL, FONT_OUTLINE);
-        sprintf(textBytes, "Gfx Pool: %d / %d", ((u32)gDisplayListHead - ((u32)gGfxPool->buffer)) / 4, GFX_POOL_SIZE);
-        print_small_text_light(SCREEN_WIDTH/2, SCREEN_HEIGHT-16, textBytes, PRINT_TEXT_ALIGN_CENTRE, PRINT_ALL, FONT_OUTLINE);
+        sprintf(textBytes, "Gfx Pool: %d / %d", (((u32)gDisplayListHead - ((u32)gGfxPool->buffer)) / 4), GFX_POOL_SIZE);
+        print_small_text_light((SCREEN_WIDTH / 2), (SCREEN_HEIGHT - 16), textBytes, PRINT_TEXT_ALIGN_CENTRE, PRINT_ALL, FONT_OUTLINE);
     }
 #endif
 }
 
 struct PuppyPrintPage ppPages[] = {
 #ifdef USE_PROFILER
-    {&puppyprint_render_standard,       "Profiler"},
-    {&puppyprint_render_minimal,        "Minimal"},
+    {&puppyprint_render_standard,       "Profiler"     },
+    {&puppyprint_render_minimal,        "Minimal"      },
 #endif
-    {&puppyprint_render_general_vars,   "General"},
-    {&print_audio_overview,             "Audio"},
-    {&print_ram_overview,               "Segments"},
-    {&puppyprint_render_collision,      "Collision"},
-    {&print_console_log,                "Log"},
-    {&puppyprint_level_select_menu,     "Level Select"},
-    {&render_coverage_map,              "Coverage"},
+    {&puppyprint_render_general_vars,   "General"      },
+    {&print_audio_overview,             "Audio"        },
+    {&print_ram_overview,               "Segments"     },
+    {&puppyprint_render_collision,      "Collision"    },
+    {&print_console_log,                "Log"          },
+    {&puppyprint_level_select_menu,     "Level Select" },
+    {&render_coverage_map,              "Coverage"     },
 #ifdef PUPPYCAM
     {&puppycamera_debug_view,           "Unlock Camera"},
 #endif
@@ -702,7 +704,6 @@ void puppyprint_render_profiler(void) {
     if (ppPages[sPPDebugPage].func != NULL) {
         (ppPages[sPPDebugPage].func)();
     }
-
     if (sDebugMenu) {
         render_page_menu();
     }
@@ -728,8 +729,12 @@ void puppyprint_profiler_process(void) {
     }
 
     if (sDebugMenu) {
-        if (gPlayer1Controller->buttonPressed & U_JPAD) sDebugOption--;
-        if (gPlayer1Controller->buttonPressed & D_JPAD) sDebugOption++;
+        if (gPlayer1Controller->buttonPressed & U_JPAD) {
+            sDebugOption--;
+        }
+        if (gPlayer1Controller->buttonPressed & D_JPAD) {
+            sDebugOption++;
+        }
 
         if (sDebugOption == 255) {
             sDebugOption = ((sizeof(ppPages) / sizeof(struct PuppyPrintPage)) - 1);
@@ -739,8 +744,7 @@ void puppyprint_profiler_process(void) {
             sDebugOption = 0;
         }
     } else {
-        if (sPPDebugPage == PUPPYPRINT_PAGE_LEVEL_SELECT)
-        {
+        if (sPPDebugPage == PUPPYPRINT_PAGE_LEVEL_SELECT) {
             if (gPlayer1Controller->buttonPressed & U_JPAD) {
                 sLevelSelectOption--;
                 // If there is no level entry to this ID, skip over.
@@ -787,35 +791,38 @@ void puppyprint_profiler_process(void) {
         }
         // Collision toggles.
 #ifdef VISUAL_DEBUG
-        if (sPPDebugPage == PUPPYPRINT_PAGE_COLLISION)
-        {
-            if (gPlayer1Controller->buttonPressed & R_JPAD)
+        if (sPPDebugPage == PUPPYPRINT_PAGE_COLLISION) {
+            if (gPlayer1Controller->buttonPressed & R_JPAD) {
                 gVisualDebugViewCycle++;
-            if (gPlayer1Controller->buttonPressed & L_JPAD)
+            }
+            if (gPlayer1Controller->buttonPressed & L_JPAD) {
                 gVisualDebugViewCycle--;
-            if (gVisualDebugViewCycle == 4)
+            }
+            if (gVisualDebugViewCycle == 4) {
                 gVisualDebugViewCycle = 0;
-            if (gVisualDebugViewCycle == 255)
+            }
+            if (gVisualDebugViewCycle == 255) {
                 gVisualDebugViewCycle = 3;
+            }
         }
 #endif
         if (sPPDebugPage == PUPPYPRINT_PAGE_RAM) {
-            if (gPlayer1Controller->buttonDown & U_JPAD && gPPSegScroll > 0)  {
+            if ((gPlayer1Controller->buttonDown & U_JPAD) && (gPPSegScroll > 0)) {
                 gPPSegScroll -= 4;
-            } else if (gPlayer1Controller->buttonDown & D_JPAD && gPPSegScroll < (12 * 32)){
+            } else if ((gPlayer1Controller->buttonDown & D_JPAD) && (gPPSegScroll < (12 * 32))) {
                 gPPSegScroll += 4;
             }
         }
     }
-    profiler_update(PROFILER_TIME_PUPPYPRINT2, osGetCount() - first);
+    profiler_update(PROFILER_TIME_PUPPYPRINT2, (osGetCount() - first));
 }
 #endif
 
 s32 print_set_envcolour(u8 r, u8 g, u8 b, u8 a) {
     if ((r != gCurrEnvCol[0])
-        || (g != gCurrEnvCol[1])
-        || (b != gCurrEnvCol[2])
-        || (a != gCurrEnvCol[3])) {
+     || (g != gCurrEnvCol[1])
+     || (b != gCurrEnvCol[2])
+     || (a != gCurrEnvCol[3])) {
         gDPSetEnvColor(gDisplayListHead++, (Color)r, (Color)g, (Color)b, (Color)a);
         vec4_set(gCurrEnvCol, r, g, b, a);
 
@@ -841,21 +848,19 @@ void finish_blank_box(void) {
 // If the width is a multiple of 4, then use fillmode (fastest)
 // Otherwise, if there's transparency, it uses that rendermode, which is slower than using opaque rendermodes.
 void render_blank_box(s32 x1, s32 y1, s32 x2, s32 y2, u8 r, u8 g, u8 b, u8 a) {
-    if (x2 < x1)
-    {
+    if (x2 < x1) {
         u32 temp = x2;
         x2 = x1;
         x1 = temp;
     }
-    if (y2 < y1)
-    {
+    if (y2 < y1) {
         u32 temp = y2;
         y2 = y1;
         y1 = temp;
     }
     if (x1 < 0) x1 = 0;
     if (y1 < 0) y1 = 0;
-    if (x2 > SCREEN_WIDTH) x2 = SCREEN_WIDTH;
+    if (x2 > SCREEN_WIDTH ) x2 = SCREEN_WIDTH;
     if (y2 > SCREEN_HEIGHT) y2 = SCREEN_HEIGHT;
     s32 cycleadd = 0;
     gDPPipeSync(gDisplayListHead++);
@@ -873,9 +878,9 @@ void render_blank_box(s32 x1, s32 y1, s32 x2, s32 y2, u8 r, u8 g, u8 b, u8 a) {
         cycleadd = 0;
     }
 
-    gDPSetFillColor(gDisplayListHead++, (GPACK_RGBA5551(r, g, b, 1) << 16) | GPACK_RGBA5551(r, g, b, 1));
+    gDPSetFillColor(gDisplayListHead++, ((GPACK_RGBA5551(r, g, b, 1) << 16) | GPACK_RGBA5551(r, g, b, 1)));
     print_set_envcolour(r, g, b, a);
-    gDPFillRectangle(gDisplayListHead++, x1, y1, x2 - cycleadd, y2 - cycleadd);
+    gDPFillRectangle(gDisplayListHead++, x1, y1, (x2 - cycleadd), (y2 - cycleadd));
     gDPPipeSync(gDisplayListHead++);
 }
 
@@ -894,7 +899,7 @@ void render_blank_box_rounded(s32 x1, s32 y1, s32 x2, s32 y2, u8 r, u8 g, u8 b, 
     }
     if (x1 < 0) x1 = 0;
     if (y1 < 0) y1 = 0;
-    if (x2 > SCREEN_WIDTH) x2 = SCREEN_WIDTH;
+    if (x2 > SCREEN_WIDTH ) x2 = SCREEN_WIDTH;
     if (y2 > SCREEN_HEIGHT) y2 = SCREEN_HEIGHT;
     s32 cycleadd = 0;
     gDPSetCycleType(gDisplayListHead++, G_CYC_1CYCLE);
@@ -948,8 +953,9 @@ s32 get_text_width(const char *str, s32 font) {
     for (i = 0; i < strLen; i++) {
         while (i < strLen && str[i] == '<') {
             commandOffset = text_iterate_command(str, i, FALSE);
-            if (commandOffset == 0)
+            if (commandOffset == 0) {
                 break;
+            }
 
             i += commandOffset;
             if (str[i] == '\n') {
@@ -958,8 +964,9 @@ s32 get_text_width(const char *str, s32 font) {
             }
         }
 
-        if (i >= strLen)
+        if (i >= strLen) {
             break;
+        }
 
         get_char_from_byte(&textX, &textPos, str[i], &pad, &spaceX, &offsetY, font);
         textPos += (spaceX + 1) * textSizeTotal;
@@ -982,14 +989,16 @@ s32 get_text_height(const char *str) {
     for (i = 0; i < strLen; i++) {
         while (i < strLen && str[i] == '<') {
             commandOffset = text_iterate_command(str, i, FALSE);
-            if (commandOffset == 0)
+            if (commandOffset == 0) {
                 break;
+            }
 
             i += commandOffset;
         }
 
-        if (i >= strLen)
+        if (i >= strLen) {
             break;
+        }
 
         if (str[i] == '\n') {
             textPos += topLineHeight;
@@ -1013,11 +1022,11 @@ const Gfx dl_small_text_begin[] = {
 };
 
 void set_text_size_params(void) {
-    textSizeTotal = textSizeTemp * textSize;
-    textTempScale = 1024/textSizeTotal;
-    textOffsets[0] = 8 * textSizeTotal;
-    textOffsets[1] = 12 * textSizeTotal;
-    topLineHeight = MAX(12.0f * textSizeTotal, topLineHeight);
+    textSizeTotal = (textSizeTemp * textSize);
+    textTempScale = (1024 / textSizeTotal);
+    textOffsets[0] = ( 8 * textSizeTotal);
+    textOffsets[1] = (12 * textSizeTotal);
+    topLineHeight = MAX((12.0f * textSizeTotal), topLineHeight);
 }
 
 static s8 sTextShakeTable[] = {
@@ -1062,14 +1071,16 @@ void print_small_text(s32 x, s32 y, const char *str, s32 align, s32 amount, u8 f
         for (s32 i = 0; i < strLen; i++) {
             while (i < strLen && str[i] == '<') {
                 commandOffset = text_iterate_command(str, i, FALSE);
-                if (commandOffset == 0)
+                if (commandOffset == 0) {
                     break;
+                }
 
                 i += commandOffset;
             }
 
-            if (i >= strLen || str[i] == '\0')
+            if (i >= strLen || str[i] == '\0') {
                 break;
+            }
 
             if (str[i] == '\n') {
                 textPos[0] = 0;
@@ -1114,8 +1125,9 @@ void print_small_text(s32 x, s32 y, const char *str, s32 align, s32 amount, u8 f
 
         while (i < textLength && str[i] == '<') {
             commandOffset = text_iterate_command(str, i, TRUE);
-            if (commandOffset == 0)
+            if (commandOffset == 0) {
                 break;
+            }
 
             i += commandOffset;
             textLength += commandOffset;
@@ -1127,11 +1139,13 @@ void print_small_text(s32 x, s32 y, const char *str, s32 align, s32 amount, u8 f
 
         if (shakeToggle) {
             shakePos[0] = (sTextShakeTable[shakeTablePos++] * textSizeTotal);
-            if (shakeTablePos == sizeof(sTextShakeTable))
+            if (shakeTablePos == sizeof(sTextShakeTable)) {
                 shakeTablePos = 0;
+            }
             shakePos[1] = sTextShakeTable[shakeTablePos++] * textSizeTotal;
-            if (shakeTablePos == sizeof(sTextShakeTable))
+            if (shakeTablePos == sizeof(sTextShakeTable)) {
                 shakeTablePos = 0;
+            }
         } else {
             shakePos[0] = 0;
             shakePos[1] = 0;
@@ -1145,7 +1159,7 @@ void print_small_text(s32 x, s32 y, const char *str, s32 align, s32 amount, u8 f
         }
 
         get_char_from_byte(&textX, &textPos[0], str[i], &widthX, &spaceX, &offsetY, font);
-        s32 goddamnJMeasure = textX == 256 ? -1 : 0; // Hack to fix a rendering bug.
+        s32 goddamnJMeasure = (textX == 256) ? -1 : 0; // Hack to fix a rendering bug.
         if (str[i] != ' ' && str[i] != '\t') {
             if (xlu != prevxlu) {
                 prevxlu = xlu;
@@ -1238,7 +1252,7 @@ void print_small_text_light(s32 x, s32 y, const char *str, s32 align, s32 amount
         }
 
         get_char_from_byte(&textX, &textPos[0], str[i], &widthX, &spaceX, &offsetY, font);
-        s32 goddamnJMeasure = textX == 256 ? -1 : 0; // Hack to fix a rendering bug.
+        s32 goddamnJMeasure = (textX == 256) ? -1 : 0; // Hack to fix a rendering bug.
         if (str[i] != ' ' && str[i] != '\t') {
             if (xlu != prevxlu) {
                 prevxlu = xlu;
@@ -1270,18 +1284,23 @@ s32 get_hex_value_at_offset(const char *str, s32 primaryOffset, u32 nibbleOffset
     s32 val = str[primaryOffset + nibbleOffset];
     s32 shiftVal = 4 * ((nibbleOffset + 1) % 2);
 
-    if (nibbleOffset > 7)
+    if (nibbleOffset > 7) {
         garbageReturnsEnv = FALSE;
+    }
 
-    if (val >= 'A' && val <= 'F')
-        return (val - 'A' + 0xA) << shiftVal;
-    if (val >= 'a' && val <= 'f')
-        return (val - 'a' + 0xA) << shiftVal;
-    if (val >= '0' && val <= '9')
-        return (val - '0') << shiftVal;
+    if (val >= 'A' && val <= 'F') {
+        return (((val - 'A') + 0xA) << shiftVal);
+    }
+    if (val >= 'a' && val <= 'f') {
+        return (((val - 'a') + 0xA) << shiftVal);
+    }
+    if (val >= '0' && val <= '9') {
+        return ((val - '0') << shiftVal);
+    }
 
-    if (garbageReturnsEnv) // Return gCurrEnvCol color value
+    if (garbageReturnsEnv) { // Return gCurrEnvCol color value
         return gCurrEnvCol[nibbleOffset / 2] & (0x0F << shiftVal);
+    }
 
     // Just return 0 otherwise
     return 0;
@@ -1292,47 +1311,51 @@ s32 text_iterate_command(const char *str, s32 i, s32 runCMD) {
     const char *newStr = &str[i];
     s32 lastCharIndex = (signed)strlen(newStr) - 1;
 
-    while ((newStr[len] != '>') && (len < lastCharIndex)) len++;
-    if (newStr[len] != '>')
+    while ((newStr[len] != '>') && (len < lastCharIndex)) {
+        len++;
+    }
+    if (newStr[len] != '>') {
         return 0;
-
+    }
     len++;
 
     // Ignores runCMD, because it's important this is ALWAYS ran.
-    if (len == 10 && strncmp((newStr), "<SIZE_xxx>", 6) == 0) { // Set the text size here. 100 is scale 1.0, with 001 being scale 0.01. this caps at 999. Going lower than 001
+    if ((len == 10) && (strncmp((newStr), "<SIZE_xxx>", 6) == 0)) { // Set the text size here. 100 is scale 1.0, with 001 being scale 0.01. this caps at 999. Going lower than 001
         // Will make the text unreadable on console, so only do it,
         textSizeTemp = (newStr[6] - '0');
-        textSizeTemp += (newStr[7] - '0')/10.0f;
-        textSizeTemp += (newStr[8] - '0')/100.0f;
+        textSizeTemp += ((newStr[7] - '0') / 10.0f);
+        textSizeTemp += ((newStr[8] - '0') / 100.0f);
         textSizeTemp = CLAMP(textSizeTemp, 0.01f, 10.0f);
         set_text_size_params();
-    } else if (len == 14 && strncmp((newStr), "<COL_xxxxxxxx>", 5) == 0) { // Simple text colour effect. goes up to FF for each, so FF0000FF is red.
+    } else if ((len == 14) && (strncmp((newStr), "<COL_xxxxxxxx>", 5) == 0)) { // Simple text colour effect. goes up to FF for each, so FF0000FF is red.
         // Each value is taken from the string. The first is shifted left 4 bits, because it's a larger significant value, then it adds the next digit onto it.
         // Reverting to envcoluor can be achieved by passing something like <COL_-------->, or it could be combined with real colors for just partial reversion like <COL_FF00FF--> for instance.
-        if (!runCMD)
+        if (!runCMD) {
             return len;
+        }
 
         s32 rgba[4];
 
         for (s32 j = 0; j < 4; j++) {
-            rgba[j] = get_hex_value_at_offset(newStr, 5, 2 * j, TRUE) | get_hex_value_at_offset(newStr, 5, (2 * j) + 1, TRUE);
+            rgba[j] = (get_hex_value_at_offset(newStr, 5, 2 * j, TRUE) | get_hex_value_at_offset(newStr, 5, ((2 * j) + 1), TRUE));
         }
 
         rainbowToggle = 0;
         gDPSetEnvColor(gDisplayListHead++, (Color) rgba[0], (Color) rgba[1], (Color) rgba[2], (Color) rgba[3]); // Don't use print_set_envcolour here
     } else if (len == 27 && strncmp((newStr), "<FADE_xxxxxxxx,xxxxxxxx,xx>", 6) == 0) { // Same as above, except it fades between two colours. The third set of numbers is the speed it fades.
-        if (!runCMD)
+        if (!runCMD) {
             return len;
+        }
 
         s32 rgba[4];
 
         // Find transition speed and set timer value
-        s32 spd = get_hex_value_at_offset(newStr, 24, 0, FALSE) | get_hex_value_at_offset(newStr, 24, 1, FALSE);
+        s32 spd = (get_hex_value_at_offset(newStr, 24, 0, FALSE) | get_hex_value_at_offset(newStr, 24, 1, FALSE));
         f32 sTimer = sins(gGlobalTimer * spd * 50);
 
         for (s32 j = 0; j < 4; j++) {
-            s32 col1 = get_hex_value_at_offset(newStr, 6, 2 * j, TRUE) | get_hex_value_at_offset(newStr, 6, (2 * j) + 1, TRUE);
-            s32 col2 = get_hex_value_at_offset(newStr, 15, 2 * j, TRUE) | get_hex_value_at_offset(newStr, 15, (2 * j) + 1, TRUE);
+            s32 col1 = (get_hex_value_at_offset(newStr,  6, (2 * j), TRUE) | get_hex_value_at_offset(newStr,  6, ((2 * j) + 1), TRUE));
+            s32 col2 = (get_hex_value_at_offset(newStr, 15, (2 * j), TRUE) | get_hex_value_at_offset(newStr, 15, ((2 * j) + 1), TRUE));
 
             // Final color value determined by median of two colors + a point in the end-to-end width of the difference between the two colors.
             // Said point changes based on the sTimer value in the form of a sine wave, which helps to create the fading effect.
@@ -1342,9 +1365,9 @@ s32 text_iterate_command(const char *str, s32 i, s32 runCMD) {
         rainbowToggle = 0;
         gDPSetEnvColor(gDisplayListHead++, (Color) rgba[0], (Color) rgba[1], (Color) rgba[2], (Color) rgba[3]); // Don't use print_set_envcolour here
     } else if (len == 9 && strncmp((newStr), "<RAINBOW>", 9) == 0) { // Toggles the happy colours :o) Do it again to disable it.
-        if (!runCMD)
+        if (!runCMD) {
             return len;
-
+        }
         rainbowToggle ^= 1;
         if (rainbowToggle) {
             s32 r = (coss(gGlobalTimer * 600) + 1) * 127;
@@ -1355,14 +1378,14 @@ s32 text_iterate_command(const char *str, s32 i, s32 runCMD) {
             gDPSetEnvColor(gDisplayListHead++, (Color) gCurrEnvCol[0], (Color) gCurrEnvCol[1], (Color) gCurrEnvCol[2], (Color) gCurrEnvCol[3]); // Reset text to envcolor
         }
     } else if (len == 7 && strncmp((newStr), "<SHAKE>", 7) == 0) { // Toggles text that shakes on the spot. Do it again to disable it.
-        if (!runCMD)
+        if (!runCMD) {
             return len;
-
+        }
         shakeToggle ^= 1;
     } else if (len == 6 && strncmp((newStr), "<WAVE>",  6) == 0) { // Toggles text that waves around. Do it again to disable it.
-        if (!runCMD)
+        if (!runCMD) {
             return len;
-
+        }
         waveToggle  ^= 1;
     } else {
         return 0; // Invalid command string; display everything inside to make this clear to the user.
@@ -1444,16 +1467,17 @@ static u8 gIsLightText = FALSE;
 void print_small_text_buffered(s32 x, s32 y, const char *str, u8 align, s32 amount, u8 font) {
     s32 strLen = strlen(str);
 
-    if (amount <= PRINT_ALL || amount > MAX_U8_STRING_SIZE)
+    if (amount <= PRINT_ALL || amount > MAX_U8_STRING_SIZE) {
         amount = MAX_U8_STRING_SIZE;
-
+    }
     amount = MIN(strLen, amount);
-    if (amount <= 0)
+    if (amount <= 0) {
         return; // No point in printing an empty string
-
+    }
     // Compare the cursor position and the string length with null terminator, plus 12 (header size) and return if it overflows.
-    if (sPuppyprintTextBufferPos + HEADERSIZE + (u8) amount + 1 > sizeof(sPuppyprintTextBuffer))
+    if (sPuppyprintTextBufferPos + HEADERSIZE + (u8) amount + 1 > sizeof(sPuppyprintTextBuffer)) {
         return;
+    }
 
     x += 0x8000;
     y += 0x8000;
@@ -1461,9 +1485,9 @@ void print_small_text_buffered(s32 x, s32 y, const char *str, u8 align, s32 amou
     struct PuppyprintDeferredBufferHeader header;
     header.x = (x & 0xFFFF);
     header.y = (y & 0xFFFF);
-    header.red = gCurrEnvCol[0];
+    header.red   = gCurrEnvCol[0];
     header.green = gCurrEnvCol[1];
-    header.blue = gCurrEnvCol[2];
+    header.blue  = gCurrEnvCol[2];
     header.alpha = gCurrEnvCol[3];
     header.alignment = align;
     header.textBufferLength = (u8) amount;
@@ -1484,8 +1508,9 @@ void print_small_text_buffered_light(s32 x, s32 y, const char *str, u8 align, s3
 }
 
 void puppyprint_print_deferred(void) {
-    if (sPuppyprintTextBufferPos == 0)
+    if (sPuppyprintTextBufferPos == 0) {
         return;
+    }
     bzero(&gCurrEnvCol, sizeof(ColorRGBA));
     print_set_envcolour(255, 255, 255, 255);
 

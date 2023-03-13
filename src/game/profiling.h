@@ -71,13 +71,13 @@ enum ProfilerDeltaTime {
     PROFILER_DELTA_COLLISION,
 #ifdef PUPPYPRINT_DEBUG
     PROFILER_DELTA_PUPPYPRINT1,
-    PROFILER_DELTA_PUPPYPRINT2
+    PROFILER_DELTA_PUPPYPRINT2,
 #endif
 };
 
 #ifndef PUPPYPRINT_DEBUG
-#define PROFILER_TIME_PUPPYPRINT1 0
-#define PROFILER_TIME_PUPPYPRINT2 0
+#define PROFILER_TIME_PUPPYPRINT1  0
+#define PROFILER_TIME_PUPPYPRINT2  0
 #define PROFILER_DELTA_PUPPYPRINT1 0
 #define PROFILER_DELTA_PUPPYPRINT2 0
 #endif
@@ -138,7 +138,7 @@ static ALWAYS_INLINE void profiler_rsp_yielded() {
 #endif
 
 #ifdef AUDIO_PROFILING
-#define AUDIO_SUBSET_SIZE PROFILER_TIME_SUB_AUDIO_END - PROFILER_TIME_SUB_AUDIO_START
+#define AUDIO_SUBSET_SIZE (PROFILER_TIME_SUB_AUDIO_END - PROFILER_TIME_SUB_AUDIO_START)
 extern u32 audio_subset_starts[AUDIO_SUBSET_SIZE];
 extern u32 audio_subset_tallies[AUDIO_SUBSET_SIZE];
 
@@ -174,10 +174,10 @@ static ALWAYS_INLINE void profiler_audio_subset_complete_func(enum ProfilerTime 
     audio_subset_tallies[index] += time - audio_subset_starts[index];
 }
 
-#define AUDIO_PROFILER_SWITCH(complete, begin) profiler_audio_subset_switch_func(complete - PROFILER_TIME_SUB_AUDIO_START, begin - PROFILER_TIME_SUB_AUDIO_START)
-#define AUDIO_PROFILER_COMPLETE_AND_SWITCH(complete1, complete2, begin) profiler_audio_subset_complete_and_switch_func(complete1 - PROFILER_TIME_SUB_AUDIO_START, \
-    complete2 - PROFILER_TIME_SUB_AUDIO_START, begin - PROFILER_TIME_SUB_AUDIO_START)
-#define AUDIO_PROFILER_START_SHARED(first, new) profiler_audio_subset_start_shared_func(first - PROFILER_TIME_SUB_AUDIO_START, new - PROFILER_TIME_SUB_AUDIO_START)
+#define AUDIO_PROFILER_SWITCH(complete, begin) profiler_audio_subset_switch_func((complete - PROFILER_TIME_SUB_AUDIO_START), (begin - PROFILER_TIME_SUB_AUDIO_START))
+#define AUDIO_PROFILER_COMPLETE_AND_SWITCH(complete1, complete2, begin) profiler_audio_subset_complete_and_switch_func((complete1 - PROFILER_TIME_SUB_AUDIO_START), \
+    (complete2 - PROFILER_TIME_SUB_AUDIO_START), (begin - PROFILER_TIME_SUB_AUDIO_START))
+#define AUDIO_PROFILER_START_SHARED(first, new) profiler_audio_subset_start_shared_func((first - PROFILER_TIME_SUB_AUDIO_START), (new - PROFILER_TIME_SUB_AUDIO_START))
 
 // These two are unused by the default audio profiler; left in for cases of manual profiling of smaller functions as needed
 #define AUDIO_PROFILER_START(which) profiler_audio_subset_start_func(which - PROFILER_TIME_SUB_AUDIO_START)

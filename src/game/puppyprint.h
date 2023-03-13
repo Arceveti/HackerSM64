@@ -84,24 +84,24 @@ enum PPPages {
     PUPPYPRINT_PAGE_LOG,
     PUPPYPRINT_PAGE_LEVEL_SELECT,
 #ifdef PUPPYCAM
-    PUPPYPRINT_PAGE_CAMERA
+    PUPPYPRINT_PAGE_CAMERA,
 #endif
 };
 
 #ifdef PUPPYPRINT_DEBUG
  #ifdef BETTER_REVERB
     #define NUM_AUDIO_POOLS 7
- #else
+ #else // !BETTER REVERB
     #define NUM_AUDIO_POOLS 6
- #endif
-#endif
+ #endif // !BETTER_REVERB
+#endif // PUPPYPRINT_DEBUG
 
 enum PuppyFont {
     FONT_DEFAULT,
     FONT_OUTLINE,
     FONT_PLAIN,
     FONT_VANILLA,
-    FONT_NUM
+    FONT_NUM,
 };
 
 extern u8 sPPDebugPage;
