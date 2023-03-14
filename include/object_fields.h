@@ -9,8 +9,12 @@
 #ifdef OBJECT_FIELDS_INDEX_DIRECTLY
 #define OBJECT_FIELD_U32(index)           index
 #define OBJECT_FIELD_S32(index)           index
+#define OBJECT_FIELD_U16(index, subIndex) index
 #define OBJECT_FIELD_S16(index, subIndex) index
+#define OBJECT_FIELD_U8(index, subIndex)  index
+#define OBJECT_FIELD_S8(index, subIndex)  index
 #define OBJECT_FIELD_F32(index)           index
+#define OBJECT_FIELD_S8P(index)           index
 #define OBJECT_FIELD_S16P(index)          index
 #define OBJECT_FIELD_S32P(index)          index
 #define OBJECT_FIELD_ANIMS(index)         index
@@ -20,12 +24,16 @@
 #define OBJECT_FIELD_SURFACE(index)       index
 #define OBJECT_FIELD_VPTR(index)          index
 #define OBJECT_FIELD_CVPTR(index)         index
-#else
+#else // !OBJECT_FIELDS_INDEX_DIRECTLY
 #define OBJECT_FIELD_U32(index)           rawData.asU32[index]
 #define OBJECT_FIELD_S32(index)           rawData.asS32[index]
+#define OBJECT_FIELD_U16(index, subIndex) rawData.asU16[index][subIndex]
 #define OBJECT_FIELD_S16(index, subIndex) rawData.asS16[index][subIndex]
+#define OBJECT_FIELD_U8(index, subIndex)  rawData.asU8[index][subIndex]
+#define OBJECT_FIELD_S8(index, subIndex)  rawData.asS8[index][subIndex]
 #define OBJECT_FIELD_F32(index)           rawData.asF32[index]
-#if !IS_64_BIT
+ #if !IS_64_BIT
+#define OBJECT_FIELD_S8P(index)           rawData.asS8P[index]
 #define OBJECT_FIELD_S16P(index)          rawData.asS16P[index]
 #define OBJECT_FIELD_S32P(index)          rawData.asS32P[index]
 #define OBJECT_FIELD_ANIMS(index)         rawData.asAnims[index]
@@ -35,7 +43,8 @@
 #define OBJECT_FIELD_SURFACE(index)       rawData.asSurface[index]
 #define OBJECT_FIELD_VPTR(index)          rawData.asVoidPtr[index]
 #define OBJECT_FIELD_CVPTR(index)         rawData.asConstVoidPtr[index]
-#else
+ #else // IS_64_BIT
+#define OBJECT_FIELD_S8P(index)           ptrData.asS8P[index]
 #define OBJECT_FIELD_S16P(index)          ptrData.asS16P[index]
 #define OBJECT_FIELD_S32P(index)          ptrData.asS32P[index]
 #define OBJECT_FIELD_ANIMS(index)         ptrData.asAnims[index]
@@ -45,8 +54,8 @@
 #define OBJECT_FIELD_SURFACE(index)       ptrData.asSurface[index]
 #define OBJECT_FIELD_VPTR(index)          ptrData.asVoidPtr[index]
 #define OBJECT_FIELD_CVPTR(index)         ptrData.asConstVoidPtr[index]
-#endif
-#endif
+ #endif // IS_64_BIT
+#endif // !OBJECT_FIELDS_INDEX_DIRECTLY
 
 // 0x088 (0x00), the first field, is object-specific and defined below the common fields.
 /* Common fields */
