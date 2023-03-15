@@ -67,65 +67,6 @@
 #define BC_W(a) ((uintptr_t)(u32)(a))
 #define BC_PTR(a) ((uintptr_t)(a))
 
-enum BehaviorCommands {
-    /*0x00*/ BHV_CMD_BEGIN,
-    /*0x01*/ BHV_CMD_DELAY,
-    /*0x02*/ BHV_CMD_CALL,
-    /*0x03*/ BHV_CMD_RETURN,
-    /*0x04*/ BHV_CMD_GOTO,
-    /*0x05*/ BHV_CMD_BEGIN_REPEAT,
-    /*0x06*/ BHV_CMD_END_REPEAT,
-    /*0x07*/ BHV_CMD_END_REPEAT_CONTINUE,
-    /*0x08*/ BHV_CMD_BEGIN_LOOP,
-    /*0x09*/ BHV_CMD_END_LOOP,
-    /*0x0A*/ BHV_CMD_BREAK,
-    /*0x0B*/ BHV_CMD_BREAK_UNUSED,
-    /*0x0C*/ BHV_CMD_CALL_NATIVE,
-    /*0x0D*/ BHV_CMD_ADD_FLOAT,
-    /*0x0E*/ BHV_CMD_SET_FLOAT,
-    /*0x0F*/ BHV_CMD_ADD_INT,
-    /*0x10*/ BHV_CMD_SET_INT,
-    /*0x11*/ BHV_CMD_OR_INT,
-    /*0x12*/ BHV_CMD_BIT_CLEAR,
-    /*0x13*/ BHV_CMD_SET_INT_RAND_RSHIFT,
-    /*0x14*/ BHV_CMD_SET_RANDOM_FLOAT,
-    /*0x15*/ BHV_CMD_SET_RANDOM_INT,
-    /*0x16*/ BHV_CMD_ADD_RANDOM_FLOAT,
-    /*0x17*/ BHV_CMD_ADD_INT_RAND_RSHIFT,
-    /*0x18*/ BHV_CMD_NOP_1,
-    /*0x19*/ BHV_CMD_NOP_2,
-    /*0x1A*/ BHV_CMD_NOP_3,
-    /*0x1B*/ BHV_CMD_SET_MODEL,
-    /*0x1C*/ BHV_CMD_SPAWN_CHILD,
-    /*0x1D*/ BHV_CMD_DEACTIVATE,
-    /*0x1E*/ BHV_CMD_DROP_TO_FLOOR,
-    /*0x1F*/ BHV_CMD_SUM_FLOAT,
-    /*0x20*/ BHV_CMD_SUM_INT,
-    /*0x21*/ BHV_CMD_BILLBOARD,
-    /*0x22*/ BHV_CMD_HIDE,
-    /*0x23*/ BHV_CMD_SET_HITBOX,
-    /*0x24*/ BHV_CMD_NOP_4,
-    /*0x25*/ BHV_CMD_DELAY_VAR,
-    /*0x26*/ BHV_CMD_BEGIN_REPEAT_UNUSED,
-    /*0x27*/ BHV_CMD_LOAD_ANIMATIONS,
-    /*0x28*/ BHV_CMD_ANIMATE,
-    /*0x29*/ BHV_CMD_SPAWN_CHILD_WITH_PARam,
-    /*0x2A*/ BHV_CMD_LOAD_COLLISION_DATA,
-    /*0x2B*/ BHV_CMD_SET_HITBOX_WITH_OFFSet,
-    /*0x2C*/ BHV_CMD_SPAWN_OBJ,
-    /*0x2D*/ BHV_CMD_SET_HOME,
-    /*0x2E*/ BHV_CMD_SET_HURTBOX,
-    /*0x2F*/ BHV_CMD_SET_INTERACT_TYPE,
-    /*0x30*/ BHV_CMD_SET_OBJ_PHYSICS,
-    /*0x31*/ BHV_CMD_SET_INTERACT_SUBTYPE,
-    /*0x32*/ BHV_CMD_SCALE,
-    /*0x33*/ BHV_CMD_PARENT_BIT_CLEAR,
-    /*0x34*/ BHV_CMD_ANIMATE_TEXTURE,
-    /*0x35*/ BHV_CMD_DISABLE_RENDERING,
-    /*0x36*/ BHV_CMD_SET_INT_UNUSED,
-    /*0x37*/ BHV_CMD_SPAWN_WATER_DROPLET,
-};
-
 // Defines the start of the behavior script as well as the object list the object belongs to.
 // Has some special behavior for certain objects.
 #define BEGIN(objList) \
@@ -174,10 +115,6 @@ enum BehaviorCommands {
 #define BREAK() \
     BC_B(BHV_CMD_BREAK)
 
-// Exits the behavior script, unused.
-#define BREAK_UNUSED() \
-    BC_B(BHV_CMD_BREAK_UNUSED)
-
 // Executes a native game function.
 #define CALL_NATIVE(func) \
     BC_B(BHV_CMD_CALL_NATIVE), \
@@ -191,28 +128,22 @@ enum BehaviorCommands {
 #define SET_FLOAT(field, value) \
     BC_BBH(BHV_CMD_SET_FLOAT, field, value)
 
-// Adds an integer to the specified field.
-#define ADD_INT(field, value) \
-    BC_BBH(BHV_CMD_ADD_INT, field, value)
+// Adds a short to the specified field.
+#define ADD_SHORT(field, value) \
+    BC_BBH(BHV_CMD_ADD_SHORT, field, value)
 
-// Sets the specified field to an integer.
-#define SET_INT(field, value) \
-    BC_BBH(BHV_CMD_SET_INT, field, value)
+// Sets the specified field to a short.
+#define SET_SHORT(field, value) \
+    BC_BBH(BHV_CMD_SET_SHORT, field, value)
 
-// Performs a bitwise OR with the specified field and the given integer.
+// Performs a bitwise OR with the specified field and the given short.
 // Usually used to set an object's flags.
-#define OR_INT(field, value) \
-    BC_BBH(BHV_CMD_OR_INT, field, value)
+#define OR_SHORT(field, value) \
+    BC_BBH(BHV_CMD_OR_SHORT, field, value)
 
 // Performs a bit clear with the specified short. Unused in favor of the 32-bit version.
 #define BIT_CLEAR(field, value) \
     BC_BBH(BHV_CMD_BIT_CLEAR, field, value)
-
-// TODO: this one needs a better name / labelling
-// Gets a random short, right shifts it the specified amount and adds min to it, then sets the specified field to that value.
-#define SET_INT_RAND_RSHIFT(field, min, rshift) \
-    BC_BBH(BHV_CMD_SET_INT_RAND_RSHIFT, field, min), \
-    BC_H(rshift)
 
 // Sets the specified field to a random float in the given range.
 #define SET_RANDOM_FLOAT(field, min, range) \
@@ -229,23 +160,24 @@ enum BehaviorCommands {
     BC_BBH(BHV_CMD_ADD_RANDOM_FLOAT, field, min), \
     BC_H(range)
 
-// TODO: better name (unused anyway)
-// Gets a random short, right shifts it the specified amount and adds min to it, then adds the value to the specified field. Unused.
-#define ADD_INT_RAND_RSHIFT(field, min, rshift) \
-    BC_BBH(BHV_CMD_ADD_INT_RAND_RSHIFT, field, min), \
-    BC_H(rshift)
+// Adds an integer to the specified field.
+#define ADD_INT(field, value) \
+    BC_BB(BHV_CMD_ADD_INT, field), \
+    BC_W(value)
 
-// No operation. Unused.
-#define CMD_NOP_1(field) \
-    BC_BB(BHV_CMD_NOP_1, field)
+// Sets the specified field to an integer.
+#define SET_INT(field, value) \
+    BC_BB(BHV_CMD_SET_INT, field), \
+    BC_W(value)
 
-// No operation. Unused.
-#define CMD_NOP_2(field) \
-    BC_BB(BHV_CMD_NOP_2, field)
+// Performs a bitwise OR with the specified field and the given integer.
+// Usually used to set an object's flags.
+#define OR_INT(field, value) \
+    BC_BB(BHV_CMD_OR_INT, field), \
+    BC_W(value)
 
-// No operation. Unused.
-#define CMD_NOP_3(field) \
-    BC_BB(BHV_CMD_NOP_3, field)
+// Backwards compatibility:
+#define OR_LONG(field, value) OR_INT(field, value)
 
 // Sets the current model ID of the object.
 #define SET_MODEL(modelID) \
@@ -287,20 +219,9 @@ enum BehaviorCommands {
     BC_B(BHV_CMD_SET_HITBOX), \
     BC_HH(radius, height)
 
-// No operation. Unused.
-#define CMD_NOP_4(field, value) \
-    BC_BBH(BHV_CMD_NOP_4, field, value)
-
 // Delays the behavior script for the number of frames given by the value of the specified field.
 #define DELAY_VAR(field) \
     BC_BB(BHV_CMD_DELAY_VAR, field)
-
-// Unused. Marks the start of a loop that will repeat a certain number of times.
-// Uses a u8 as the argument, instead of a s16 like the other version does.
-#define BEGIN_REPEAT_UNUSED(count) \
-    BC_BB(BHV_CMD_BEGIN_REPEAT_UNUSED, count)
-
-#define OR_LONG(field, value) LOAD_ANIMATIONS(field, value)
 
 // Loads the animations for the object. <field> is always set to oAnimations.
 #define LOAD_ANIMATIONS(field, anims) \
@@ -313,7 +234,7 @@ enum BehaviorCommands {
 
 // Spawns a child object with the specified model and behavior, plus a behavior param.
 #define SPAWN_CHILD_WITH_PARAM(bhvParam, modelID, behavior) \
-    BC_B0H(BHV_CMD_SPAWN_CHILD_WITH_PARam, bhvParam), \
+    BC_B0H(BHV_CMD_SPAWN_CHILD_WITH_PARAM, bhvParam), \
     BC_W(modelID), \
     BC_PTR(behavior)
 
@@ -324,7 +245,7 @@ enum BehaviorCommands {
 
 // Sets the size of the object's cylindrical hitbox, and applies a downwards offset.
 #define SET_HITBOX_WITH_OFFSET(radius, height, downOffset) \
-    BC_B(BHV_CMD_SET_HITBOX_WITH_OFFSet), \
+    BC_B(BHV_CMD_SET_HITBOX_WITH_OFFSET), \
     BC_HH(radius, height), \
     BC_H(downOffset)
 
@@ -379,16 +300,10 @@ enum BehaviorCommands {
 #define DISABLE_RENDERING() \
     BC_B(BHV_CMD_DISABLE_RENDERING)
 
-// Unused. Sets the specified field to an integer. Wastes 4 bytes of space for no reason at all.
-#define SET_INT_UNUSED(field, value) \
-    BC_BB(BHV_CMD_SET_INT_UNUSED, field), \
-    BC_HH(0, value)
-
 // Spawns a water droplet with the given parameters.
 #define SPAWN_WATER_DROPLET(dropletParams) \
     BC_B(BHV_CMD_SPAWN_WATER_DROPLET), \
     BC_PTR(dropletParams)
-
 
 const BehaviorScript bhvStarDoor[] = {
     BEGIN(OBJ_LIST_SURFACE),
@@ -750,7 +665,7 @@ const BehaviorScript bhvChuckyaAnchorMario[] = {
 
 const BehaviorScript bhvRotatingPlatform[] = {
     BEGIN(OBJ_LIST_SURFACE),
-    OR_LONG(oFlags, (OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE | OBJ_FLAG_DONT_CALC_COLL_DIST)),
+    OR_INT(oFlags, (OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE | OBJ_FLAG_DONT_CALC_COLL_DIST)),
     SET_HOME(),
     BEGIN_LOOP(),
         CALL_NATIVE(bhv_rotating_platform_loop),
@@ -837,7 +752,7 @@ const BehaviorScript bhvWfRotatingWoodenPlatform[] = {
 
 const BehaviorScript bhvKoopaShellUnderwater[] = {
     BEGIN(OBJ_LIST_GENACTOR),
-    OR_LONG(oFlags, (OBJ_FLAG_HOLDABLE | OBJ_FLAG_COMPUTE_DIST_TO_MARIO | OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE | OBJ_FLAG_SILHOUETTE)),
+    OR_INT(oFlags, (OBJ_FLAG_HOLDABLE | OBJ_FLAG_COMPUTE_DIST_TO_MARIO | OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE | OBJ_FLAG_SILHOUETTE)),
     BEGIN_LOOP(),
         CALL_NATIVE(bhv_koopa_shell_underwater_loop),
     END_LOOP(),
@@ -907,7 +822,7 @@ const BehaviorScript bhvSpawnedStar[] = {
     BEGIN(OBJ_LIST_LEVEL),
     OR_INT(oFlags, OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE),
     SET_INT(oBehParams2ndByte, SPAWN_STAR_POS_CUTSCENE_BP_SPAWN_AT_HOME),
-    GOTO(bhvSpawnedStarNoLevelExit + 1 + 1),
+    GOTO(bhvSpawnedStarNoLevelExit + 1 + 2),
 };
 
 const BehaviorScript bhvSpawnedStarNoLevelExit[] = {
@@ -1118,7 +1033,7 @@ const BehaviorScript bhvTriangleParticleSpawner[] = {
 const BehaviorScript bhvDoorWarp[] = {
     BEGIN(OBJ_LIST_SURFACE),
     SET_INT(oInteractType, INTERACT_WARP_DOOR),
-    GOTO(bhvDoor + 1 + 1),
+    GOTO(bhvDoor + 1 + 2),
 };
 
 const BehaviorScript bhvDoor[] = {
@@ -1405,7 +1320,7 @@ const BehaviorScript bhvUkikiCageStar[] = {
 
 const BehaviorScript bhvUkikiCage[] = {
     BEGIN(OBJ_LIST_SURFACE),
-    OR_LONG(oFlags, (OBJ_FLAG_SET_FACE_YAW_TO_MOVE_YAW | OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE | OBJ_FLAG_DONT_CALC_COLL_DIST)),
+    OR_INT(oFlags, (OBJ_FLAG_SET_FACE_YAW_TO_MOVE_YAW | OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE | OBJ_FLAG_DONT_CALC_COLL_DIST)),
     SET_HOME(),
     LOAD_COLLISION_DATA(ttm_seg7_collision_ukiki_cage),
     SPAWN_CHILD(/*Model*/ MODEL_STAR, /*Behavior*/ bhvUkikiCageStar),
@@ -1466,7 +1381,7 @@ const BehaviorScript bhvBitfsTiltingInvertedPyramid[] = {
 
 const BehaviorScript bhvSquishablePlatform[] = {
     BEGIN(OBJ_LIST_SURFACE),
-    OR_LONG(oFlags, (OBJ_FLAG_COMPUTE_DIST_TO_MARIO | OBJ_FLAG_SET_FACE_YAW_TO_MOVE_YAW | OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE | OBJ_FLAG_DONT_CALC_COLL_DIST)),
+    OR_INT(oFlags, (OBJ_FLAG_COMPUTE_DIST_TO_MARIO | OBJ_FLAG_SET_FACE_YAW_TO_MOVE_YAW | OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE | OBJ_FLAG_DONT_CALC_COLL_DIST)),
     LOAD_COLLISION_DATA(bitfs_seg7_collision_squishable_platform),
     SET_FLOAT(oCollisionDistance, 10000),
     CALL_NATIVE(bhv_platform_normals_init),
@@ -1790,7 +1705,7 @@ const BehaviorScript bhvHiddenObject[] = {
 
 const BehaviorScript bhvBreakableBox[] = {
     BEGIN(OBJ_LIST_SURFACE),
-    OR_LONG(oFlags, (OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE | OBJ_FLAG_DONT_CALC_COLL_DIST)),
+    OR_INT(oFlags, (OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE | OBJ_FLAG_DONT_CALC_COLL_DIST)),
     LOAD_COLLISION_DATA(breakable_box_seg8_collision),
     SET_FLOAT(oCollisionDistance, 1000),
     CALL_NATIVE(bhv_init_room),
@@ -1798,7 +1713,6 @@ const BehaviorScript bhvBreakableBox[] = {
         CALL_NATIVE(bhv_breakable_box_loop),
         CALL_NATIVE(load_object_collision_model),
     END_LOOP(),
-    BREAK(),
 };
 
 const BehaviorScript bhvPushableMetalBox[] = {
@@ -2043,7 +1957,7 @@ const BehaviorScript bhvBowserFlameSpawn[] = {
 
 const BehaviorScript bhvTiltingBowserLavaPlatform[] = {
     BEGIN(OBJ_LIST_SURFACE),
-    OR_LONG(oFlags, (OBJ_FLAG_COMPUTE_ANGLE_TO_MARIO | OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE | OBJ_FLAG_DONT_CALC_COLL_DIST)),
+    OR_INT(oFlags, (OBJ_FLAG_COMPUTE_ANGLE_TO_MARIO | OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE | OBJ_FLAG_DONT_CALC_COLL_DIST)),
     LOAD_COLLISION_DATA(bowser_2_seg7_collision_tilting_platform),
     SET_FLOAT(oDrawingDistance, 20000),
     SET_FLOAT(oCollisionDistance, 20000),
@@ -2057,7 +1971,7 @@ const BehaviorScript bhvTiltingBowserLavaPlatform[] = {
 
 const BehaviorScript bhvFallingBowserPlatform[] = {
     BEGIN(OBJ_LIST_SURFACE),
-    OR_LONG(oFlags, (OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE | OBJ_FLAG_DONT_CALC_COLL_DIST)),
+    OR_INT(oFlags, (OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE | OBJ_FLAG_DONT_CALC_COLL_DIST)),
     SET_FLOAT(oDrawingDistance, 20000),
     SET_FLOAT(oCollisionDistance, 20000),
     SET_HOME(),
@@ -2255,7 +2169,7 @@ const BehaviorScript bhvMoatGrills[] = {
 const BehaviorScript bhvClockMinuteHand[] = {
     BEGIN(OBJ_LIST_DEFAULT),
     SET_INT(oAngleVelRoll, -0x180),
-    GOTO(bhvClockHourHand + 1 + 1),
+    GOTO(bhvClockHourHand + 1 + 2),
 };
 
 const BehaviorScript bhvClockHourHand[] = {
@@ -2290,7 +2204,7 @@ const BehaviorScript bhvMacroUkiki[] = {
 
 const BehaviorScript bhvLllRotatingHexagonalPlatform[] = {
     BEGIN(OBJ_LIST_SURFACE),
-    OR_LONG(oFlags, (OBJ_FLAG_SET_FACE_YAW_TO_MOVE_YAW | OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE | OBJ_FLAG_DONT_CALC_COLL_DIST)),
+    OR_INT(oFlags, (OBJ_FLAG_SET_FACE_YAW_TO_MOVE_YAW | OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE | OBJ_FLAG_DONT_CALC_COLL_DIST)),
     LOAD_COLLISION_DATA(lll_seg7_collision_hexagonal_platform),
     SET_HOME(),
     BEGIN_LOOP(),
@@ -2430,7 +2344,7 @@ const BehaviorScript bhvLllTiltingInvertedPyramid[] = {
 
 const BehaviorScript bhvKoopaShell[] = {
     BEGIN(OBJ_LIST_LEVEL),
-    OR_LONG(oFlags, (OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE | OBJ_FLAG_SILHOUETTE)), //! Silhouette doesn't show up in-game, due to combiner modes.
+    OR_INT(oFlags, (OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE | OBJ_FLAG_SILHOUETTE)), //! Silhouette doesn't show up in-game, due to combiner modes.
     SET_OBJ_PHYSICS(/*Wall hitbox radius*/ 30, /*Gravity*/ -400, /*Bounciness*/ -50, /*Drag strength*/ 1000, /*Friction*/ 1000, /*Buoyancy*/ 200, /*Unused*/ 0, 0),
     BEGIN_LOOP(),
         CALL_NATIVE(bhv_koopa_shell_loop),
@@ -2481,7 +2395,7 @@ const BehaviorScript bhvPiranhaPlant[] = {
 
 const BehaviorScript bhvLllBowserPuzzlePiece[] = {
     BEGIN(OBJ_LIST_SURFACE),
-    OR_LONG(oFlags, (OBJ_FLAG_COMPUTE_DIST_TO_MARIO | OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE | OBJ_FLAG_DONT_CALC_COLL_DIST)),
+    OR_INT(oFlags, (OBJ_FLAG_COMPUTE_DIST_TO_MARIO | OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE | OBJ_FLAG_DONT_CALC_COLL_DIST)),
     LOAD_COLLISION_DATA(lll_seg7_collision_puzzle_piece),
     SET_HOME(),
     SET_FLOAT(oCollisionDistance, 3000),
@@ -3160,7 +3074,7 @@ const BehaviorScript bhvFloorTrapInCastle[] = {
 const BehaviorScript bhvTree[] = {
     BEGIN(OBJ_LIST_POLELIKE),
     BILLBOARD(),
-    OR_LONG(oFlags, (OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE | OBJ_FLAG_OPACITY_FROM_CAMERA_DIST)),
+    OR_INT(oFlags, (OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE | OBJ_FLAG_OPACITY_FROM_CAMERA_DIST)),
     SET_INT(oInteractType, INTERACT_POLE),
     SET_HITBOX(/*Radius*/ 80, /*Height*/ 500),
     SET_INT(oIntangibleTimer, 0),
@@ -3233,7 +3147,7 @@ const BehaviorScript bhvWhompKingBoss[] = {
     BEGIN(OBJ_LIST_SURFACE),
     SET_INT(oBehParams2ndByte, WHOMP_BP_KING),
     SET_INT(oHealth, 3),
-    GOTO(bhvSmallWhomp + 1 + 1),
+    GOTO(bhvSmallWhomp + 1 + 2),
 };
 
 const BehaviorScript bhvSmallWhomp[] = {
@@ -3376,7 +3290,7 @@ const BehaviorScript bhvShallowWaterSplash[] = {
 const BehaviorScript bhvObjectWaveTrail[] = {
     BEGIN(OBJ_LIST_UNIMPORTANT),
     OR_INT(oFlags, OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE),
-    GOTO(bhvWaveTrail + 1 + 1 + 2), // Wave trail - common
+    GOTO(bhvWaveTrail + 1 + 2 + 2), // Wave trail - common
 };
 
 // The waves created by Mario while he is swimming.
@@ -3457,7 +3371,7 @@ UNUSED static const u64 behavior_data_unused_0 = 0;
 const BehaviorScript bhvMario[] = {
     BEGIN(OBJ_LIST_PLAYER),
     SET_INT(oIntangibleTimer, 0),
-    OR_LONG(oFlags, (OBJ_FLAG_PLAYER | OBJ_FLAG_SILHOUETTE)),
+    OR_INT(oFlags, (OBJ_FLAG_PLAYER | OBJ_FLAG_SILHOUETTE)),
     OR_INT(oUnk94, 0x0001),
     SET_HITBOX(/*Radius*/ 37, /*Height*/ 160),
     BEGIN_LOOP(),
@@ -3711,10 +3625,18 @@ const BehaviorScript bhvBobombFuseSmoke[] = {
     END_LOOP(),
 };
 
+const BehaviorScript bhvBobombBuddyOpensCannon[] = {
+    BEGIN(OBJ_LIST_GENACTOR),
+    OR_INT(oFlags, (OBJ_FLAG_PERSISTENT_RESPAWN | OBJ_FLAG_COMPUTE_ANGLE_TO_MARIO | OBJ_FLAG_HOLDABLE | OBJ_FLAG_COMPUTE_DIST_TO_MARIO | OBJ_FLAG_SET_FACE_YAW_TO_MOVE_YAW | OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE)),
+    SET_INT(oBobombBuddyRole, 1),
+    GOTO(bhvBobombBuddy + 1 + 2 + 2),
+};
+
 const BehaviorScript bhvBobombBuddy[] = {
     BEGIN(OBJ_LIST_GENACTOR),
     OR_INT(oFlags, (OBJ_FLAG_COMPUTE_ANGLE_TO_MARIO | OBJ_FLAG_HOLDABLE | OBJ_FLAG_COMPUTE_DIST_TO_MARIO | OBJ_FLAG_SET_FACE_YAW_TO_MOVE_YAW | OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE)),
     SET_INT(oBobombBuddyRole, 0),
+    // Bob-omb Buddy - common:
     LOAD_ANIMATIONS(oAnimations, bobomb_seg8_anims_0802396C),
     SET_INTERACT_TYPE(INTERACT_TEXT),
     DROP_TO_FLOOR(),
@@ -3726,13 +3648,6 @@ const BehaviorScript bhvBobombBuddy[] = {
         SET_INT(oIntangibleTimer, 0),
         CALL_NATIVE(bhv_bobomb_buddy_loop),
     END_LOOP(),
-};
-
-const BehaviorScript bhvBobombBuddyOpensCannon[] = {
-    BEGIN(OBJ_LIST_GENACTOR),
-    OR_INT(oFlags, (OBJ_FLAG_PERSISTENT_RESPAWN | OBJ_FLAG_COMPUTE_ANGLE_TO_MARIO | OBJ_FLAG_HOLDABLE | OBJ_FLAG_COMPUTE_DIST_TO_MARIO | OBJ_FLAG_SET_FACE_YAW_TO_MOVE_YAW | OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE)),
-    SET_INT(oBobombBuddyRole, 1),
-    GOTO(bhvBobombBuddy + 1 + 2),
 };
 
 const BehaviorScript bhvCannonClosed[] = {
@@ -3880,7 +3795,6 @@ const BehaviorScript bhvObjectBubble[] = {
     SET_INT(oAnimState, OBJ_ANIM_STATE_INIT_ANIM),
     CALL_NATIVE(bhv_object_bubble_init),
     SET_RANDOM_FLOAT(oVelY, /*Minimum*/ 3, /*Range*/ 6),
-    SET_INT_RAND_RSHIFT(oMoveAngleYaw, /*Minimum*/ 0, /*Right shift*/ 0),
     DELAY(1),
     BEGIN_LOOP(),
         CALL_NATIVE(bhv_object_bubble_loop),
@@ -4500,7 +4414,7 @@ const BehaviorScript bhvBigBoulderGenerator[] = {
 
 const BehaviorScript bhvWingCap[] = {
     BEGIN(OBJ_LIST_LEVEL),
-    OR_LONG(oFlags, (OBJ_FLAG_COMPUTE_ANGLE_TO_MARIO | OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE | OBJ_FLAG_SILHOUETTE)),
+    OR_INT(oFlags, (OBJ_FLAG_COMPUTE_ANGLE_TO_MARIO | OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE | OBJ_FLAG_SILHOUETTE)),
     CALL_NATIVE(bhv_wing_cap_init),
     BEGIN_LOOP(),
         CALL_NATIVE(bhv_wing_vanish_cap_loop),
@@ -4509,7 +4423,7 @@ const BehaviorScript bhvWingCap[] = {
 
 const BehaviorScript bhvMetalCap[] = {
     BEGIN(OBJ_LIST_LEVEL),
-    OR_LONG(oFlags, (OBJ_FLAG_COMPUTE_ANGLE_TO_MARIO | OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE | OBJ_FLAG_SILHOUETTE)),
+    OR_INT(oFlags, (OBJ_FLAG_COMPUTE_ANGLE_TO_MARIO | OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE | OBJ_FLAG_SILHOUETTE)),
     CALL_NATIVE(bhv_metal_cap_init),
     BEGIN_LOOP(),
         CALL_NATIVE(bhv_metal_cap_loop),
@@ -4518,7 +4432,7 @@ const BehaviorScript bhvMetalCap[] = {
 
 const BehaviorScript bhvNormalCap[] = {
     BEGIN(OBJ_LIST_LEVEL),
-    OR_LONG(oFlags, (OBJ_FLAG_COMPUTE_ANGLE_TO_MARIO | OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE | OBJ_FLAG_SILHOUETTE)),
+    OR_INT(oFlags, (OBJ_FLAG_COMPUTE_ANGLE_TO_MARIO | OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE | OBJ_FLAG_SILHOUETTE)),
     CALL_NATIVE(bhv_normal_cap_init),
     BEGIN_LOOP(),
         SET_INT(oIntangibleTimer, 0),
@@ -4528,7 +4442,7 @@ const BehaviorScript bhvNormalCap[] = {
 
 const BehaviorScript bhvVanishCap[] = {
     BEGIN(OBJ_LIST_LEVEL),
-    OR_LONG(oFlags, (OBJ_FLAG_COMPUTE_ANGLE_TO_MARIO | OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE | OBJ_FLAG_SILHOUETTE)),
+    OR_INT(oFlags, (OBJ_FLAG_COMPUTE_ANGLE_TO_MARIO | OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE | OBJ_FLAG_SILHOUETTE)),
     CALL_NATIVE(bhv_vanish_cap_init),
     BEGIN_LOOP(),
         CALL_NATIVE(bhv_wing_vanish_cap_loop),
@@ -5186,7 +5100,7 @@ const BehaviorScript bhvChainChompChainPart[] = {
 const BehaviorScript bhvWoodenPost[] = {
     BEGIN(OBJ_LIST_SURFACE),
     LOAD_COLLISION_DATA(poundable_pole_collision_wooden_post),
-    OR_LONG(oFlags, (OBJ_FLAG_COMPUTE_ANGLE_TO_MARIO | OBJ_FLAG_COMPUTE_DIST_TO_MARIO | OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE | OBJ_FLAG_DONT_CALC_COLL_DIST)),
+    OR_INT(oFlags, (OBJ_FLAG_COMPUTE_ANGLE_TO_MARIO | OBJ_FLAG_COMPUTE_DIST_TO_MARIO | OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE | OBJ_FLAG_DONT_CALC_COLL_DIST)),
     SET_OBJ_PHYSICS(/*Wall hitbox radius*/ 0, /*Gravity*/ -400, /*Bounciness*/ -50, /*Drag strength*/ 1000, /*Friction*/ 1000, /*Buoyancy*/ 200, /*Unused*/ 0, 0),
     SET_INT(oNumLootCoins, 5),
     DROP_TO_FLOOR(),
