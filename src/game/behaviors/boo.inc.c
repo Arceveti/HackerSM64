@@ -33,19 +33,17 @@ void bhv_boo_init(void) {
 
 static s32 boo_should_be_stopped(void) {
     if (cur_obj_has_behavior(bhvMerryGoRoundBigBoo) || cur_obj_has_behavior(bhvMerryGoRoundBoo)) {
-        if (!gMarioOnMerryGoRound) {
-            return TRUE;
-        } else {
-            return FALSE;
-        }
+        return !gMarioOnMerryGoRound;
     } else {
         if (o->activeFlags & ACTIVE_FLAG_IN_DIFFERENT_ROOM) {
             return TRUE;
         }
 
-        if (o->oRoom == 10 && (gTimeStopState & TIME_STOP_MARIO_OPENED_DOOR)) {
+#ifdef ENABLE_VANILLA_LEVEL_SPECIFIC_CHECKS
+        if (o->oRoom == BBH_NEAR_MERRY_GO_ROUND_ROOM && (gTimeStopState & TIME_STOP_MARIO_OPENED_DOOR)) {
             return TRUE;
         }
+#endif
     }
 
     return FALSE;
@@ -61,11 +59,7 @@ static s32 boo_should_be_active(void) {
     }
 
     if (cur_obj_has_behavior(bhvMerryGoRoundBigBoo) || cur_obj_has_behavior(bhvMerryGoRoundBoo)) {
-        if (gMarioOnMerryGoRound == TRUE) {
-            return TRUE;
-        } else {
-            return FALSE;
-        }
+        return gMarioOnMerryGoRound;
     } else if (o->oRoom == ROOM_NULL) {
         if (o->oDistanceToMario < activationRadius) {
             return TRUE;
@@ -89,11 +83,13 @@ void bhv_courtyard_boo_triplet_init(void) {
 #endif
     {
         for (i = 0; i < 3; i++) {
-            struct Object *boo = spawn_object_relative( BOO_BP_NORMAL,
+            struct Object *boo = spawn_object_relative(
+                BOO_BP_NORMAL,
                 sCourtyardBooTripletPositions[i][0],
                 sCourtyardBooTripletPositions[i][1],
                 sCourtyardBooTripletPositions[i][2],
-                o, MODEL_BOO, bhvGhostHuntBoo );
+                o, MODEL_BOO, bhvGhostHuntBoo
+            );
             OR_BPARAM1(boo->oBehParams, COIN_INSIDE_BOO_BP_YELLOW_COIN);
             boo->oMoveAngleYaw = random_u16();
         }
@@ -126,9 +122,9 @@ static void boo_approach_target_opacity_and_update_scale(void) {
 static void boo_oscillate(s32 ignoreOpacity) {
     o->oFaceAnglePitch = sins(o->oBooOscillationTimer) * 0x400;
 
-    if (o->oOpacity == 255 || ignoreOpacity == TRUE) {
-        o->header.gfx.scale[0] = sins(o->oBooOscillationTimer) * 0.08 + o->oBooBaseScale;
-        o->header.gfx.scale[1] = -sins(o->oBooOscillationTimer) * 0.08 + o->oBooBaseScale;
+    if (o->oOpacity == 255 || ignoreOpacity) {
+        o->header.gfx.scale[0] =  sins(o->oBooOscillationTimer) * 0.08f + o->oBooBaseScale;
+        o->header.gfx.scale[1] = -sins(o->oBooOscillationTimer) * 0.08f + o->oBooBaseScale;
         o->header.gfx.scale[2] = o->header.gfx.scale[0];
         o->oGravity = sins(o->oBooOscillationTimer) * o->oBooBaseScale;
         o->oBooOscillationTimer += 0x400;
@@ -365,9 +361,11 @@ static void boo_chase_mario(f32 minDY, s16 yawIncrement, f32 mul) {
 static void boo_act_0(void) {
     o->activeFlags |= ACTIVE_FLAG_MOVE_THROUGH_GRATE;
 
-    if (o->oBehParams2ndByte == 2) {
-        o->oRoom = 10;
+#ifdef ENABLE_VANILLA_LEVEL_SPECIFIC_CHECKS
+    if (o->oBehParams2ndByte == BOO_BP_MERRY_GO_ROUND) {
+        o->oRoom = BBH_NEAR_MERRY_GO_ROUND_ROOM;
     }
+#endif
 
     cur_obj_set_pos_to_home();
     o->oMoveAngleYaw = o->oBooInitialMoveYaw;
@@ -379,7 +377,7 @@ static void boo_act_0(void) {
 
     if (boo_should_be_active()) {
         // Condition is met if the object is bhvBalconyBigBoo or bhvMerryGoRoundBoo
-        if (o->oBehParams2ndByte == 2) {
+        if (o->oBehParams2ndByte == BOO_BP_MERRY_GO_ROUND) {
             o->oBooParentBigBoo = NULL;
             o->oAction = 5;
         } else {
@@ -437,7 +435,7 @@ static void boo_act_2(void) {
 
 static void boo_act_3(void) {
     if (boo_update_during_death()) {
-        if (o->oBehParams2ndByte != 0) {
+        if (o->oBehParams2ndByte != BOO_BP_GHOST_HUNT) {
             obj_mark_for_deletion(o);
         } else {
             o->oAction = 4;
