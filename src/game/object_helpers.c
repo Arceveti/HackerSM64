@@ -962,10 +962,7 @@ static void cur_obj_move_xz(f32 steepSlopeNormalY, s32 careAboutEdgesAndSteepSlo
         && intendedFloor != NULL
         && intendedFloor->room != ROOM_GLOBAL
         && o->oRoom != intendedFloor->room
-#ifdef ENABLE_VANILLA_LEVEL_SPECIFIC_CHECKS
-        && intendedFloor->room != 18
-#endif
-) {
+    ) {
         // Don't leave native room
         return;
     }
