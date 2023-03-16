@@ -722,6 +722,7 @@ u32 save_file_get_sound_mode(void) {
 
 void save_file_move_cap_to_default_location(void) {
     if (save_file_get_flags() & SAVE_FLAG_CAP_ON_GROUND) {
+#ifdef ENABLE_VANILLA_LEVEL_SPECIFIC_CHECKS
         switch (gSaveBuffer.files[gCurrSaveFileNum - 1][0].capLevel) {
             case LEVEL_SSL:
                 save_file_set_flags(SAVE_FLAG_CAP_ON_KLEPTO);
@@ -733,6 +734,9 @@ void save_file_move_cap_to_default_location(void) {
                 save_file_set_flags(SAVE_FLAG_CAP_ON_UKIKI);
                 break;
         }
+#else
+            save_file_set_flags(SAVE_FLAG_CAP_ON_KLEPTO);
+#endif
         save_file_clear_flags(SAVE_FLAG_CAP_ON_GROUND);
     }
 }

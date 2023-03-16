@@ -204,6 +204,7 @@ void bhv_normal_cap_init(void) {
 void normal_cap_set_save_flags(void) {
     save_file_clear_flags(SAVE_FLAG_CAP_ON_GROUND);
 
+#ifdef ENABLE_VANILLA_LEVEL_SPECIFIC_CHECKS
     switch (gCurrCourseNum) {
         case COURSE_SSL:
             save_file_set_flags(SAVE_FLAG_CAP_ON_KLEPTO);
@@ -221,6 +222,9 @@ void normal_cap_set_save_flags(void) {
             save_file_set_flags(SAVE_FLAG_CAP_ON_KLEPTO);
             break;
     }
+#else
+    save_file_set_flags(SAVE_FLAG_CAP_ON_KLEPTO);
+#endif
 }
 
 void normal_cap_act_0(void) {
