@@ -3085,7 +3085,7 @@ const BehaviorScript bhvMerryGoRound[] = {
     OR_INT(oFlags, (OBJ_FLAG_COMPUTE_DIST_TO_MARIO | OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE)),
     LOAD_COLLISION_DATA(bbh_seg7_collision_merry_go_round),
     SET_FLOAT(oCollisionDistance, 2000),
-    SET_INT(oRoom, 10),
+    CALL_NATIVE(bhv_init_room),
     BEGIN_LOOP(),
         CALL_NATIVE(bhv_merry_go_round_loop),
         CALL_NATIVE(load_object_collision_model),

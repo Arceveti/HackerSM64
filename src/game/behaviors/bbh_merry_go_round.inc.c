@@ -14,11 +14,10 @@ static void handle_merry_go_round_music(void) {
     // If the music should play, play it and check whether it still should.
     // Otherwise, don't play it and check whether it should.
     if (o->oMerryGoRoundMusicShouldPlay == FALSE) {
-        if (gMarioCurrentRoom == BBH_NEAR_MERRY_GO_ROUND_ROOM) {
+        if (gMarioCurrentRoom == o->oRoom) {
             // Play the merry-go-round and BBH music at the same time
             play_secondary_music(SEQ_EVENT_MERRY_GO_ROUND, 45, 20, 200);
-            // Set to TRUE
-            o->oMerryGoRoundMusicShouldPlay++;
+            o->oMerryGoRoundMusicShouldPlay = TRUE;
         }
     } else {
         // Get Mario's floor and floor surface type
@@ -49,7 +48,7 @@ static void handle_merry_go_round_music(void) {
         // If Mario is not in the merry-go-round's area of the basement anymore,
         // stop playing the music.
         // If he is, play the creaking sound.
-        if (gMarioCurrentRoom != BBH_NEAR_MERRY_GO_ROUND_ROOM) {
+        if (gMarioCurrentRoom != o->oRoom) {
             func_80321080(300); //! Switch to BBH music? FIXME: Audio needs labelling
             o->oMerryGoRoundMusicShouldPlay = FALSE;
         } else {
@@ -66,8 +65,7 @@ void bhv_merry_go_round_loop(void) {
     // for playing the howling wind sound in BBH.
     if (!o->oMerryGoRoundMarioIsOutside) {
         if (gMarioCurrentRoom == BBH_OUTSIDE_ROOM) {
-            // Set to TRUE
-            o->oMerryGoRoundMarioIsOutside++;
+            o->oMerryGoRoundMarioIsOutside = TRUE;
         }
     } else {
         play_sound(SOUND_AIR_HOWLING_WIND, gGlobalSoundSource);

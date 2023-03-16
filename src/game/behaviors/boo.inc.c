@@ -33,17 +33,20 @@ void bhv_boo_init(void) {
 
 static s32 boo_should_be_stopped(void) {
     if (cur_obj_has_behavior(bhvMerryGoRoundBigBoo) || cur_obj_has_behavior(bhvMerryGoRoundBoo)) {
-        return !gMarioOnMerryGoRound;
+        if (!gMarioOnMerryGoRound) {
+            return TRUE;
+        }
     } else {
         if (o->activeFlags & ACTIVE_FLAG_IN_DIFFERENT_ROOM) {
             return TRUE;
         }
 
-#ifdef ENABLE_VANILLA_LEVEL_SPECIFIC_CHECKS
-        if (o->oRoom == BBH_NEAR_MERRY_GO_ROUND_ROOM && (gTimeStopState & TIME_STOP_MARIO_OPENED_DOOR)) {
-            return TRUE;
+        if (gTimeStopState & TIME_STOP_MARIO_OPENED_DOOR) {
+            struct Object *merryGoRound = cur_obj_nearest_object_with_behavior(bhvMerryGoRound);
+            if (merryGoRound != NULL && o->oRoom == merryGoRound->oRoom) {
+                return TRUE;
+            }
         }
-#endif
     }
 
     return FALSE;
@@ -59,7 +62,9 @@ static s32 boo_should_be_active(void) {
     }
 
     if (cur_obj_has_behavior(bhvMerryGoRoundBigBoo) || cur_obj_has_behavior(bhvMerryGoRoundBoo)) {
-        return gMarioOnMerryGoRound;
+        if (gMarioOnMerryGoRound) {
+            return TRUE;
+        }
     } else if (o->oRoom == ROOM_NULL) {
         if (o->oDistanceToMario < activationRadius) {
             return TRUE;
@@ -361,12 +366,6 @@ static void boo_chase_mario(f32 minDY, s16 yawIncrement, f32 mul) {
 static void boo_act_0(void) {
     o->activeFlags |= ACTIVE_FLAG_MOVE_THROUGH_GRATE;
 
-#ifdef ENABLE_VANILLA_LEVEL_SPECIFIC_CHECKS
-    if (o->oBehParams2ndByte == BOO_BP_MERRY_GO_ROUND) {
-        o->oRoom = BBH_NEAR_MERRY_GO_ROUND_ROOM;
-    }
-#endif
-
     cur_obj_set_pos_to_home();
     o->oMoveAngleYaw = o->oBooInitialMoveYaw;
     boo_stop();
@@ -537,12 +536,7 @@ static void big_boo_act_1(void) {
 
     s32 attackStatus = boo_get_attack_status();
 
-    // redundant; this check is in boo_should_be_stopped
-    if (cur_obj_has_behavior(bhvMerryGoRoundBigBoo)) {
-        if (!gMarioOnMerryGoRound) {
-            o->oAction = 0;
-        }
-    } else if (boo_should_be_stopped()) {
+    if (boo_should_be_stopped()) {
         o->oAction = 0;
     }
 
