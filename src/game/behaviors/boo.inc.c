@@ -795,7 +795,7 @@ void bhv_boo_in_castle_loop(void) {
             obj_mark_for_deletion(o);
         }
 #endif
-        if (gMarioCurrentRoom == 1) {
+        if (!(o->activeFlags & ACTIVE_FLAG_IN_DIFFERENT_ROOM)) {
             o->oAction++;
         }
     } else if (o->oAction == 1) {
