@@ -64,6 +64,7 @@ static void handle_merry_go_round_music(void) {
  */
 void bhv_merry_go_round_loop(void) {
     // The "outside" room will be the last room where there was no ceiling above Mario.
+    // In vanilla BBH this will always be room 10.
     if (gMarioState->ceil == NULL) {
         sMerryGoRoundOutsideRoom = gMarioCurrentRoom;
     }

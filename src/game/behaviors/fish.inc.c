@@ -232,18 +232,17 @@ void bhv_fish_loop(void) {
     // Apply hitbox and resolve wall collisions
     o->oWallHitboxRadius = 30.0f;
     cur_obj_resolve_wall_collisions();
-#ifdef ENABLE_VANILLA_LEVEL_SPECIFIC_CHECKS //! TODO: Make this a param
+
     // Delete fish if it's drifted to an area with no water.
-    if (gCurrLevelNum != LEVEL_UNKNOWN_32 && o->oFishWaterLevel < FLOOR_LOWER_LIMIT_MISC) {
-        obj_mark_for_deletion(o);
-        return;
-    }
-#else
-    if (o->oFishWaterLevel < FLOOR_LOWER_LIMIT_MISC) {
-        obj_mark_for_deletion(o);
-        return;
-    }
+    if (
+#ifdef ENABLE_VANILLA_LEVEL_SPECIFIC_CHECKS //! TODO: Make this a param
+        gCurrLevelNum != LEVEL_UNKNOWN_32 &&
 #endif
+        o->oFishWaterLevel < FLOOR_LOWER_LIMIT_MISC
+    ) {
+        obj_mark_for_deletion(o);
+        return;
+    }
 
     // Call fish action methods and apply physics engine.
     cur_obj_call_action_function(sFishActions);

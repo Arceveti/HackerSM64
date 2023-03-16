@@ -315,7 +315,6 @@ void bhv_piranha_plant_loop(void) {
     if (gCurrLevelNum == LEVEL_WF) {
         COND_BIT((gMarioObject->oPosY > 3400.0f), o->header.gfx.node.flags, GRAPH_RENDER_INVISIBLE);
     }
-
 #endif
     o->oInteractStatus = INT_STATUS_NONE;
 }
