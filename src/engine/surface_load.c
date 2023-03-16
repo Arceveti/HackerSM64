@@ -80,7 +80,7 @@ static struct Surface *alloc_surface(u32 dynamic) {
     surface->type = SURFACE_DEFAULT;
     surface->force = 0;
     surface->flags = SURFACE_FLAGS_NONE;
-    surface->room = 0;
+    surface->room = ROOM_GLOBAL;
     surface->object = NULL;
 
     return surface;
@@ -355,7 +355,7 @@ static s32 surf_has_no_cam_collision(s32 surfaceType) {
 static void load_static_surfaces(TerrainData **data, TerrainData *vertexData, s32 surfaceType, RoomData **surfaceRooms) {
     s32 i;
     struct Surface *surface;
-    RoomData room = 0;
+    RoomData room = ROOM_GLOBAL;
 #ifndef ALL_SURFACES_HAVE_FORCE
     s16 hasForce = surface_has_force(surfaceType);
 #endif
@@ -634,7 +634,7 @@ void load_object_surfaces(TerrainData **data, TerrainData *vertexData, u32 dynam
 
     // The DDD warp is initially loaded at the origin and moved to the proper
     // position in paintings.c and doesn't update its room, so set it here.
-    RoomData room = (o->behavior == segmented_to_virtual(bhvDddWarp)) ? 5 : 0;
+    RoomData room = (o->behavior == segmented_to_virtual(bhvDddWarp)) ? 5 : ROOM_GLOBAL;
 
     for (i = 0; i < numSurfaces; i++) {
         struct Surface *surface = read_surface_data(vertexData, data, dynamic);

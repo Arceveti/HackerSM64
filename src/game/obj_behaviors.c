@@ -594,7 +594,7 @@ s32 current_mario_room_check(RoomData room) {
 
     // Since object surfaces have room 0, this tests if the surface is an
     // object first and uses the last room if so.
-    if (gMarioCurrentRoom == 0) {
+    if (gMarioCurrentRoom == ROOM_GLOBAL) {
         return room == sPrevCheckMarioRoom;
     } else {
         result = room == gMarioCurrentRoom;

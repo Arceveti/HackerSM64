@@ -669,7 +669,7 @@ s32 get_room_at_pos(f32 x, f32 y, f32 z) {
         }
     }
 
-    return -1;
+    return ROOM_NULL;
 }
 
 /**

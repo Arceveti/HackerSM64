@@ -922,7 +922,7 @@ static s32 puppycam_check_volume_bounds(struct sPuppyVolume *volume, s32 index) 
     s32 rel[3];
     s32 pos[2];
 
-    if (sPuppyVolumeStack[index]->room != gMarioCurrentRoom && sPuppyVolumeStack[index]->room != -1) {
+    if (sPuppyVolumeStack[index]->room != gMarioCurrentRoom && sPuppyVolumeStack[index]->room != ROOM_NULL) {
         return FALSE;
     }
     if (sPuppyVolumeStack[index]->shape == PUPPYVOLUME_SHAPE_BOX) {

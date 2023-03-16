@@ -520,7 +520,7 @@ void clear_objects(void) {
     gTHIWaterDrained = 0;
     gTimeStopState = 0;
     gMarioObject = NULL;
-    gMarioCurrentRoom = 0;
+    gMarioCurrentRoom = ROOM_GLOBAL;
 
     bzero(gDoorAdjacentRooms, sizeof(gDoorAdjacentRooms));
 

@@ -125,7 +125,13 @@ struct TransitionRoomData {
 
 extern struct TransitionRoomData gDoorAdjacentRooms[MAX_NUM_TRANSITION_ROOMS];
 
+enum GlobalRoomIDs {
+    ROOM_NULL = -1,
+    ROOM_GLOBAL,
+};
+
 extern s16 gMarioCurrentRoom;
+
 extern s16 gTHIWaterDrained;
 extern s16 gTTCSpeedSetting;
 extern s16 gMarioShotFromCannon;

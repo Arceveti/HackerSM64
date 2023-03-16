@@ -115,7 +115,7 @@ void bhv_door_init(void) {
 
     if (
         // Ensure the room number is in bounds.
-        o->oDoorSelfRoom > 0 && o->oDoorSelfRoom < ARRAY_COUNT(gDoorAdjacentRooms)
+        o->oDoorSelfRoom > ROOM_GLOBAL && o->oDoorSelfRoom < ARRAY_COUNT(gDoorAdjacentRooms)
         // Only set gDoorAdjacentRooms for transition rooms.
         && o->oDoorSelfRoom    != o->oDoorForwardRoom
         && o->oDoorSelfRoom    != o->oDoorBackwardRoom
@@ -130,7 +130,7 @@ void bhv_door_rendering_loop(void) {
     struct TransitionRoomData* transitionRoom = &gDoorAdjacentRooms[gMarioCurrentRoom];
 
     o->oDoorIsRendering = (
-        gMarioCurrentRoom            == 0                    || // Mario is in the "global" room.
+        gMarioCurrentRoom            == ROOM_GLOBAL          || // Mario is in the "global" room.
         gMarioCurrentRoom            == o->oDoorSelfRoom     || // Mario is in the same room as the door.
         gMarioCurrentRoom            == o->oDoorForwardRoom  || // Mario is in the door's  forward room.
         gMarioCurrentRoom            == o->oDoorBackwardRoom || // Mario is in the door's backward room.

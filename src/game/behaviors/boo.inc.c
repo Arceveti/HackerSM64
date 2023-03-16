@@ -66,13 +66,13 @@ static s32 boo_should_be_active(void) {
         } else {
             return FALSE;
         }
-    } else if (o->oRoom == -1) {
+    } else if (o->oRoom == ROOM_NULL) {
         if (o->oDistanceToMario < activationRadius) {
             return TRUE;
         }
     } else if (!boo_should_be_stopped()) {
         if (o->oDistanceToMario < activationRadius
-            && (o->oRoom == gMarioCurrentRoom || gMarioCurrentRoom == 0)) {
+            && (o->oRoom == gMarioCurrentRoom || gMarioCurrentRoom == ROOM_GLOBAL)) {
             return TRUE;
         }
     }

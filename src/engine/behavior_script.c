@@ -924,7 +924,7 @@ void cur_obj_update(void) {
 #endif
 
     // Handle visibility of object
-    if (o->oRoom != -1) {
+    if (o->oRoom != ROOM_NULL) {
         // If the object is in a room, only show it when Mario is in the room.
         if (
             (objFlags & OBJ_FLAG_ACTIVE_FROM_AFAR)

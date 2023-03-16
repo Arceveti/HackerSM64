@@ -235,7 +235,7 @@ void load_area(s32 index) {
         main_pool_pop_state();
         main_pool_push_state();
 
-        gMarioCurrentRoom = 0;
+        gMarioCurrentRoom = ROOM_GLOBAL;
 
         if (gCurrentArea->terrainData != NULL) {
             load_area_terrain(index, gCurrentArea->terrainData, gCurrentArea->surfaceRooms,

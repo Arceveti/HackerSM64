@@ -184,7 +184,7 @@ struct Object *allocate_object(struct ObjectNode *objList) {
     obj->respawnInfo = NULL;
 
     obj->oDistanceToMario = 19000.0f;
-    obj->oRoom = -1;
+    obj->oRoom = ROOM_NULL;
 
     obj->header.gfx.node.flags &= ~GRAPH_RENDER_INVISIBLE;
 #ifdef OBJECTS_REJ

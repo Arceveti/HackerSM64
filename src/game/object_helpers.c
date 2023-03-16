@@ -132,11 +132,11 @@ Gfx *geo_switch_area(s32 callContext, struct GraphNode *node, UNUSED void *conte
         gMarioCurrentRoom = room;
         print_debug_top_down_objectinfo("areainfo %d", room);
 
-        if (room > 0) {
+        if (room > ROOM_GLOBAL) {
             switchCase->selectedCase = (room - 1);
         }
     } else {
-        switchCase->selectedCase = 0;
+        switchCase->selectedCase = ROOM_GLOBAL;
     }
 
     return NULL;
@@ -957,11 +957,15 @@ static void cur_obj_move_xz(f32 steepSlopeNormalY, s32 careAboutEdgesAndSteepSlo
 
     o->oMoveFlags &= ~OBJ_MOVE_HIT_EDGE;
 
-    if (o->oRoom != -1
+    if (
+        o->oRoom != ROOM_NULL
         && intendedFloor != NULL
-        && intendedFloor->room != 0
+        && intendedFloor->room != ROOM_GLOBAL
         && o->oRoom != intendedFloor->room
-        && intendedFloor->room != 18) {
+#ifdef ENABLE_VANILLA_LEVEL_SPECIFIC_CHECKS
+        && intendedFloor->room != 18
+#endif
+) {
         // Don't leave native room
         return;
     }
@@ -1869,7 +1873,7 @@ void bhv_init_room(void) {
 }
 
 s32 cur_obj_is_mario_in_room(void) {
-    if (o->oRoom != -1 && gMarioCurrentRoom != 0) {
+    if (o->oRoom != ROOM_NULL && gMarioCurrentRoom != ROOM_GLOBAL) {
         if (gMarioCurrentRoom == o->oRoom // Object is in Mario's room.
             || gDoorAdjacentRooms[gMarioCurrentRoom].forwardRoom  == o->oRoom // Object is in the transition room's forward  room.
             || gDoorAdjacentRooms[gMarioCurrentRoom].backwardRoom == o->oRoom // Object is in the transition room's backward room.
