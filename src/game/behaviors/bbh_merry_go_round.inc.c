@@ -49,10 +49,7 @@ static void handle_merry_go_round_music(void) {
         // If Mario is not in the merry-go-round's area of the basement anymore,
         // stop playing the music.
         // If he is, play the creaking sound.
-        if (
-            // The merry-go-round is a dynamic surface.
-            gMarioCurrentRoom != BBH_DYNAMIC_SURFACE_ROOM
-            && gMarioCurrentRoom != BBH_NEAR_MERRY_GO_ROUND_ROOM) {
+        if (gMarioCurrentRoom != BBH_NEAR_MERRY_GO_ROUND_ROOM) {
             func_80321080(300); //! Switch to BBH music? FIXME: Audio needs labelling
             o->oMerryGoRoundMusicShouldPlay = FALSE;
         } else {
@@ -75,13 +72,7 @@ void bhv_merry_go_round_loop(void) {
     } else {
         play_sound(SOUND_AIR_HOWLING_WIND, gGlobalSoundSource);
 
-        if (
-            // There are objects outside BBH, such as corkboxes.
-            // The howling wind should not stop when Mario stands on a cork box.
-            //! @bug Interestingly, this means if Mario goes from outside
-            // to a dynamic surface *inside* the mansion in a single frame,
-            // the howling wind music will still play.
-            gMarioCurrentRoom != BBH_OUTSIDE_ROOM && gMarioCurrentRoom != BBH_DYNAMIC_SURFACE_ROOM) {
+        if (gMarioCurrentRoom != BBH_OUTSIDE_ROOM) {
             o->oMerryGoRoundMarioIsOutside = FALSE;
         }
     }
