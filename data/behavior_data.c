@@ -678,6 +678,7 @@ const BehaviorScript bhvSmallParticleBubbles[] = {
 
 const BehaviorScript bhvFishGroup[] = {
     BEGIN(OBJ_LIST_DEFAULT),
+    CALL_NATIVE(bhv_init_room),
     BEGIN_LOOP(),
         CALL_NATIVE(bhv_fish_group_loop),
     END_LOOP(),
@@ -1204,6 +1205,7 @@ const BehaviorScript bhvBbhTumblingBridge[] = {
     OR_INT(oFlags, (OBJ_FLAG_ACTIVE_FROM_AFAR | OBJ_FLAG_COMPUTE_DIST_TO_MARIO | OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE)),
     SET_HOME(),
     SET_INT(oBehParams2ndByte, TUMBLING_BRIDGE_BP_BBH),
+    CALL_NATIVE(bhv_init_room),
     BEGIN_LOOP(),
         CALL_NATIVE(bhv_tumbling_bridge_loop),
     END_LOOP(),
@@ -2167,6 +2169,7 @@ const BehaviorScript bhvTankFishGroup[] = {
     BEGIN(OBJ_LIST_DEFAULT),
     OR_INT(oFlags, OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE),
     SET_HOME(),
+    CALL_NATIVE(bhv_init_room),
     BEGIN_LOOP(),
         CALL_NATIVE(bhv_tank_fish_group_loop),
     END_LOOP(),
@@ -4491,6 +4494,7 @@ const BehaviorScript bhvBigBoulder[] = {
 const BehaviorScript bhvBigBoulderGenerator[] = {
     BEGIN(OBJ_LIST_DEFAULT),
     OR_INT(oFlags, OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE),
+    CALL_NATIVE(bhv_init_room),
     BEGIN_LOOP(),
         CALL_NATIVE(bhv_big_boulder_generator_loop),
     END_LOOP(),
@@ -4986,6 +4990,7 @@ const BehaviorScript bhvMips[] = {
     DROP_TO_FLOOR(),
     SET_HITBOX(/*Radius*/ 50, /*Height*/ 75),
     SET_INT(oIntangibleTimer, 0),
+    CALL_NATIVE(bhv_init_room),
     CALL_NATIVE(bhv_mips_init),
     BEGIN_LOOP(),
         CALL_NATIVE(bhv_mips_loop),
@@ -5997,6 +6002,7 @@ const BehaviorScript bhvRedCoinStarMarker[] = {
     SCALE(/*Unused*/ 0, /*Field*/ 150),
     SET_INT(oFaceAnglePitch, 0x4000),
     ADD_FLOAT(oPosY, 60),
+    CALL_NATIVE(bhv_init_room),
     CALL_NATIVE(bhv_red_coin_star_marker_init),
     BEGIN_LOOP(),
         ADD_INT(oFaceAngleYaw, 0x100),
