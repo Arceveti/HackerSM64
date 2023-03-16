@@ -52,12 +52,6 @@ static struct Surface *sObjFloor;
 static s8 sOrientObjWithFloor = TRUE;
 
 /**
- * Keeps track of Mario's previous non-zero room.
- * Helps keep track of room when Mario is over an object.
- */
-s16 sPrevCheckMarioRoom = 0;
-
-/**
  * Tracks whether or not Yoshi has walked/jumped off the roof.
  */
 s8 sYoshiDead = FALSE;
@@ -584,25 +578,6 @@ s32 obj_flicker_and_disappear(struct Object *obj, s16 lifeSpan) {
     }
 
     return FALSE;
-}
-
-/**
- * Checks if a given room is Mario's current room, even if on an object.
- */
-s32 current_mario_room_check(RoomData room) {
-    s32 result;
-
-    // Since object surfaces have room 0, this tests if the surface is an
-    // object first and uses the last room if so.
-    if (gMarioCurrentRoom == ROOM_GLOBAL) {
-        return room == sPrevCheckMarioRoom;
-    } else {
-        result = room == gMarioCurrentRoom;
-
-        sPrevCheckMarioRoom = gMarioCurrentRoom;
-    }
-
-    return result;
 }
 
 /**
