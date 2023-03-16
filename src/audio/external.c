@@ -157,9 +157,13 @@ enum MusicDynConditionTypes {
 #define DYN3(cond1, val1, cond2, val2, cond3, val3, res)                                               \
     (s16)(1 << (15 - cond1) | 1 << (15 - cond2) | 1 << (15 - cond3) | res), val1, val2, val3
 
+enum RoomIDsBBH {
+    ROOM_BBH_NEAR_MERRY_GO_ROUND = 10,
+    ROOM_BBH_OUTSIDE             = 13,
+};
 s16 sDynBbh[] = {
-    SEQ_LEVEL_SPOOKY, DYN1(MARIO_IS_IN_ROOM, BBH_OUTSIDE_ROOM, 6),
-    DYN1(MARIO_IS_IN_ROOM, BBH_NEAR_MERRY_GO_ROUND_ROOM, 6), 5,
+    SEQ_LEVEL_SPOOKY, DYN1(MARIO_IS_IN_ROOM, ROOM_BBH_OUTSIDE, 6),
+    DYN1(MARIO_IS_IN_ROOM, ROOM_BBH_NEAR_MERRY_GO_ROUND, 6), 5,
 };
 s16 sDynDdd[] = {
     SEQ_LEVEL_WATER,

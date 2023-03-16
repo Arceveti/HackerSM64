@@ -1355,11 +1355,6 @@ enum oBehParams1stByteSlidingPlatform { // collisionDataIndex
     #define BBH_MERRY_GO_ROUND_ACT_SPAWN_BOOS               0x0
     #define BBH_MERRY_GO_ROUND_ACT_WAIT                     0x1
     #define BBH_MERRY_GO_ROUND_ACT_STOPPED                  0x2
-    /* gMarioCurrentRoom */
-enum RoomIDsBBH {
-    BBH_NEAR_MERRY_GO_ROUND_ROOM = 10,
-    BBH_OUTSIDE_ROOM = 13,
-}
 
 /* Coffin Spawner */
     /* oAction */
