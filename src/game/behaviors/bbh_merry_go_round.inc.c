@@ -4,6 +4,8 @@
  * This is the merry-go-round in BBH.
  */
 
+s16 sMerryGoRoundOutsideRoom = ROOM_GLOBAL;
+
 /**
  * This function handles the merry-go-round's music.
  * It starts the music when Mario enters the room around the
@@ -61,16 +63,21 @@ static void handle_merry_go_round_music(void) {
  * Merry-go-round update function.
  */
 void bhv_merry_go_round_loop(void) {
+    // The "outside" room will be the last room where there was no ceiling above Mario.
+    if (gMarioState->ceil == NULL) {
+        sMerryGoRoundOutsideRoom = gMarioCurrentRoom;
+    }
+
     // Surprisingly, the merry-go-round is what's responsible
     // for playing the howling wind sound in BBH.
     if (!o->oMerryGoRoundMarioIsOutside) {
-        if (gMarioCurrentRoom == BBH_OUTSIDE_ROOM) {
+        if (gMarioCurrentRoom == sMerryGoRoundOutsideRoom) {
             o->oMerryGoRoundMarioIsOutside = TRUE;
         }
     } else {
         play_sound(SOUND_AIR_HOWLING_WIND, gGlobalSoundSource);
 
-        if (gMarioCurrentRoom != BBH_OUTSIDE_ROOM) {
+        if (gMarioCurrentRoom != sMerryGoRoundOutsideRoom) {
             o->oMerryGoRoundMarioIsOutside = FALSE;
         }
     }
