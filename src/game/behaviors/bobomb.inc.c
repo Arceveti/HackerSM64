@@ -380,7 +380,13 @@ void bobomb_buddy_act_talk(void) {
                 break;
 
             case BOBOMB_BUDDY_ROLE_CANNON:
-                if (gCurrCourseNum == COURSE_BOB) {
+                if (
+#ifdef ENABLE_VANILLA_LEVEL_SPECIFIC_CHECKS
+                    gCurrCourseNum == COURSE_BOB
+#else
+                    FALSE
+#endif
+                ) {
                     bobomb_buddy_cannon_dialog(DIALOG_004, DIALOG_105);
                 } else {
                     bobomb_buddy_cannon_dialog(DIALOG_047, DIALOG_106);
