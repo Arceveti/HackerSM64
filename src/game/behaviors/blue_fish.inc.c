@@ -105,7 +105,7 @@ void bhv_tank_fish_group_loop(void) {
 
     switch (o->oAction) {
         case BLUE_FISH_ACT_SPAWN:
-            if (gMarioCurrentRoom == 15 || gMarioCurrentRoom == 7) {
+            if (!(o->activeFlags & ACTIVE_FLAG_IN_DIFFERENT_ROOM)) {
 
                 // spawns fifteen fish and moves them within 200.0f
                 for (i = 0; i < 15; i++) {
@@ -120,7 +120,7 @@ void bhv_tank_fish_group_loop(void) {
 
         // Sets next oAction phase if Mario is not in rooms fifteen and seven.
         case BLUE_FISH_ACT_ROOM:
-            if (gMarioCurrentRoom != 15 && gMarioCurrentRoom != 7) {
+            if (o->activeFlags & ACTIVE_FLAG_IN_DIFFERENT_ROOM) {
                 o->oAction++;
             }
             break;
