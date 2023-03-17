@@ -6,7 +6,6 @@
 #include "draw_objects.h"
 #include "dynlist_proc.h"
 #include "dynlists/dynlists.h"
-#include "gd_macros.h"
 #include "gd_main.h"
 #include "gd_math.h"
 #include "gd_memory.h"
@@ -18,6 +17,9 @@
 #include "shape_helper.h"
 #include "skin.h"
 #include "types.h"
+#include "engine/math_util.h"
+#include "game/game_init.h"
+#include "game/area.h"
 
 #define MAX_GD_DLS 1000
 #define OS_MESG_SI_COMPLETE 0x33333333
@@ -87,25 +89,12 @@ struct DynListBankInfo {
 };
 
 // bss
-#if defined(VERSION_EU) || defined(VERSION_SH)
-static OSMesgQueue sGdSIEventMesgQueue; // controller msg queue
-static OSMesg sGdSIEventMesgBuf[10];
-u8 EUpad1[0x40];
 UNUSED static OSMesgQueue D_801BE8B0;
 static OSMesgQueue sGdDMAQueue; // @ 801BE8C8
-u8 EUpad2[0x64];
 static OSMesg sGdMesgBuf[1]; // @ 801BE944
-u8 EUpad3[0x34];
 static OSMesg sGdDMACompleteMsg; // msg buf for D_801BE8B0 queue
 static OSIoMesg sGdDMAReqMesg;
 static struct ObjView *D_801BE994; // store if View flag 0x40 set
-
-u8 EUpad4[0x88];
-#endif
-static OSContStatus sGdContStatuses[4];
-static OSContPadEx sGdContPads[4];    // @ 801BAE70
-static OSContPadEx sPrevFrameCont[4]; // @ 801BAE88
-static u8 sGdContBits;
 static struct ObjGadget *sTimerGadgets[GD_NUM_TIMERS]; // @ 801BAEA8
 static u32 D_801BAF28;                                 // RAM addr offset?
 static s16 sTriangleBuf[13][8];                          // [[s16; 8]; 13]? vert indices?
@@ -158,16 +147,6 @@ static s32 sPickBufPosition;                         // @ 801BE784
 static s16 *sPickBuf;                                // @ 801BE788
 static LookAt D_801BE790[2];
 static LookAt D_801BE7D0[3];
-#if defined(VERSION_JP) || defined(VERSION_US)
-static OSMesgQueue sGdSIEventMesgQueue; // controller msg queue
-static OSMesg sGdSIEventMesgBuf[10];
-UNUSED static OSMesgQueue D_801BE8B0;
-static OSMesgQueue sGdDMAQueue; // @ 801BE8C8
-static OSMesg sGdMesgBuf[1]; // @ 801BE944
-static OSMesg sGdDMACompleteMsg; // msg buf for D_801BE8B0 queue
-static OSIoMesg sGdDMAReqMesg;
-static struct ObjView *D_801BE994; // store if View flag 0x40 set
-#endif
 
 // data
 static s32 D_801A8674 = 0;
@@ -1009,14 +988,6 @@ void Unknown8019C270(u8 *buf) {
     gGdStreamBuffer = buf;
 }
 
-/* 24AA58 -> 24AAA8 */
-void Unknown8019C288(s32 stickX, s32 stickY) {
-    struct GdControl *ctrl = &gGdCtrl; // 4
-
-    ctrl->stickXf = (f32) stickX;
-    ctrl->stickYf = (f32)(stickY / 2);
-}
-
 /* 24AAA8 -> 24AAE0; orig name: func_8019C2D8 */
 void gd_add_to_heap(void *addr, u32 size) {
     // TODO: is this `1` for permanence special?
@@ -1144,22 +1115,6 @@ void gd_vblank(void) {
     update_cursor();
 }
 
-/**
- * Copies the player1 controller data from p1cont to sGdContPads[0].
- */
-void gd_copy_p1_contpad(OSContPadEx *p1cont) {
-    u32 i;                                    // 24
-    u8 *src = (u8 *) p1cont;             // 20
-    u8 *dest = (u8 *) &sGdContPads[0]; // 1c
-
-    for (i = 0; i < sizeof(OSContPadEx); i++) {
-        dest[i] = src[i];
-    }
-
-    if (p1cont->button & Z_TRIG) {
-        print_all_timers();
-    }
-}
 
 /* 24B058 -> 24B088; orig name: gd_sfx_to_play */
 s32 gd_sfx_to_play(void) {
@@ -1946,7 +1901,7 @@ void gd_dl_hilite(s32 idx, // material GdDl number; offsets into hilite array
     sp40.z = cam->unkE8[0][2] + arg4->x;
     sp40.y = cam->unkE8[1][2] + arg4->y;
     sp40.x = cam->unkE8[2][2] + arg4->z;
-    sp3C = sqrtf(SQ(sp40.z) + SQ(sp40.y) + SQ(sp40.x));
+    sp3C = sqrtf(sqr(sp40.z) + sqr(sp40.y) + sqr(sp40.x));
     if (sp3C > 0.1f) {
         sp3C = 1.0f / sp3C;
         sp40.z *= sp3C;
@@ -2222,48 +2177,50 @@ void start_view_dl(struct ObjView *view) {
 
 /* 251014 -> 251A1C; orig name: func_801A2844 */
 void parse_p1_controller(void) {
-    u32 i;
+    s32 i;
     struct GdControl *gdctrl = &gGdCtrl;
-    OSContPadEx *currInputs;
-    OSContPadEx *prevInputs;
+    u16 button, buttonPressed;
 
-    // Copy current inputs to previous
-    u8 *src = (u8 *) gdctrl;
-    u8 *dest = (u8 *) gdctrl->prevFrame;
-    for (i = 0; i < sizeof(struct GdControl); i++) {
-        *dest++ = *src++;
+    if (gContStatusPolling
+     || gPlayer1Controller->controllerData == NULL
+     || gWarpTransition.isActive) {
+        return;
     }
 
-    gdctrl->unk50 = gdctrl->unk4C = gdctrl->dup = gdctrl->ddown = 0;
+    // Copy current inputs to previous.
+    *gdctrl->prevFrame = *gdctrl;
 
-    currInputs = &sGdContPads[0];
-    prevInputs = &sPrevFrameCont[0];
-    // stick values
-    gdctrl->stickXf     = currInputs->stick_x;
-    gdctrl->stickYf     = currInputs->stick_y;
+    gdctrl->unk50 = gdctrl->unk4C = gdctrl->dup = gdctrl->ddown = 0;
+    // Stick values.
+    gdctrl->stickXf     = gPlayer1Controller->rawStickX;
+    gdctrl->stickYf     = gPlayer1Controller->rawStickY;
     gdctrl->stickDeltaX = gdctrl->stickX;
     gdctrl->stickDeltaY = gdctrl->stickY;
-    gdctrl->stickX      = currInputs->stick_x;
-    gdctrl->stickY      = currInputs->stick_y;
+    gdctrl->stickX      = gPlayer1Controller->rawStickX;
+    gdctrl->stickY      = gPlayer1Controller->rawStickY;
     gdctrl->stickDeltaX -= gdctrl->stickX;
     gdctrl->stickDeltaY -= gdctrl->stickY;
-    // button values (as bools)
-    gdctrl->trgL   = ((currInputs->button & L_TRIG    ) != 0);
-    gdctrl->trgR   = ((currInputs->button & R_TRIG    ) != 0);
-    gdctrl->btnA   = ((currInputs->button & A_BUTTON  ) != 0);
-    gdctrl->btnB   = ((currInputs->button & B_BUTTON  ) != 0);
-    gdctrl->cleft  = ((currInputs->button & L_CBUTTONS) != 0);
-    gdctrl->cright = ((currInputs->button & R_CBUTTONS) != 0);
-    gdctrl->cup    = ((currInputs->button & U_CBUTTONS) != 0);
-    gdctrl->cdown  = ((currInputs->button & D_CBUTTONS) != 0);
-    // but not these buttons??
-    gdctrl->dleft  = (currInputs->button & L_JPAD);
-    gdctrl->dright = (currInputs->button & R_JPAD);
-    gdctrl->dup    = (currInputs->button & U_JPAD);
-    gdctrl->ddown  = (currInputs->button & D_JPAD);
+
+    button        = gPlayer1Controller->buttonDown;
+    buttonPressed = gPlayer1Controller->buttonPressed;
+
+    // Button values (as bools).
+    gdctrl->trgL   = ((button & L_TRIG    ) != 0);
+    gdctrl->trgR   = ((button & R_TRIG    ) != 0);
+    gdctrl->btnA   = ((button & A_BUTTON  ) != 0);
+    gdctrl->btnB   = ((button & B_BUTTON  ) != 0);
+    gdctrl->cleft  = ((button & L_CBUTTONS) != 0);
+    gdctrl->cright = ((button & R_CBUTTONS) != 0);
+    gdctrl->cup    = ((button & U_CBUTTONS) != 0);
+    gdctrl->cdown  = ((button & D_CBUTTONS) != 0);
+    gdctrl->dleft  = ((button & L_JPAD    ) != 0);
+    gdctrl->dright = ((button & R_JPAD    ) != 0);
+    gdctrl->dup    = ((button & U_JPAD    ) != 0);
+    gdctrl->ddown  = ((button & D_JPAD    ) != 0);
 
     gdctrl->startedDragging = (gdctrl->btnA && !gdctrl->dragging);
-    // toggle if A is pressed? or is this just some seed for an rng?
+
+    // Toggle if A is pressed? or is this just some seed for an rng?
     gdctrl->dragging = gdctrl->btnA;
     gdctrl->unkD8b20 = gdctrl->unkD8b40 = FALSE;
     gdctrl->AbtnPressWait = FALSE;
@@ -2282,12 +2239,13 @@ void parse_p1_controller(void) {
     }
     gdctrl->currFrame++;
 
-    if ((currInputs->button & START_BUTTON) && !(prevInputs->button & START_BUTTON)) {
-        gdctrl->newStartPress ^= 1;
+    if (buttonPressed & START_BUTTON) {
+        gdctrl->newStartPress ^= TRUE;
     }
 
-    if ((currInputs->button & Z_TRIG) && !(prevInputs->button & Z_TRIG)) {
+    if (buttonPressed & Z_TRIG) {
         sCurrDebugViewIndex++;
+        print_all_timers();
     }
 
     if (sCurrDebugViewIndex > sDebugViewsCount) {
@@ -2302,7 +2260,7 @@ void parse_p1_controller(void) {
         activate_timing();
     }
 
-    for (i = 0; (s32) i < sDebugViewsCount; i++) {
+    for (i = 0; i < sDebugViewsCount; i++) {
         sDebugViews[i]->flags &= ~VIEW_UPDATE;
     }
 
@@ -2310,31 +2268,18 @@ void parse_p1_controller(void) {
         sDebugViews[sCurrDebugViewIndex - 1]->flags |= VIEW_UPDATE;
     }
 
-    // deadzone checks
-    if (ABS(gdctrl->stickX) >= 6) {
-        gdctrl->csrX += gdctrl->stickX * 0.1f;
-    }
-    if (ABS(gdctrl->stickY) >= 6) {
-        gdctrl->csrY -= gdctrl->stickY * 0.1f;
-    }
+    // Deadzone checks.
+    if (absi(gdctrl->stickX) > 7) gdctrl->csrX += (gdctrl->stickX * 0.1f);
+    if (absi(gdctrl->stickY) > 7) gdctrl->csrY -= (gdctrl->stickY * 0.1f);
 
-    // clamp cursor position within screen view bounds
-    if (gdctrl->csrX < sScreenView->parent->upperLeft.x + 16.0f) {
-        gdctrl->csrX = sScreenView->parent->upperLeft.x + 16.0f;
-    }
-    if (gdctrl->csrX > sScreenView->parent->upperLeft.x + sScreenView->parent->lowerRight.x - 48.0f) {
-        gdctrl->csrX = sScreenView->parent->upperLeft.x + sScreenView->parent->lowerRight.x - 48.0f;
-    }
-    if (gdctrl->csrY < sScreenView->parent->upperLeft.y + 16.0f) {
-        gdctrl->csrY = sScreenView->parent->upperLeft.y + 16.0f;
-    }
-    if (gdctrl->csrY > sScreenView->parent->upperLeft.y + sScreenView->parent->lowerRight.y - 32.0f) {
-        gdctrl->csrY = sScreenView->parent->upperLeft.y + sScreenView->parent->lowerRight.y - 32.0f;
-    }
+    // Clamp cursor position within screen view bounds.
+    const f32 ulx = sScreenView->parent->upperLeft.x;
+    const f32 uly = sScreenView->parent->upperLeft.y;
+    const f32 lrx = sScreenView->parent->lowerRight.x;
+    const f32 lry = sScreenView->parent->lowerRight.y;
 
-    for (i = 0; i < sizeof(OSContPadEx); i++) {
-        ((u8 *) prevInputs)[i] = ((u8 *) currInputs)[i];
-    }
+    gdctrl->csrX = CLAMP(gdctrl->csrX, (ulx + 16.0f), (ulx + lrx - 48.0f));
+    gdctrl->csrY = CLAMP(gdctrl->csrY, (uly + 16.0f), (uly + lry - 32.0f));
 }
 
 /**
@@ -2602,21 +2547,6 @@ s32 setup_view_buffers(const char *name, struct ObjView *view, UNUSED s32 ulx, U
     }
 
     return 0;
-}
-
-/* 252AF8 -> 252BAC; orig name: _InitControllers */
-void gd_init_controllers(void) {
-    OSContPadEx *p1cont = &sPrevFrameCont[0]; // 1c
-    u32 i;                                  // 18
-
-    osCreateMesgQueue(&sGdSIEventMesgQueue, sGdSIEventMesgBuf, ARRAY_COUNT(sGdSIEventMesgBuf));
-    osSetEventMesg(OS_EVENT_SI, &sGdSIEventMesgQueue, (OSMesg) OS_MESG_SI_COMPLETE);
-    osContInit(&sGdSIEventMesgQueue, &sGdContBits, sGdContStatuses);
-    osContStartReadDataEx(&sGdSIEventMesgQueue);
-
-    for (i = 0; i < sizeof(OSContPadEx); i++) {
-        ((u8 *) p1cont)[i] = 0;
-    }
 }
 
 /**
@@ -3551,8 +3481,7 @@ struct GdObj *load_dynlist(struct DynList *dynlist) {
  * Unused (not called)
  */
 UNUSED void func_801A71CC(struct ObjNet *net) {
-    s32 i; // spB4
-    s32 j; // spB0
+    s32 i, j;
     f32 spAC;
     f32 spA8;
     struct GdBoundingBox bbox;
@@ -3575,8 +3504,8 @@ UNUSED void func_801A71CC(struct ObjNet *net) {
 
     gd_print_bounding_box("making zones for net=", &net->boundingBox);
 
-    sp64.x = (ABS(net->boundingBox.minX) + ABS(net->boundingBox.maxX)) / 16.0f;
-    sp64.z = (ABS(net->boundingBox.minZ) + ABS(net->boundingBox.maxZ)) / 16.0f;
+    sp64.x = (absf(net->boundingBox.minX) + absf(net->boundingBox.maxX)) / 16.0f;
+    sp64.z = (absf(net->boundingBox.minZ) + absf(net->boundingBox.maxZ)) / 16.0f;
 
     spA8 = net->boundingBox.minZ + sp64.z / 2.0f;
 
