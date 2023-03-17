@@ -189,7 +189,7 @@ static s32 lower_cell_index(s32 coord) {
     s32 index = coord / CELL_SIZE;
 
     // Potentially > NUM_CELLS - 1, but since the upper index is <= NUM_CELLS - 1, not exploitable
-    return MAX(0, index);
+    return max(0, index);
 }
 
 /**
@@ -208,7 +208,7 @@ static s32 upper_cell_index(s32 coord) {
     s32 index = coord / CELL_SIZE;
 
     // Potentially < 0, but since lower index is >= 0, not exploitable
-    return MIN((NUM_CELLS - 1), index);
+    return min((NUM_CELLS - 1), index);
 }
 
 /**

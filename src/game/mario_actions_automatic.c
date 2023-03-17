@@ -335,7 +335,7 @@ s32 update_hang_moving(struct MarioState *m) {
         // Reduce Mario's forward speed by the turn amount, so Mario won't move off sideward from the intended angle when turning around.
         m->forwardVel *= ((coss(dYaw) + 1.0f) / 2.0f); // 1.0f is turning forwards, 0.0f is turning backwards
         // Increase turn speed if forwardVel is lower and intendedMag is higher
-        turnRange *= (2.0f - (absf(m->forwardVel) / MAX(m->intendedMag, NEAR_ZERO))); // 1.0f front, 2.0f back
+        turnRange *= (2.0f - (absf(m->forwardVel) / max(m->intendedMag, NEAR_ZERO))); // 1.0f front, 2.0f back
     }
     m->faceAngle[1] = approach_angle(m->faceAngle[1], m->intendedYaw, turnRange);
 #else
@@ -551,7 +551,7 @@ void climb_up_ledge(struct MarioState *m) {
 }
 
 void update_ledge_climb_camera(struct MarioState *m) {
-    f32 dist = MIN(m->actionTimer, 14.0f);
+    f32 dist = min(m->actionTimer, 14.0f);
 
     m->statusForCamera->pos[0] = m->pos[0] + dist * sins(m->faceAngle[1]);
     m->statusForCamera->pos[2] = m->pos[2] + dist * coss(m->faceAngle[1]);

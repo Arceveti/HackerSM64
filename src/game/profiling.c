@@ -205,7 +205,7 @@ u32 profiler_get_rdp_cycles() {
     u32 rdp_tmem_cycles = all_profiling_data[PROFILER_TIME_TMEM].total;
     u32 rdp_cmd_cycles  = all_profiling_data[PROFILER_TIME_CMD ].total;
 
-    u32 rdp_max_cycles = MAX(MAX(rdp_pipe_cycles, rdp_tmem_cycles), rdp_cmd_cycles);
+    u32 rdp_max_cycles = max(max(rdp_pipe_cycles, rdp_tmem_cycles), rdp_cmd_cycles);
 
     return (rdp_max_cycles / PROFILING_BUFFER_SIZE);
 }
@@ -227,7 +227,7 @@ u32 profiler_get_rdp_microseconds() {
     u32 rdp_tmem_cycles = all_profiling_data[PROFILER_TIME_TMEM].total;
     u32 rdp_cmd_cycles = all_profiling_data[PROFILER_TIME_CMD].total;
 
-    u32 rdp_max_cycles = MAX(MAX(rdp_pipe_cycles, rdp_tmem_cycles), rdp_cmd_cycles);
+    u32 rdp_max_cycles = max(max(rdp_pipe_cycles, rdp_tmem_cycles), rdp_cmd_cycles);
 
     return RDP_CYCLE_CONV(rdp_max_cycles / PROFILING_BUFFER_SIZE);
 }
@@ -266,7 +266,7 @@ void profiler_print_times() {
         // audio time is removed from the main thread profiling, so add it back here
         u32 total_cpu = (microseconds[PROFILER_TIME_TOTAL  ] + (microseconds[PROFILER_TIME_AUDIO] * 2));
         u32 total_rsp = (microseconds[PROFILER_TIME_RSP_GFX] + microseconds[PROFILER_TIME_RSP_AUDIO]);
-        u32 max_rdp = MAX(MAX(microseconds[PROFILER_TIME_TMEM], microseconds[PROFILER_TIME_CMD]), microseconds[PROFILER_TIME_PIPE]);
+        u32 max_rdp = max(max(microseconds[PROFILER_TIME_TMEM], microseconds[PROFILER_TIME_CMD]), microseconds[PROFILER_TIME_PIPE]);
 
         sprintf(text_buffer,
             "FPS: %5.2f\n"

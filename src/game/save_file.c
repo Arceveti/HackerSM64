@@ -524,7 +524,7 @@ u32 save_file_get_max_coin_score(s32 courseIndex) {
             }
         }
     }
-    return ((maxScoreFileNum << 16) + MAX(maxCoinScore, 0));
+    return ((maxScoreFileNum << 16) + max(maxCoinScore, 0));
 }
 
 #ifdef COMPLETE_SAVE_FILE

@@ -55,7 +55,7 @@ struct MemoryPool *gLightsPool; // The memory pool where the above is stored.
 
 // Runs after an area load, allocates the dynamic light slots.
 void puppylights_allocate(void) {
-    s32 numAllocate = MIN((MAX_LIGHTS - gNumLights), MAX_LIGHTS_DYNAMIC);
+    s32 numAllocate = min((MAX_LIGHTS - gNumLights), MAX_LIGHTS_DYNAMIC);
     s32 i;
 
     gDynLightStart = gNumLights;
@@ -188,7 +188,7 @@ void puppylights_iterate(struct PuppyLight *light, Lights1 *src, struct Object *
         }
         // A slightly hacky way to offset the ambient lighting in order to prevent directional lighting from having a noticeable change in ambient brightness.
         if (flags & LIGHTFLAG_DIRECTIONAL_OFFSET) {
-            ambient = approach_f32_asymptotic(MIN((tempLight->a.l.col[i] * 2), 0xFF), tempLight->a.l.col[i], (scale2 * ((f32)light->rgba[3] / 255.0f)));
+            ambient = approach_f32_asymptotic(min((tempLight->a.l.col[i] * 2), 0xFF), tempLight->a.l.col[i], (scale2 * ((f32)light->rgba[3] / 255.0f)));
             tempLight->a.l.col[i]  = ambient;
             tempLight->a.l.colc[i] = ambient;
         }
@@ -284,7 +284,7 @@ void puppylights_object_emit(struct Object *obj) {
                 puppylights_deallocate_obj(obj);
                 return;
             }
-            for (i = gDynLightStart; i < MIN((gDynLightStart + MAX_LIGHTS_DYNAMIC), MAX_LIGHTS); i++) {
+            for (i = gDynLightStart; i < min((gDynLightStart + MAX_LIGHTS_DYNAMIC), MAX_LIGHTS); i++) {
                 if (gPuppyLights[i]->active) {
                     if (gPuppyLights[i]->flags & PUPPYLIGHT_DELETE) {
                         fadingExists = TRUE;
@@ -301,7 +301,7 @@ void puppylights_object_emit(struct Object *obj) {
             }
             // Go through all the lights again, now this time, ignore the fading light flag and overwrite them.
             if (fadingExists) {
-                for (i = gDynLightStart; i < MIN((gDynLightStart + MAX_LIGHTS_DYNAMIC), MAX_LIGHTS); i++) {
+                for (i = gDynLightStart; i < min((gDynLightStart + MAX_LIGHTS_DYNAMIC), MAX_LIGHTS); i++) {
                     if (gPuppyLights[i]->active && !(gPuppyLights[i]->flags & PUPPYLIGHT_DELETE)) {
                         continue;
                     }
@@ -329,9 +329,9 @@ void set_light_properties(struct PuppyLight *light, s32 x, s32 y, s32 z, s32 off
     light->pos[0][0] = x;
     light->pos[0][1] = y;
     light->pos[0][2] = z;
-    light->pos[1][0] = MAX(offsetX, 10);
-    light->pos[1][1] = MAX(offsetY, 10);
-    light->pos[1][2] = MAX(offsetZ, 10);
+    light->pos[1][0] = max(offsetX, 10);
+    light->pos[1][1] = max(offsetY, 10);
+    light->pos[1][2] = max(offsetZ, 10);
     light->rgba[0] = RGBA32_R(colour);
     light->rgba[1] = RGBA32_G(colour);
     light->rgba[2] = RGBA32_B(colour);

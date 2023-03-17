@@ -85,19 +85,25 @@ extern const f32 gSineTable[];
 
 #define signum_positive(x) ((x < 0) ? -1 : 1)
 
-#undef MIN
-#define MIN(a, b) ({        \
+#undef min
+#define min(a, b) ({        \
     __auto_type _a = (a);   \
     __auto_type _b = (b);   \
     (_a < _b) ? _a : _b;    \
 })
+#ifndef MIN
+#define MIN(a, b) min((a), (b))
+#endif
 
-#undef MAX
-#define MAX(a, b) ({        \
+#undef max
+#define max(a, b) ({        \
     __auto_type _a = (a);   \
     __auto_type _b = (b);   \
     (_a > _b) ? _a : _b;    \
 })
+#ifndef MAX
+#define MAX(a, b) max((a), (b))
+#endif
 
 #define ABS(x) ({           \
     __auto_type = (x);      \

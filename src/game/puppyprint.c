@@ -970,7 +970,7 @@ s32 get_text_width(const char *str, s32 font) {
 
         get_char_from_byte(&textX, &textPos, str[i], &pad, &spaceX, &offsetY, font);
         textPos += (spaceX + 1) * textSizeTotal;
-        wideX = MAX(textPos, wideX);
+        wideX = max(textPos, wideX);
     }
     return wideX;
 }
@@ -1026,7 +1026,7 @@ void set_text_size_params(void) {
     textTempScale = (1024 / textSizeTotal);
     textOffsets[0] = ( 8 * textSizeTotal);
     textOffsets[1] = (12 * textSizeTotal);
-    topLineHeight = MAX((12.0f * textSizeTotal), topLineHeight);
+    topLineHeight = max((12.0f * textSizeTotal), topLineHeight);
 }
 
 static s8 sTextShakeTable[] = {
@@ -1091,7 +1091,7 @@ void print_small_text(s32 x, s32 y, const char *str, s32 align, s32 amount, u8 f
 
             get_char_from_byte(&textX, &textPos[0], str[i], &widthX, &spaceX, &offsetY, font);
             textPos[0] += (spaceX + 1) * textSizeTotal;
-            wideX[lines] = MAX(textPos[0], wideX[lines]);
+            wideX[lines] = max(textPos[0], wideX[lines]);
         }
 
         if (align == PRINT_TEXT_ALIGN_CENTRE) {
@@ -1222,7 +1222,7 @@ void print_small_text_light(s32 x, s32 y, const char *str, s32 align, s32 amount
 
             get_char_from_byte(&textX, &textPos[0], str[i], &widthX, &spaceX, &offsetY, font);
             textPos[0] += (spaceX + 1) * textSizeTotal;
-            wideX[lines] = MAX(textPos[0], wideX[lines]);
+            wideX[lines] = max(textPos[0], wideX[lines]);
         }
 
         if (align == PRINT_TEXT_ALIGN_CENTRE) {
@@ -1470,7 +1470,7 @@ void print_small_text_buffered(s32 x, s32 y, const char *str, u8 align, s32 amou
     if (amount <= PRINT_ALL || amount > MAX_U8_STRING_SIZE) {
         amount = MAX_U8_STRING_SIZE;
     }
-    amount = MIN(strLen, amount);
+    amount = min(strLen, amount);
     if (amount <= 0) {
         return; // No point in printing an empty string
     }

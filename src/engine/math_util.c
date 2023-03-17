@@ -651,7 +651,7 @@ void mtxf_lookat(Mat4 mtx, Vec3f from, Vec3f to, s16 roll) {
     f32 dx = to[0] - from[0];
     f32 dz = to[2] - from[2];
     f32 invLength = sqrtf(sqr(dx) + sqr(dz));
-    invLength = (-1.0f / MAX(invLength, NEAR_ZERO));
+    invLength = (-1.0f / max(invLength, NEAR_ZERO));
     dx *= invLength;
     dz *= invLength;
     f32 sr  = sins(roll);
@@ -843,7 +843,7 @@ void mtxf_align_terrain_triangle(Mat4 mtx, Vec3f pos, s16 yaw, f32 radius) {
     vec3f_copy(mtx[2], zColumn);
 
     mtx[3][0] = pos[0];
-    mtx[3][1] = MAX(pos[1], avgY);
+    mtx[3][1] = max(pos[1], avgY);
     mtx[3][2] = pos[2];
 
     MTXF_END(mtx);

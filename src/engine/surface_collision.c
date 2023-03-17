@@ -847,7 +847,7 @@ f32 find_water_floor(s32 xPos, s32 yPos, s32 zPos, struct Surface **pfloor) {
     find_water_bottom_from_list(surfaceList, x, y, z, &staticBottomHeight);
 
     // Use the lower bottom.
-    f32 bottomHeight = MIN(staticBottomHeight, dynamicBottomHeight);
+    f32 bottomHeight = min(staticBottomHeight, dynamicBottomHeight);
 
     f32 dynamicTopHeight = FLOOR_LOWER_LIMIT;
     f32 staticTopHeight  = FLOOR_LOWER_LIMIT;
