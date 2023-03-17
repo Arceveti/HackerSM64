@@ -1267,7 +1267,7 @@ void thread2_crash_screen(UNUSED void *arg) {
 
                 osContStartReadDataEx(&gSIEventMesgQueue);
                 osRecvMesg(&gSIEventMesgQueue, &mesg, OS_MESG_BLOCK);
-                osContGetReadData(gControllerPads);
+                osContGetReadDataEx(gControllerPads);
 
                 release_rumble_pak_control();
             }
