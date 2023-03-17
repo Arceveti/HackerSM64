@@ -4,6 +4,7 @@
 #include "engine/math_util.h"
 #include "game/area.h"
 #include "game/game_init.h"
+#include "game/game_input.h"
 #include "game/level_update.h"
 #include "game/main.h"
 #include "game/memory.h"
@@ -16,6 +17,7 @@
 #include "seq_ids.h"
 #include "sm64.h"
 #include "title_screen.h"
+#include "level_commands.h"
 
 /**
  * @file title_screen.c
@@ -36,10 +38,10 @@ static char sLevelSelectStageNames[64][16] = {
 #ifdef KEEP_MARIO_HEAD
 static s16 sPlayMarioGreeting = TRUE;
 static s16 sPlayMarioGameOver = TRUE;
-
  #ifndef DISABLE_DEMO
+static u16 sDemoCountdown   = 0;
+static u16 gDemoInputListID = 0;
 
-static u16 sDemoCountdown = 0;
 #define PRESS_START_DEMO_TIMER 800
 
 /**
@@ -69,10 +71,11 @@ s32 run_level_id_or_demo(s32 level) {
                 // Use the first 4 bytes to store level ID,
                 // then use the rest of the values for inputs
                 demoInputBufTarget = gDemoInputsBuf.bufTarget;
+
                 gCurrDemoInput = demoInputBufTarget + 1;
                 level = demoInputBufTarget->timer;
 
-                // use the first save file and act
+                // Use the first save file and act.
                 gCurrSaveFileNum = SAVE_INDEX_TO_NUM(SAVE_FILE_A);
                 gCurrActNum = ACT_INDEX_TO_NUM(ACT_INDEX_1);
             }
@@ -100,17 +103,19 @@ s32 intro_level_select(void) {
 
     if (gPlayer1Controller->rawStickY < -60
      || gPlayer1Controller->rawStickX < -60
-     || gPlayer1Controller->buttonDown & (D_CBUTTONS | D_JPAD | L_CBUTTONS | L_JPAD)
+     || (gPlayer1Controller->buttonDown & (D_CBUTTONS | D_JPAD | L_CBUTTONS | L_JPAD))
     ) {
-        index |= 0b01;
+        index |= 0b01; // Left
     }
 
     if (gPlayer1Controller->rawStickY > 60
      || gPlayer1Controller->rawStickX > 60
-     || gPlayer1Controller->buttonDown & (U_CBUTTONS | U_JPAD | R_CBUTTONS | R_JPAD)
+     || (gPlayer1Controller->buttonDown & (U_CBUTTONS | U_JPAD | R_CBUTTONS | R_JPAD))
     ) {
-        index = 0b10;
+        index |= 0b10; // Right
     }
+
+    // Only increase/decrese if not holding that direction on the previous frame:
 
     if (((index ^ gLevelSelectHoldKeyIndex) & index) == 0b10) {
         if (gCurrLevelNum > LEVEL_MAX) {
@@ -137,14 +142,16 @@ s32 intro_level_select(void) {
         }
     }
 
+    // If there has been input for 10 frames, set the timer to 8 and set gLevelSelectHoldKeyIndex to 0 so the above becomes true.
     if (gLevelSelectHoldKeyTimer == 10) {
         gLevelSelectHoldKeyTimer = 8;
         gLevelSelectHoldKeyIndex = 0b00;
-    } else {
+    } else { // Otherwise, increment the timer while there is input.
         gLevelSelectHoldKeyTimer++;
         gLevelSelectHoldKeyIndex = index;
     }
 
+    // If no input, keep timer at 0.
     if (index == 0) {
         gLevelSelectHoldKeyTimer = 0;
     }

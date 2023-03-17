@@ -11,6 +11,7 @@
 #include "types.h"
 #include "buffers/framebuffers.h"
 #include "game/game_init.h"
+#include "game/save_file.h" //! TODO: Change this to "game/ingame_menu.h" after ASCII/multilang is merged.
 #include "audio/external.h"
 
 // frame counts for the zoom in, hold, and zoom out of title model
@@ -457,7 +458,51 @@ Gfx *geo_intro_face_easter_egg(s32 callContext, struct GraphNode *node, UNUSED v
 #endif
 
 #ifdef ENABLE_RUMBLE
-extern Gfx title_screen_bg_dl_rumble_pak[];
+//! TODO: Move rumble pak graphic textures here once build order is fixed.
+
+#define RUMBLE_X 220
+#define RUMBLE_Y 200
+#define RUMBLE_W 80
+#define RUMBLE_H 24
+
+static const Gfx title_screen_bg_dl_rumble_pak_begin[] = {
+    gsDPPipeSync(),
+    gsDPSetCycleType(G_CYC_COPY),
+    gsDPSetTexturePersp(G_TP_NONE),
+    gsDPSetTextureFilter(G_TF_POINT),
+    gsDPSetRenderMode(G_RM_NOOP, G_RM_NOOP2),
+    gsDPSetScissor(G_SC_NON_INTERLACE, 0, 0, (SCREEN_WIDTH - 1), (SCREEN_HEIGHT - 1)),
+    gsSPEndDisplayList(),
+};
+
+static const Gfx title_screen_bg_dl_rumble_pak_end[] = {
+    gsSPTextureRectangle((RUMBLE_X << 2), (RUMBLE_Y << 2), ((RUMBLE_X + RUMBLE_W - 1) << 2), ((RUMBLE_Y + RUMBLE_H - 1) << 2), G_TX_RENDERTILE, 0, 0, (4 << 10), (1 << 10)),
+    gsDPPipeSync(),
+    gsDPSetCycleType(G_CYC_1CYCLE),
+    gsDPSetTexturePersp(G_TP_PERSP),
+    gsDPSetTextureFilter(G_TF_BILERP),
+    gsDPSetRenderMode(G_RM_AA_ZB_OPA_SURF, G_RM_AA_ZB_OPA_SURF2),
+    gsSPEndDisplayList(),
+};
+
+//! TODO: Use DEFINE_LANGUAGE_ARRAY after ASCII/multilang is merged.
+Texture *title_texture_rumble_pak_language_array[] = {
+    title_texture_rumble_pak_en,
+ #if MULTILANG
+  #ifdef ENABLE_FRENCH
+    title_texture_rumble_pak_fr,
+  #endif // ENABLE_FRENCH
+  #ifdef ENABLE_GERMAN
+    title_texture_rumble_pak_de,
+  #endif // ENABLE_GERMAN
+  #ifdef ENABLE_JAPANESE
+    title_texture_rumble_pak_jp,
+  #endif // ENABLE_JAPANESE
+  #if defined(ENABLE_SPANISH_SPAIN) || defined(ENABLE_SPANISH_LATIN_AMERICA)
+    title_texture_rumble_pak_es,
+  #endif // (ENABLE_SPANISH_SPAIN || ENABLE_SPANISH_LATIN_AMERICA)
+ #endif // MULTILANG
+};
 
 Gfx *geo_intro_rumble_pak_graphic(s32 callContext, struct GraphNode *node, UNUSED void *context) {
     struct GraphNodeGenerated *genNode = (struct GraphNodeGenerated *)node;
@@ -478,12 +523,29 @@ Gfx *geo_intro_rumble_pak_graphic(s32 callContext, struct GraphNode *node, UNUSE
         if (backgroundTileSix == INTRO_BACKGROUND_SUPER_MARIO) {
             u32 gfxCmds = (
                 GFX_ALLOC(gSPDisplayList    ) +
+                GFX_ALLOC(gDPLoadTextureTile) +
+                GFX_ALLOC(gSPDisplayList    ) +
                 GFX_ALLOC(gSPEndDisplayList )
             );
             dl = alloc_display_list(gfxCmds * sizeof(*dl));
             if (dl != NULL) {
                 dlIter = dl;
-                gSPDisplayList(dlIter++, &title_screen_bg_dl_rumble_pak);
+                gSPDisplayList(dlIter++, &title_screen_bg_dl_rumble_pak_begin);
+                gDPLoadTextureTile(dlIter++,
+                    title_texture_rumble_pak_language_array[LANGUAGE_ENGLISH],
+                    G_IM_FMT_RGBA, G_IM_SIZ_16b,
+                    RUMBLE_W,
+                    RUMBLE_H,
+                    0, 0,
+                    (RUMBLE_W - 1),
+                    (RUMBLE_H - 1),
+                    0,
+                    (G_TX_NOMIRROR | G_TX_CLAMP),
+                    (G_TX_NOMIRROR | G_TX_CLAMP),
+                    G_TX_NOMASK, G_TX_NOMASK,
+                    G_TX_NOLOD,  G_TX_NOLOD
+                );
+                gSPDisplayList(dlIter++, &title_screen_bg_dl_rumble_pak_end);
                 gSPEndDisplayList(dlIter);
             }
         } else {
@@ -493,4 +555,4 @@ Gfx *geo_intro_rumble_pak_graphic(s32 callContext, struct GraphNode *node, UNUSE
 
     return dl;
 }
-#endif
+#endif // ENABLE_RUMBLE

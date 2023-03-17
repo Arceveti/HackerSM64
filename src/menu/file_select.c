@@ -1072,16 +1072,13 @@ void handle_cursor_button_input(void) {
  * Cursor function that handles analog stick input and button presses with a function near the end.
  */
 void handle_controller_cursor_input(void) {
+    const s16 deadzone = 2;
     s16 rawStickX = gPlayer1Controller->rawStickX;
     s16 rawStickY = gPlayer1Controller->rawStickY;
 
     // Handle deadzone
-    if (rawStickY > -2 && rawStickY < 2) {
-        rawStickY = 0;
-    }
-    if (rawStickX > -2 && rawStickX < 2) {
-        rawStickX = 0;
-    }
+    if (abss(rawStickY) < deadzone) rawStickY = 0;
+    if (abss(rawStickX) < deadzone) rawStickX = 0;
 
     // Move cursor
     sCursorPos[0] += rawStickX / 8;

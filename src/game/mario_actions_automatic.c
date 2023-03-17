@@ -772,6 +772,7 @@ s32 act_in_cannon(struct MarioState *m) {
                 play_sound(SOUND_MOVING_AIM_CANNON, marioObj->header.gfx.cameraToObject);
                 reset_rumble_timers_vibrate(m->controller, 0);
             }
+            break;
     }
 
     vec3f_copy(marioObj->header.gfx.pos, m->pos);

@@ -2349,6 +2349,23 @@ const Gfx dl_rgba16_text_end[] = {
     gsSPEndDisplayList(),
 };
 
+const Gfx dl_shade_screen_begin[] = {
+    gsDPPipeSync(),
+    gsDPSetRenderMode(G_RM_CLD_SURF, G_RM_CLD_SURF2),
+    gsDPSetCycleType(G_CYC_1CYCLE),
+    gsDPSetPrimColor(0, 0, 0, 0, 0, 127),
+    gsDPSetCombineMode(G_CC_PRIMITIVE, G_CC_PRIMITIVE),
+    gsSPEndDisplayList(),
+};
+
+const Gfx dl_shade_screen_end[] = {
+    gsDPPipeSync(),
+    gsDPSetRenderMode(G_RM_AA_ZB_OPA_SURF, G_RM_AA_ZB_OPA_SURF2),
+    gsDPSetPrimColor(0, 0, 255, 255, 255, 255),
+    gsDPSetCombineMode(G_CC_SHADE, G_CC_SHADE),
+    gsSPEndDisplayList(),
+};
+
 // 0x0200EDA8 - 0x0200EDE8
 static const Vtx vertex_text_bg_box[] = {
     {{{     0,    -80,      0}, 0, {     0,      0}, {0xff, 0xff, 0xff, 0xff}}},
@@ -3006,6 +3023,75 @@ const Gfx dl_ia8_up_arrow_end[] = {
 };
 
 // 0x02014958 - 0x02014960
+ALIGNED8 const Texture texture_controller_port[] = {
+#include "textures/segment2/controller_port.rgba16.inc.c"
+};
+ALIGNED8 const Texture texture_controller_unknown[] = {
+#include "textures/segment2/controller_unknown.rgba16.inc.c"
+};
+ALIGNED8 const Texture texture_controller_n64_normal[] = {
+#include "textures/segment2/controller_n64_normal.rgba16.inc.c"
+};
+ALIGNED8 const Texture texture_controller_n64_mouse[] = {
+#include "textures/segment2/controller_n64_mouse.rgba16.inc.c"
+};
+ALIGNED8 const Texture texture_controller_n64_voice[] = {
+#include "textures/segment2/controller_n64_voice.rgba16.inc.c"
+};
+ALIGNED8 const Texture texture_controller_n64_keyboard[] = {
+#include "textures/segment2/controller_n64_keyboard.rgba16.inc.c"
+};
+ALIGNED8 const Texture texture_controller_gba[] = {
+#include "textures/segment2/controller_gba.rgba16.inc.c"
+};
+ALIGNED8 const Texture texture_controller_gcn_normal[] = {
+#include "textures/segment2/controller_gcn_normal.rgba16.inc.c"
+};
+ALIGNED8 const Texture texture_controller_gcn_receiver[] = {
+#include "textures/segment2/controller_gcn_receiver.rgba16.inc.c"
+};
+ALIGNED8 const Texture texture_controller_gcn_wavebird[] = {
+#include "textures/segment2/controller_gcn_wavebird.rgba16.inc.c"
+};
+ALIGNED8 const Texture texture_controller_gcn_wheel[] = {
+#include "textures/segment2/controller_gcn_wheel.rgba16.inc.c"
+};
+ALIGNED8 const Texture texture_controller_gcn_keyboard[] = {
+#include "textures/segment2/controller_gcn_keyboard.rgba16.inc.c"
+};
+ALIGNED8 const Texture texture_controller_gcn_dancepad[] = {
+#include "textures/segment2/controller_gcn_dancepad.rgba16.inc.c"
+};
+
+#ifdef ENABLE_RUMBLE
+//! TODO: Move rumble pak graphic textures to src/menu/intro_geo.c once build order is fixed.
+ALIGNED8 const Texture title_texture_rumble_pak_en[] = {
+#include "textures/segment2/rumble_pak_en.rgba16.inc.c"
+};
+//! TODO: Use these after ASCII/multilang is merged.
+ #if MULTILANG
+  #ifdef ENABLE_FRENCH
+ALIGNED8 const Texture title_texture_rumble_pak_fr[] = {
+#include "textures/segment2/rumble_pak_fr.rgba16.inc.c"
+};
+  #endif // ENABLE_FRENCH
+  #ifdef ENABLE_GERMAN
+ALIGNED8 const Texture title_texture_rumble_pak_de[] = {
+#include "textures/segment2/rumble_pak_de.rgba16.inc.c"
+};
+  #endif // ENABLE_GERMAN
+  #ifdef ENABLE_JAPANESE
+ALIGNED8 const Texture title_texture_rumble_pak_jp[] = {
+#include "textures/segment2/rumble_pak_jp.rgba16.inc.c"
+};
+  #endif // ENABLE_JAPANESE
+  #if defined(ENABLE_SPANISH_SPAIN) || defined(ENABLE_SPANISH_LATIN_AMERICA)
+ALIGNED8 const Texture title_texture_rumble_pak_es[] = {
+#include "textures/segment2/rumble_pak_es.rgba16.inc.c"
+};
+  #endif // (ENABLE_SPANISH_SPAIN || ENABLE_SPANISH_LATIN_AMERICA)
+ #endif // MULTILANG
+#endif // ENABLE_RUMBLE
 
 // 0x02014970 - 0x020149A8
 const Gfx dl_paintings_rippling_begin[] = {

@@ -743,7 +743,6 @@ u32 interact_coin(struct MarioState *m, UNUSED u32 interactType, struct Object *
         g100CoinStarSpawned = TRUE;
     }
 #endif
-
     if (obj->oDamageOrCoinValue >= 2) {
         queue_rumble_data(m->controller, 5, 80, 0);
     }
@@ -1156,8 +1155,9 @@ u32 interact_strong_wind(struct MarioState *m, UNUSED u32 interactType, struct O
 u32 interact_flame(struct MarioState *m, UNUSED u32 interactType, struct Object *obj) {
     u32 burningAction = ACT_BURNING_JUMP;
 
-    if (!sInvulnerable && !(m->flags & MARIO_METAL_CAP) && !(m->flags & MARIO_VANISH_CAP)
-        && !(obj->oInteractionSubtype & INT_SUBTYPE_DELAY_INVINCIBILITY)) {
+    if (!sInvulnerable
+     && !(m->flags & (MARIO_METAL_CAP | MARIO_VANISH_CAP))
+     && !(obj->oInteractionSubtype & INT_SUBTYPE_DELAY_INVINCIBILITY)) {
         queue_rumble_data(m->controller, 5, 80, 0);
 
         obj->oInteractStatus = INT_STATUS_INTERACTED;
@@ -1274,7 +1274,6 @@ u32 interact_shock(struct MarioState *m, UNUSED u32 interactType, struct Object 
         take_damage_from_interact_object(m);
         play_sound(SOUND_MARIO_ATTACKED, m->marioObj->header.gfx.cameraToObject);
         queue_rumble_data(m->controller, 70, 60, 0);
-
 
         if (m->action & (ACT_FLAG_SWIMMING | ACT_FLAG_METAL_WATER)) {
             return drop_and_set_mario_action(m, ACT_WATER_SHOCKED, 0);

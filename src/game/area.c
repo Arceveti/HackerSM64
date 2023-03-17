@@ -1,4 +1,5 @@
 #include <PR/ultratypes.h>
+#include <string.h>
 
 #include "config.h"
 #include "area.h"
@@ -26,7 +27,9 @@
 #include "puppyprint.h"
 #include "debug_box.h"
 #include "engine/colors.h"
+#include "joybus.h"
 #include "profiling.h"
+#include "fasttext.h"
 
 struct SpawnInfo gPlayerSpawnInfos[1];
 struct GraphNode *gGraphNodePointers[MODEL_ID_COUNT];
@@ -94,14 +97,6 @@ Vp gViewport = {
     }
 };
 
-#if MULTILANG
-const char *gNoControllerMsg[] = {
-    "NO CONTROLLER",
-    "MANETTE DEBRANCHEE",
-    "CONTROLLER FEHLT",
-};
-#endif
-
 void override_viewport_and_clip(Vp *vpOverride, Vp *vpClip, Color red, Color green, Color blue) {
     RGBA16 color = RGBA_TO_RGBA16(red, green, blue, 0xFF);
 
@@ -120,24 +115,13 @@ void set_warp_transition_rgb(Color red, Color green, Color blue) {
 }
 
 void print_intro_text(void) {
-#if MULTILANG
-    s32 language = eu_get_language();
-#endif
     if ((gGlobalTimer & 31) < 20) {
-        if (gControllerBits == 0) {
-#if MULTILANG
-            print_text_centered(SCREEN_CENTER_X, 20, gNoControllerMsg[language]);
-#else
-            print_text_centered(SCREEN_CENTER_X, 20, "NO CONTROLLER");
-#endif
-        } else {
 #ifdef VERSION_EU
-            print_text(20, 20, "START");
+        print_text(20, 20, "START");
 #else
-            print_text_centered(60, 38, "PRESS");
-            print_text_centered(60, 20, "START");
+        print_text_centered(60, 38, "PRESS");
+        print_text_centered(60, 20, "START");
 #endif
-        }
     }
 }
 
@@ -390,6 +374,188 @@ void play_transition_after_delay(s16 transType, s16 time, Color red, Color green
     play_transition(transType, time, red, green, blue);
 }
 
+#ifdef ALLOW_STATUS_REPOLLING_COMBO
+ #if (MAX_NUM_PLAYERS > 1)
+ALIGNED8 static const char* sN64ButtonNames[16] = {
+    "A",       // A_BUTTON
+    "B",       // B_BUTTON
+    "Z",       // Z_TRIG
+    "START",   // START_BUTTON
+    "D UP",    // U_JPAD
+    "D DOWN",  // D_JPAD
+    "D LEFT",  // L_JPAD
+    "D RIGHT", // R_JPAD
+    "X",       // X_BUTTON (The reset bit on a standard N64 controller).
+    "Y",       // Y_BUTTON (The unused bit on a standard N64 controller).
+    "L",       // L_TRIG
+    "R",       // R_TRIG
+    "C UP",    // U_CBUTTONS
+    "C DOWN",  // D_CBUTTONS
+    "C LEFT",  // L_CBUTTONS
+    "C RIGHT", // R_CBUTTONS
+};
+
+/**
+ * @brief Creates a string from a combination of buttons and adds it to 'strp'.
+ */
+static size_t button_combo_to_string(char* strp, u16 buttons) {
+    size_t count = 0;
+
+    for (int i = 0; i < ARRAY_COUNT(sN64ButtonNames); i++) {
+        if (buttons & ((1 << (ARRAY_COUNT(sN64ButtonNames) - 1)) >> i)) { // 0x8000 >> i
+            if (count) {
+                strcat(strp, "+");
+                count += strlen("+");
+            }
+
+            strcat(strp, sN64ButtonNames[i]);
+            count += strlen(sN64ButtonNames[i]);
+        }
+    }
+
+    return count;
+}
+ #endif // (MAX_NUM_PLAYERS > 1)
+
+ALIGNED8 static const struct ControllerIcon sControllerIcons[] = {
+    { .type = CONT_NONE,                .texture = texture_controller_port         },
+    { .type = CONT_TYPE_NORMAL,         .texture = texture_controller_n64_normal   },
+    { .type = CONT_TYPE_MOUSE,          .texture = texture_controller_n64_mouse    },
+    { .type = CONT_TYPE_VOICE,          .texture = texture_controller_n64_voice    },
+    { .type = CONT_TYPE_KEYBOARD,       .texture = texture_controller_n64_keyboard },
+    { .type = CONT_TYPE_GBA,            .texture = texture_controller_gba          },
+    { .type = CONT_TYPE_GCN_NORMAL,     .texture = texture_controller_gcn_normal   },
+    { .type = CONT_TYPE_GCN_RECEIVER,   .texture = texture_controller_gcn_receiver },
+    { .type = CONT_TYPE_GCN_WAVEBIRD,   .texture = texture_controller_gcn_wavebird },
+    { .type = CONT_TYPE_GCN_WHEEL,      .texture = texture_controller_gcn_wheel    },
+    { .type = CONT_TYPE_GCN_KEYBOARD,   .texture = texture_controller_gcn_keyboard },
+    { .type = CONT_TYPE_GCN_DANCEPAD,   .texture = texture_controller_gcn_dancepad },
+};
+
+static const Gfx dl_controller_icons_begin[] = {
+    gsDPPipeSync(),
+    gsDPSetCycleType(G_CYC_COPY),
+    gsDPSetTexturePersp(G_TP_NONE),
+    gsDPSetTextureFilter(G_TF_POINT),
+    gsDPSetRenderMode(G_RM_NOOP, G_RM_NOOP2),
+    gsDPSetAlphaCompare(G_AC_THRESHOLD),
+    gsSPEndDisplayList(),
+};
+
+static const Gfx dl_controller_icons_end[] = {
+    gsDPPipeSync(),
+    gsDPSetCycleType(G_CYC_1CYCLE),
+    gsDPSetTexturePersp(G_TP_PERSP),
+    gsDPSetTextureFilter(G_TF_BILERP),
+    gsDPSetRenderMode(G_RM_AA_ZB_OPA_SURF, G_RM_AA_ZB_OPA_SURF2),
+    gsDPSetAlphaCompare(G_AC_NONE),
+    gsSPEndDisplayList(),
+};
+
+/**
+ * @brief Displays controller info (eg. type and player number) while polling for controller statuses.
+ */
+void render_controllers_overlay(void) {
+    const s32 w = 32;
+    const s32 h = 32;
+    s32 x = SCREEN_CENTER_X;
+    const s32 y = (SCREEN_CENTER_Y - (h / 2));
+    const s32 texW = 32;
+    const s32 texH = 32;
+    Texture* texture_controller = texture_controller_unknown;
+    OSPortInfo* portInfo = NULL;
+    char text_buffer[32] = "";
+    int port;
+
+    // Only show UI when status polling and not in boot mode.
+    if (!gContStatusPolling || gContStatusPollingIsBootMode) {
+        return;
+    }
+
+    Color col = remap(get_cycle(((f32)CONT_STATUS_POLLING_TIME / 30.0f), 1.0f, gContStatusPollTimer), -1, 1, 127, 255);
+
+    // Darken the screen while polling controller status, similar to pausing the game.
+    shade_screen();
+
+    Gfx* dlHead = gDisplayListHead;
+
+    // Allow drawing outside the screen borders.
+    gDPSetScissor(dlHead++, G_SC_NON_INTERLACE, 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
+
+    gSPDisplayList(dlHead++, dl_controller_icons_begin);
+
+    // Draw the port icons:
+    for (port = 0; port < MAXCONTROLLERS; port++) {
+        portInfo = &gPortInfo[port];
+
+        // Loop through sControllerIcons to get the port's corresponding texture.
+        for (int i = 0; i < ARRAY_COUNT(sControllerIcons); i++) {
+            if (portInfo->type == sControllerIcons[i].type) {
+                texture_controller = sControllerIcons[i].texture;
+                break;
+            }
+        }
+
+        x = (SCREEN_CENTER_X - (w * (MAXCONTROLLERS / 2))) + (w * port);
+        gDPLoadTextureTile(dlHead++,
+            texture_controller, G_IM_FMT_RGBA, G_IM_SIZ_16b,
+            texW, texH, 0, 0,
+            (texW - 1), (texH - 1), 0,
+            (G_TX_NOMIRROR | G_TX_CLAMP),
+            (G_TX_NOMIRROR | G_TX_CLAMP),
+            G_TX_NOMASK, G_TX_NOMASK,
+            G_TX_NOLOD,  G_TX_NOLOD
+        );
+        gSPTextureRectangle(dlHead++,
+            (x << 2), (y << 2),
+            (((x + w) - 1) << 2),
+            (((y + h) - 1) << 2),
+            G_TX_RENDERTILE, 0, 0,
+            (4 << 10), (1 << 10)
+        );
+    }
+
+    gSPDisplayList(dlHead++, dl_controller_icons_end);
+    gSPDisplayList(dlHead++, dl_fasttext_begin);
+
+    drawSmallStringCol(&dlHead, (SCREEN_CENTER_X - 79), (SCREEN_CENTER_Y - 40), "WAITING FOR CONTROLLERS...", col, col, col);
+
+    // Instructions:
+    if (gControllerBits) {
+        if (gContStatusPollingReadyForInput) {
+            sprintf(text_buffer, "PRESS BUTTON TO ASSIGN P%d", (gNumPlayers + 1));
+            drawSmallStringCol(&dlHead, (SCREEN_CENTER_X - 77), (SCREEN_CENTER_Y - 28), text_buffer, col, col, col);
+ #if (MAX_NUM_PLAYERS > 1)
+            char comboStr[32] = "";
+            size_t count = button_combo_to_string(comboStr, TOGGLE_CONT_STATUS_POLLING_COMBO);
+            sprintf(text_buffer, "OR %s TO EXIT", comboStr);
+            s32 xOffset = ((strlen("ORTOEXIT") + 1 + count) / 2) * 7; // Center the text based on char count.
+            drawSmallStringCol(&dlHead, (SCREEN_CENTER_X - xOffset), (SCREEN_CENTER_Y + 28), text_buffer, col, col, col);
+ #endif // (MAX_NUM_PLAYERS > 1)
+        } else {
+            drawSmallStringCol(&dlHead, (SCREEN_CENTER_X - 84), (SCREEN_CENTER_Y - 28), "RELEASE ALL INPUTS TO START", col, col, col);
+        }
+    }
+
+    // Print the assigned port numbers.
+    for (port = 0; port < MAXCONTROLLERS; port++) {
+        portInfo = &gPortInfo[port];
+
+        if (portInfo->plugged && portInfo->playerNum) {
+            sprintf(text_buffer, "P%d", portInfo->playerNum);
+            drawSmallString(&dlHead, ((SCREEN_CENTER_X - (w * (MAXCONTROLLERS / 2))) + (w * port) + 8), (SCREEN_CENTER_Y + 16), text_buffer);
+        }
+    }
+
+    gSPDisplayList(dlHead++, dl_fasttext_end);
+
+    // Disallow drawing outside the screen borders.
+    gDPSetScissor(dlHead++, G_SC_NON_INTERLACE, 0, gBorderHeight, SCREEN_WIDTH, (SCREEN_HEIGHT - gBorderHeight));
+
+    gDisplayListHead = dlHead;
+}
+#endif // ALLOW_STATUS_REPOLLING_COMBO
+
 void render_game(void) {
     PROFILER_GET_SNAPSHOT_TYPE(PROFILER_DELTA_COLLISION);
     if (gCurrentArea != NULL && !gWarpTransition.pauseRendering) {
@@ -462,6 +628,10 @@ void render_game(void) {
 
     gViewportOverride = NULL;
     gViewportClip = NULL;
+
+#ifdef ALLOW_STATUS_REPOLLING_COMBO
+    render_controllers_overlay();
+#endif
 
     profiler_update(PROFILER_TIME_GFX, (profiler_get_delta(PROFILER_DELTA_COLLISION) - first));
     profiler_print_times();

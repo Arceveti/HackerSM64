@@ -15,6 +15,7 @@
 #include "engine/colors.h"
 #include "game/debug.h"
 #include "game/game_init.h"
+#include "game/game_input.h"
 #include "game/main.h"
 #include "game/printf.h"
 #include "game/puppyprint.h"
@@ -1166,9 +1167,9 @@ void fill_function_stack_trace(OSThread *thread) {
 #endif
 
 #ifdef FUNNY_CRASH_SOUND
+extern struct SequenceQueueItem sBackgroundMusicQueue[6];
 extern void audio_signal_game_loop_tick(void);
 extern void stop_sounds_in_continuous_banks(void);
-extern struct SequenceQueueItem sBackgroundMusicQueue[6];
 
 void play_crash_sound(struct CrashScreen *crashScreen, s32 sound) {
     crashScreen->thread.priority = 15;
@@ -1181,8 +1182,6 @@ void play_crash_sound(struct CrashScreen *crashScreen, s32 sound) {
     crash_screen_sleep(200);
 }
 #endif
-
-extern void read_controller_inputs(void);
 
 #ifdef CRASH_SCREEN_CRASH_SCREEN
 void thread20_crash_screen_crash_screen(UNUSED void *arg) {
@@ -1262,16 +1261,7 @@ void thread2_crash_screen(UNUSED void *arg) {
 #endif
             }
         } else {
-            if (gControllerBits) {
-                block_until_rumble_pak_free();
-
-                osContStartReadDataEx(&gSIEventMesgQueue);
-                osRecvMesg(&gSIEventMesgQueue, &mesg, OS_MESG_BLOCK);
-                osContGetReadDataEx(gControllerPads);
-
-                release_rumble_pak_control();
-            }
-            read_controller_inputs();
+            handle_input(&mesg);
             update_crash_screen_input();
             draw_crash_screen(thread);
             sCrashScreenSwitchedPage = FALSE;

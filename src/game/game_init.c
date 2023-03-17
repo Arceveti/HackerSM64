@@ -10,6 +10,7 @@
 #include "engine/level_script.h"
 #include "engine/math_util.h"
 #include "game_init.h"
+#include "game_input.h"
 #include "main.h"
 #include "memory.h"
 #include "save_file.h"
@@ -38,11 +39,6 @@ Gfx *gDisplayListHead;
 u8 *gGfxPoolEnd;
 struct GfxPool *gGfxPool;
 
-// OS Controllers
-struct Controller gControllers[MAXCONTROLLERS];
-OSContStatus gControllerStatuses[MAXCONTROLLERS];
-OSContPadEx gControllerPads[MAXCONTROLLERS];
-u8 gControllerBits = 0b0000; // Which ports have a controller connected to them.
 u8 gIsConsole = TRUE; // Needs to be initialized before audio_reset_session is called
 u8 gCacheEmulated = TRUE;
 u8 gBorderHeight;
@@ -84,17 +80,6 @@ u16 sRenderingFramebuffer = 0;
 
 // Goddard Vblank Function Caller
 void (*gGoddardVblankCallback)(void) = NULL;
-
-// Defined controller slots. Anything above MAX_NUM_PLAYERS will be unused.
-struct Controller* const gPlayer1Controller = &gControllers[0];
-struct Controller* const gPlayer2Controller = &gControllers[1];
-struct Controller* const gPlayer3Controller = &gControllers[2];
-struct Controller* const gPlayer4Controller = &gControllers[3];
-
-// Title Screen Demo Handler
-struct DemoInput *gCurrDemoInput = NULL;
-u16 gDemoInputListID = 0;
-struct DemoInput gRecordedDemoInput = { 0 };
 
 // Display
 // ----------------------------------------------------------------------------------------------------
@@ -486,238 +471,6 @@ void display_and_vsync(void) {
     gGlobalTimer++;
 }
 
-#if !defined(DISABLE_DEMO) && defined(KEEP_MARIO_HEAD)
-// this function records distinct inputs over a 255-frame interval to RAM locations and was likely
-// used to record the demo sequences seen in the final game. This function is unused.
-UNUSED static void record_demo(void) {
-    // record the player's button mask and current rawStickX and rawStickY.
-    u8 buttonMask =
-        ((gPlayer1Controller->buttonDown & (A_BUTTON | B_BUTTON | Z_TRIG | START_BUTTON)) >> 8)
-        | (gPlayer1Controller->buttonDown & (U_CBUTTONS | D_CBUTTONS | L_CBUTTONS | R_CBUTTONS));
-    s8 rawStickX = gPlayer1Controller->rawStickX;
-    s8 rawStickY = gPlayer1Controller->rawStickY;
-
-    // If the stick is in deadzone, set its value to 0 to
-    // nullify the effects. We do not record deadzone inputs.
-    if (rawStickX > -8 && rawStickX < 8) {
-        rawStickX = 0;
-    }
-
-    if (rawStickY > -8 && rawStickY < 8) {
-        rawStickY = 0;
-    }
-
-    // Rrecord the distinct input and timer so long as they are unique.
-    // If the timer hits 0xFF, reset the timer for the next demo input.
-    if (gRecordedDemoInput.timer == 0xFF
-     || buttonMask != gRecordedDemoInput.buttonMask
-     || rawStickX != gRecordedDemoInput.rawStickX
-     || rawStickY != gRecordedDemoInput.rawStickY) {
-        gRecordedDemoInput.timer = 0;
-        gRecordedDemoInput.buttonMask = buttonMask;
-        gRecordedDemoInput.rawStickX = rawStickX;
-        gRecordedDemoInput.rawStickY = rawStickY;
-    }
-    gRecordedDemoInput.timer++;
-}
-
-/**
- * If a demo sequence exists, this will run the demo input list until it is complete.
- */
-void run_demo_inputs(void) {
-    // Eliminate the unused bits.
-    gPlayer1Controller->controllerData->button &= VALID_BUTTONS;
-
-    // Check if a demo inputs list exists and if so,
-    // run the active demo input list.
-    if (gCurrDemoInput != NULL) {
-        // The timer variable being 0 at the current input means the demo is over.
-        // Set the button to the END_DEMO mask to end the demo.
-        if (gCurrDemoInput->timer == 0) {
-            gPlayer1Controller->controllerData->stick_x = 0;
-            gPlayer1Controller->controllerData->stick_y = 0;
-            gPlayer1Controller->controllerData->button = END_DEMO;
-        } else {
-            // Backup the start button if it is pressed, since we don't want the
-            // demo input to override the mask where start may have been pressed.
-            u16 startPushed = (gPlayer1Controller->controllerData->button & START_BUTTON);
-
-            // Perform the demo inputs by assigning the current button mask and the stick inputs.
-            gPlayer1Controller->controllerData->stick_x = gCurrDemoInput->rawStickX;
-            gPlayer1Controller->controllerData->stick_y = gCurrDemoInput->rawStickY;
-
-            // To assign the demo input, the button information is stored in
-            // an 8-bit mask rather than a 16-bit mask. this is because only
-            // A, B, Z, Start, and the C-Buttons are used in a demo, as bits
-            // in that order. In order to assign the mask, we need to take the
-            // upper 4 bits (A, B, Z, and Start) and shift then left by 8 to
-            // match the correct input mask. We then add this to the masked
-            // lower 4 bits to get the correct button mask.
-            gPlayer1Controller->controllerData->button =
-                ((gCurrDemoInput->buttonMask & (BITMASK(4) << 4)) << 8) + ((gCurrDemoInput->buttonMask & BITMASK(4)));
-
-            // If start was pushed, put it into the demo sequence being input to end the demo.
-            gPlayer1Controller->controllerData->button |= startPushed;
-
-            // Run the current demo input's timer down. if it hits 0, advance the demo input list.
-            if (--gCurrDemoInput->timer == 0) {
-                gCurrDemoInput++;
-            }
-        }
-    }
-}
-
-#endif
-
-/**
- * Take the updated controller struct and calculate the new x, y, and distance floats.
- */
-void adjust_analog_stick(struct Controller *controller) {
-    // Reset the controller's x and y floats.
-    controller->stickX = 0;
-    controller->stickY = 0;
-
-    // Modulate the rawStickX and rawStickY to be the new f32 values by adding/subtracting 6.
-    if (controller->rawStickX <= -8) {
-        controller->stickX = controller->rawStickX + 6;
-    }
-
-    if (controller->rawStickX >= 8) {
-        controller->stickX = controller->rawStickX - 6;
-    }
-
-    if (controller->rawStickY <= -8) {
-        controller->stickY = controller->rawStickY + 6;
-    }
-
-    if (controller->rawStickY >= 8) {
-        controller->stickY = controller->rawStickY - 6;
-    }
-
-    // Calculate f32 magnitude from the center by vector length.
-    controller->stickMag = sqrtf(sqr(controller->stickX) + sqr(controller->stickY));
-
-    // Magnitude cannot exceed 64.0f: if it does, modify the values
-    // appropriately to flatten the values down to the allowed maximum value.
-    if (controller->stickMag > 64) {
-        controller->stickX *= 64 / controller->stickMag;
-        controller->stickY *= 64 / controller->stickMag;
-        controller->stickMag = 64;
-    }
-}
-
-/**
- * Update the controller struct with available inputs if present.
- */
-void read_controller_inputs(void) {
-    s32 i;
-
-#if !defined(DISABLE_DEMO) && defined(KEEP_MARIO_HEAD)
-    run_demo_inputs();
-#endif
-
-    for (i = 0; i < MAX_NUM_PLAYERS; i++) {
-        struct Controller* controller = &gControllers[i];
-        OSContPadEx* controllerData = controller->controllerData;
-        // if we're receiving inputs, update the controller struct with the new button info.
-        if (controller->controllerData != NULL) {
-            // HackerSM64: Swaps Z and L, only on console, and only when playing with a GameCube controller.
-            if (__osControllerTypes[controller->port] == CONT_TYPE_GCN) {
-                u32 oldButton = controllerData->button;
-                u32 newButton = oldButton & ~(Z_TRIG | L_TRIG);
-                if (oldButton & Z_TRIG) {
-                    newButton |= L_TRIG;
-                }
-                if (controllerData->l_trig > 85) { // How far the player has to press the L trigger for it to be considered a Z press. 64 is about 25%. 127 would be about 50%.
-                    newButton |= Z_TRIG;
-                }
-                controllerData->button = newButton;
-            }
-            controller->rawStickX = controllerData->stick_x;
-            controller->rawStickY = controllerData->stick_y;
-            controller->buttonPressed  = (~controller->buttonDown & controllerData->button);
-            controller->buttonReleased = (~controllerData->button & controller->buttonDown);
-            // 0.5x A presses are a good meme
-            controller->buttonDown = controllerData->button;
-            adjust_analog_stick(controller);
-        } else { // otherwise, if the controllerData is NULL, 0 out all of the inputs.
-            controller->rawStickX      = 0x0000;
-            controller->rawStickY      = 0x0000;
-            controller->buttonPressed  = 0x0000;
-            controller->buttonReleased = 0x0000;
-            controller->buttonDown     = 0x0000;
-            controller->stickX         = 0.0f;
-            controller->stickY         = 0.0f;
-            controller->stickMag       = 0.0f;
-        }
-    }
-}
-
-/**
- * Initialize the controller structs to point at the OSCont information.
- */
-void init_controllers(void) {
-    struct Controller* controller = NULL;
-    int port, cont = 0;
-    int lastUsedPort = -1;
-
-    // Set controller 1 to point to the set of status/pads for input 1 and
-    // init the controllers.
-    gControllers[0].statusData = &gControllerStatuses[0];
-    gControllers[0].controllerData = &gControllerPads[0];
-    osContInit(&gSIEventMesgQueue, &gControllerBits, &gControllerStatuses[0]);
-
-#ifdef EEP
-    // strangely enough, the EEPROM probe for save data is done in this function.
-    // save pak detection?
-    gEepromProbe = gIsVC
-                 ? osEepromProbeVC(&gSIEventMesgQueue)
-                 : osEepromProbe  (&gSIEventMesgQueue);
-#endif
-#ifdef SRAM
-    gSramProbe = nuPiInitSram();
-#endif
-
-    // Loop over the 4 ports and link the controller structs to the appropriate status and pad.
-    for (port = 0; port < MAXCONTROLLERS; port++) {
-        if (cont >= MAX_NUM_PLAYERS) {
-            break;
-        }
-
-        // Is controller plugged in?
-        if (gControllerBits & BIT(port)) {
-            // The game allows you to have just 1 controller plugged
-            // into any port in order to play the game. this was probably
-            // so if any of the ports didn't work, you can have controllers
-            // plugged into any of them and it will work.
-            controller = &gControllers[cont];
-            controller->statusData = &gControllerStatuses[port];
-            controller->controllerData = &gControllerPads[port];
-            controller->port = port;
-
-            lastUsedPort = port;
-
-            cont++;
-        }
-    }
-
-#if (MAX_NUM_PLAYERS >= 2)
-    //! Some flashcarts (eg. ED64p) don't let you start a ROM with a GameCube controller in port 1,
-    //   so if port 1 is an N64 controller and port 2 is a GC controller, swap them.
-    if (gIsConsole) {
-        if (__osControllerTypes[0] == CONT_TYPE_N64
-         && __osControllerTypes[1] == CONT_TYPE_GCN) {
-            struct Controller temp = gControllers[0];
-            gControllers[0] = gControllers[1];
-            gControllers[1] = temp;
-        }
-    }
-#endif
-
-    // Disable the ports after the last used one.
-    osContSetCh(lastUsedPort + 1);
-}
-
 // Game thread core
 // ----------------------------------------------------------------------------------------------------
 
@@ -759,6 +512,15 @@ void setup_game_memory(void) {
 void thread5_game_loop(UNUSED void *arg) {
     setup_game_memory();
     init_controllers();
+#ifdef EEP
+    // EEPROM probe for save data.
+    gEepromProbe = gIsVC
+                 ? osEepromProbeVC(&gSIEventMesgQueue)
+                 : osEepromProbe  (&gSIEventMesgQueue);
+#endif
+#ifdef SRAM
+    gSramProbe = nuPiInitSram();
+#endif
 #ifdef ENABLE_RUMBLE
     create_thread_6_rumble();
 #endif
@@ -797,20 +559,9 @@ void thread5_game_loop(UNUSED void *arg) {
         audio_game_loop_tick();
         select_gfx_pool();
 
-        // If any controllers are plugged in, start read the data for when
-        // read_controller_inputs is called later.
-        if (gControllerBits) {
-            block_until_rumble_pak_free();
-
-            osContStartReadDataEx(&gSIEventMesgQueue);
-            osRecvMesg(&gSIEventMesgQueue, &gMainReceivedMesg, OS_MESG_BLOCK);
-            osContGetReadDataEx(gControllerPads);
-
-            release_rumble_pak_control();
-        }
-
-        read_controller_inputs();
+        handle_input(&gMainReceivedMesg);
         profiler_update(PROFILER_TIME_CONTROLLERS, 0);
+
         profiler_collision_reset();
         addr = level_script_execute(addr);
         profiler_collision_completed();

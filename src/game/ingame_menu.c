@@ -627,7 +627,7 @@ void print_credits_string(s16 x, s16 y, const unsigned char *str) {
 }
 
 void handle_menu_scrolling(s8 scrollDirection, s8 *currentIndex, s8 minIndex, s8 maxIndex) {
-    u8 index = 0;
+    u8 index = 0b00;
 
     if (scrollDirection == MENU_SCROLL_VERTICAL) {
         if ((gPlayer1Controller->rawStickY >  60) || (gPlayer1Controller->buttonDown & (U_CBUTTONS | U_JPAD))) {
@@ -1544,22 +1544,12 @@ void change_dialog_camera_angle(void) {
 }
 
 void shade_screen(void) {
-    create_dl_translation_matrix(MENU_MTX_PUSH, GFX_DIMENSIONS_FROM_LEFT_EDGE(0), SCREEN_HEIGHT, 0);
-
-    // This is a bit weird. It reuses the dialog text box (width 130, height -80),
-    // so scale to at least fit the screen.
-#ifdef WIDESCREEN
-    create_dl_scale_matrix(MENU_MTX_NOPUSH,
-                           ((GFX_DIMENSIONS_ASPECT_RATIO * SCREEN_HEIGHT) / 130.0f), 3.0f, 1.0f);
-#else
-    create_dl_scale_matrix(MENU_MTX_NOPUSH, 2.6f, 3.4f, 1.0f);
-#endif
-
     Gfx* dlHead = gDisplayListHead;
 
-    gDPSetEnvColor(dlHead++,   0,   0,   0, 110);
-    gSPDisplayList(dlHead++, dl_draw_text_bg_box);
-    gSPPopMatrix(dlHead++, G_MTX_MODELVIEW);
+    gSPDisplayList(dlHead++, dl_shade_screen_begin);
+    gDPFillRectangle(dlHead++, GFX_DIMENSIONS_RECT_FROM_LEFT_EDGE(0), gBorderHeight,
+        (GFX_DIMENSIONS_RECT_FROM_RIGHT_EDGE(0) - 1), ((SCREEN_HEIGHT - gBorderHeight) - 1));
+    gSPDisplayList(dlHead++, dl_shade_screen_end);
 
     gDisplayListHead = dlHead;
 }

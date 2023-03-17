@@ -19,17 +19,20 @@
 
 /**
  * Enables Rumble Pak Support.
- * Currently not recommended, as it may cause random crashes.
  */
 #define ENABLE_RUMBLE
 
 /**
  * The maximum number of supported players/controllers. 1-4.
  * This will save performance if the player has extra unused controllers plugged in.
- * NOTE: Default is 2, maximum is 4.
- * NOTE: This needs to be at least 2 for now for gamecube controller swap to work.
+ * NOTE: Default is 1, maximum is 4.
  */
-#define MAX_NUM_PLAYERS 2
+#define MAX_NUM_PLAYERS 1
+
+/**
+ * Allows the player to use a button combo (defined in game_input.h) to toggle the ability to plug/unplug controllers and change the controller order.
+ */
+#define ALLOW_STATUS_REPOLLING_COMBO
 
 /**
  * Informs supported emulators to default to gamecube controller inputs.

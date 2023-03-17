@@ -36,7 +36,6 @@ u32 __main__(void) {
     gGdCtrl.newStartPress = FALSE;
     gGdCtrl.prevFrame = &gGdCtrlPrev;
 
-    gd_init_controllers();
     print_all_memtrackers();
 
     start_timer("dlgen");

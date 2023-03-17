@@ -529,6 +529,32 @@ extern const f32 gSineTable[];
     ((u32 *)(mtx))[15] = FLOAT_ONE;             \
 } while (0)
 
+// Float lerp.
+// Return the value between [a, b] based on f's value between [0.0, 1.0].
+ALWAYS_INLINE f32 lerpf(f32 a, f32 b, f32 f) {
+    return (a + (f * (b - a)));
+}
+
+// Precise float lerp.
+// Return the value between [a, b] based on f's value between [0.0, 1.0].
+// Sloer but more precise than the regular float lerp.
+ALWAYS_INLINE f32 lerpf_precise(f32 a, f32 b, f32 f) {
+    return ((a * (1.0f - f)) + (b * f));
+}
+
+// Integer lerp.
+// Return the value between [a, b] based on f's value between [0, 256].
+// Faster than float lerps.
+ALWAYS_INLINE s32 lerpi(s32 a, s32 b, u32 f) {
+    return (((f * (b - a)) >> 8) + a);
+}
+
+// Remaps a number from one range to another.
+// Return the value between [fromB, toB] based on X's value between [fromA, toA].
+// Equivalent to lerp but with a custom range for f.
+ALWAYS_INLINE f32 remap(f32 f, f32 fromA, f32 toA, f32 fromB, f32 toB) {
+    return ((((f - fromA) / (toA - fromA)) * (toB - fromB)) + fromB);
+}
 
 // Inline asm functions:
 
@@ -652,6 +678,9 @@ ALWAYS_INLINE void swl(void* addr, s32 val, const int offset) {
 u16 random_u16(void);
 f32 random_float(void);
 s32 random_sign(void);
+
+f32 get_cycle(f32 cycleLength, f32 cycleOffset, u32 timer);
+
 // Min/Max
 f32  min_3f(    f32 a, f32 b, f32 c);
 s32  min_3i(    s32 a, s32 b, s32 c);
