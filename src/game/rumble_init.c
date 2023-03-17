@@ -1,12 +1,12 @@
 #include <ultra64.h>
 #include "macros.h"
+#include "config.h"
 
 #include "buffers/buffers.h"
 #include "main.h"
 #include "rumble_init.h"
-#include "config.h"
 
-#if ENABLE_RUMBLE
+#ifdef ENABLE_RUMBLE
 
 OSThread gRumblePakThread;
 
@@ -17,36 +17,63 @@ OSMesgQueue gRumblePakSchedulerMesgQueue;
 OSMesg gRumbleThreadVIMesgBuf[1];
 OSMesgQueue gRumbleThreadVIMesgQueue;
 
-struct RumbleData gRumbleDataQueue[3];
+struct RumbleData gRumbleDataQueue[RUMBLE_QUEUE_SIZE];
 struct RumbleSettings gCurrRumbleSettings;
 
-s32 sRumblePakThreadActive = FALSE;
+s32 sRumblePakThreadActive = FALSE; // Set to TRUE when the rumble thread starts.
 s32 sRumblePakActive = FALSE;
 s32 sRumblePakErrorCount = 0;
 s32 gRumblePakTimer = 0;
 
-void init_rumble_pak_scheduler_queue(void) {
-    osCreateMesgQueue(&gRumblePakSchedulerMesgQueue, gRumblePakSchedulerMesgBuf, 1);
-    osSendMesg(&gRumblePakSchedulerMesgQueue, (OSMesg) 0, OS_MESG_NOBLOCK);
-}
-
+/**
+ * @brief Locks controller input data while reading new inputs or another thread is using the current inputs.
+ * This prevents new inputs overwriting the current inputs while they are in use.
+ */
 void block_until_rumble_pak_free(void) {
     OSMesg msg;
     osRecvMesg(&gRumblePakSchedulerMesgQueue, &msg, OS_MESG_BLOCK);
 }
 
+/**
+ * @brief Unlocks controller input data, allowing to read new inputs or another thread to access the most recently
+ * polled inputs.
+ */
 void release_rumble_pak_control(void) {
     osSendMesg(&gRumblePakSchedulerMesgQueue, (OSMesg) 0, OS_MESG_NOBLOCK);
 }
 
-static void start_rumble(void) {
+/**
+ * @brief Check the rumble pak status.
+ * Called by thread6_rumble_loop.
+ */
+static void detect_rumble_pak(void) {
+    if (sRumblePakActive) {
+        // Disable the rumble pak if there were too many failed start/stop attempts without a success.
+        if (sRumblePakErrorCount >= RUMBLE_MAX_ERRORS) {
+            sRumblePakActive = FALSE;
+        }
+    } else if ((gNumVblanks % RUMBLE_PAK_CHECK_TIME) == 0) { // Check the Rumble Pak status about once per second.
+        sRumblePakActive = (osMotorInitEx(&gSIEventMesgQueue, &gRumblePakPfs, gPlayer1Controller->port) == PFS_ERR_SUCCESS);
+        sRumblePakErrorCount = 0;
+    }
+
+}
+
+/**
+ * @brief Turn the Rumble Pak motor on or off. This is called every frame.
+ *
+ * @param[in] motorState MOTOR_STOP = stop motor, MOTOR_START = start motor, MOTOR_STOP_HARD (GCN only) = motor brake.
+ */
+static void set_motor(s32 motorState) {
+    // Check the rumble pak's status and make sure it's initialized.
     if (!sRumblePakActive) {
         return;
     }
 
     block_until_rumble_pak_free();
 
-    if (!osMotorStart(&gRumblePakPfs)) {
+    // Equivalent to osMotorStart or osMotorStop.
+    if (!__osMotorAccessEx(&gRumblePakPfs, motorState)) {
         sRumblePakErrorCount = 0;
     } else {
         sRumblePakErrorCount++;
@@ -55,170 +82,206 @@ static void start_rumble(void) {
     release_rumble_pak_control();
 }
 
-static void stop_rumble(void) {
-    if (!sRumblePakActive) {
-        return;
-    }
-
-    block_until_rumble_pak_free();
-
-    if (!osMotorStop(&gRumblePakPfs)) {
-        sRumblePakErrorCount = 0;
-    } else {
-        sRumblePakErrorCount++;
-    }
-
-    release_rumble_pak_control();
-}
-
+/**
+ * @brief Handle turning the motor on/off based on current rumble settings data.
+ */
 static void update_rumble_pak(void) {
+    // Stop rumble after pressing the reset button.
     if (gResetTimer > 0) {
-        stop_rumble();
+        set_motor(MOTOR_STOP);
         return;
     }
 
-    if (gCurrRumbleSettings.start > 0) {
+    // Before doing anything else, rumble for the duration of RUMBLE_START_TIME.
+    if (gCurrRumbleSettings.start > 0) { // Start phase
         gCurrRumbleSettings.start--;
-        start_rumble();
-    } else if (gCurrRumbleSettings.timer > 0) {
+
+        set_motor(MOTOR_START);
+    } else if (gCurrRumbleSettings.timer > 0) { // Timer phase.
+        // Handle rumbling during the duration of the timer.
         gCurrRumbleSettings.timer--;
 
+        // Reduce 'level' by 'decay' until 0.
         gCurrRumbleSettings.level -= gCurrRumbleSettings.decay;
         if (gCurrRumbleSettings.level < 0) {
             gCurrRumbleSettings.level = 0;
         }
 
-        if (gCurrRumbleSettings.event == 1) {
-            start_rumble();
-        } else if (gCurrRumbleSettings.count >= 0x100) {
-            gCurrRumbleSettings.count -= 0x100;
-            start_rumble();
-        } else {
-            gCurrRumbleSettings.count +=
-                ((gCurrRumbleSettings.level * gCurrRumbleSettings.level * gCurrRumbleSettings.level) / (1 << 9)) + 4;
+        // Rumble event type.
+        if (gCurrRumbleSettings.event == RUMBLE_EVENT_CONSTON) {
+            // Constant rumble for the duration of the timer phase.
+            set_motor(MOTOR_START);
+        } else { // RUMBLE_EVENT_LEVELON
+            // Modulate rumble based on 'count' and 'level'.
+            // Rumble when ((count + (((level^3) / 512) + RUMBLE_START_TIME)) >= 256).
+            if (gCurrRumbleSettings.count >= 0x100) {
+                gCurrRumbleSettings.count -= 0x100;
 
-            stop_rumble();
+                set_motor(MOTOR_START);
+            } else { // count < 256, stop rumbling until count >= 256 again.
+                s16 level = gCurrRumbleSettings.level;
+                gCurrRumbleSettings.count += ((level * level * level) / 0x200) + RUMBLE_START_TIME;
+
+                set_motor(MOTOR_STOP);
+            }
         }
-    } else {
+    } else { // Slip phase.
+        // Reached end of timer.
         gCurrRumbleSettings.timer = 0;
 
-        if (gCurrRumbleSettings.slip >= 5) {
-            start_rumble();
-        } else if ((gCurrRumbleSettings.slip >= 2) && (gNumVblanks % gCurrRumbleSettings.vibrate == 0)) {
-            start_rumble();
-        } else {
-            stop_rumble();
+        if (gCurrRumbleSettings.slip >= 5) { // Rumble until 'slip' gets too low.
+            set_motor(MOTOR_START);
+        } else if ((gCurrRumbleSettings.slip >= 2) && (gNumVblanks % gCurrRumbleSettings.vibrate == 0)) { // Rumble every 'vibrate' frames.
+            set_motor(MOTOR_START);
+        } else { // Rumble fully ended.
+            set_motor(MOTOR_STOP);
         }
     }
 
+    // 'slip' decrements regardless of timer state.
     if (gCurrRumbleSettings.slip > 0) {
         gCurrRumbleSettings.slip--;
     }
+
+    // Update the timer for the rumble that occurs when nearly out of breath.
+    if (gRumblePakTimer > 0) {
+        gRumblePakTimer--;
+    }
 }
 
+/**
+ * @brief Rumble commands are written to the end of the queue, move down through the queue each frame, and trigger when they reach the beginning.
+ */
 static void update_rumble_data_queue(void) {
-    if (gRumbleDataQueue[0].comm) {
+    // If the first queue entry has a command...
+    if (gRumbleDataQueue[0].event != RUMBLE_EVENT_NOMESG) {
         gCurrRumbleSettings.count = 0;
-        gCurrRumbleSettings.start = 4;
-        gCurrRumbleSettings.event = gRumbleDataQueue[0].comm;
-        gCurrRumbleSettings.timer = gRumbleDataQueue[0].time;
+        gCurrRumbleSettings.start = RUMBLE_START_TIME;
+
+        // Copy the first command in the queue to current settings.
+        gCurrRumbleSettings.event = gRumbleDataQueue[0].event;
+        gCurrRumbleSettings.timer = gRumbleDataQueue[0].timer;
         gCurrRumbleSettings.level = gRumbleDataQueue[0].level;
         gCurrRumbleSettings.decay = gRumbleDataQueue[0].decay;
     }
 
-    gRumbleDataQueue[0] = gRumbleDataQueue[1];
-    gRumbleDataQueue[1] = gRumbleDataQueue[2];
+    // Copy each queue entry to the previous one every frame.
+    for (int i = 0; i < (RUMBLE_QUEUE_SIZE - 1); i++) {
+        gRumbleDataQueue[i] = gRumbleDataQueue[i + 1];
+    }
 
-    gRumbleDataQueue[2].comm = 0;
+    // Disable the last command in the queue.
+    gRumbleDataQueue[RUMBLE_QUEUE_SIZE - 1].event = RUMBLE_EVENT_NOMESG;
 }
 
-void queue_rumble_data(s16 time, s16 level) {
+void queue_rumble_data(UNUSED struct Controller *controller, s16 timer, s16 level, s16 decay) {
     if (gCurrDemoInput != NULL) {
         return;
     }
 
-    if (level > 70) {
-        gRumbleDataQueue[2].comm = 1;
-    } else {
-        gRumbleDataQueue[2].comm = 2;
-    }
+    struct RumbleData *queueEnd = &gRumbleDataQueue[RUMBLE_QUEUE_SIZE - 1];
 
-    gRumbleDataQueue[2].level = level;
-    gRumbleDataQueue[2].time = time;
-    gRumbleDataQueue[2].decay = 0;
+    // Write the rumble command.
+    queueEnd->event = (level > 70) ? RUMBLE_EVENT_CONSTON : RUMBLE_EVENT_LEVELON;
+    queueEnd->level = level;
+    queueEnd->timer = timer;
+    queueEnd->decay = decay;
 }
 
-void queue_rumble_decay(s16 decay) {
-    gRumbleDataQueue[2].decay = decay;
-}
-
-u32 is_rumble_finished_and_queue_empty(void) {
-    if (gCurrRumbleSettings.start + gCurrRumbleSettings.timer >= 4) {
+/**
+ * @brief Used after setting gRumblePakTimer to check if any rumble commands are being executed or queued.
+ *
+ * @param[in] controller A pointer to the controller to rumble.
+ * @returns s32 Boolean, whether the controller is done rumbling.
+ */
+u32 is_rumble_finished_and_queue_empty(UNUSED struct Controller *controller) {
+    // Check whether currently rumbling.
+    if (gCurrRumbleSettings.start + gCurrRumbleSettings.timer >= RUMBLE_START_TIME) {
         return FALSE;
     }
 
-    if (gRumbleDataQueue[0].comm != 0) return FALSE;
-    if (gRumbleDataQueue[1].comm != 0) return FALSE;
-    if (gRumbleDataQueue[2].comm != 0) return FALSE;
+    // Check the rumble command queue.
+    for (int i = 0; i < RUMBLE_QUEUE_SIZE; i++) {
+        if (gRumbleDataQueue[i].event != RUMBLE_EVENT_NOMESG) {
+            return FALSE;
+        }
+    }
 
     return TRUE;
 }
 
-void reset_rumble_timers_slip(void) {
-    if (gCurrDemoInput != NULL) {
-        return;
-    }
-
+/**
+ * @brief Resets the 'slip' timer.
+ */
+static void reset_rumble_slip(void) {
     if (gCurrRumbleSettings.slip == 0) {
         gCurrRumbleSettings.slip = 7;
     }
 
-    if (gCurrRumbleSettings.slip < 4) {
-        gCurrRumbleSettings.slip = 4;
+    if (gCurrRumbleSettings.slip < RUMBLE_START_TIME) {
+        gCurrRumbleSettings.slip = RUMBLE_START_TIME;
     }
+}
+
+/**
+ * @brief Resets the 'slip' timer and sets 'vibrate' to 7.
+ *
+ * @param[in] controller A pointer to the controller to rumble.
+ */
+void reset_rumble_timers_slip(UNUSED struct Controller *controller) {
+    if (gCurrDemoInput != NULL) {
+        return;
+    }
+
+    reset_rumble_slip();
 
     gCurrRumbleSettings.vibrate = 7;
 }
 
-void reset_rumble_timers_vibrate(s32 level) {
+/**
+ * @brief Resets the 'slip' timer and sets 'vibrate' based on the arg.
+ *
+ * @param[in] controller A pointer to the controller to rumble.
+ * @param[in] level      Used to modulate rumble when 'event' is RUMBLE_EVENT_LEVELON.
+ */
+void reset_rumble_timers_vibrate(UNUSED struct Controller *controller, s32 level) {
     if (gCurrDemoInput != NULL) {
         return;
     }
 
-    if (gCurrRumbleSettings.slip == 0) {
-        gCurrRumbleSettings.slip = 7;
-    }
+    reset_rumble_slip();
 
-    if (gCurrRumbleSettings.slip < 4) {
-        gCurrRumbleSettings.slip = 4;
-    }
-
-    switch (level) {
-        case 0: gCurrRumbleSettings.vibrate = 5; break;
-        case 1: gCurrRumbleSettings.vibrate = 4; break;
-        case 2: gCurrRumbleSettings.vibrate = 3; break;
-        case 3: gCurrRumbleSettings.vibrate = 2; break;
-        case 4: gCurrRumbleSettings.vibrate = 1; break;
+    if (level < 5) {
+        gCurrRumbleSettings.vibrate = (5 - level);
     }
 }
 
-void queue_rumble_submerged(void) {
+/**
+ * @brief Bypasses the queue by changing the current rumble command directly.
+ * Called by act_breaststroke.
+ *
+ * @param[in] controller A pointer to the controller to rumble.
+ */
+void queue_rumble_submerged(UNUSED struct Controller *controller) {
     if (gCurrDemoInput != NULL) {
         return;
     }
 
-    gCurrRumbleSettings.slip = 4;
-    gCurrRumbleSettings.vibrate = 4;
+    gCurrRumbleSettings.slip    = RUMBLE_START_TIME;
+    gCurrRumbleSettings.vibrate = RUMBLE_START_TIME;
 }
 
+/**
+ * @brief Rumble thread loop.
+ *
+ * @param[in] arg Unused argument.
+ */
 static void thread6_rumble_loop(UNUSED void *arg) {
     OSMesg msg;
 
-	osSyncPrintf("start motor thread\n");
     cancel_rumble();
 
     sRumblePakThreadActive = TRUE;
-	osSyncPrintf("go motor thread\n");
 
     while (TRUE) {
         // Block until VI
@@ -226,55 +289,61 @@ static void thread6_rumble_loop(UNUSED void *arg) {
 
         update_rumble_data_queue();
         update_rumble_pak();
-
-        if (sRumblePakActive) {
-            if (sRumblePakErrorCount >= 30) {
-                sRumblePakActive = FALSE;
-            }
-        } else if ((gNumVblanks % 60) == 0) {
-            sRumblePakActive = (osMotorInitEx(&gSIEventMesgQueue, &gRumblePakPfs, gPlayer1Controller->port) < 1);
-            sRumblePakErrorCount = 0;
-        }
-
-        if (gRumblePakTimer > 0) {
-            gRumblePakTimer--;
-        }
+        detect_rumble_pak();
     }
 }
 
+/**
+ * @brief Reinitialize the Rumble Pak and stops the motor.
+ */
 void cancel_rumble(void) {
-    sRumblePakActive = (osMotorInitEx(&gSIEventMesgQueue, &gRumblePakPfs, gPlayer1Controller->port) < 1);
+    // Check the rumble pak status.
+    sRumblePakActive = (osMotorInitEx(&gSIEventMesgQueue, &gRumblePakPfs, gPlayer1Controller->port) == PFS_ERR_SUCCESS);
 
-    if (sRumblePakActive) {
-        osMotorStop(&gRumblePakPfs);
+    // Stop the rumble pak if it's plugged in.
+    set_motor(MOTOR_STOP);
+
+    // Clear the command queue.
+    for (int i = 0; i < RUMBLE_QUEUE_SIZE; i++) {
+        gRumbleDataQueue[i].event = RUMBLE_EVENT_NOMESG;
     }
 
-    gRumbleDataQueue[0].comm = 0;
-    gRumbleDataQueue[1].comm = 0;
-    gRumbleDataQueue[2].comm = 0;
-
+    // Reset timers.
     gCurrRumbleSettings.timer = 0;
     gCurrRumbleSettings.slip  = 0;
 
     gRumblePakTimer = 0;
 }
 
-void create_rumble_thread(void) {
+/**
+ * @brief Creates the Rumble Pak scheduler message queue and thread.
+ * Called by thread5_game_loop.
+ */
+void create_thread_6_rumble(void) {
+    // Create the Rumble Pak scheduler message queue.
+    osCreateMesgQueue(&gRumblePakSchedulerMesgQueue, gRumblePakSchedulerMesgBuf, 1);
+    osSendMesg(&gRumblePakSchedulerMesgQueue, (OSMesg) 0, OS_MESG_NOBLOCK);
+
+    // Create the rumble thread.
     osCreateMesgQueue(&gRumbleThreadVIMesgQueue, gRumbleThreadVIMesgBuf, 1);
     osCreateThread(&gRumblePakThread, THREAD_6_RUMBLE, thread6_rumble_loop, NULL, (gThread6Stack + THREAD6_STACK), 30);
     osStartThread(&gRumblePakThread);
 }
 
-#define VRTC 0x56525443
-
+/**
+ * @brief Sends a "VRTC" message on gRumbleThreadVIMesgQueue every vblank.
+ * Called by handle_vblank.
+ */
 void rumble_thread_update_vi(void) {
+    union {
+        char asStr[sizeof("VRTC")];
+        OSMesg asMesg;
+    } VRTC = { .asStr = "VRTC" };
+
     if (!sRumblePakThreadActive) {
         return;
     }
 
-    osSendMesg(&gRumbleThreadVIMesgQueue, (OSMesg) VRTC, OS_MESG_NOBLOCK);
+    osSendMesg(&gRumbleThreadVIMesgQueue, VRTC.asMesg, OS_MESG_NOBLOCK);
 }
-
-#undef VRTC
-
 #endif

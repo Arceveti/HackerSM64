@@ -127,8 +127,6 @@ const Texture *const game_over_texture_table[] = {
     title_texture_game_over_3,
 };
 
-UNUSED static const u64 title_screen_bg_unused_0 = 0;
-
 #ifdef GODDARD_EASTER_EGG
 const Gfx title_screen_bg_dl_face_easter_egg_begin[] = {
     gsDPPipeSync(),
@@ -149,7 +147,7 @@ const Gfx title_screen_bg_dl_face_easter_egg_end[] = {
 };
 #endif
 
-#if ENABLE_RUMBLE
+#ifdef ENABLE_RUMBLE
 ALIGNED8 static const Texture title_texture_rumble_pak[] = {
 #include "textures/title_screen_bg/title_screen_bg.06648.rgba16.inc.c"
 };

@@ -609,19 +609,9 @@ void adjust_analog_stick(struct Controller *controller) {
 /**
  * Update the controller struct with available inputs if present.
  */
-void read_controller_inputs(s32 threadID) {
+void read_controller_inputs(void) {
     s32 i;
 
-    // If any controllers are plugged in, update the controller information.
-    if (gControllerBits) {
-        if (threadID == THREAD_5_GAME_LOOP) {
-            osRecvMesg(&gSIEventMesgQueue, &gMainReceivedMesg, OS_MESG_BLOCK);
-        }
-        osContGetReadDataEx(&gControllerPads[0]);
-#if ENABLE_RUMBLE
-        release_rumble_pak_control();
-#endif
-    }
 #if !defined(DISABLE_DEMO) && defined(KEEP_MARIO_HEAD)
     run_demo_inputs();
 #endif
@@ -768,12 +758,9 @@ void setup_game_memory(void) {
  */
 void thread5_game_loop(UNUSED void *arg) {
     setup_game_memory();
-#if ENABLE_RUMBLE
-    init_rumble_pak_scheduler_queue();
-#endif
     init_controllers();
-#if ENABLE_RUMBLE
-    create_rumble_thread();
+#ifdef ENABLE_RUMBLE
+    create_thread_6_rumble();
 #endif
 #ifdef HVQM
     createHvqmThread();
@@ -802,21 +789,27 @@ void thread5_game_loop(UNUSED void *arg) {
             draw_reset_bars();
             continue;
         }
+
 #ifdef PUPPYPRINT_DEBUG
         bzero(&gPuppyCallCounter, sizeof(gPuppyCallCounter));
 #endif
-        // If any controllers are plugged in, start read the data for when
-        // read_controller_inputs is called later.
-        if (gControllerBits) {
-#if ENABLE_RUMBLE
-            block_until_rumble_pak_free();
-#endif
-            osContStartReadDataEx(&gSIEventMesgQueue);
-        }
 
         audio_game_loop_tick();
         select_gfx_pool();
-        read_controller_inputs(THREAD_5_GAME_LOOP);
+
+        // If any controllers are plugged in, start read the data for when
+        // read_controller_inputs is called later.
+        if (gControllerBits) {
+            block_until_rumble_pak_free();
+
+            osContStartReadDataEx(&gSIEventMesgQueue);
+            osRecvMesg(&gSIEventMesgQueue, &gMainReceivedMesg, OS_MESG_BLOCK);
+            osContGetReadDataEx(gControllerPads);
+
+            release_rumble_pak_control();
+        }
+
+        read_controller_inputs();
         profiler_update(PROFILER_TIME_CONTROLLERS, 0);
         profiler_collision_reset();
         addr = level_script_execute(addr);

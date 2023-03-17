@@ -1,22 +1,19 @@
 #include "PR/os_internal.h"
+#include "config.h"
+#include "string.h"
+#include "engine/math_util.h"
 
 /////////////////////////////////////////////////
 // Libultra structs and macros (from ultralib) //
 /////////////////////////////////////////////////
 
-#define ARRLEN(x) ((s32)(sizeof(x) / sizeof(x[0])))
 #define CHNL_ERR(format) (((format).rxsize & CHNL_ERR_MASK) >> 4)
-
-#define CLAMP(x, low, high)  (((x) > (high)) ? (high) : (((x) < (low)) ? (low) : (x)))
-#define S8_MAX __SCHAR_MAX__
-#define S8_MIN (-S8_MAX - 1)
-#define CLAMP_S8( x)        CLAMP((x),  S8_MIN,  S8_MAX)
 
 #define CHNL_ERR_MASK		0xC0	/* Bit 6-7: channel errors */
 
 typedef struct
 {
-    /* 0x0 */ u32 ramarray[15];
+    /* 0x00 */ u32 ramarray[16 - 1];
     /* 0x3C */ u32 pifstatus;
 } OSPifRam;
 
@@ -67,8 +64,6 @@ typedef struct
 
 extern OSPifRam __osContPifRam;
 extern u8 __osMaxControllers;
-
-#define CONT_CMD_READ_BUTTON    1
 
 // Controller accessory addresses
 // https://github.com/joeldipops/TransferBoy/blob/master/docs/TransferPakReference.md
@@ -140,9 +135,10 @@ extern u8 __osMaxControllers;
 #define CONT_CMD_RESET_RX          3
 #define CONT_CMD_GCN_SHORTPOLL_RX  8
 
-#define CONT_CMD_NOP 0xff
-#define CONT_CMD_END 0xfe //indicates end of a command
-#define CONT_CMD_EXE 1    //set pif ram status byte to this to do a command
+#define CONT_CMD_SKIP_CHNL  0x00
+#define CONT_CMD_NOP        0xff
+#define CONT_CMD_END        0xfe //indicates end of a command
+#define CONT_CMD_EXE        1    //set pif ram status byte to this to do a command
 
 void __osSiGetAccess(void);
 void __osSiRelAccess(void);
@@ -249,16 +245,17 @@ void osContGetReadDataEx(OSContPadEx* data) {
             readformat = *(__OSContReadFormat*)ptr;
             data->errno = CHNL_ERR(readformat);
 
-            if (data->errno == 0) {
-                data->stick_x = readformat.stick_x;
-                data->stick_y = readformat.stick_y;
-                data->button = readformat.button;
-                data->c_stick_x = 0;
-                data->c_stick_y = 0;
-                data->l_trig = 0;
-                data->r_trig = 0;
+            if (data->errno != 0) {
+                continue;
             }
 
+            data->stick_x = readformat.stick_x;
+            data->stick_y = readformat.stick_y;
+            data->button = readformat.button;
+            data->c_stick_x = 0;
+            data->c_stick_y = 0;
+            data->l_trig = 0;
+            data->r_trig = 0;
             ptr += sizeof(__OSContReadFormat);
         }
     }
@@ -270,9 +267,7 @@ static void __osPackReadData(void) {
     __OSContGCNShortPollFormat readformatgcn;
     int i;
 
-    for (i = 0; i < ARRLEN(__osContPifRam.ramarray); i++) {
-        __osContPifRam.ramarray[i] = 0;
-    }
+    bzero(__osContPifRam.ramarray, sizeof(__osContPifRam.ramarray));
 
     __osContPifRam.pifstatus = CONT_CMD_EXE;
     readformat.dummy = CONT_CMD_NOP;
@@ -288,7 +283,7 @@ static void __osPackReadData(void) {
     readformatgcn.rxsize = CONT_CMD_GCN_SHORTPOLL_RX;
     readformatgcn.cmd = CONT_CMD_GCN_SHORTPOLL;
     readformatgcn.analog_mode = 3;
-    readformatgcn.rumble = 0;
+    readformatgcn.rumble = MOTOR_STOP;
     readformatgcn.button = 0xFFFF;
     readformatgcn.stick_x = -1;
     readformatgcn.stick_y = -1;
@@ -421,144 +416,189 @@ void __osContGetInitDataEx(u8* pattern, OSContStatus* data) {
 // motor.c //
 /////////////
 
-static OSPifRam __MotorDataBuf[MAXCONTROLLERS];
+ALIGNED64 static OSPifRam __MotorDataBuf[MAXCONTROLLERS];
 
-#define READFORMAT(ptr) ((__OSContRamReadFormat*)(ptr))
+/**
+ * @brief Turns controller rumble on or off.
+ * Modified from vanilla libultra to handle GameCube controller rumble.
+ * Called by osMotorStart, osMotorStop, and osMotorStopHard via macro.
+ *
+ * @param[in] pfs        A pointer to a buffer for the controller pak (AKA rumble pak) file system.
+ * @param[in] motorState MOTOR_STOP = stop motor, MOTOR_START = start motor, MOTOR_STOP_HARD (GCN only) = motor brake.
+ * @returns PIF error status.
+ */
+s32 __osMotorAccessEx(OSPfs* pfs, s32 motorState) {
+    s32 err = PFS_ERR_SUCCESS;
+    int channel = pfs->channel;
+    u8* ptr = (u8*)&__MotorDataBuf[channel];
 
-s32 __osMotorAccessEx(OSPfs* pfs, s32 flag) {
-    int i;
-    s32 ret = 0;
-    u8* ptr = (u8*)&__MotorDataBuf[pfs->channel];
-
+    // Make sure the rumble pak pfs was initialized.
     if (!(pfs->status & PFS_MOTOR_INITIALIZED)) {
-        return 5;
+        return PFS_ERR_INVALID;
     }
 
-    if (__osControllerTypes[pfs->channel] == CONT_TYPE_GCN) {
-        __osGamecubeRumbleEnabled[pfs->channel] = flag;
+    if (__osControllerTypes[channel] == CONT_TYPE_GCN) { // GCN Controllers.
+        __osGamecubeRumbleEnabled[channel] = motorState;
+
+        // Change the last command ID so that input poll command (which includes rumble) gets written again.
         __osContLastCmd = CONT_CMD_END;
-    } else {
+    } else { // N64 Controllers.
+        // N64 rumble pak can only use MOTOR_STOP or MOTOR_START.
+        motorState &= MOTOR_MASK_N64;
+
         __osSiGetAccess();
-        __MotorDataBuf[pfs->channel].pifstatus = CONT_CMD_EXE;
-        ptr += pfs->channel;
 
-        for (i = 0; i < BLOCKSIZE; i++) {
-            READFORMAT(ptr)->data[i] = flag;
-        }
+        // Set the PIF to be ready to run a command.
+        __MotorDataBuf[channel].pifstatus = CONT_CMD_EXE;
+
+        // Leave a PIF_CMD_SKIP_CHNL (0x00) byte in __MotorDataBuf for each skipped channel.
+        ptr += channel;
+
+        __OSContRamReadFormat* readformat = (__OSContRamReadFormat*)ptr;
+
+        // Set the entire block to either MOTOR_STOP or MOTOR_START.
+        memset(readformat->data, motorState, sizeof(readformat->data));
 
         __osContLastCmd = CONT_CMD_END;
-        __osSiRawStartDma(OS_WRITE, &__MotorDataBuf[pfs->channel]);
-        osRecvMesg(pfs->queue, NULL, OS_MESG_BLOCK);
-        __osSiRawStartDma(OS_READ, &__MotorDataBuf[pfs->channel]);
+
+        // Write __MotorDataBuf to the PIF RAM and then wait for the command to execute.
+        __osSiRawStartDma(OS_WRITE, &__MotorDataBuf[channel]);
         osRecvMesg(pfs->queue, NULL, OS_MESG_BLOCK);
 
-        ret = READFORMAT(ptr)->rxsize & CHNL_ERR_MASK;
-        if (!ret) {
-            if (!flag) {
-                if (READFORMAT(ptr)->datacrc != 0) {
-                    ret = PFS_ERR_CONTRFAIL;
+        // Read the resulting __MotorDataBuf from the PIF RAM and then wait for the command to execute.
+        __osSiRawStartDma(OS_READ, &__MotorDataBuf[channel]);
+        osRecvMesg(pfs->queue, NULL, OS_MESG_BLOCK);
+
+        // Check for errors.
+        err = (readformat->rxsize & CHNL_ERR_MASK);
+        if (err == 0) {
+            if (motorState == MOTOR_STOP) {
+                if (readformat->datacrc != 0x00) { // 0xFF = Disconnected.
+                    err = PFS_ERR_CONTRFAIL; // "Controller pack communication error"
                 }
-            } else {
-                if (READFORMAT(ptr)->datacrc != 0xEB) {
-                    ret = PFS_ERR_CONTRFAIL;
+            } else { // MOTOR_START
+                if (readformat->datacrc != 0xEB) { // 0x14 = Uninitialized.
+                    err = PFS_ERR_CONTRFAIL; // "Controller pack communication error"
                 }
             }
         }
+
         __osSiRelAccess();
     }
 
-    return ret;
+    return err;
 }
 
 u8 __osContAddressCrc(u16 addr);
 s32 __osPfsSelectBank(OSPfs *pfs, u8 bank);
 s32 __osContRamRead(OSMesgQueue *mq, int channel, u16 address, u8 *buffer);
 
+/**
+ * @brief Writes PIF commands to control the rumble pak.
+ * Unmodified from vanilla libultra.
+ * Called by osMotorInit and osMotorInitEx.
+ *
+ * @param[in] channel The port ID to operate on.
+ * @param[in] mdata   A pointer to a buffer for the PIF RAM command data.
+ */
 static void _MakeMotorData(int channel, OSPifRam *mdata) {
     u8 *ptr = (u8 *)mdata->ramarray;
     __OSContRamReadFormat ramreadformat;
     int i;
 
-    ramreadformat.dummy = CONT_CMD_NOP;
+    ramreadformat.dummy  = CONT_CMD_NOP;
     ramreadformat.txsize = CONT_CMD_WRITE_PAK_TX;
     ramreadformat.rxsize = CONT_CMD_WRITE_PAK_RX;
-    ramreadformat.cmd = CONT_CMD_WRITE_PAK;
-    ramreadformat.addrh = CONT_BLOCK_RUMBLE >> 3;
-    ramreadformat.addrl = (u8)(__osContAddressCrc(CONT_BLOCK_RUMBLE) | (CONT_BLOCK_RUMBLE << 5));
+    ramreadformat.cmd    = CONT_CMD_WRITE_PAK;
+    ramreadformat.addrh  = (CONT_BLOCK_RUMBLE >> 3);
+    ramreadformat.addrl  = (u8)(__osContAddressCrc(CONT_BLOCK_RUMBLE) | (CONT_BLOCK_RUMBLE << 5));
 
+    // Leave a PIF_CMD_SKIP_CHNL (0x00) byte in mdata->ramarray for each skipped channel.
     if (channel != 0) {
         for (i = 0; i < channel; i++) {
-            *ptr++ = CONT_CMD_REQUEST_STATUS;
+            *ptr++ = CONT_CMD_SKIP_CHNL;
         }
     }
 
-    *READFORMAT(ptr) = ramreadformat;
+    *(__OSContRamReadFormat*)ptr = ramreadformat;
     ptr += sizeof(__OSContRamReadFormat);
-    ptr[0] = CONT_CMD_END;
+    *ptr = CONT_CMD_END;
 }
 
-s32 osMotorInitEx(OSMesgQueue *mq, OSPfs *pfs, int channel)
-{
-    s32 ret;
-    u8 temp[32];
+/**
+ * @brief Initializes the Rumble Pak.
+ * Modified from vanilla libultra to ignore GameCube controllers.
+ * Called by thread6_rumble_loop and cancel_rumble.
+ *
+ * @param[in]  mq      The SI event message queue.
+ * @param[out] pfs     A pointer to a buffer for the controller pak (AKA rumble pak) file system.
+ * @param[in]  channel The port ID to operate on.
+ * @returns    PFS error status.
+ */
+s32 osMotorInitEx(OSMesgQueue *mq, OSPfs *pfs, int channel) {
+    s32 err;
+    u8 data[BLOCKSIZE];
 
-    pfs->queue = mq;
-    pfs->channel = channel;
+    pfs->status     = PFS_STATUS_NONE;
+    pfs->queue      = mq;
+    pfs->channel    = channel;
     pfs->activebank = 0xFF;
-    pfs->status = 0;
 
-    if (__osControllerTypes[pfs->channel] != CONT_TYPE_GCN) {
-        ret = __osPfsSelectBank(pfs, 0xFE);
-
-        if (ret == PFS_ERR_NEW_PACK) {
-            ret = __osPfsSelectBank(pfs, 0x80);
+    if (__osControllerTypes[channel] != CONT_TYPE_GCN) {
+        // Write probe value (ensure Transfer Pak is turned off).
+        err = __osPfsSelectBank(pfs, 0xFE);
+        if (err == PFS_ERR_NEW_PACK) {
+            // Write probe value (Rumble bank).
+            err = __osPfsSelectBank(pfs, 0x80);
+        }
+        if (err != PFS_ERR_SUCCESS) {
+            return err;
         }
 
-        if (ret != 0) {
-            return ret;
+        // Read probe value (1).
+        err = __osContRamRead(mq, channel, CONT_BLOCK_DETECT, data);
+        if (err == PFS_ERR_NEW_PACK) {
+            err = PFS_ERR_CONTRFAIL; // "Controller pack communication error"
+        }
+        if (err != PFS_ERR_SUCCESS) {
+            return err;
         }
 
-        ret = __osContRamRead(mq, channel, CONT_BLOCK_DETECT, temp);
-
-        if (ret == PFS_ERR_NEW_PACK) {
-            ret = PFS_ERR_CONTRFAIL;
+        // Ensure the accessory is not a turned off Transfer Pak.
+        if (data[BLOCKSIZE - 1] == 0xFE) {
+            return PFS_ERR_DEVICE; // Wrong device.
         }
 
-        if (ret != 0) {
-            return ret;
+        // Write probe value (Rumble bank).
+        err = __osPfsSelectBank(pfs, 0x80);
+        if (err == PFS_ERR_NEW_PACK) {
+            err = PFS_ERR_CONTRFAIL; // "Controller pack communication error"
+        }
+        if (err != PFS_ERR_SUCCESS) {
+            return err;
         }
 
-        if (temp[31] == 254) {
-            return PFS_ERR_DEVICE;
+        // Read probe value (2).
+        err = __osContRamRead(mq, channel, CONT_BLOCK_DETECT, data);
+        if (err == PFS_ERR_NEW_PACK) {
+            err = PFS_ERR_CONTRFAIL; // "Controller pack communication error"
+        }
+        if (err != PFS_ERR_SUCCESS) {
+            return err;
         }
 
-        ret = __osPfsSelectBank(pfs, 0x80);
-        if (ret == PFS_ERR_NEW_PACK) {
-            ret = PFS_ERR_CONTRFAIL;
+        // Ensure the accessory is a Rumble Pak.
+        if (data[BLOCKSIZE - 1] != 0x80) {
+            return PFS_ERR_DEVICE; // Wrong device.
         }
 
-        if (ret != 0) {
-            return ret;
-        }
-
-        ret = __osContRamRead(mq, channel, CONT_BLOCK_DETECT, temp);
-        if (ret == PFS_ERR_NEW_PACK) {
-            ret = PFS_ERR_CONTRFAIL;
-        }
-
-        if (ret != 0) {
-            return ret;
-        }
-
-        if (temp[31] != 0x80) {
-            return PFS_ERR_DEVICE;
-        }
-
+        // Write the PIF command.
         if (!(pfs->status & PFS_MOTOR_INITIALIZED)) {
             _MakeMotorData(channel, &__MotorDataBuf[channel]);
         }
     }
 
     pfs->status = PFS_MOTOR_INITIALIZED;
-    return 0;
+
+    return PFS_ERR_SUCCESS;
 }
