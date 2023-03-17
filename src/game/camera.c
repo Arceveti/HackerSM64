@@ -9217,6 +9217,7 @@ void cutscene_enter_painting(struct Camera *c) {
     struct Surface *highFloor;
     Vec3f paintingPos, focus, focusOffset;
     Vec3s paintingAngle;
+    f32 floorHeight, size;
 
     // Zoom in
     set_fov_function(CAM_FOV_APP_20);
@@ -9225,22 +9226,22 @@ void cutscene_enter_painting(struct Camera *c) {
     struct Object *ripplingPainting = gCutsceneFocus;
 
     if (ripplingPainting != NULL) {
-        const struct PaintingImage *paintingImage = ripplingPainting->oPaintingImage;
-
+        vec3f_copy(paintingPos, &ripplingPainting->oPosVec);
         vec3i_to_vec3s(paintingAngle, &ripplingPainting->oFaceAngleVec);
 
-        f32 size = ((paintingImage->sizeX + paintingImage->sizeY) / 2.0f);
-        focusOffset[0] = (size * 0.5f);
-        focusOffset[1] = focusOffset[0];
-        focusOffset[2] = 0;
+        f32 sizeX = ripplingPainting->header.gfx.scale[0];
+        f32 sizeY = ripplingPainting->header.gfx.scale[1];
 
-        vec3f_copy(paintingPos, &ripplingPainting->oPosVec);
+        focusOffset[0] = (sizeX * 0.5f);
+        focusOffset[1] = (sizeY * 0.5f);
+        focusOffset[2] = 0;
 
         offset_rotated(focus, paintingPos, focusOffset, paintingAngle);
         approach_vec3f_asymptotic(c->focus, focus, 0.1f, 0.1f, 0.1f);
-        focusOffset[2] = -(((size * 1000.0f) / 2) / 307.0f);
+        size = ((sizeX + sizeY) / 2.0f);
+        focusOffset[2] = -(((size * 1000.f) / 2) / 307.f);
         offset_rotated(focus, paintingPos, focusOffset, paintingAngle);
-        f32 floorHeight = find_floor(focus[0], focus[1] + 500.0f, focus[2], &highFloor) + MARIO_EYE_HEIGHT;
+        floorHeight = find_floor(focus[0], focus[1] + 500.f, focus[2], &highFloor) + 125.f;
 
         if (focus[1] < floorHeight) {
             focus[1] = floorHeight;
@@ -9275,6 +9276,7 @@ void cutscene_exit_painting_start(struct Camera *c) {
 
     vec3f_set(sCutsceneVars[2].point, 258.0f, -352.0f, 1189.0f);
     vec3f_set(sCutsceneVars[1].point,  65.0f, -155.0f,  444.0f);
+
 #ifdef ENABLE_VANILLA_CAM_PROCESSING
     if (gPrevLevel == LEVEL_TTM) {
         sCutsceneVars[1].point[1] = 0.0f;

@@ -8,25 +8,31 @@
 #include "types.h"
 
 
-/// The default painting edge length. Default is 614.4f.
-#define PAINTING_SIZE 614.4f
+// The size of the stored painting mesh model, before it is created and scaled down to 1x1.
+// Vanilla is 614.4f, changed to 600.0f in HackerSM64 to prevent rounding issues.
+// Changing this affects the painting's lighting. The larger the difference between this and
+// the final size of the painting, the greater the difference in lighting.
+#define PAINTING_SIZE 600.0f
 
-/// The depth of the area in front of the painting which triggers ripples without warping. Default is 102.4f.
+// The threshold of scale at which to use a larger ripple animation in sRippleAnimations. Default is 1200.0f.
+#define PAINTING_SCALE_LARGE_RIPPLE_THRESHOLD 1200.0f
+
+// The depth of the area in front of the painting which triggers ripples without warping. Default is 102.4f.
 #define PAINTING_WOBBLE_DEPTH 102.4f
 
-/// The depth of the area behind the painting which triggers the warp. Default is 409.6f.
+// The depth of the area behind the painting which triggers the warp. Default is 409.6f.
 #define PAINTING_WARP_DEPTH 409.6f
 
-/// The threshold relative to the painting's plane between wobbling and warping. Default is -30.72f.
+// The threshold relative to the painting's plane between wobbling and warping. Default is -30.72f.
 #define PAINTING_WOBBLE_WARP_THRESHOLD -30.72f
 
-/// The size of the buffer around the edges of the painting in which Mario is still considered within bounds.
+// The size of the buffer around the edges of the painting in which Mario is still considered within bounds.
 #define PAINTING_EDGE_MARGIN 160.0f
 
-/// This is added to Mario's Y position to make the ripple closer to Mario's center of mass. Default is 50.0f
+// This is added to Mario's Y position to make the ripple closer to Mario's center of mass. Default is 50.0f
 #define PAINTING_MARIO_Y_OFFSET 50.0f
 
-/// Convert image coordinates to texel coordinates.
+// Convert image coordinates to texel coordinates.
 #define TC(t) (((t) - 1) << 5)
 
 
@@ -59,12 +65,14 @@ enum PaintingRippleAnimations {
     RIPPLE_ANIM_PROXIMITY_LARGE,
 };
 
-// Painting->textureType
+// Painting->imageType
 enum PaintingType {
-    /// Painting that uses 1 or more images as a texture
-    PAINTING_TYPE_IMAGE,
-    /// Painting that has one texture used for an environment map effect
-    PAINTING_TYPE_ENV_MAP
+    /// Painting that is invisible.
+    PAINTING_IMAGE_TYPE_INVISIBLE,
+    /// Painting that uses 1 or more textures as a texture.
+    PAINTING_IMAGE_TYPE_TEXTURE,
+    /// Painting that has one texture used for an environment map effect.
+    PAINTING_IMAGE_TYPE_ENV_MAP
 };
 
 // Painting->rippleTrigger
@@ -108,27 +116,27 @@ struct PaintingImage {
     /*0x00*/ const Texture *const *textureArray;
 
     /// How many textures the painting uses.
-    /*0x04*/ s32 imageCount;
+    /*0x04*/ const s32 imageCount;
 
     /// Texture size.
-    /*0x08*/ s16 textureWidth;
-    /*0x0A*/ s16 textureHeight;
+    /*0x08*/ const s16 textureWidth;
+    /*0x0A*/ const s16 textureHeight;
 
-    /// Either PAINTING_TYPE_IMAGE or PAINTING_TYPE_ENV_MAP.
-    /*0x0C*/ s8 textureType;
+    /// Controls how the painting image is displayed. PAINTING_IMAGE_TYPE_INVISIBLE, PAINTING_IMAGE_TYPE_TEXTURE, or PAINTING_IMAGE_TYPE_ENV_MAP.
+    /*0x0C*/ const s8 imageType;
 
-    /// Controls when a passive ripple starts. RIPPLE_TRIGGER_NONE, RIPPLE_TRIGGER_CONTINUOUS or RIPPLE_TRIGGER_PROXIMITY.
-    /*0x0D*/ s8 rippleTrigger;
+    /// Controls when a passive ripple starts. RIPPLE_TRIGGER_NONE, RIPPLE_TRIGGER_CONTINUOUS, or RIPPLE_TRIGGER_PROXIMITY.
+    /*0x0D*/ const s8 rippleTrigger;
 
     /// Whether the painting uses shading when not rippling. Only used for Snowman's Land in vanilla and makes the transition to/from rippling not seamless.
-    /*0x0E*/ s8 shaded;
+    /*0x0E*/ const s8 shaded;
 
     /// The painting's transparency (0..255). Determines the drawing layer of the painting.
-    /*0x0F*/ Alpha alpha;
+    /*0x0F*/ const Alpha alpha;
 
     /// By default a painting is 614.0f x 614.0f (PAINTING_SIZE).
-    /*0x10*/ f32 sizeX;
-    /*0x14*/ f32 sizeY;
+    /*0x10*/ const f32 sizeX;
+    /*0x14*/ const f32 sizeY;
 }; /*0x18*/
 
 /**
