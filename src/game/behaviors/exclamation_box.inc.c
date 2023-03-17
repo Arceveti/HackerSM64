@@ -115,7 +115,6 @@ void exclamation_box_act_scaling(void) {
 }
 
 void exclamation_box_spawn_contents(struct ExclamationBoxContents *contentsList, u8 boxType) {
-    struct ExclamationBoxContents *contents = &contentsList[boxType];
     struct Object *contentsObj = NULL;
 
     if (boxType < ARRAY_COUNT(sExclamationBoxContents)) {
