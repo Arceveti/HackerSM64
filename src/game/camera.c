@@ -10619,8 +10619,7 @@ Gfx *geo_camera_fov(s32 callContext, struct GraphNode *g, UNUSED void *context) 
                 approach_fov(60.0f, 1.0f);
                 break;
             default:
-                set_fov_45(marioState);
-                set_fov_45(45.
+                set_fov(45.0f);
                 break;
         }
     }
