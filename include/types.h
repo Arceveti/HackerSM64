@@ -302,10 +302,13 @@ struct Object {
         // Object fields. See object_fields.h.
         u32 asU32[MAX_OBJECT_FIELDS];
         s32 asS32[MAX_OBJECT_FIELDS];
-        s16 asU16[MAX_OBJECT_FIELDS][2];
+        u16 asU16[MAX_OBJECT_FIELDS][2];
         s16 asS16[MAX_OBJECT_FIELDS][2];
+        u8 asU8[MAX_OBJECT_FIELDS][4];
+        s8 asS8[MAX_OBJECT_FIELDS][4];
         f32 asF32[MAX_OBJECT_FIELDS];
 #if !IS_64_BIT
+        s8 *asS8P[MAX_OBJECT_FIELDS];
         s16 *asS16P[MAX_OBJECT_FIELDS];
         s32 *asS32P[MAX_OBJECT_FIELDS];
         f32 *asF32P[MAX_OBJECT_FIELDS];
@@ -320,6 +323,7 @@ struct Object {
     } rawData;
 #if IS_64_BIT
     union {
+        s8 *asS8P[MAX_OBJECT_FIELDS];
         s16 *asS16P[MAX_OBJECT_FIELDS];
         s32 *asS32P[MAX_OBJECT_FIELDS];
         f32 *asF32P[MAX_OBJECT_FIELDS];

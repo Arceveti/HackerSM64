@@ -116,10 +116,6 @@
 #define BREAK() \
     BC_B(BHV_CMD_BREAK)
 
-// Exits the behavior script, unused.
-#define BREAK_UNUSED() \
-    BC_B(BHV_CMD_BREAK_UNUSED)
-
 // Executes a native game function.
 #define CALL_NATIVE(func) \
     BC_B(BHV_CMD_CALL_NATIVE), \
@@ -150,12 +146,6 @@
 #define BIT_CLEAR(field, value) \
     BC_BBH(BHV_CMD_BIT_CLEAR, field, value)
 
-// TODO: this one needs a better name / labelling
-// Gets a random short, right shifts it the specified amount and adds min to it, then sets the specified field to that value.
-#define SET_INT_RAND_RSHIFT(field, min, rshift) \
-    BC_BBH(BHV_CMD_SET_INT_RAND_RSHIFT, field, min), \
-    BC_H(rshift)
-
 // Sets the specified field to a random float in the given range.
 #define SET_RANDOM_FLOAT(field, min, range) \
     BC_BBH(BHV_CMD_SET_RANDOM_FLOAT, field, min), \
@@ -170,12 +160,6 @@
 #define ADD_RANDOM_FLOAT(field, min, range) \
     BC_BBH(BHV_CMD_ADD_RANDOM_FLOAT, field, min), \
     BC_H(range)
-
-// TODO: better name (unused anyway)
-// Gets a random short, right shifts it the specified amount and adds min to it, then adds the value to the specified field. Unused.
-#define ADD_INT_RAND_RSHIFT(field, min, rshift) \
-    BC_BBH(BHV_CMD_ADD_INT_RAND_RSHIFT, field, min), \
-    BC_H(rshift)
 
 // Adds an integer to the specified field.
 #define ADD_INT(field, value) \
@@ -192,6 +176,9 @@
 #define OR_INT(field, value) \
     BC_BB(BHV_CMD_OR_INT, field), \
     BC_W(value)
+
+// Backwards compatibility:
+#define OR_LONG(field, value) OR_INT(field, value)
 
 // Sets the current model ID of the object.
 #define SET_MODEL(modelID) \
@@ -233,18 +220,9 @@
     BC_B(BHV_CMD_SET_HITBOX), \
     BC_HH(radius, height)
 
-// No operation. Unused.
-#define CMD_NOP_4(field, value) \
-    BC_BBH(BHV_CMD_NOP_4, field, value)
-
 // Delays the behavior script for the number of frames given by the value of the specified field.
 #define DELAY_VAR(field) \
     BC_BB(BHV_CMD_DELAY_VAR, field)
-
-// Unused. Marks the start of a loop that will repeat a certain number of times.
-// Uses a u8 as the argument, instead of a s16 like the other version does.
-#define BEGIN_REPEAT_UNUSED(count) \
-    BC_BB(BHV_CMD_BEGIN_REPEAT_UNUSED, count)
 
 // Loads the animations for the object. <field> is always set to oAnimations.
 #define LOAD_ANIMATIONS(field, anims) \
@@ -323,16 +301,10 @@
 #define DISABLE_RENDERING() \
     BC_B(BHV_CMD_DISABLE_RENDERING)
 
-// Unused. Sets the specified field to an integer. Wastes 4 bytes of space for no reason at all.
-#define SET_INT_UNUSED(field, value) \
-    BC_BB(BHV_CMD_SET_INT_UNUSED, field), \
-    BC_HH(0, value)
-
 // Spawns a water droplet with the given parameters.
 #define SPAWN_WATER_DROPLET(dropletParams) \
     BC_B(BHV_CMD_SPAWN_WATER_DROPLET), \
     BC_PTR(dropletParams)
-
 
 const BehaviorScript bhvStarDoor[] = {
     BEGIN(OBJ_LIST_SURFACE),
@@ -3630,6 +3602,13 @@ const BehaviorScript bhvBobombFuseSmoke[] = {
     END_LOOP(),
 };
 
+const BehaviorScript bhvBobombBuddyOpensCannon[] = {
+    BEGIN(OBJ_LIST_GENACTOR),
+    OR_INT(oFlags, (OBJ_FLAG_PERSISTENT_RESPAWN | OBJ_FLAG_COMPUTE_ANGLE_TO_MARIO | OBJ_FLAG_HOLDABLE | OBJ_FLAG_COMPUTE_DIST_TO_MARIO | OBJ_FLAG_SET_FACE_YAW_TO_MOVE_YAW | OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE)),
+    SET_INT(oBobombBuddyRole, 1),
+    GOTO(bhvBobombBuddy + 1 + 2 + 2),
+};
+
 const BehaviorScript bhvBobombBuddy[] = {
     BEGIN(OBJ_LIST_GENACTOR),
     OR_INT(oFlags, (OBJ_FLAG_COMPUTE_ANGLE_TO_MARIO | OBJ_FLAG_HOLDABLE | OBJ_FLAG_COMPUTE_DIST_TO_MARIO | OBJ_FLAG_SET_FACE_YAW_TO_MOVE_YAW | OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE)),
@@ -3646,13 +3625,6 @@ const BehaviorScript bhvBobombBuddy[] = {
         SET_INT(oIntangibleTimer, 0),
         CALL_NATIVE(bhv_bobomb_buddy_loop),
     END_LOOP(),
-};
-
-const BehaviorScript bhvBobombBuddyOpensCannon[] = {
-    BEGIN(OBJ_LIST_GENACTOR),
-    OR_INT(oFlags, (OBJ_FLAG_PERSISTENT_RESPAWN | OBJ_FLAG_COMPUTE_ANGLE_TO_MARIO | OBJ_FLAG_HOLDABLE | OBJ_FLAG_COMPUTE_DIST_TO_MARIO | OBJ_FLAG_SET_FACE_YAW_TO_MOVE_YAW | OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE)),
-    SET_INT(oBobombBuddyRole, 1),
-    GOTO(bhvBobombBuddy + 1 + 2 + 2),
 };
 
 const BehaviorScript bhvCannonClosed[] = {
@@ -3790,7 +3762,6 @@ const BehaviorScript bhvObjectBubble[] = {
     SET_INT(oAnimState, OBJ_ANIM_STATE_INIT_ANIM),
     CALL_NATIVE(bhv_object_bubble_init),
     SET_RANDOM_FLOAT(oVelY, /*Minimum*/ 3, /*Range*/ 6),
-    // SET_INT_RAND_RSHIFT(oMoveAngleYaw, /*Minimum*/ 0, /*Right shift*/ 0),
     DELAY(1),
     BEGIN_LOOP(),
         CALL_NATIVE(bhv_object_bubble_loop),
