@@ -1182,7 +1182,7 @@ void play_crash_sound(struct CrashScreen *crashScreen, s32 sound) {
 }
 #endif
 
-extern void read_controller_inputs(s32 threadID);
+extern void read_controller_inputs(void);
 
 #ifdef CRASH_SCREEN_CRASH_SCREEN
 void thread20_crash_screen_crash_screen(UNUSED void *arg) {
@@ -1225,8 +1225,8 @@ void thread2_crash_screen(UNUSED void *arg) {
     OSMesg mesg;
     OSThread *thread = NULL;
 
-    osSetEventMesg(OS_EVENT_CPU_BREAK, &gCrashScreen.mesgQueue, (OSMesg)CRASH_SCREEN_MSG_CPU_BREAK);
-    osSetEventMesg(OS_EVENT_FAULT,     &gCrashScreen.mesgQueue, (OSMesg)CRASH_SCREEN_MSG_FAULT);
+    osSetEventMesg(OS_EVENT_CPU_BREAK, &gCrashScreen.mesgQueue, (OSMesg) CRASH_SCREEN_MSG_CPU_BREAK);
+    osSetEventMesg(OS_EVENT_FAULT,     &gCrashScreen.mesgQueue, (OSMesg) CRASH_SCREEN_MSG_FAULT);
 
     while (TRUE) {
         if (thread == NULL) {
@@ -1263,12 +1263,15 @@ void thread2_crash_screen(UNUSED void *arg) {
             }
         } else {
             if (gControllerBits) {
-#if ENABLE_RUMBLE
                 block_until_rumble_pak_free();
-#endif
+
                 osContStartReadDataEx(&gSIEventMesgQueue);
+                osRecvMesg(&gSIEventMesgQueue, &mesg, OS_MESG_BLOCK);
+                osContGetReadData(gControllerPads);
+
+                release_rumble_pak_control();
             }
-            read_controller_inputs(THREAD_2_CRASH_SCREEN);
+            read_controller_inputs();
             update_crash_screen_input();
             draw_crash_screen(thread);
             sCrashScreenSwitchedPage = FALSE;
