@@ -611,7 +611,7 @@ void draw_disasm_branch_arrow(s32 startLine, s32 endLine, s32 dist, RGBA32 color
         s32 height = abss(arrowEndHeight - arrowStartHeight);
 
         // Middle of arrow
-        crash_screen_draw_rect((DISASM_BRANCH_ARROW_START_X + dist), min(arrowStartHeight, arrowEndHeight), 1, height, color);
+        crash_screen_draw_rect((DISASM_BRANCH_ARROW_START_X + dist), MIN(arrowStartHeight, arrowEndHeight), 1, height, color);
     }
 }
 

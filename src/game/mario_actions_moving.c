@@ -448,7 +448,7 @@ void update_walking_speed(struct MarioState *m) {
         maxTargetSpeed = 32.0f;
     }
 
-    targetSpeed = min(m->intendedMag, maxTargetSpeed);
+    targetSpeed = MIN(m->intendedMag, maxTargetSpeed);
 
     if (m->quicksandDepth > 10.0f) {
         targetSpeed *= 6.25f / m->quicksandDepth;
@@ -474,7 +474,7 @@ void update_walking_speed(struct MarioState *m) {
             s16 turnRange = abs_angle_diff(m->faceAngle[1], m->intendedYaw);
             f32 fac = (m->forwardVel + m->intendedMag);
             turnRange *= (1.0f - (CLAMP(fac, 0.0f, 32.0f) / 32.0f));
-            turnRange = max(turnRange, 0x800);
+            turnRange = MAX(turnRange, 0x800);
 
             approach_angle_bool(&m->faceAngle[1], m->intendedYaw, turnRange);
         } else {
@@ -540,7 +540,7 @@ void anim_and_audio_for_walk(struct MarioState *m) {
     s32 inLoop = TRUE;
     s16 targetPitch = 0;
 
-    f32 intendedSpeed = max(m->intendedMag, m->forwardVel);
+    f32 intendedSpeed = MAX(m->intendedMag, m->forwardVel);
 
     if (intendedSpeed < 4.0f) {
         intendedSpeed = 4.0f;
@@ -629,7 +629,7 @@ void anim_and_audio_for_hold_walk(struct MarioState *m) {
     s32 animSpeed;
     s32 inLoop = TRUE;
 
-    f32 intendedSpeed = max(m->intendedMag, m->forwardVel);
+    f32 intendedSpeed = MAX(m->intendedMag, m->forwardVel);
 
     if (intendedSpeed < 2.0f) {
         intendedSpeed = 2.0f;

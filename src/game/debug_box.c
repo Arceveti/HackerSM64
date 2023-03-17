@@ -290,7 +290,7 @@ void visual_surface_display(Vtx *verts, s32 iteration) {
 
     while (vts > 0) {
         if (count == VERTCOUNT) {
-            ntx = min(VERTCOUNT, vts);
+            ntx = MIN(VERTCOUNT, vts);
             gSPVertex(dlHead++, VIRTUAL_TO_PHYSICAL(verts + (gVisualSurfaceCount - vts)), ntx, 0);
             count = 0;
             vtl = VERTCOUNT;

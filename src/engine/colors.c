@@ -169,12 +169,12 @@ void colorRGB_add_hue(ColorRGB color, Color hueAdd, Color s) {
     f32 hue = 0.0f;
     if ((color[0] < color[1]) || (color[0] < color[2])) {
         if (color[1] < color[2]) {
-            hue = (4.0f + (color[0] - color[1]) / (f32)(color[2] - min(color[0], color[1]))); // blue
+            hue = (4.0f + (color[0] - color[1]) / (f32)(color[2] - MIN(color[0], color[1]))); // blue
         } else {
-            hue = (2.0f + (color[2] - color[0]) / (f32)(color[1] - min(color[0], color[2]))); // green
+            hue = (2.0f + (color[2] - color[0]) / (f32)(color[1] - MIN(color[0], color[2]))); // green
         }
     } else {
-        hue = (0.0f + (color[1] - color[2]) / (f32)(color[0] - min(color[1], color[2]))); // red
+        hue = (0.0f + (color[1] - color[2]) / (f32)(color[0] - MIN(color[1], color[2]))); // red
     }
     if (hue < 0.0f) hue += 6.0f;
     // this is the algorithm to convert from RGB to HSV:

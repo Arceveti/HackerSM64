@@ -986,7 +986,7 @@ void init_reverb_eu(void) {
     gNumSynthesisReverbs = preset->numReverbs;
     for (j = 0; j < gNumSynthesisReverbs; j++) {
         reverb = &gSynthesisReverbs[j];
-        reverbSettings = &sReverbSettings[min((u32)(gAudioResetPresetIdToLoad + j), ((sizeof(sReverbSettings) / sizeof(struct ReverbSettingsEU)) - 1))];
+        reverbSettings = &sReverbSettings[MIN((u32)(gAudioResetPresetIdToLoad + j), ((sizeof(sReverbSettings) / sizeof(struct ReverbSettingsEU)) - 1))];
         reverb->windowSize = (reverbSettings->windowSize * 0x40);
         reverb->downsampleRate = reverbSettings->downsampleRate;
         reverb->reverbGain = reverbSettings->gain;

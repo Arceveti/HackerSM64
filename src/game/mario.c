@@ -365,8 +365,8 @@ void play_mario_sound(struct MarioState *m, s32 actionSound, s32 marioSound) {
  * Gets the number of subframe steps (quarter steps) for Mario's movement.
  */
 s32 get_num_steps(struct MarioState *m, s32 numSteps) {
-    s32 steps = (max(m->moveSpeed, m->intendedMag) / (f32)numSteps);
-    return max(steps, numSteps);
+    s32 steps = (MAX(m->moveSpeed, m->intendedMag) / (f32)numSteps);
+    return MAX(steps, numSteps);
 }
 #endif
 
@@ -894,7 +894,7 @@ u32 set_mario_action_airborne(struct MarioState *m, u32 action, u32 actionArg) {
 u32 set_mario_action_moving(struct MarioState *m, u32 action, UNUSED u32 actionArg) {
     s16 floorClass = mario_get_floor_class(m);
     f32 forwardVel = m->forwardVel;
-    f32 mag = min(m->intendedMag, 8.0f);
+    f32 mag = MIN(m->intendedMag, 8.0f);
 
     switch (action) {
         case ACT_WALKING:

@@ -895,7 +895,7 @@ void puppycam_terrain_angle(void) {
         adjustSpeed = 0.25f;
         farFromSurface = TRUE;
     } else {
-        adjustSpeed = CLAMP(max((gMarioState->forwardVel / 400.0f), (gPuppyCam.yawAcceleration / 100.0f)), 0.05f, 1.0f);
+        adjustSpeed = CLAMP(MAX((gMarioState->forwardVel / 400.0f), (gPuppyCam.yawAcceleration / 100.0f)), 0.05f, 1.0f);
 
         f32 x = gPuppyCam.targetObj->oPosX - (10 * sins(gPuppyCam.yaw));
         f32 z = gPuppyCam.targetObj->oPosZ - (10 * coss(gPuppyCam.yaw));
@@ -1066,7 +1066,7 @@ void puppycam_projection_behaviours(void) {
             gPuppyCam.zoom = approach_f32_asymptotic(gPuppyCam.zoom, gPuppyCam.zoomPoints[0], 0.01f);
         } else if ((gMarioState->action & ACT_FLAG_SWIMMING_OR_FLYING && gMarioState->waterLevel - 100 - gMarioState->pos[1] > 5) || gMarioState->action == ACT_FLYING) {
             // When moving underwater or flying, the camera will zoom in on Mayro.
-            gPuppyCam.zoom = approach_f32_asymptotic(gPuppyCam.zoom, max((gPuppyCam.zoomTarget / 1.5f), gPuppyCam.zoomPoints[0]), 0.2f);
+            gPuppyCam.zoom = approach_f32_asymptotic(gPuppyCam.zoom, MAX((gPuppyCam.zoomTarget / 1.5f), gPuppyCam.zoomPoints[0]), 0.2f);
         } else {
             gPuppyCam.zoom = approach_f32_asymptotic(gPuppyCam.zoom, gPuppyCam.zoomTarget, 0.2f);
         }
@@ -1302,9 +1302,9 @@ static void puppycam_collision(void) {
     gPuppyCam.collisionDistance = gPuppyCam.zoomTarget;
 
     if (surf[0] && surf[1]) {
-        gPuppyCam.collisionDistance = sqrtf(max(dist[0], dist[1]));
+        gPuppyCam.collisionDistance = sqrtf(MAX(dist[0], dist[1]));
         if (gPuppyCam.zoom > gPuppyCam.collisionDistance) {
-            gPuppyCam.zoom = min(gPuppyCam.collisionDistance, gPuppyCam.zoomTarget);
+            gPuppyCam.zoom = MIN(gPuppyCam.collisionDistance, gPuppyCam.zoomTarget);
             if (gPuppyCam.zoom - gPuppyCam.zoomTarget < 5) {
                 if (dist[0] >= dist[1]) {
                     vec3_copy(gPuppyCam.pos, hitpos[0]);
