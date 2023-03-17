@@ -95,38 +95,50 @@ void bhv_door_loop(void) {
 }
 
 void bhv_door_init(void) {
+    const f32 checkDist = 200.0f;
+
     f32 x = o->oPosX;
     f32 y = o->oPosY;
     f32 z = o->oPosZ;
 
     o->oDoorSelfRoom = get_room_at_pos(x, y, z);
 
-    x = o->oPosX + sins(o->oMoveAngleYaw) *  200.0f;
-    z = o->oPosZ + coss(o->oMoveAngleYaw) *  200.0f;
+    x = o->oPosX + (sins(o->oMoveAngleYaw) *  checkDist);
+    z = o->oPosZ + (coss(o->oMoveAngleYaw) *  checkDist);
 
     o->oDoorForwardRoom = get_room_at_pos(x, y, z);
 
-    x = o->oPosX + sins(o->oMoveAngleYaw) * -200.0f;
-    z = o->oPosZ + coss(o->oMoveAngleYaw) * -200.0f;
+    x = o->oPosX + (sins(o->oMoveAngleYaw) * -checkDist);
+    z = o->oPosZ + (coss(o->oMoveAngleYaw) * -checkDist);
 
     o->oDoorBackwardRoom = get_room_at_pos(x, y, z);
 
-    if (o->oDoorSelfRoom > 0 && o->oDoorSelfRoom < 60) {
-        gDoorAdjacentRooms[o->oDoorSelfRoom][0] = o->oDoorForwardRoom;
-        gDoorAdjacentRooms[o->oDoorSelfRoom][1] = o->oDoorBackwardRoom;
+    if (
+        // Ensure the room number is in bounds.
+        o->oDoorSelfRoom > 0 && o->oDoorSelfRoom < ARRAY_COUNT(gDoorAdjacentRooms)
+        // Only set gDoorAdjacentRooms for transition rooms.
+        && o->oDoorSelfRoom    != o->oDoorForwardRoom
+        && o->oDoorSelfRoom    != o->oDoorBackwardRoom
+        && o->oDoorForwardRoom != o->oDoorBackwardRoom
+    ) {
+        gDoorAdjacentRooms[o->oDoorSelfRoom].forwardRoom  = o->oDoorForwardRoom;
+        gDoorAdjacentRooms[o->oDoorSelfRoom].backwardRoom = o->oDoorBackwardRoom;
     }
 }
 
 void bhv_door_rendering_loop(void) {
+    struct TransitionRoomData* transitionRoom = &gDoorAdjacentRooms[gMarioCurrentRoom];
+
     o->oDoorIsRendering = (
-        gMarioCurrentRoom == 0
-        || gMarioCurrentRoom == o->oDoorSelfRoom
-        || gMarioCurrentRoom == o->oDoorForwardRoom
-        || gMarioCurrentRoom == o->oDoorBackwardRoom
-        || gDoorAdjacentRooms[gMarioCurrentRoom][0] == o->oDoorForwardRoom
-        || gDoorAdjacentRooms[gMarioCurrentRoom][0] == o->oDoorBackwardRoom
-        || gDoorAdjacentRooms[gMarioCurrentRoom][1] == o->oDoorForwardRoom
-        || gDoorAdjacentRooms[gMarioCurrentRoom][1] == o->oDoorBackwardRoom
+        gMarioCurrentRoom            == 0                    || // Mario is in the "global" room.
+        gMarioCurrentRoom            == o->oDoorSelfRoom     || // Mario is in the same room as the door.
+        gMarioCurrentRoom            == o->oDoorForwardRoom  || // Mario is in the door's  forward room.
+        gMarioCurrentRoom            == o->oDoorBackwardRoom || // Mario is in the door's backward room.
+        transitionRoom->forwardRoom  == o->oDoorForwardRoom  || // The transition room's  forward room is in the same room as this door's  forward room.
+        transitionRoom->forwardRoom  == o->oDoorBackwardRoom || // The transition room's  forward room is in the same room as this door's backward room.
+        transitionRoom->backwardRoom == o->oDoorForwardRoom  || // The transition room's backward room is in the same room as this door's  forward room.
+        transitionRoom->backwardRoom == o->oDoorBackwardRoom    // The transition room's backward room is in the same room as this door's backward room.
     );
+
     o->header.gfx.node.flags = COND_BIT(o->header.gfx.node.flags, GRAPH_RENDER_ACTIVE, o->oDoorIsRendering);
 }
