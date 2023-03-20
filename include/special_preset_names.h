@@ -44,7 +44,7 @@ enum SpecialPresets {
     special_wf_tumbling_bridge,
     special_large_bomp,
 
-    special_level_geo_03 = 0x65,
+    special_level_geo_03,
     special_level_geo_04,
     special_level_geo_05,
     special_level_geo_06,
@@ -64,28 +64,32 @@ enum SpecialPresets {
     special_level_geo_14,
     special_level_geo_15,
     special_level_geo_16,
+
     special_bubble_tree,
     special_spiky_tree,
     special_snow_tree,
     special_unknown_tree,
     special_palm_tree,
+    
+    special_castle_door,
     special_wooden_door,
     special_haunted_door = special_wooden_door,
     special_unknown_door,
     special_metal_door,
     special_hmc_door,
     special_unknown2_door,
+
+    special_0stars_door,
+    special_1star_door,
+    special_3star_door,
+    special_key_door,
+
+    special_castle_door_warp,
     special_wooden_door_warp,
     special_unknown1_door_warp,
     special_metal_door_warp,
     special_unknown2_door_warp,
     special_unknown3_door_warp,
-    special_castle_door_warp,
-    special_castle_door,
-    special_0stars_door,
-    special_1star_door,
-    special_3star_door,
-    special_key_door,
 
     special_null_end = 0xFF
 };

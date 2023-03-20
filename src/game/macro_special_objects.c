@@ -131,7 +131,6 @@ void spawn_macro_objects(s32 areaIndex, MacroObject *macroObjList) {
 
 void spawn_special_objects(s32 areaIndex, TerrainData **specialObjList) {
     s32 i;
-    s32 offset;
     Vec3s pos;
     TerrainData extraParams[4];
     ModelID16 model;
@@ -151,15 +150,12 @@ void spawn_special_objects(s32 areaIndex, TerrainData **specialObjList) {
         pos[1]   = *(*specialObjList)++;
         pos[2]   = *(*specialObjList)++;
 
-        offset = 0;
-        while (SpecialObjectPresets[offset].preset_id != presetID) {
-            offset++;
-        }
+        struct SpecialPreset *preset = &SpecialObjectPresets[presetID];
 
-        model        = SpecialObjectPresets[offset].model;
-        behavior     = SpecialObjectPresets[offset].behavior;
-        type         = SpecialObjectPresets[offset].type;
-        defaultParam = SpecialObjectPresets[offset].defParam;
+        model        = preset->model;
+        behavior     = preset->behavior;
+        type         = preset->type;
+        defaultParam = preset->defParam;
 
         switch (type) {
             case SPTYPE_NO_YROT_OR_PARAMS:
@@ -195,20 +191,16 @@ u32 get_special_objects_size(MacroObject *data) {
     MacroObject *startPos = data;
     s32 i;
     u8 presetID;
-    s32 offset;
 
     s32 numOfSpecialObjects = *data++;
 
     for (i = 0; i < numOfSpecialObjects; i++) {
         presetID = (u8) *data++;
         data += 3;
-        offset = 0;
 
-        while (SpecialObjectPresets[offset].preset_id != presetID) {
-            offset++;
-        }
+        struct SpecialPreset *preset = &SpecialObjectPresets[presetID];
 
-        switch (SpecialObjectPresets[offset].type) {
+        switch (preset->type) {
             case SPTYPE_NO_YROT_OR_PARAMS:
                 break;
             case SPTYPE_YROT_NO_PARAMS:
