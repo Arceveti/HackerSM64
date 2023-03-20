@@ -6,7 +6,7 @@ const GeoLayout ttc_geo_0003B8[] = {
       GEO_OPEN_NODE(),
          GEO_NODE_ORTHO(100),
          GEO_OPEN_NODE(),
-            GEO_BACKGROUND_COLOR(0xC7FF),
+            GEO_BACKGROUND_COLOR(GPACK_RGBA5551(96, 255, 255, 1)),
          GEO_CLOSE_NODE(),
       GEO_CLOSE_NODE(),
       GEO_ZBUFFER(1),
