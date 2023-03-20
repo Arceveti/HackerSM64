@@ -5,7 +5,7 @@
 
 enum BhvProc {
     BHV_PROC_CONTINUE,
-    BHV_PROC_BREAK
+    BHV_PROC_BREAK,
 };
 
 #define cur_obj_get_int(offset)          gCurrentObject->OBJECT_FIELD_S32(offset)
