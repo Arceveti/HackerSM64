@@ -38,7 +38,7 @@ enum BehaviorCommands {
     /*0x2F*/ BHV_CMD_HIDE,
     /*0x20*/ BHV_CMD_SET_HITBOX,
     /*0x21*/ BHV_CMD_DELAY_VAR,
-    /*0x22*/ BHV_CMD_LOAD_ANIMATIONS,
+    /*0x22*/ BHV_CMD_SET_VPTR,
     /*0x23*/ BHV_CMD_ANIMATE,
     /*0x24*/ BHV_CMD_SPAWN_CHILD_WITH_PARAM,
     /*0x25*/ BHV_CMD_LOAD_COLLISION_DATA,
@@ -46,16 +46,12 @@ enum BehaviorCommands {
     /*0x27*/ BHV_CMD_SPAWN_OBJ,
     /*0x28*/ BHV_CMD_SET_HOME,
     /*0x29*/ BHV_CMD_SET_HURTBOX,
-    /*0x2A*/ BHV_CMD_SET_INTERACT_TYPE,
-    /*0x2B*/ BHV_CMD_SET_OBJ_PHYSICS,
-    /*0x2C*/ BHV_CMD_SET_INTERACT_SUBTYPE,
-    /*0x2D*/ BHV_CMD_SCALE,
-    /*0x2E*/ BHV_CMD_PARENT_BIT_CLEAR,
-    /*0x2F*/ BHV_CMD_ANIMATE_TEXTURE,
-    /*0x30*/ BHV_CMD_DISABLE_RENDERING,
-    /*0x31*/ BHV_CMD_SPAWN_WATER_DROPLET,
-    /*0x00*/ BHV_CMD_GOTO_DEST,
-    /*0x00*/ BHV_CMD_DEST,
+    /*0x2A*/ BHV_CMD_SET_OBJ_PHYSICS,
+    /*0x2B*/ BHV_CMD_SCALE,
+    /*0x2C*/ BHV_CMD_PARENT_BIT_CLEAR,
+    /*0x2D*/ BHV_CMD_ANIMATE_TEXTURE,
+    /*0x2E*/ BHV_CMD_DISABLE_RENDERING,
+    /*0x2F*/ BHV_CMD_SPAWN_WATER_DROPLET,
 };
 
 #define B(a, n, s) (_SHIFTL((a), (32 - ((n) * (s))), (s)))
@@ -155,6 +151,20 @@ enum BehaviorCommands {
 #define SET_FLOAT(field, value) \
     BC_BBH(BHV_CMD_SET_FLOAT, field, value)
 
+// Shortcut:
+#define SET_DRAWING_DISTANCE(dist) \
+    SET_FLOAT(oDrawingDistance, (dist))
+
+// Shortcut:
+#define SET_COLLISION_DISTANCE(dist) \
+    SET_FLOAT(oCollisionDistance, (dist))
+
+// Shortcut:
+#define SET_POS(x, y, z) \
+    SET_FLOAT(oPosX, (x)), \
+    SET_FLOAT(oPosY, (y)), \
+    SET_FLOAT(oPosZ, (z))
+
 // Adds a short to the specified field.
 #define ADD_SHORT(field, value) \
     BC_BBH(BHV_CMD_ADD_SHORT, field, value)
@@ -192,10 +202,46 @@ enum BehaviorCommands {
     BC_BB(BHV_CMD_ADD_INT, field), \
     BC_W(value)
 
+// Shortcut:
+#define ADD_ANIM_STATE(n) \
+    ADD_INT(oAnimState, (n))
+
 // Sets the specified field to an integer.
 #define SET_INT(field, value) \
     BC_BB(BHV_CMD_SET_INT, field), \
     BC_W(value)
+
+// Shortcut:
+#define SET_ANIM_STATE(n) \
+    SET_INT(oAnimState, (n))
+
+// Shortcut:
+#define SET_ROOM(room) \
+    SET_INT(oRoom, (room))
+
+// Shortcut:
+#define BECOME_TANGIBLE() \
+    SET_INT(oIntangibleTimer, 0)
+
+// Shortcut:
+#define SET_INTERACT_TYPE(type) \
+    SET_INT(oInteractType, (type))
+
+// Shortcut:
+#define SET_INTERACT_SUBTYPE(type) \
+    SET_INT(oInteractionSubtype, (type))
+
+// Shortcut:
+#define SET_FACE_ANGLE(pitch, yaw, roll) \
+    SET_INT(oFaceAnglePitch, (pitch)), \
+    SET_INT(oFaceAngleYaw,   (yaw  )), \
+    SET_INT(oFaceAngleRoll,  (roll ))
+
+// Shortcut:
+#define SET_MOVE_ANGLE(pitch, yaw, roll) \
+    SET_INT(oMoveAnglePitch, (pitch)), \
+    SET_INT(oMoveAngleYaw,   (yaw  )), \
+    SET_INT(oMoveAngleRoll,  (roll ))
 
 // Performs a bitwise OR with the specified field and the given integer.
 // Usually used to set an object's flags.
@@ -203,7 +249,11 @@ enum BehaviorCommands {
     BC_BB(BHV_CMD_OR_INT, field), \
     BC_W(value)
 
-// Backwards compatibility:
+// Shortcut:
+#define OR_FLAGS(flags) \
+    OR_INT(oFlags, (flags))
+
+// HackerSM64 backwards compatibility:
 #define OR_LONG(field, value) OR_INT(field, value)
 
 // Sets the current model ID of the object.
@@ -250,10 +300,18 @@ enum BehaviorCommands {
 #define DELAY_VAR(field) \
     BC_BB(BHV_CMD_DELAY_VAR, field)
 
+// Sets the specified field to a pointer.
+#define SET_VPTR(field, anims) \
+    BC_BB(BHV_CMD_SET_VPTR, field), \
+    BC_PTR(anims)
+
 // Loads the animations for the object. <field> is always set to oAnimations.
 #define LOAD_ANIMATIONS(field, anims) \
-    BC_BB(BHV_CMD_LOAD_ANIMATIONS, field), \
-    BC_PTR(anims)
+    SET_VPTR(field, anims)
+
+// Shortcut:
+#define SET_ANIMATIONS(anims) \
+    LOAD_ANIMATIONS(oAnimations, (anims))
 
 // Begins animation and sets the object's current animation index to the specified value.
 #define ANIMATE(animIndex) \
@@ -291,26 +349,16 @@ enum BehaviorCommands {
     BC_B(BHV_CMD_SET_HURTBOX), \
     BC_HH(radius, height)
 
-// Sets the object's interaction type.
-#define SET_INTERACT_TYPE(type) \
-    BC_B(BHV_CMD_SET_INTERACT_TYPE), \
-    BC_W(type)
-
 // Sets various parameters that the object uses for calculating physics.
-#define SET_OBJ_PHYSICS(wallHitboxRadius, gravity, bounciness, dragStrength, friction, buoyancy, unused1, unused2) \
+#define SET_OBJ_PHYSICS(wallHitboxRadius, gravity, bounciness, dragStrength, friction, buoyancy) \
     BC_B(BHV_CMD_SET_OBJ_PHYSICS), \
     BC_HH(wallHitboxRadius, gravity), \
     BC_HH(bounciness, dragStrength), \
     BC_HH(friction, buoyancy)
 
-// Sets the object's interaction subtype. Unused.
-#define SET_INTERACT_SUBTYPE(subtype) \
-    BC_B(BHV_CMD_SET_INTERACT_SUBTYPE), \
-    BC_W(subtype)
-
 // Sets the object's size to the specified percentage.
-#define SCALE(unusedField, percent) \
-    BC_BBH(BHV_CMD_SCALE, unusedField, percent)
+#define SCALE(percent) \
+    BC_B0H(BHV_CMD_SCALE, percent)
 
 // Performs a bit clear on the object's parent's field with the specified value.
 // Used for clearing active particle flags fron Mario's object.

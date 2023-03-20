@@ -128,7 +128,7 @@ static s32 bhv_cmd_billboard(void) {
 static s32 bhv_cmd_set_model(void) {
     ModelID32 modelID = BHV_CMD_GET_2ND_S16(0);
 
-    gCurrentObject->header.gfx.sharedChild = gLoadedGraphNodes[modelID];
+    cur_obj_set_model(modelID);
 
     gCurBhvCommand += SIZEOF_CMD(SET_MODEL(modelID));;
     return BHV_PROC_CONTINUE;
@@ -214,7 +214,7 @@ static s32 bhv_cmd_return(void) {
 static s32 bhv_cmd_delay(void) {
     s16 num = BHV_CMD_GET_2ND_S16(0);
 
-    if (gCurrentObject->bhvDelayTimer < num - 1) {
+    if (gCurrentObject->bhvDelayTimer < (num - 1)) {
         gCurrentObject->bhvDelayTimer++; // Increment timer
     } else {
         gCurrentObject->bhvDelayTimer = 0;
@@ -230,7 +230,7 @@ static s32 bhv_cmd_delay_var(void) {
     u8 field = BHV_CMD_GET_2ND_U8(0);
     s32 num = cur_obj_get_int(field);
 
-    if (gCurrentObject->bhvDelayTimer < num - 1) {
+    if (gCurrentObject->bhvDelayTimer < (num - 1)) {
         gCurrentObject->bhvDelayTimer++; // Increment timer
     } else {
         gCurrentObject->bhvDelayTimer = 0;
@@ -441,15 +441,15 @@ static s32 bhv_cmd_bit_clear(void) {
     return BHV_PROC_CONTINUE;
 }
 
-// BHV_CMD_LOAD_ANIMATIONS: Loads the animations for the object. <field> is always set to oAnimations.
-// Usage: LOAD_ANIMATIONS(field, anims)
-static s32 bhv_cmd_load_animations(void) {
+// BHV_CMD_SET_VPTR: Sets the specified field to a pointer.
+// Usage: SET_VPTR(field, ptr)
+static s32 bhv_cmd_set_vptr(void) {
     u8 field = BHV_CMD_GET_2ND_U8(0);
-    const struct Animation *anims = BHV_CMD_GET_VPTR(1);
+    void *ptr = BHV_CMD_GET_VPTR(1);
 
-    cur_obj_set_vptr(field, anims);
+    cur_obj_set_vptr(field, ptr);
 
-    gCurBhvCommand += SIZEOF_CMD(LOAD_ANIMATIONS(field, anims));
+    gCurBhvCommand += SIZEOF_CMD(SET_VPTR(field, ptr));
     return BHV_PROC_CONTINUE;
 }
 
@@ -609,42 +609,19 @@ static s32 bhv_cmd_set_home(void) {
     return BHV_PROC_CONTINUE;
 }
 
-// BHV_CMD_SET_INTERACT_TYPE: Sets the object's interaction type.
-// Usage: SET_INTERACT_TYPE(type)
-static s32 bhv_cmd_set_interact_type(void) {
-    u32 interactType = BHV_CMD_GET_U32(1);
-
-    gCurrentObject->oInteractType = interactType;
-
-    gCurBhvCommand += SIZEOF_CMD(SET_INTERACT_TYPE(interactType));
-    return BHV_PROC_CONTINUE;
-}
-
-// BHV_CMD_SET_INTERACT_SUBTYPE: Sets the object's interaction subtype. Unused.
-// Usage: SET_INTERACT_SUBTYPE(subtype)
-static s32 bhv_cmd_set_interact_subtype(void) {
-    u32 interactSubtype = BHV_CMD_GET_U32(1);
-
-    gCurrentObject->oInteractionSubtype = interactSubtype;
-
-    gCurBhvCommand += SIZEOF_CMD(SET_INTERACT_SUBTYPE(interactSubtype));
-    return BHV_PROC_CONTINUE;
-}
-
 // BHV_CMD_SCALE: Sets the object's size to the specified percentage.
-// Usage: SCALE(unusedField, percent)
+// Usage: SCALE(percent)
 static s32 bhv_cmd_scale(void) {
-    UNUSED u8 unusedField = BHV_CMD_GET_2ND_U8(0);
     s16 percent = BHV_CMD_GET_2ND_S16(0);
 
     cur_obj_scale(percent / 100.0f);
 
-    gCurBhvCommand += SIZEOF_CMD(SCALE(unusedField, percent));
+    gCurBhvCommand += SIZEOF_CMD(SCALE(percent));
     return BHV_PROC_CONTINUE;
 }
 
 // BHV_CMD_SET_OBJ_PHYSICS: Sets various parameters that the object uses for calculating physics.
-// Usage: SET_OBJ_PHYSICS(wallHitboxRadius, gravity, bounciness, dragStrength, friction, buoyancy, unused1, unused2)
+// Usage: SET_OBJ_PHYSICS(wallHitboxRadius, gravity, bounciness, dragStrength, friction, buoyancy)
 static s32 bhv_cmd_set_obj_physics(void) {
     s16 wallHitboxRadius = BHV_CMD_GET_1ST_S16(1);
     s16 gravity          = BHV_CMD_GET_2ND_S16(1);
@@ -662,10 +639,7 @@ static s32 bhv_cmd_set_obj_physics(void) {
     obj->oFriction         = friction     / 100.0f;
     obj->oBuoyancy         = buoyancy     / 100.0f;
 
-    // UNUSED f32 unused1 = BHV_CMD_GET_1ST_S16(4) / 100.0f;
-    // UNUSED f32 unused2 = BHV_CMD_GET_2ND_S16(4) / 100.0f;
-
-    gCurBhvCommand += SIZEOF_CMD(SET_OBJ_PHYSICS(wallHitboxRadius, gravity, bounciness, dragStrength, friction, buoyancy, 0, 0));
+    gCurBhvCommand += SIZEOF_CMD(SET_OBJ_PHYSICS(wallHitboxRadius, gravity, bounciness, dragStrength, friction, buoyancy));
     return BHV_PROC_CONTINUE;
 }
 
@@ -745,7 +719,7 @@ static BhvCommandProc sBehaviorCmdTable[] = {
     [BHV_CMD_HIDE                   ] = bhv_cmd_hide,
     [BHV_CMD_SET_HITBOX             ] = bhv_cmd_set_hitbox,
     [BHV_CMD_DELAY_VAR              ] = bhv_cmd_delay_var,
-    [BHV_CMD_LOAD_ANIMATIONS        ] = bhv_cmd_load_animations,
+    [BHV_CMD_SET_VPTR               ] = bhv_cmd_set_vptr,
     [BHV_CMD_ANIMATE                ] = bhv_cmd_animate,
     [BHV_CMD_SPAWN_CHILD_WITH_PARAM ] = bhv_cmd_spawn_child_with_param,
     [BHV_CMD_LOAD_COLLISION_DATA    ] = bhv_cmd_load_collision_data,
@@ -753,9 +727,7 @@ static BhvCommandProc sBehaviorCmdTable[] = {
     [BHV_CMD_SPAWN_OBJ              ] = bhv_cmd_spawn_obj,
     [BHV_CMD_SET_HOME               ] = bhv_cmd_set_home,
     [BHV_CMD_SET_HURTBOX            ] = bhv_cmd_set_hurtbox,
-    [BHV_CMD_SET_INTERACT_TYPE      ] = bhv_cmd_set_interact_type,
     [BHV_CMD_SET_OBJ_PHYSICS        ] = bhv_cmd_set_obj_physics,
-    [BHV_CMD_SET_INTERACT_SUBTYPE   ] = bhv_cmd_set_interact_subtype,
     [BHV_CMD_SCALE                  ] = bhv_cmd_scale,
     [BHV_CMD_PARENT_BIT_CLEAR       ] = bhv_cmd_parent_bit_clear,
     [BHV_CMD_ANIMATE_TEXTURE        ] = bhv_cmd_animate_texture,
