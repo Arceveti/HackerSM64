@@ -389,6 +389,8 @@ enum GeoLayoutCommands {
     CMD_PTR(function)
 #define GEO_BACKGROUND_COLOR(background) \
     GEO_BACKGROUND(background, NULL)
+#define GEO_BACKGROUND_RGB(r, g, b) \
+    GEO_BACKGROUND_COLOR(GPACK_RGBA5551(r, g, b, 1)) 
 
 /**
  * GEO_CMD_COPY_VIEW: Copy the shared children from an object parent node from a specific view
