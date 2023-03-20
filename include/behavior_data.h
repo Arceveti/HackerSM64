@@ -229,7 +229,6 @@ extern const BehaviorScript bhvWaterLevelPillar[];
 extern const BehaviorScript bhvMoatGrills[];
 extern const BehaviorScript bhvClockMinuteHand[];
 extern const BehaviorScript bhvClockHourHand[];
-extern const BehaviorScript bhvMacroUkiki[];
 extern const BehaviorScript bhvLllRotatingHexagonalPlatform[];
 extern const BehaviorScript bhvLllSinkingRockBlock[];
 extern const BehaviorScript bhvLllMovingOctagonalMeshPlatform[];

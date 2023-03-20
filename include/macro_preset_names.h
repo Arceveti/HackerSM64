@@ -367,15 +367,13 @@ enum MacroPresets {
     macro_empty_362,
     macro_empty_363,
     macro_empty_364,
-#ifdef FLOOMBAS
     macro_empty_365,
+#ifdef FLOOMBAS
     macro_floomba,
     macro_huge_floomba,
     macro_tiny_floomba,
     macro_floomba_triplet_spawner,
-    macro_floomba_quintuplet_spawner
-#else
-    macro_empty_365
+    macro_floomba_quintuplet_spawner,
 #endif
 };
 
