@@ -101,7 +101,7 @@ static uintptr_t cur_obj_bhv_stack_pop(void) {
 static s32 bhv_cmd_hide(void) {
     cur_obj_hide();
 
-    gCurBhvCommand += SIZEOF_CMD(HIDE());
+    gCurBhvCommand += SIZEOF_BHV_CMD(HIDE());
     return BHV_PROC_CONTINUE;
 }
 
@@ -110,7 +110,7 @@ static s32 bhv_cmd_hide(void) {
 static s32 bhv_cmd_disable_rendering(void) {
     gCurrentObject->header.gfx.node.flags &= ~GRAPH_RENDER_ACTIVE;
 
-    gCurBhvCommand += SIZEOF_CMD(DISABLE_RENDERING());
+    gCurBhvCommand += SIZEOF_BHV_CMD(DISABLE_RENDERING());
     return BHV_PROC_CONTINUE;
 }
 
@@ -119,7 +119,7 @@ static s32 bhv_cmd_disable_rendering(void) {
 static s32 bhv_cmd_billboard(void) {
     gCurrentObject->header.gfx.node.flags |= GRAPH_RENDER_BILLBOARD;
 
-    gCurBhvCommand += SIZEOF_CMD(BILLBOARD());
+    gCurBhvCommand += SIZEOF_BHV_CMD(BILLBOARD());
     return BHV_PROC_CONTINUE;
 }
 
@@ -130,7 +130,7 @@ static s32 bhv_cmd_set_model(void) {
 
     cur_obj_set_model(modelID);
 
-    gCurBhvCommand += SIZEOF_CMD(SET_MODEL(modelID));;
+    gCurBhvCommand += SIZEOF_BHV_CMD(SET_MODEL(modelID));;
     return BHV_PROC_CONTINUE;
 }
 
@@ -143,7 +143,7 @@ static s32 bhv_cmd_spawn_child(void) {
     struct Object *child = spawn_object_at_origin(gCurrentObject, 0, model, behavior);
     obj_copy_pos_and_angle(child, gCurrentObject);
 
-    gCurBhvCommand += SIZEOF_CMD(SPAWN_CHILD(model, behavior));;
+    gCurBhvCommand += SIZEOF_BHV_CMD(SPAWN_CHILD(model, behavior));;
     return BHV_PROC_CONTINUE;
 }
 
@@ -158,7 +158,7 @@ static s32 bhv_cmd_spawn_obj(void) {
     // TODO: Does this cmd need renaming? This line is the only difference between this and the above func.
     gCurrentObject->prevObj = object;
 
-    gCurBhvCommand += SIZEOF_CMD(SPAWN_OBJ(MODEL_NONE, NULL));
+    gCurBhvCommand += SIZEOF_BHV_CMD(SPAWN_OBJ(MODEL_NONE, NULL));
     return BHV_PROC_CONTINUE;
 }
 
@@ -173,7 +173,7 @@ static s32 bhv_cmd_spawn_child_with_param(void) {
     obj_copy_pos_and_angle(child, gCurrentObject);
     child->oBehParams2ndByte = bhvParam;
 
-    gCurBhvCommand += SIZEOF_CMD(SPAWN_CHILD_WITH_PARAM(OBJ_BP_NONE, MODEL_NONE, NULL));
+    gCurBhvCommand += SIZEOF_BHV_CMD(SPAWN_CHILD_WITH_PARAM(OBJ_BP_NONE, MODEL_NONE, NULL));
     return BHV_PROC_CONTINUE;
 }
 
@@ -195,7 +195,7 @@ static s32 bhv_cmd_break(void) {
 static s32 bhv_cmd_call(void) {
     const BehaviorScript *addr = segmented_to_virtual(BHV_CMD_GET_VPTR(1));
 
-    cur_obj_bhv_stack_push(BHV_CMD_GET_ADDR_OF_CMD(SIZEOF_CMD(CALL(addr)))); // Store address of the next bhv command in the stack.
+    cur_obj_bhv_stack_push(BHV_CMD_GET_ADDR_OF_CMD(SIZEOF_BHV_CMD(CALL(addr)))); // Store address of the next bhv command in the stack.
     
     gCurBhvCommand = addr; // Jump to the new address.
 
@@ -218,7 +218,7 @@ static s32 bhv_cmd_delay(void) {
         gCurrentObject->bhvDelayTimer++; // Increment timer
     } else {
         gCurrentObject->bhvDelayTimer = 0;
-        gCurBhvCommand += SIZEOF_CMD(DELAY(num)); // Delay ended, move to next bhv command (note: following commands will not execute until next frame)
+        gCurBhvCommand += SIZEOF_BHV_CMD(DELAY(num)); // Delay ended, move to next bhv command (note: following commands will not execute until next frame)
     }
 
     return BHV_PROC_BREAK;
@@ -234,7 +234,7 @@ static s32 bhv_cmd_delay_var(void) {
         gCurrentObject->bhvDelayTimer++; // Increment timer
     } else {
         gCurrentObject->bhvDelayTimer = 0;
-        gCurBhvCommand += SIZEOF_CMD(DELAY_VAR(field)); // Delay ended, move to next bhv command
+        gCurBhvCommand += SIZEOF_BHV_CMD(DELAY_VAR(field)); // Delay ended, move to next bhv command
     }
 
     return BHV_PROC_BREAK;
@@ -255,7 +255,7 @@ static s32 bhv_cmd_begin_repeat(void) {
     cur_obj_bhv_stack_push(BHV_CMD_GET_ADDR_OF_CMD(1)); // Store address of the first command of the loop in the stack
     cur_obj_bhv_stack_push(count); // Store repeat count in the stack too
 
-    gCurBhvCommand += SIZEOF_CMD(BEGIN_REPEAT(count));
+    gCurBhvCommand += SIZEOF_BHV_CMD(BEGIN_REPEAT(count));
     return BHV_PROC_CONTINUE;
 }
 
@@ -271,7 +271,7 @@ static s32 bhv_cmd_end_repeat(void) {
         cur_obj_bhv_stack_push(count);
     } else { // Finished iterating over the loop
         cur_obj_bhv_stack_pop(); // Necessary to remove address from the stack
-        gCurBhvCommand += SIZEOF_CMD(END_REPEAT());
+        gCurBhvCommand += SIZEOF_BHV_CMD(END_REPEAT());
     }
 
     // Don't execute following commands until next frame
@@ -290,7 +290,7 @@ static s32 bhv_cmd_end_repeat_continue(void) {
         cur_obj_bhv_stack_push(count);
     } else { // Finished iterating over the loop
         cur_obj_bhv_stack_pop(); // Necessary to remove address from the stack
-        gCurBhvCommand += SIZEOF_CMD(END_REPEAT_CONTINUE());
+        gCurBhvCommand += SIZEOF_BHV_CMD(END_REPEAT_CONTINUE());
     }
 
     // Start executing following commands immediately
@@ -302,7 +302,7 @@ static s32 bhv_cmd_end_repeat_continue(void) {
 static s32 bhv_cmd_begin_loop(void) {
     cur_obj_bhv_stack_push(BHV_CMD_GET_ADDR_OF_CMD(1)); // Store address of the first command of the loop in the stack
 
-    gCurBhvCommand += SIZEOF_CMD(BEGIN_LOOP());
+    gCurBhvCommand += SIZEOF_BHV_CMD(BEGIN_LOOP());
     return BHV_PROC_CONTINUE;
 }
 
@@ -323,7 +323,7 @@ static s32 bhv_cmd_call_native(void) {
 
     behaviorFunc();
 
-    gCurBhvCommand += SIZEOF_CMD(CALL_NATIVE(NULL));
+    gCurBhvCommand += SIZEOF_BHV_CMD(CALL_NATIVE(NULL));
     return BHV_PROC_CONTINUE;
 }
 
@@ -335,7 +335,7 @@ static s32 bhv_cmd_set_float(void) {
 
     cur_obj_set_float(field, value);
 
-    gCurBhvCommand += SIZEOF_CMD(SET_FLOAT(field, value));
+    gCurBhvCommand += SIZEOF_BHV_CMD(SET_FLOAT(field, value));
     return BHV_PROC_CONTINUE;
 }
 
@@ -347,7 +347,7 @@ static s32 bhv_cmd_set_short(void) {
 
     cur_obj_set_int(field, value);
 
-    gCurBhvCommand += SIZEOF_CMD(SET_SHORT(field, value));
+    gCurBhvCommand += SIZEOF_BHV_CMD(SET_SHORT(field, value));
     return BHV_PROC_CONTINUE;
 }
 
@@ -360,7 +360,7 @@ static s32 bhv_cmd_set_random_float(void) {
 
     cur_obj_set_float(field, (range * random_float()) + min);
 
-    gCurBhvCommand += SIZEOF_CMD(SET_RANDOM_FLOAT(field, min, range));
+    gCurBhvCommand += SIZEOF_BHV_CMD(SET_RANDOM_FLOAT(field, min, range));
     return BHV_PROC_CONTINUE;
 }
 
@@ -373,7 +373,7 @@ static s32 bhv_cmd_set_random_int(void) {
 
     cur_obj_set_int(field, (s32)(range * random_float()) + min);
 
-    gCurBhvCommand += SIZEOF_CMD(SET_RANDOM_INT(field, min, range));
+    gCurBhvCommand += SIZEOF_BHV_CMD(SET_RANDOM_INT(field, min, range));
     return BHV_PROC_CONTINUE;
 }
 
@@ -386,7 +386,7 @@ static s32 bhv_cmd_add_random_float(void) {
 
     cur_obj_set_float(field, (cur_obj_get_float(field) + min + (range * random_float())));
 
-    gCurBhvCommand += SIZEOF_CMD(ADD_RANDOM_FLOAT(field, min, range));
+    gCurBhvCommand += SIZEOF_BHV_CMD(ADD_RANDOM_FLOAT(field, min, range));
     return BHV_PROC_CONTINUE;
 }
 
@@ -398,7 +398,7 @@ static s32 bhv_cmd_add_float(void) {
 
     cur_obj_add_float(field, value);
 
-    gCurBhvCommand += SIZEOF_CMD(ADD_FLOAT(field, value));
+    gCurBhvCommand += SIZEOF_BHV_CMD(ADD_FLOAT(field, value));
     return BHV_PROC_CONTINUE;
 }
 
@@ -410,7 +410,7 @@ static s32 bhv_cmd_add_short(void) {
 
     cur_obj_add_int(field, value);
 
-    gCurBhvCommand += SIZEOF_CMD(ADD_SHORT(field, value));
+    gCurBhvCommand += SIZEOF_BHV_CMD(ADD_SHORT(field, value));
     return BHV_PROC_CONTINUE;
 }
 
@@ -424,7 +424,7 @@ static s32 bhv_cmd_or_short(void) {
     value &= BITMASK(16);
     cur_obj_or_int(field, value);
 
-    gCurBhvCommand += SIZEOF_CMD(OR_SHORT(field, value));
+    gCurBhvCommand += SIZEOF_BHV_CMD(OR_SHORT(field, value));
     return BHV_PROC_CONTINUE;
 }
 
@@ -437,7 +437,7 @@ static s32 bhv_cmd_bit_clear(void) {
     value = ((value & BITMASK(16)) ^ BITMASK(16));
     cur_obj_and_int(field, value);
 
-    gCurBhvCommand += SIZEOF_CMD(BIT_CLEAR(field, value));
+    gCurBhvCommand += SIZEOF_BHV_CMD(BIT_CLEAR(field, value));
     return BHV_PROC_CONTINUE;
 }
 
@@ -449,7 +449,7 @@ static s32 bhv_cmd_set_vptr(void) {
 
     cur_obj_set_vptr(field, ptr);
 
-    gCurBhvCommand += SIZEOF_CMD(SET_VPTR(field, ptr));
+    gCurBhvCommand += SIZEOF_BHV_CMD(SET_VPTR(field, ptr));
     return BHV_PROC_CONTINUE;
 }
 
@@ -461,7 +461,7 @@ static s32 bhv_cmd_animate(void) {
 
     geo_obj_init_animation(&gCurrentObject->header.gfx, &animations[animIndex]);
 
-    gCurBhvCommand += SIZEOF_CMD(ANIMATE(animIndex));
+    gCurBhvCommand += SIZEOF_BHV_CMD(ANIMATE(animIndex));
     return BHV_PROC_CONTINUE;
 }
 
@@ -472,7 +472,7 @@ static s32 bhv_cmd_drop_to_floor(void) {
     gCurrentObject->oPosY = floor;
     gCurrentObject->oMoveFlags |= OBJ_MOVE_ON_GROUND;
 
-    gCurBhvCommand += SIZEOF_CMD(DROP_TO_FLOOR());
+    gCurBhvCommand += SIZEOF_BHV_CMD(DROP_TO_FLOOR());
     return BHV_PROC_CONTINUE;
 }
 
@@ -484,7 +484,7 @@ static s32 bhv_cmd_add_int(void) {
 
     cur_obj_add_int(field, value);
 
-    gCurBhvCommand += SIZEOF_CMD(ADD_INT(field, value));
+    gCurBhvCommand += SIZEOF_BHV_CMD(ADD_INT(field, value));
     return BHV_PROC_CONTINUE;
 }
 
@@ -496,7 +496,7 @@ static s32 bhv_cmd_or_int(void) {
 
     cur_obj_or_int(field, value);
 
-    gCurBhvCommand += SIZEOF_CMD(OR_INT(field, value));
+    gCurBhvCommand += SIZEOF_BHV_CMD(OR_INT(field, value));
     return BHV_PROC_CONTINUE;
 }
 
@@ -508,7 +508,7 @@ static s32 bhv_cmd_set_int(void) {
 
     cur_obj_set_int(field, value);
 
-    gCurBhvCommand += SIZEOF_CMD(SET_INT(field, value));
+    gCurBhvCommand += SIZEOF_BHV_CMD(SET_INT(field, value));
     return BHV_PROC_CONTINUE;
 }
 
@@ -521,7 +521,7 @@ static s32 bhv_cmd_sum_float(void) {
 
     cur_obj_set_float(fieldDst, cur_obj_get_float(fieldSrc1) + cur_obj_get_float(fieldSrc2));
 
-    gCurBhvCommand += SIZEOF_CMD(SUM_FLOAT(fieldDst, fieldSrc1, fieldSrc2));
+    gCurBhvCommand += SIZEOF_BHV_CMD(SUM_FLOAT(fieldDst, fieldSrc1, fieldSrc2));
     return BHV_PROC_CONTINUE;
 }
 
@@ -534,7 +534,7 @@ static s32 bhv_cmd_sum_int(void) {
 
     cur_obj_set_int(fieldDst, cur_obj_get_int(fieldSrc1) + cur_obj_get_int(fieldSrc2));
 
-    gCurBhvCommand += SIZEOF_CMD(SUM_INT(fieldDst, fieldSrc1, fieldSrc2));
+    gCurBhvCommand += SIZEOF_BHV_CMD(SUM_INT(fieldDst, fieldSrc1, fieldSrc2));
     return BHV_PROC_CONTINUE;
 }
 
@@ -547,7 +547,7 @@ static s32 bhv_cmd_set_hitbox(void) {
     gCurrentObject->hitboxRadius = radius;
     gCurrentObject->hitboxHeight = height;
 
-    gCurBhvCommand += SIZEOF_CMD(SET_HITBOX(radius, height));
+    gCurBhvCommand += SIZEOF_BHV_CMD(SET_HITBOX(radius, height));
     return BHV_PROC_CONTINUE;
 }
 
@@ -560,7 +560,7 @@ static s32 bhv_cmd_set_hurtbox(void) {
     gCurrentObject->hurtboxRadius = radius;
     gCurrentObject->hurtboxHeight = height;
 
-    gCurBhvCommand += SIZEOF_CMD(SET_HURTBOX(radius, height));
+    gCurBhvCommand += SIZEOF_BHV_CMD(SET_HURTBOX(radius, height));
     return BHV_PROC_CONTINUE;
 }
 
@@ -575,7 +575,7 @@ static s32 bhv_cmd_set_hitbox_with_offset(void) {
     gCurrentObject->hitboxHeight = height;
     gCurrentObject->hitboxDownOffset = downOffset;
 
-    gCurBhvCommand += SIZEOF_CMD(SET_HITBOX_WITH_OFFSET(radius, height, downOffset));
+    gCurBhvCommand += SIZEOF_BHV_CMD(SET_HITBOX_WITH_OFFSET(radius, height, downOffset));
     return BHV_PROC_CONTINUE;
 }
 
@@ -585,7 +585,7 @@ static s32 bhv_cmd_set_hitbox_with_offset(void) {
 static s32 bhv_cmd_begin(void) {
     u8 objList = BHV_CMD_GET_2ND_U8(0);
 
-    gCurBhvCommand += SIZEOF_CMD(BEGIN(objList));
+    gCurBhvCommand += SIZEOF_BHV_CMD(BEGIN(objList));
     return BHV_PROC_CONTINUE;
 }
 
@@ -596,7 +596,7 @@ static s32 bhv_cmd_load_collision_data(void) {
 
     gCurrentObject->collisionData = collisionData;
 
-    gCurBhvCommand += SIZEOF_CMD(LOAD_COLLISION_DATA(collisionData));
+    gCurBhvCommand += SIZEOF_BHV_CMD(LOAD_COLLISION_DATA(collisionData));
     return BHV_PROC_CONTINUE;
 }
 
@@ -605,7 +605,7 @@ static s32 bhv_cmd_load_collision_data(void) {
 static s32 bhv_cmd_set_home(void) {
     vec3f_copy(&o->oHomeVec, &o->oPosVec);
 
-    gCurBhvCommand += SIZEOF_CMD(SET_HOME());
+    gCurBhvCommand += SIZEOF_BHV_CMD(SET_HOME());
     return BHV_PROC_CONTINUE;
 }
 
@@ -616,7 +616,7 @@ static s32 bhv_cmd_scale(void) {
 
     cur_obj_scale(percent / 100.0f);
 
-    gCurBhvCommand += SIZEOF_CMD(SCALE(percent));
+    gCurBhvCommand += SIZEOF_BHV_CMD(SCALE(percent));
     return BHV_PROC_CONTINUE;
 }
 
@@ -639,7 +639,7 @@ static s32 bhv_cmd_set_obj_physics(void) {
     obj->oFriction         = friction     / 100.0f;
     obj->oBuoyancy         = buoyancy     / 100.0f;
 
-    gCurBhvCommand += SIZEOF_CMD(SET_OBJ_PHYSICS(wallHitboxRadius, gravity, bounciness, dragStrength, friction, buoyancy));
+    gCurBhvCommand += SIZEOF_BHV_CMD(SET_OBJ_PHYSICS(wallHitboxRadius, gravity, bounciness, dragStrength, friction, buoyancy));
     return BHV_PROC_CONTINUE;
 }
 
@@ -653,7 +653,7 @@ static s32 bhv_cmd_parent_bit_clear(void) {
     value ^= 0xFFFFFFFF;
     obj_and_int(gCurrentObject->parentObj, field, value);
 
-    gCurBhvCommand += SIZEOF_CMD(PARENT_BIT_CLEAR(field, value));
+    gCurBhvCommand += SIZEOF_BHV_CMD(PARENT_BIT_CLEAR(field, value));
     return BHV_PROC_CONTINUE;
 }
 
@@ -664,7 +664,7 @@ static s32 bhv_cmd_spawn_water_droplet(void) {
 
     spawn_water_droplet(gCurrentObject, dropletParams);
 
-    gCurBhvCommand += SIZEOF_CMD(SPAWN_WATER_DROPLET(dropletParams));
+    gCurBhvCommand += SIZEOF_BHV_CMD(SPAWN_WATER_DROPLET(dropletParams));
     return BHV_PROC_CONTINUE;
 }
 
@@ -679,7 +679,7 @@ static s32 bhv_cmd_animate_texture(void) {
         cur_obj_add_int(field, 1);
     }
 
-    gCurBhvCommand += SIZEOF_CMD(ANIMATE_TEXTURE(field, rate));
+    gCurBhvCommand += SIZEOF_BHV_CMD(ANIMATE_TEXTURE(field, rate));
     return BHV_PROC_CONTINUE;
 }
 

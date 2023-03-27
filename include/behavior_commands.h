@@ -77,9 +77,7 @@ enum BehaviorCommands {
 #define BC_W(a)             ((uintptr_t)(u32)(a))
 #define BC_PTR(a)           ((uintptr_t)(a))
 
-// #define SIZEOF_CMD(_cmd, ...) sizeof((u8[]){_cmd(__VA_ARGS__)})
-
-#define SIZEOF_CMD(_cmd) sizeof((u8[]){_cmd})
+#define SIZEOF_BHV_CMD(_cmd) sizeof((u8[]){_cmd})
 
 // Goto destination
 #define GOTO_DEST(behavior, identifier) \
