@@ -21,8 +21,8 @@
 #define CRASH_SCREEN_ROW_HEIGHT         (CRASH_SCREEN_FONT_CHAR_HEIGHT + CRASH_SCREEN_CHAR_SPACING_Y) // 10
 
 // Width and height of crash screen.
-#define CRASH_SCREEN_W 270
-#define CRASH_SCREEN_H 222
+#define CRASH_SCREEN_W (270 * RESOLUTION_MULTIPLIER)
+#define CRASH_SCREEN_H (222 * RESOLUTION_MULTIPLIER)
 
 // Number of chars that can fit in the crash screen.
 #define CRASH_SCREEN_NUM_CHARS_X ((CRASH_SCREEN_W - 1) / CRASH_SCREEN_LETTER_WIDTH) // 44
