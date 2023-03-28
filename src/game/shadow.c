@@ -178,14 +178,13 @@ s32 correct_lava_shadow_height(f32 *floorHeight) {
 static Gfx *shadow_display_list(s8 shadowType, Alpha solidity, s8 isDecal) {
     const ColorRGB shadowColor = { 0x00, 0x00, 0x00 };
 
-    u32 gfxCmds = (
-        GFX_ALLOC(gSPDisplayList    ) +
-        GFX_ALLOC(gSPDisplayList    ) +
-        GFX_ALLOC(gDPSetEnvColor    ) +
-        GFX_ALLOC(gSPDisplayList    ) +
-        GFX_ALLOC(gSPEndDisplayList )
+    Gfx *gfxHead = alloc_display_list(
+        SIZEOF_GFX_CMD(SPDisplayList(0)) +
+        SIZEOF_GFX_CMD(SPDisplayList(0)) +
+        SIZEOF_GFX_CMD(DPSetPrimColor(0,0,0,0,0,0)) +
+        SIZEOF_GFX_CMD(SPDisplayList(0)) +
+        SIZEOF_GFX_CMD(SPEndDisplayList())
     );
-    Gfx *gfxHead = alloc_display_list(gfxCmds * sizeof(Gfx));
     if (gfxHead == NULL) {
         return NULL;
     }

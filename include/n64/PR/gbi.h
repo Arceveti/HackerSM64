@@ -22,7 +22,6 @@
 
 #include <PR/ultratypes.h>
 #include <config.h>
-#include "gbi_cmd_alloc.h"
 
 /*
  * Converts texel coordinates to S and T values
@@ -1863,6 +1862,7 @@ typedef union {
 /*
  * Macros to assemble the graphics display list
  */
+#define SIZEOF_GFX_CMD(_cmd) sizeof((Gfx[]){gs##_cmd})
 
 /*
  * DMA macros

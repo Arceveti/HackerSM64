@@ -374,24 +374,15 @@ Gfx *movtex_gen_from_quad(s16 y, struct MovtexQuad *quad) {
     Vtx *verts = alloc_display_list(4 * sizeof(*verts));
     Gfx *gfxHead;
     Gfx *gfx;
-    u32 gfxCmds;
 
-    if (textureId == gMovetexLastTextureId) {
-        gfxCmds = (
-            GFX_ALLOC(gSPVertex         ) +
-            GFX_ALLOC(gSPDisplayList    ) +
-            GFX_ALLOC(gSPEndDisplayList )
-        );
-    } else {
-        gfxCmds = (
-            GFX_ALLOC(gLoadBlockTexture ) +
-            GFX_ALLOC(gSPVertex         ) +
-            GFX_ALLOC(gSPDisplayList    ) +
-            GFX_ALLOC(gSPEndDisplayList )
-        );
-    }
-
-    gfxHead = alloc_display_list(gfxCmds * sizeof(*gfxHead));
+    gfxHead = alloc_display_list(
+        ((textureId != gMovetexLastTextureId) * (
+            SIZEOF_GFX_CMD(LoadBlockTexture(0,0,0,0))
+        )) +
+        SIZEOF_GFX_CMD(SPVertex(0,0,0)) +
+        SIZEOF_GFX_CMD(SPDisplayList(0)) +
+        SIZEOF_GFX_CMD(SPEndDisplayList())
+    );
 
     if (gfxHead == NULL || verts == NULL) {
         return NULL;
@@ -440,13 +431,12 @@ Gfx *movtex_gen_from_quad(s16 y, struct MovtexQuad *quad) {
 Gfx *movtex_gen_from_quad_array(s16 y, void *quadArrSegmented) {
     Movtex *quadArr = segmented_to_virtual(quadArrSegmented);
     Movtex numLists = quadArr[0];
-    u32 gfxCmds = (
+    Gfx *gfxHead = alloc_display_list(
         (numLists * (
-            GFX_ALLOC(gSPDisplayList    )
+            SIZEOF_GFX_CMD(SPDisplayList(0))
         )) +
-        GFX_ALLOC(gSPEndDisplayList )
+        SIZEOF_GFX_CMD(SPEndDisplayList())
     );
-    Gfx *gfxHead = alloc_display_list(gfxCmds * sizeof(*gfxHead));
     Gfx *gfx = gfxHead;
     Gfx *subList;
     s32 i;
@@ -584,15 +574,14 @@ Gfx *geo_movtex_draw_water_regions(s32 callContext, struct GraphNode *node, UNUS
             return NULL;
         }
         numWaterBoxes = gEnvironmentRegions[0];
-        u32 gfxCmds = (
-            GFX_ALLOC(gSPDisplayList    ) +
+        gfxHead = alloc_display_list(
+            SIZEOF_GFX_CMD(SPDisplayList(0)) +
             (numWaterBoxes * (
-                GFX_ALLOC(gSPDisplayList    )
+                SIZEOF_GFX_CMD(SPDisplayList(0))
             )) +
-            GFX_ALLOC(gSPDisplayList    ) +
-            GFX_ALLOC(gSPEndDisplayList )
+            SIZEOF_GFX_CMD(SPDisplayList(0)) +
+            SIZEOF_GFX_CMD(SPEndDisplayList())
         );
-        gfxHead = alloc_display_list(gfxCmds * sizeof(*gfxHead));
         if (gfxHead == NULL) {
             return NULL;
         } else {
@@ -731,15 +720,14 @@ void movtex_write_vertex_index(Vtx *verts, s32 index, Movtex *movtexVerts, struc
  */
 Gfx *movtex_gen_list(Movtex *movtexVerts, struct MovtexObject *movtexList, s8 attrLayout) {
     Vtx *verts = alloc_display_list(movtexList->vtx_count * sizeof(*verts));
-    u32 gfxCmds = (
-        GFX_ALLOC(gSPDisplayList    ) +
-        GFX_ALLOC(gLoadBlockTexture ) +
-        GFX_ALLOC(gSPVertex         ) +
-        GFX_ALLOC(gSPDisplayList    ) +
-        GFX_ALLOC(gSPDisplayList    ) +
-        GFX_ALLOC(gSPEndDisplayList )
+    Gfx *gfxHead = alloc_display_list(
+        SIZEOF_GFX_CMD(SPDisplayList(0)) +
+        SIZEOF_GFX_CMD(LoadBlockTexture(0,0,0,0)) +
+        SIZEOF_GFX_CMD(SPVertex(0,0,0)) +
+        SIZEOF_GFX_CMD(SPDisplayList(0)) +
+        SIZEOF_GFX_CMD(SPDisplayList(0)) +
+        SIZEOF_GFX_CMD(SPEndDisplayList())
     );
-    Gfx *gfxHead = alloc_display_list(gfxCmds * sizeof(*gfxHead));
     Gfx *gfx = gfxHead;
     s32 i;
 

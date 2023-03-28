@@ -46,13 +46,12 @@ Gfx *geo_intro_super_mario_64_logo(s32 callContext, struct GraphNode *node, UNUS
         f32 *scaleTable2 = segmented_to_virtual(intro_seg7_table_scale_2);
         graphNode->drawingLayer = LAYER_OPAQUE;
         Mtx *scaleMat = alloc_display_list(sizeof(*scaleMat));
-        u32 gfxCmds = (
-            GFX_ALLOC(gSPMatrix         ) +
-            GFX_ALLOC(gSPDisplayList    ) +
-            GFX_ALLOC(gSPPopMatrix      ) +
-            GFX_ALLOC(gSPEndDisplayList )
+        dl = alloc_display_list(
+            SIZEOF_GFX_CMD(SPMatrix(0,0)) +
+            SIZEOF_GFX_CMD(SPDisplayList(0)) +
+            SIZEOF_GFX_CMD(SPPopMatrix(0)) +
+            SIZEOF_GFX_CMD(SPEndDisplayList())
         );
-        dl = alloc_display_list(gfxCmds * sizeof(*dl));
         dlIter = dl;
         Vec3f scale;
 
@@ -93,14 +92,13 @@ Gfx *geo_intro_tm_copyright(s32 callContext, struct GraphNode *node, UNUSED void
     if (callContext != GEO_CONTEXT_RENDER) { // reset
         sTmCopyrightAlpha = 0;
     } else if (callContext == GEO_CONTEXT_RENDER) { // draw
-        u32 gfxCmds = (
-            GFX_ALLOC(gSPDisplayList    ) +
-            GFX_ALLOC(gDPSetEnvColor    ) +
-            GFX_ALLOC(gDPSetRenderMode  ) +
-            GFX_ALLOC(gSPDisplayList    ) +
-            GFX_ALLOC(gSPEndDisplayList )
+        dl = alloc_display_list(
+            SIZEOF_GFX_CMD(SPDisplayList(0)) +
+            SIZEOF_GFX_CMD(DPSetEnvColor(0,0,0,0)) +
+            SIZEOF_GFX_CMD(DPSetRenderMode(0,0)) +
+            SIZEOF_GFX_CMD(SPDisplayList(0)) +
+            SIZEOF_GFX_CMD(SPEndDisplayList())
         );
-        dl = alloc_display_list(gfxCmds * sizeof(*dl));
         dlIter = dl;
         gSPDisplayList(dlIter++, dl_proj_mtx_fullscreen);
         gDPSetEnvColor(dlIter++, 255, 255, 255, sTmCopyrightAlpha);
@@ -164,17 +162,16 @@ static const Texture *const *textureTables[] = {
  */
 static Gfx *intro_backdrop_one_image(s32 index, const s8 *backgroundTable) {
     Mtx *mtx = alloc_display_list(sizeof(*mtx));
-    u32 gfxCmds = (
-        GFX_ALLOC(gSPMatrix             ) +
-        GFX_ALLOC(gSPDisplayList        ) +
+    Gfx *dl = alloc_display_list(
+        SIZEOF_GFX_CMD(SPMatrix(0,0)) +
+        SIZEOF_GFX_CMD(SPDisplayList(0)) +
         (4 * (
-            GFX_ALLOC(gDPLoadTextureBlock   ) +
-            GFX_ALLOC(gSPDisplayList        )
+            SIZEOF_GFX_CMD(DPLoadTextureBlock(0,0,G_IM_SIZ_16b,0,0,0,0,0,0,0,0,0)) +
+            SIZEOF_GFX_CMD(SPDisplayList(0))
         )) +
-        GFX_ALLOC(gSPPopMatrix          ) +
-        GFX_ALLOC(gSPEndDisplayList     )
+        SIZEOF_GFX_CMD(SPPopMatrix(0)) +
+        SIZEOF_GFX_CMD(SPEndDisplayList())
     );
-    Gfx *dl = alloc_display_list(gfxCmds * sizeof(*dl));
     Gfx *dlIter = dl;
     const Texture *const *vIntroBgTable = segmented_to_virtual(textureTables[backgroundTable[index]]);
     s32 i;
@@ -210,16 +207,15 @@ Gfx *geo_intro_regular_backdrop(s32 callContext, struct GraphNode *node, UNUSED 
     s32 i;
 
     if (callContext == GEO_CONTEXT_RENDER) { // draw
-        u32 gfxCmds = (
-            GFX_ALLOC(gSPDisplayList    ) +
-            GFX_ALLOC(gSPDisplayList    ) +
+        dl = alloc_display_list(
+            SIZEOF_GFX_CMD(SPDisplayList(0)) +
+            SIZEOF_GFX_CMD(SPDisplayList(0)) +
             (ARRAY_COUNT(introBackgroundIndexTable) * (
-                GFX_ALLOC(gSPDisplayList    )
+                SIZEOF_GFX_CMD(SPDisplayList(0))
             )) +
-            GFX_ALLOC(gSPDisplayList    ) +
-            GFX_ALLOC(gSPEndDisplayList )
+            SIZEOF_GFX_CMD(SPDisplayList(0)) +
+            SIZEOF_GFX_CMD(SPEndDisplayList())
         );
-        dl = alloc_display_list(gfxCmds * sizeof(*dl));
         dlIter = dl;
         graphNode->drawingLayer = LAYER_OPAQUE;
         gSPDisplayList(dlIter++, &dl_proj_mtx_fullscreen);
@@ -263,16 +259,15 @@ Gfx *geo_intro_gameover_backdrop(s32 callContext, struct GraphNode *node, UNUSED
             gameOverBackgroundTable[i] = INTRO_BACKGROUND_GAME_OVER;
         }
     } else { // draw
-        u32 gfxCmds = (
-            GFX_ALLOC(gSPDisplayList    ) +
-            GFX_ALLOC(gSPDisplayList    ) +
+        dl = alloc_display_list(
+            SIZEOF_GFX_CMD(SPDisplayList(0)) +
+            SIZEOF_GFX_CMD(SPDisplayList(0)) +
             (ARRAY_COUNT(gameOverBackgroundTable) * (
-                GFX_ALLOC(gSPDisplayList    )
+                SIZEOF_GFX_CMD(SPDisplayList(0))
             )) +
-            GFX_ALLOC(gSPDisplayList    ) +
-            GFX_ALLOC(gSPEndDisplayList )
+            SIZEOF_GFX_CMD(SPDisplayList(0)) +
+            SIZEOF_GFX_CMD(SPEndDisplayList())
         );
-        dl = alloc_display_list(gfxCmds * sizeof(*dl));
         dlIter = dl;
         if (sGameOverTableIndex == -2) {
             if (sGameOverFrameCounter == 180) {
@@ -354,16 +349,15 @@ void intro_gen_face_texrect(Gfx **dlIter) {
 Gfx *intro_draw_face(RGBA16 *image, s32 imageW, s32 imageH) {
     Gfx *dlIter;
 
-    u32 gfxCmds = (
-        GFX_ALLOC(gSPDisplayList        ) +
-        GFX_ALLOC(gDPLoadTextureBlock   ) +
+    Gfx *dl = alloc_display_list(
+        SIZEOF_GFX_CMD(SPDisplayList(0)        ) +
+        SIZEOF_GFX_CMD(DPLoadTextureBlock(0,0,G_IM_SIZ_16b,0,0,0,0,0,0,0,0,0)) +
         (((6 * 8) - 8) * (
-            GFX_ALLOC(gSPTextureRectangle   )
+            SIZEOF_GFX_CMD(SPTextureRectangle(0,0,0,0,0,0,0,0,0))
         )) +
-        GFX_ALLOC(gSPDisplayList        ) +
-        GFX_ALLOC(gSPEndDisplayList     )
+        SIZEOF_GFX_CMD(SPDisplayList(0)) +
+        SIZEOF_GFX_CMD(SPEndDisplayList())
     );
-    Gfx *dl = alloc_display_list(gfxCmds * sizeof(Gfx));
 
     if (dl == NULL) {
         return dl;
@@ -521,13 +515,12 @@ Gfx *geo_intro_rumble_pak_graphic(s32 callContext, struct GraphNode *node, UNUSE
             backgroundTileSix = gameOverBackgroundTable[6];
         }
         if (backgroundTileSix == INTRO_BACKGROUND_SUPER_MARIO) {
-            u32 gfxCmds = (
-                GFX_ALLOC(gSPDisplayList    ) +
-                GFX_ALLOC(gDPLoadTextureTile) +
-                GFX_ALLOC(gSPDisplayList    ) +
-                GFX_ALLOC(gSPEndDisplayList )
+            dl = alloc_display_list(
+                SIZEOF_GFX_CMD(SPDisplayList(0)) +
+                SIZEOF_GFX_CMD(DPLoadTextureTile(0,0,G_IM_SIZ_16b,0,0,0,0,0,0,0,0,0,0,0,0,0)) +
+                SIZEOF_GFX_CMD(SPDisplayList(0)) +
+                SIZEOF_GFX_CMD(SPEndDisplayList())
             );
-            dl = alloc_display_list(gfxCmds * sizeof(*dl));
             if (dl != NULL) {
                 dlIter = dl;
                 gSPDisplayList(dlIter++, &title_screen_bg_dl_rumble_pak_begin);

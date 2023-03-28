@@ -55,12 +55,11 @@ Gfx *geo_update_layer_transparency(s32 callContext, struct GraphNode *node, UNUS
         }
 
         s32 objectOpacity = objectGraphNode->oOpacity;
-        u32 gfxCmds = (
-            GFX_ALLOC(gDPSetAlphaCompare) +
-            GFX_ALLOC(gDPSetEnvColor    ) +
-            GFX_ALLOC(gSPEndDisplayList )
+        dlStart = alloc_display_list(
+            SIZEOF_GFX_CMD(DPSetAlphaCompare(0)) +
+            SIZEOF_GFX_CMD(DPSetEnvColor(0,0,0,0)) +
+            SIZEOF_GFX_CMD(SPEndDisplayList())
         );
-        dlStart = alloc_display_list(gfxCmds * sizeof(Gfx));
 
         Gfx *dlHead = dlStart;
 

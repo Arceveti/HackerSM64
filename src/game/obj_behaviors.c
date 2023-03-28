@@ -90,11 +90,10 @@ Gfx UNUSED *geo_obj_transparency_something(s32 callContext, struct GraphNode *no
             heldObject = gCurGraphNodeHeldObject->objNode;
         }
 
-        u32 gfxCmds = (
-            GFX_ALLOC(gDPSetEnvColor    ) +
-            GFX_ALLOC(gSPEndDisplayList )
+        gfxHead = alloc_display_list(
+            SIZEOF_GFX_CMD(DPSetEnvColor(0,0,0,0)) +
+            SIZEOF_GFX_CMD(SPEndDisplayList())
         );
-        gfxHead = alloc_display_list(gfxCmds * sizeof(Gfx));
         gfx = gfxHead;
         obj->header.gfx.node.drawingLayer = LAYER_TRANSPARENT;
 

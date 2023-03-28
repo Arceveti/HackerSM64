@@ -249,25 +249,24 @@ Gfx *render_cannon_circle_base(void) {
 #else
     Vtx *verts = alloc_display_list(4 * sizeof(*verts));
 #endif
-    u32 gfxCmds = (
-        GFX_ALLOC(gSPDisplayList        ) +
-        GFX_ALLOC(gDPSetCombineMode     ) +
-        GFX_ALLOC(gDPSetTextureFilter   ) +
-        GFX_ALLOC(gDPLoadTextureBlock   ) +
-        GFX_ALLOC(gSPTexture            ) +
-        GFX_ALLOC(gSPVertex             ) +
-        GFX_ALLOC(gSPDisplayList        ) +
-        GFX_ALLOC(gSPTexture            ) +
+    Gfx *dlist = alloc_display_list(
+        SIZEOF_GFX_CMD(SPDisplayList(0)) +
+        SIZEOF_GFX_CMD(DPSetCombineMode(G_CC_SHADE,G_CC_SHADE)) +
+        SIZEOF_GFX_CMD(DPSetTextureFilter(0)) +
+        SIZEOF_GFX_CMD(DPLoadTextureBlock(0,0,G_IM_SIZ_8b,0,0,0,0,0,0,0,0,0)) +
+        SIZEOF_GFX_CMD(SPTexture(0,0,0,0,0)) +
+        SIZEOF_GFX_CMD(SPVertex(0,0,0)) +
+        SIZEOF_GFX_CMD(SPDisplayList(0)) +
+        SIZEOF_GFX_CMD(SPTexture(0,0,0,0,0)) +
 #ifdef WIDESCREEN
-        GFX_ALLOC(gDPSetCombineMode     ) +
-        GFX_ALLOC(gSPVertex             ) +
-        GFX_ALLOC(gSP2Triangles         ) +
-        GFX_ALLOC(gSP2Triangles         ) +
+        SIZEOF_GFX_CMD(DPSetCombineMode(0,0)) +
+        SIZEOF_GFX_CMD(SPVertex(0,0,0)) +
+        SIZEOF_GFX_CMD(SP2Triangles(0,0,0,0,0,0,0,0)) +
+        SIZEOF_GFX_CMD(SP2Triangles(0,0,0,0,0,0,0,0)) +
 #endif
-        GFX_ALLOC(gSPDisplayList        ) +
-        GFX_ALLOC(gSPEndDisplayList     )
+        SIZEOF_GFX_CMD(SPDisplayList(0)) +
+        SIZEOF_GFX_CMD(SPEndDisplayList())
     );
-    Gfx *dlist = alloc_display_list(gfxCmds * sizeof(*dlist));
     Gfx *g = dlist;
 
     if (verts != NULL && dlist != NULL) {

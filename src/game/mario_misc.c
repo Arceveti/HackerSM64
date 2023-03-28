@@ -305,24 +305,21 @@ void bhv_unlock_door_star_loop(void) {
 static Gfx *make_gfx_mario_alpha(struct GraphNodeGenerated *node, s16 alpha) {
     Gfx *gfx;
     Gfx *gfxHead = NULL;
-    u32 gfxCmds = 0;
 
     if (alpha == 255) {
         node->fnNode.node.drawingLayer = LAYER_OPAQUE;
-        gfxCmds = (
-            GFX_ALLOC(gDPSetEnvColor        ) +
-            GFX_ALLOC(gSPEndDisplayList     )
+        gfxHead = alloc_display_list(
+            SIZEOF_GFX_CMD(DPSetEnvColor(0,0,0,0)) +
+            SIZEOF_GFX_CMD(SPEndDisplayList())
         );
-        gfxHead = alloc_display_list(gfxCmds * sizeof(*gfxHead));
         gfx = gfxHead;
     } else {
         node->fnNode.node.drawingLayer = LAYER_TRANSPARENT;
-        gfxCmds = (
-            GFX_ALLOC(gDPSetAlphaCompare    ) +
-            GFX_ALLOC(gDPSetEnvColor        ) +
-            GFX_ALLOC(gSPEndDisplayList     )
+        gfxHead = alloc_display_list(
+            SIZEOF_GFX_CMD(DPSetAlphaCompare(0)) +
+            SIZEOF_GFX_CMD(DPSetEnvColor(0,0,0,0)) +
+            SIZEOF_GFX_CMD(SPEndDisplayList())
         );
-        gfxHead = alloc_display_list(gfxCmds * sizeof(*gfxHead));
         gfx = gfxHead;
         if (gMarioState->flags & (MARIO_VANISH_CAP | MARIO_TELEPORTING)) {
             gDPSetAlphaCompare(gfx++, G_AC_DITHER);
@@ -642,12 +639,11 @@ Gfx *geo_mirror_mario_backface_culling(s32 callContext, struct GraphNode *node, 
     Gfx *gfx = NULL;
 
     if (callContext == GEO_CONTEXT_RENDER && gCurGraphNodeObject == &gMirrorMario) {
-        u32 gfxCmds = (
-            GFX_ALLOC(gSPClearGeometryMode  ) +
-            GFX_ALLOC(gSPSetGeometryMode    ) +
-            GFX_ALLOC(gSPEndDisplayList     )
+        gfx = alloc_display_list(
+            SIZEOF_GFX_CMD(SPClearGeometryMode(0)) +
+            SIZEOF_GFX_CMD(SPSetGeometryMode(0)) +
+            SIZEOF_GFX_CMD(SPEndDisplayList())
         );
-        gfx = alloc_display_list(gfxCmds * sizeof(*gfx));
 
         if (asGenerated->parameter == 0) {
             gSPClearGeometryMode(&gfx[0], G_CULL_BACK);

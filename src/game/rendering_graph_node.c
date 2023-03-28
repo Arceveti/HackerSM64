@@ -844,16 +844,15 @@ void geo_process_background(struct GraphNodeBackground *node) {
     if (list != NULL) {
         geo_append_display_list((void *) VIRTUAL_TO_PHYSICAL(list), node->fnNode.node.drawingLayer);
     } else if (gCurGraphNodeMasterList != NULL) {
-        u32 gfxCmds = (
-            GFX_ALLOC(gDPPipeSync       ) +
-            GFX_ALLOC(gDPSetCycleType   ) +
-            GFX_ALLOC(gDPSetFillColor   ) +
-            GFX_ALLOC(gDPFillRectangle  ) +
-            GFX_ALLOC(gDPPipeSync       ) +
-            GFX_ALLOC(gDPSetCycleType   ) +
-            GFX_ALLOC(gSPEndDisplayList )
+        Gfx *gfxStart = alloc_display_list(
+            SIZEOF_GFX_CMD(DPPipeSync()) +
+            SIZEOF_GFX_CMD(DPSetCycleType(0)) +
+            SIZEOF_GFX_CMD(DPSetFillColor(0)) +
+            SIZEOF_GFX_CMD(DPFillRectangle(0,0,0,0)) +
+            SIZEOF_GFX_CMD(DPPipeSync()) +
+            SIZEOF_GFX_CMD(DPSetCycleType(0)) +
+            SIZEOF_GFX_CMD(SPEndDisplayList())
         );
-        Gfx *gfxStart = alloc_display_list(gfxCmds * sizeof(Gfx));
         Gfx *gfx = gfxStart;
 
         gDPPipeSync(gfx++);

@@ -291,19 +291,18 @@ Gfx *render_painting_segment(const Texture *img, s16 index, s16 imageCount, s16 
     PaintingData numVtx       = (numTris * 3); // 3 verts per tri
 
     Vtx *verts = alloc_display_list(numVtx * sizeof(Vtx));
-    u32 gfxCmds = (
-        /*gLoadBlockTexture */ 5 +
+    Gfx *dlist = alloc_display_list(
+        SIZEOF_GFX_CMD(LoadBlockTexture(0,0,0,0)) +
         (triGroups * (
-            /*gSPVertex         */ 1 +
-            /*gSPDisplayList    */ 1
+            SIZEOF_GFX_CMD(SPVertex(0,0,0)) +
+            SIZEOF_GFX_CMD(SPDisplayList(0))
         )) +
-        /*gSPVertex         */ 1 +
+        SIZEOF_GFX_CMD(SPVertex(0,0,0)) +
         (remGroupTris * (
-            /*gSP1Triangle      */ 1
+            SIZEOF_GFX_CMD(SP1Triangle(0,0,0,0))
         )) +
-        /*gSPEndDisplayList */ 1
+        SIZEOF_GFX_CMD(SPEndDisplayList())
     );
-    Gfx *dlist = alloc_display_list(gfxCmds * sizeof(Gfx));
     Gfx *gfx = dlist;
 
     gLoadBlockTexture(gfx++, tWidth, tHeight, G_IM_FMT_RGBA, img);
@@ -429,19 +428,18 @@ Gfx *dl_painting_rippling(const struct PaintingImage *paintingImage, struct Pain
     const Texture **tArray = segmented_to_virtual(paintingImage->textureArray);
     s32 isEnvMap = (paintingImage->imageType == PAINTING_IMAGE_TYPE_ENV_MAP);
 
-    u32 gfxCmds = (
-        GFX_ALLOC(gSPMatrix         ) +
-        GFX_ALLOC(gSPDisplayList    ) +
-        GFX_ALLOC(gDPSetTile        ) +
-        GFX_ALLOC(gDPSetTileSize    ) +
+    Gfx *dlist = alloc_display_list(
+        SIZEOF_GFX_CMD(SPMatrix(0,0)) +
+        SIZEOF_GFX_CMD(SPDisplayList(0)) +
+        SIZEOF_GFX_CMD(DPSetTile(0,0,0,0,0,0,0,0,0,0,0,0)) +
+        SIZEOF_GFX_CMD(DPSetTileSize(0,0,0,0,0)) +
         (imageCount * (
-            GFX_ALLOC(gSPDisplayList    )
+            SIZEOF_GFX_CMD(SPDisplayList(0))
         )) +
-        GFX_ALLOC(gSPDisplayList    ) +
-        GFX_ALLOC(gSPPopMatrix      ) +
-        GFX_ALLOC(gSPEndDisplayList )
+        SIZEOF_GFX_CMD(SPDisplayList(0)) +
+        SIZEOF_GFX_CMD(SPPopMatrix(0)) +
+        SIZEOF_GFX_CMD(SPEndDisplayList())
     );
-    Gfx *dlist = alloc_display_list(gfxCmds * sizeof(Gfx));
     Gfx *gfx = dlist;
 
     if (dlist == NULL) {
@@ -523,26 +521,25 @@ Gfx *dl_painting_not_rippling(struct Object *obj) {
     Alpha alpha = paintingImage->alpha;
     s16 imageCount = paintingImage->imageCount;
     s32 shaded = paintingImage->shaded;
-    u32 gfxCmds = (
-        GFX_ALLOC(gSPMatrix         ) +
-        GFX_ALLOC(gSPDisplayList    ) +
-        GFX_ALLOC(gSPVertex         ) +
-        GFX_ALLOC(gDPSetTile        ) +
-        GFX_ALLOC(gDPSetTileSize    ) +
+    Gfx *dlist = alloc_display_list(
+        SIZEOF_GFX_CMD(SPMatrix(0,0)) +
+        SIZEOF_GFX_CMD(SPDisplayList(0)) +
+        SIZEOF_GFX_CMD(SPVertex(0,0,0)) +
+        SIZEOF_GFX_CMD(DPSetTile(0,0,0,0,0,0,0,0,0,0,0,0)) +
+        SIZEOF_GFX_CMD(DPSetTileSize(0,0,0,0,0)) +
         (imageCount * (
-            GFX_ALLOC(gDPSetTextureImage) +
-            GFX_ALLOC(gDPLoadSync       ) +
-            GFX_ALLOC(gDPLoadBlock      ) +
-            GFX_ALLOC(gSP2Triangles     )
+            SIZEOF_GFX_CMD(DPSetTextureImage(0,0,0,0)) +
+            SIZEOF_GFX_CMD(DPLoadSync()) +
+            SIZEOF_GFX_CMD(DPLoadBlock(0,0,0,0,0)) +
+            SIZEOF_GFX_CMD(SP2Triangles(0,0,0,0,0,0,0,0))
         )) +
-        GFX_ALLOC(gSPDisplayList    ) +
+        SIZEOF_GFX_CMD(SPDisplayList(0)) +
         (!shaded * (
-            GFX_ALLOC(gSPSetGeometryMode)
+            SIZEOF_GFX_CMD(SPSetGeometryMode(0))
         )) +
-        GFX_ALLOC(gSPPopMatrix      ) +
-        GFX_ALLOC(gSPEndDisplayList )
+        SIZEOF_GFX_CMD(SPPopMatrix(0)) +
+        SIZEOF_GFX_CMD(SPEndDisplayList())
     );
-    Gfx *dlist = alloc_display_list(gfxCmds * sizeof(Gfx));
     Gfx *gfx = dlist;
 
     if (dlist == NULL) {

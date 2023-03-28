@@ -75,11 +75,10 @@ Gfx *geo_exec_inside_castle_light(s32 callContext, struct GraphNode *node, UNUSE
     if (callContext == GEO_CONTEXT_RENDER) {
         s32 flags = save_file_get_flags();
         if (gHudDisplay.stars >= NUM_STARS_REQUIRED_FOR_WING_CAP_LIGHT && !(flags & SAVE_FLAG_HAVE_WING_CAP)) {
-            u32 gfxCmds = (
-                GFX_ALLOC(gSPDisplayList    ) +
-                GFX_ALLOC(gSPEndDisplayList )
+            displayList = alloc_display_list(
+                SIZEOF_GFX_CMD(SPDisplayList(0)) +
+                SIZEOF_GFX_CMD(SPEndDisplayList())
             );
-            displayList = alloc_display_list(gfxCmds * sizeof(*displayList));
 
             if (displayList == NULL) {
                 return NULL;
@@ -134,16 +133,15 @@ Gfx *geo_exec_flying_carpet_create(s32 callContext, struct GraphNode *node, UNUS
 
     if (callContext == GEO_CONTEXT_RENDER) {
         verts = alloc_display_list(NUM_FLYING_CARPET_VERTICES * sizeof(*verts));
-        u32 gfxCmds = (
-            GFX_ALLOC(gSPDisplayList    ) +
-            GFX_ALLOC(gSPVertex         ) +
-            GFX_ALLOC(gSPDisplayList    ) +
-            GFX_ALLOC(gSPVertex         ) +
-            GFX_ALLOC(gSPDisplayList    ) +
-            GFX_ALLOC(gSPDisplayList    ) +
-            GFX_ALLOC(gSPEndDisplayList )
+        displayList = alloc_display_list(
+            SIZEOF_GFX_CMD(SPDisplayList(0)) +
+            SIZEOF_GFX_CMD(SPVertex(0,0,0)) +
+            SIZEOF_GFX_CMD(SPDisplayList(0)) +
+            SIZEOF_GFX_CMD(SPVertex(0,0,0)) +
+            SIZEOF_GFX_CMD(SPDisplayList(0)) +
+            SIZEOF_GFX_CMD(SPDisplayList(0)) +
+            SIZEOF_GFX_CMD(SPEndDisplayList())
         );
-        displayList = alloc_display_list(gfxCmds * sizeof(*displayList));
         displayListHead = displayList;
 
         if (verts == NULL || displayList == NULL) {
@@ -200,12 +198,11 @@ Gfx *geo_exec_cake_end_screen(s32 callContext, struct GraphNode *node, UNUSED Ma
     Gfx *displayListHead = NULL;
 
     if (callContext == GEO_CONTEXT_RENDER) {
-        u32 gfxCmds = (
-            GFX_ALLOC(gSPDisplayList    ) +
-            GFX_ALLOC(gSPDisplayList    ) +
-            GFX_ALLOC(gSPEndDisplayList )
+        displayList = alloc_display_list(
+            SIZEOF_GFX_CMD(SPDisplayList(0)) +
+            SIZEOF_GFX_CMD(SPDisplayList(0)) +
+            SIZEOF_GFX_CMD(SPEndDisplayList())
         );
-        displayList = alloc_display_list(gfxCmds * sizeof(*displayList));
         displayListHead = displayList;
 
         generatedNode->fnNode.node.drawingLayer = LAYER_OPAQUE;

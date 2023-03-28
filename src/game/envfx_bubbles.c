@@ -429,18 +429,17 @@ Gfx *envfx_update_bubble_particles(s32 mode, UNUSED Vec3s marioPos, Vec3s camFro
     Vec3s vertex2;
     Vec3s vertex3;
 
-    u32 gfxCmds = (
-        GFX_ALLOC(gSPDisplayList    ) +
+    Gfx *gfxStart = alloc_display_list(
+        SIZEOF_GFX_CMD(SPDisplayList(0)) +
         (sBubbleParticleMaxCount * (
-            GFX_ALLOC(gDPPipeSync       ) +
-            GFX_ALLOC(gSP2Triangles     ) +
-            GFX_ALLOC(gSP2Triangles     ) +
-            GFX_ALLOC(gSP1Triangle      )
+            SIZEOF_GFX_CMD(DPPipeSync()) +
+            SIZEOF_GFX_CMD(SP2Triangles(0,0,0,0,0,0,0,0)) +
+            SIZEOF_GFX_CMD(SP2Triangles(0,0,0,0,0,0,0,0)) +
+            SIZEOF_GFX_CMD(SP1Triangle(0,0,0,0))
         )) +
-        GFX_ALLOC(gSPDisplayList    ) +
-        GFX_ALLOC(gSPEndDisplayList )
+        SIZEOF_GFX_CMD(SPDisplayList(0)) +
+        SIZEOF_GFX_CMD(SPEndDisplayList())
     );
-    Gfx *gfxStart = alloc_display_list(gfxCmds * sizeof(Gfx));
     if (gfxStart == NULL) {
         return NULL;
     }
