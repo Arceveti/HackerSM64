@@ -18,12 +18,12 @@ s8 gCrashScreenWordWrap = TRUE;
 static u8 sCrashScreenPrintEscape = FALSE;
 
 
-PrintCommand crash_screen_parse_formatting(const char *buf, u32 index, u32 size, RGBA32 *color, u32 x, u32 y);
+PrintCommand crash_screen_parse_formatting(const char *buf, u32 index, u32 size, RGBA32 *color, u32 x, u32 y, s32 isMain);
 
 
 PrintCommand crash_screen_fornat_space(const char *buf, u32 index, u32 size, u32 x, u32 y) {
     PrintCommand cmd = { .raw = 0 }, cmd2;
-    UNUSED RGBA32 checkColor = 0;
+    UNUSED RGBA32 checkColor = COLOR_RGBA32_WHITE;
 
     // Parse space
     u32 numSpaces = 0;
@@ -32,6 +32,7 @@ PrintCommand crash_screen_fornat_space(const char *buf, u32 index, u32 size, u32
         if (index > size) {
             break;
         }
+
         numSpaces++;
     }
     // index is now the first non-space
@@ -45,16 +46,22 @@ PrintCommand crash_screen_fornat_space(const char *buf, u32 index, u32 size, u32
     u32 checkX = x;
     u32 checkY = y;
     if (remainingSize > 0) {
-        for (u32 i = 0; i < remainingSize && buf[index + i] != CHAR_SPACE; i += (1 + cmd2.d.skip)) {
-            cmd2 = crash_screen_parse_formatting(buf, (index + i), size, &checkColor, checkX, checkY);
+        for (u32 i = 0; i < remainingSize; i += (1 + cmd2.d.skip)) {
+            if (buf[index + i] == CHAR_SPACE) {
+                break;
+            }
+
+            cmd2 = crash_screen_parse_formatting(buf, (index + i), size, &checkColor, checkX, checkY, FALSE);
+
             if (cmd2.d.newLine) {
                 break;
             }
+
             checkX += TEXT_WIDTH(cmd2.d.shift);
         }
     }
 
-    if (gCrashScreenWordWrap && checkX >= CRASH_SCREEN_TEXT_X2) {
+    if (gCrashScreenWordWrap && (checkX >= CRASH_SCREEN_TEXT_X2)) {
         cmd.d.newLine = TRUE;
     } else {
         cmd.d.shift = (1 + numSpaces);
@@ -137,7 +144,7 @@ PrintCommand crash_screen_fornat_escape(const char *buf, u32 index) {
     return cmd;
 }
 
-PrintCommand crash_screen_fornat_local_scroll(const char *buf, u32 index, u32 size, RGBA32 *color, u32 x, u32 y) {
+PrintCommand crash_screen_fornat_local_scroll(const char *buf, u32 index, u32 size, RGBA32 *color, u32 x, u32 y, s32 isMain) {
     PrintCommand cmd = { .raw = 0 };
 
     unsigned char glyph = buf[index];
@@ -170,7 +177,7 @@ PrintCommand crash_screen_fornat_local_scroll(const char *buf, u32 index, u32 si
         glyph = buf[startIndex + numChars];
     }
 
-    if (numChars > 0) {
+    if (isMain && numChars > 0) {
         if (numChars > maxNumChars) {
             // Scroll text
             u32 offset = (CYCLES_TO_FRAMES(osGetTime()) >> 3);
@@ -206,7 +213,7 @@ PrintCommand crash_screen_fornat_normal_glyph(u32 index, u32 size, u32 x) {
     PrintCommand cmd = { .raw = 0 };
 
     cmd.d.print = TRUE;
-    if (gCrashScreenWordWrap && index < size && (x + TEXT_WIDTH(1)) >= CRASH_SCREEN_TEXT_X2) {
+    if (gCrashScreenWordWrap && (index < size) && ((x + TEXT_WIDTH(1)) >= CRASH_SCREEN_TEXT_X2)) {
         cmd.d.newLine = TRUE;
     } else {
         cmd.d.shift = 1;
@@ -215,7 +222,7 @@ PrintCommand crash_screen_fornat_normal_glyph(u32 index, u32 size, u32 x) {
     return cmd;
 }
 
-PrintCommand crash_screen_parse_formatting(const char *buf, u32 index, u32 size, RGBA32 *color, u32 x, u32 y) {
+PrintCommand crash_screen_parse_formatting(const char *buf, u32 index, u32 size, RGBA32 *color, u32 x, u32 y, s32 isMain) {
     PrintCommand cmd = { .raw = 0 };
 
     unsigned char glyph = buf[index++];
@@ -239,7 +246,7 @@ PrintCommand crash_screen_parse_formatting(const char *buf, u32 index, u32 size,
                 cmd = crash_screen_fornat_escape(buf, index);
                 break;
             case CHAR_SCROLL:
-                cmd = crash_screen_fornat_local_scroll(buf, index, size, color, x, y);
+                cmd = crash_screen_fornat_local_scroll(buf, index, size, color, x, y, isMain);
                 break;
             default:
                 cmd = crash_screen_fornat_normal_glyph(index, size, x);
@@ -280,7 +287,7 @@ u32 crash_screen_print(u32 startX, u32 startY, const char *fmt, ...) {
 
     if (size > 0) {
         for (u32 index = 0; index < size && buf[index]; index += (1 + cmd.d.skip)) {
-            cmd = crash_screen_parse_formatting(buf, index, size, &color, x, y);
+            cmd = crash_screen_parse_formatting(buf, index, size, &color, x, y, TRUE);
             if (cmd.d.print) {
                 crash_screen_draw_glyph(x, y, buf[index], color);
             }
