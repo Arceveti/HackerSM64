@@ -13,21 +13,22 @@
 #include "game/printf.h"
 
 
+PrintCommand gCrashScreenPrintBuffer[CHAR_BUFFER_SIZE];
+
 s8 gCrashScreenWordWrap = TRUE;
 
-static u8 sCrashScreenPrintEscape = FALSE;
+
+void crash_screen_parse_formatting(PrintCommand *cmd, const char *buf, u32 index, u32 size, RGBA32 *color, u32 x, u32 y, u8* printEscape, s32 isMain);
 
 
-PrintCommand crash_screen_parse_formatting(const char *buf, u32 index, u32 size, RGBA32 *color, u32 x, u32 y, s32 isMain);
-
-
-PrintCommand crash_screen_fornat_space(const char *buf, u32 index, u32 size, u32 x, u32 y) {
-    PrintCommand cmd = { .raw = 0 }, cmd2;
+void crash_screen_format_space(PrintCommand *cmd, const char *buf, u32 index, u32 size, u32 x, u32 y) {
+    PrintCommand cmd2 = { .raw = 0 };
     UNUSED RGBA32 checkColor = COLOR_RGBA32_WHITE;
 
-    // Parse space
+    // Parse space:
+
+    // Count the number of spaces
     u32 numSpaces = 0;
-    // Count number of spaces
     while (buf[index++] == CHAR_SPACE) {
         if (index > size) {
             break;
@@ -35,41 +36,42 @@ PrintCommand crash_screen_fornat_space(const char *buf, u32 index, u32 size, u32
 
         numSpaces++;
     }
+
     // index is now the first non-space
     x += TEXT_WIDTH(numSpaces);
     if (x >= CRASH_SCREEN_TEXT_X2) {
-        cmd.d.newLine = TRUE;
-        cmd.d.skip = numSpaces;
-        return cmd;
+        cmd->newLine = TRUE;
+        cmd->skip = numSpaces;
+        return;
     }
+
     u32 remainingSize = (size - index);
     u32 checkX = x;
     u32 checkY = y;
+    u8 printEscape2 = FALSE;
     if (remainingSize > 0) {
-        for (u32 i = 0; i < remainingSize; i += (1 + cmd2.d.skip)) {
+        for (u32 i = 0; i < remainingSize; i += (1 + cmd2.skip)) {
             if (buf[index + i] == CHAR_SPACE) {
                 break;
             }
 
-            cmd2 = crash_screen_parse_formatting(buf, (index + i), size, &checkColor, checkX, checkY, FALSE);
+            crash_screen_parse_formatting(&cmd2, buf, (index + i), size, &checkColor, checkX, checkY, &printEscape2, FALSE);
 
-            if (cmd2.d.newLine) {
+            if (cmd2.newLine) {
                 break;
             }
 
-            checkX += TEXT_WIDTH(cmd2.d.shift);
+            checkX += TEXT_WIDTH(cmd2.shift);
         }
     }
 
     if (gCrashScreenWordWrap && (checkX >= CRASH_SCREEN_TEXT_X2)) {
-        cmd.d.newLine = TRUE;
+        cmd->newLine = TRUE;
     } else {
-        cmd.d.shift = (1 + numSpaces);
+        cmd->shift = (1 + numSpaces);
     }
 
-    cmd.d.skip = numSpaces;
-
-    return cmd;
+    cmd->skip = numSpaces;
 }
 
 static s32 glyph_to_hex(char *dest, unsigned char glyph) {
@@ -86,95 +88,95 @@ static s32 glyph_to_hex(char *dest, unsigned char glyph) {
     return TRUE;
 }
 
-PrintCommand crash_screen_fornat_text_color(const char *buf, u32 index, u32 size, RGBA32 *color) {
-    PrintCommand cmd = { .raw = 0 };
+static s32 read_str_to_bytes(u8 dest[], const char *buf, u32 index, size_t numBytes) {
+    for (u32 byteIndex = 0; byteIndex < numBytes; byteIndex++) {
+        u8 retByte = 0x00;
 
-    u32 byteIndex, digit;
-    char hex = 0x00;
-    Color component = 0x00;
-    ColorRGBA rgba = { 0x00, 0x00, 0x00, 0x00 };
-    *color = COLOR_RGBA32_WHITE;
+        for (int digit = 0; digit < 2; digit++) {
+            unsigned char glyph = buf[index];
+            char hex = 0x0;
 
-    if ((index + 8) > size) {
-        return cmd;
-    }
-
-    for (byteIndex = 0; byteIndex < sizeof(RGBA32); byteIndex++) {
-        // Parse byte as color component.
-        for (digit = 0; digit < 2; digit++) {
-            if (!glyph_to_hex(&hex, buf[index])) {
-                return cmd;
+            if (glyph == CHAR_NULL) {
+                return FALSE;
             }
 
-            if (!buf[++index]) {
-                return cmd;
+            if (!glyph_to_hex(&hex, glyph)) {
+                return FALSE;
             }
 
-            component |= (hex << ((1 - digit) * sizeof(RGBA32)));
+            retByte |= (hex << ((1 - digit) * 4));
+            index++;
         }
 
-        rgba[byteIndex] = component;
-        component = 0x00;
+        dest[byteIndex] = retByte;
     }
 
-    *color = COLORRGBA_TO_RGBA32(rgba);
-    cmd.d.skip = 8;
-
-    return cmd;
+    return TRUE;
 }
 
-PrintCommand crash_screen_fornat_escape(const char *buf, u32 index) {
-    PrintCommand cmd = { .raw = 0 };
 
+void crash_screen_format_text_color(PrintCommand *cmd, const char *buf, u32 index, size_t size, RGBA32 *color) {
+    ColorRGBA rgba = { 0x00, 0x00, 0x00, 0x00 };
+    *color = COLOR_RGBA32_WHITE;
+    const u32 numCharsToRead = (sizeof(RGBA32) * 2);
+
+    if ((index + numCharsToRead) > size) {
+        return;
+    }
+
+    if (!read_str_to_bytes(rgba, buf, index, sizeof(RGBA32))) {
+        return;
+    }
+    index += numCharsToRead;
+
+    *color = COLORRGBA_TO_RGBA32(rgba);
+    cmd->skip = numCharsToRead;
+}
+
+void crash_screen_format_escape(PrintCommand *cmd, const char *buf, u32 index, u8* printEscape) {
     unsigned char glyph = buf[index];
 
-    if (!sCrashScreenPrintEscape
+    if (!*printEscape
      && glyph != CHAR_NULL
      && (glyph == CHAR_NEWLINE
       || glyph == CHAR_RETURN
       || glyph == CHAR_COLOR
       || glyph == CHAR_SCROLL
       || glyph == CHAR_ESCAPE)) {
-        sCrashScreenPrintEscape = TRUE;
+        *printEscape = TRUE;
     } else {
-        cmd.d.print = TRUE;
-        cmd.d.shift = 1;
+        cmd->print = TRUE;
+        cmd->shift = 1;
     }
-
-    return cmd;
 }
 
-PrintCommand crash_screen_fornat_local_scroll(const char *buf, u32 index, u32 size, RGBA32 *color, u32 x, u32 y, s32 isMain) {
-    PrintCommand cmd = { .raw = 0 };
-
+void crash_screen_format_local_scroll(PrintCommand *cmd, const char *buf, u32 index, u32 size, RGBA32 *color, u32 x, u32 y, s32 isMain) {
     unsigned char glyph = buf[index];
-    u32 numDigits = 0;
-    u32 numChars = 0;
-    u32 maxNumChars = 0;
+    const size_t numCharsToRead = (sizeof(u8) * 2);
 
-    while (glyph != CHAR_NULL && IS_NUMERIC(glyph)) {
-        if (index + numDigits > size) {
-            return cmd;
-        }
-        maxNumChars *= 10;
-        maxNumChars += ((glyph - '0') & BITMASK(4)); //! TODO: use glyph_to_hex
-        numDigits++;
-        glyph = buf[index + numDigits];
+    if ((index + numCharsToRead) > size) {
+        return;
     }
 
-    if (numDigits == 0) {
-        return cmd;
+    u8 maxNumChars = 0x00;
+
+    if (!read_str_to_bytes(&maxNumChars, buf, index, sizeof(u8))) {
+        return;
+    }
+    index += numCharsToRead;
+
+    maxNumChars = MIN(maxNumChars, (size - index));
+
+    if ((index + maxNumChars) > size) {
+        return;
     }
 
-    u32 startIndex = index + numDigits;
-    u32 charCheckIndex = startIndex;
+    u8 numChars = 0;
 
+    // Count how many total characters will need to be scrolled if they exceed the limit.
     while (glyph != CHAR_NULL && glyph != CHAR_SPACE) {
-        if (charCheckIndex > size) {
-            break;
-        }
         numChars++;
-        glyph = buf[startIndex + numChars];
+        glyph = buf[index + numChars];
     }
 
     if (isMain && numChars > 0) {
@@ -182,7 +184,7 @@ PrintCommand crash_screen_fornat_local_scroll(const char *buf, u32 index, u32 si
             // Scroll text
             u32 offset = (CYCLES_TO_FRAMES(osGetTime()) >> 3);
             for (u32 i = 0; i < maxNumChars; i++) {
-                glyph = buf[startIndex + ((i + offset) % (numChars + TEXT_SCROLL_NUM_SPACES))];
+                glyph = buf[index + ((i + offset) % (numChars + TEXT_SCROLL_NUM_SPACES))];
                 if (glyph != CHAR_NULL) {
                     crash_screen_draw_glyph(x, y, glyph, *color);
                 }
@@ -194,7 +196,7 @@ PrintCommand crash_screen_fornat_local_scroll(const char *buf, u32 index, u32 si
         } else {
             // Print "normally"
             for (u32 i = 0; i < numChars; i++) {
-                glyph = buf[startIndex + i];
+                glyph = buf[index + i];
                 if (glyph != CHAR_NULL) {
                     crash_screen_draw_glyph(x, y, glyph, *color);
                 }
@@ -204,61 +206,51 @@ PrintCommand crash_screen_fornat_local_scroll(const char *buf, u32 index, u32 si
         }
     }
 
-    cmd.d.shift = cmd.d.skip = (numDigits + numChars);
-
-    return cmd;
+    cmd->shift = cmd->skip = (numCharsToRead + numChars);
 }
 
-PrintCommand crash_screen_fornat_normal_glyph(u32 index, u32 size, u32 x) {
-    PrintCommand cmd = { .raw = 0 };
-
-    cmd.d.print = TRUE;
+void crash_screen_format_normal_glyph(PrintCommand *cmd, u32 index, u32 size, u32 x) {
+    cmd->print = TRUE;
     if (gCrashScreenWordWrap && (index < size) && ((x + TEXT_WIDTH(1)) >= CRASH_SCREEN_TEXT_X2)) {
-        cmd.d.newLine = TRUE;
+        cmd->newLine = TRUE;
     } else {
-        cmd.d.shift = 1;
+        cmd->shift = 1;
     }
-
-    return cmd;
 }
 
-PrintCommand crash_screen_parse_formatting(const char *buf, u32 index, u32 size, RGBA32 *color, u32 x, u32 y, s32 isMain) {
-    PrintCommand cmd = { .raw = 0 };
-
+void crash_screen_parse_formatting(PrintCommand *cmd, const char *buf, u32 index, u32 size, RGBA32 *color, u32 x, u32 y, u8 *printEscape, s32 isMain) {
     unsigned char glyph = buf[index++];
 
-    if (sCrashScreenPrintEscape) {
-        sCrashScreenPrintEscape = FALSE;
-        cmd = crash_screen_fornat_normal_glyph(index, size, x);
+    if (*printEscape) {
+        *printEscape = FALSE;
+        crash_screen_format_normal_glyph(cmd, index, size, x);
     } else {
         switch (glyph) {
             case CHAR_NEWLINE:
             case CHAR_RETURN:
-                cmd.d.newLine = TRUE;
+                cmd->newLine = TRUE;
                 break;
             case CHAR_SPACE:
-                cmd = crash_screen_fornat_space(buf, index, size, x, y);
+                crash_screen_format_space(cmd, buf, index, size, x, y);
                 break;
             case CHAR_COLOR: // @RRGGBBAA color prefix
-                cmd = crash_screen_fornat_text_color(buf, index, size, color);
+                crash_screen_format_text_color(cmd, buf, index, size, color);
                 break;
             case CHAR_ESCAPE:
-                cmd = crash_screen_fornat_escape(buf, index);
+                crash_screen_format_escape(cmd, buf, index, printEscape);
                 break;
-            case CHAR_SCROLL:
-                cmd = crash_screen_fornat_local_scroll(buf, index, size, color, x, y, isMain);
+            case CHAR_SCROLL: // ^XX, XX = the max number of characters for the next word before scrolling it.
+                crash_screen_format_local_scroll(cmd, buf, index, size, color, x, y, isMain);
                 break;
             default:
-                cmd = crash_screen_fornat_normal_glyph(index, size, x);
+                crash_screen_format_normal_glyph(cmd, index, size, x);
                 break;
         }
     }
 
     if (glyph != CHAR_ESCAPE) {
-        sCrashScreenPrintEscape = FALSE;
+        *printEscape = FALSE;
     }
-
-    return cmd;
 }
 
 static char *write_to_buf(char *buffer, const char *data, size_t size) {
@@ -283,20 +275,29 @@ u32 crash_screen_print(u32 startX, u32 startY, const char *fmt, ...) {
 
     PrintCommand cmd = { .raw = 0 };
 
-    sCrashScreenPrintEscape = FALSE;
+    u8 printEscape = FALSE;
 
     if (size > 0) {
-        for (u32 index = 0; index < size && buf[index]; index += (1 + cmd.d.skip)) {
-            cmd = crash_screen_parse_formatting(buf, index, size, &color, x, y, TRUE);
-            if (cmd.d.print) {
+        for (u32 index = 0; index < size; index += (1 + cmd.skip)) {
+            if (buf[index] == CHAR_NULL) {
+                break;
+            }
+
+            bzero(&cmd, sizeof(cmd));
+
+            crash_screen_parse_formatting(&cmd, buf, index, size, &color, x, y, &printEscape, TRUE);
+
+            if (cmd.print) {
                 crash_screen_draw_glyph(x, y, buf[index], color);
             }
-            if (cmd.d.newLine) {
+
+            if (cmd.newLine) {
                 x = startX;
                 y += TEXT_HEIGHT(1);
                 numLines++;
             }
-            x += TEXT_WIDTH(cmd.d.shift);
+
+            x += TEXT_WIDTH(cmd.shift);
         }
     }
 
