@@ -96,6 +96,24 @@ char *find_function_in_stack(uintptr_t *sp) {
 
     return NULL;
 }
+
+_Bool is_in_same_function(uintptr_t oldPos, uintptr_t newPos) {
+    if (oldPos == newPos) {
+        return TRUE;
+    }
+
+    oldPos &= ~(sizeof(uintptr_t) - 1);
+    newPos &= ~(sizeof(uintptr_t) - 1);
+
+    if (oldPos == newPos) {
+        return TRUE;
+    }
+
+    parse_map(&oldPos);
+    parse_map(&newPos);
+
+    return (oldPos == newPos);
+}
 #else
 char *parse_map(UNUSED uintptr_t *addr) {
     return NULL;
@@ -105,5 +123,9 @@ char *parse_map_exact(UNUSED uintptr_t addr) {
 }
 char *find_function_in_stack(UNUSED uintptr_t *sp) {
     return NULL;
+}
+
+_Bool is_in_same_function(UNUSED uintptr_t oldPos, UNUSED uintptr_t newPos) {
+    return FALSE;
 }
 #endif

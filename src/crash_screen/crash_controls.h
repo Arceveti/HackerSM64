@@ -34,8 +34,8 @@ enum ControlTypes {
     CONT_DESC_CURSOR_HORIZONTAL,
     CONT_DESC_JUMP_TO_ADDRESS,
     CONT_DESC_TOGGLE_ASCII,
-    CONT_DESC_TOGGLE_FUNCTIONS,
     CONT_DESC_TOGGLE_UNKNOWNS,
+    CONT_DESC_TOGGLE_FUNCTIONS,
     NUM_CONT_DESC,
 };
 
@@ -44,12 +44,13 @@ struct ControlType {
     /*0x04*/ const char *description;
 }; /*0x08*/
 
+extern _Bool gDrawControls;
+
 extern CrashScreenDirections gCrashScreenDirectionFlags;
 
 extern const struct ControlType gCrashControlsDescriptions[];
 
 extern const enum ControlTypes defaultPageControls[];
 
-void crash_screen_input_default(void);
 void update_crash_screen_input(void);
 void draw_controls_box(void);
