@@ -11,10 +11,10 @@ typedef union {
         u8 down  : 1;
         u8 left  : 1;
         u8 right : 1;
-        u8 : 4;
+        u8       : 4;
     } pressed;
     struct PACKED {
-        u8 : 4;
+        u8       : 4;
         u8 up    : 1;
         u8 down  : 1;
         u8 left  : 1;
@@ -44,6 +44,7 @@ struct ControlType {
     /*0x04*/ const char *description;
 }; /*0x08*/
 
+
 extern _Bool gDrawControls;
 
 extern CrashScreenDirections gCrashScreenDirectionFlags;
@@ -51,6 +52,7 @@ extern CrashScreenDirections gCrashScreenDirectionFlags;
 extern const struct ControlType gCrashControlsDescriptions[];
 
 extern const enum ControlTypes defaultPageControls[];
+
 
 void update_crash_screen_input(void);
 void draw_controls_box(void);

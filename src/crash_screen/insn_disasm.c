@@ -353,6 +353,7 @@ const RGBA32 sDisasmColors[] = {
     [DISASM_COLOR_OFFSET   ] = COLOR_RGBA32_CRASH_FUNCTION_NAME_2,
 };
 
+
 static char fmt_to_char(InsnData insn) {
     switch (insn.fmt) {
         case FMT_SINGLE:     return 'S'; // Single

@@ -9,6 +9,7 @@
 #include "game/debug.h"
 #include "game/game_input.h"
 
+
 static _Bool sDisasmShowDestFunctionNames = TRUE;
 static _Bool sDisasmShowDataAsBinary = FALSE;
 
@@ -32,6 +33,7 @@ ALIGNED16 static struct BranchArrow sBranchArrows[DISASM_BRANCH_BUFFER_SIZE];
 static u32 sNumBranchArrows = 0;
 
 static uintptr_t sBranchBufferCurrAddr = 0x00000000;
+
 
 void reset_branch_buffer(UNUSED const char *fname, uintptr_t funcAddr) {
     bzero(sBranchArrows, sizeof(sBranchArrows));

@@ -50,6 +50,7 @@ struct CrashScreenPage {
     /*0x10*/ const char *name;
 }; /*0x14*/
 
+
 // Time conversion macros
 #define FPS_COUNT 30
 #define FRAMES_TO_NESC(f)   (((u64)(f) * 1000000000LL) / FPS_COUNT)
@@ -76,6 +77,7 @@ extern uintptr_t gScrollAddress;
 extern uintptr_t gSelectedAddress;
 
 extern struct CrashScreenPage gCrashScreenPages[];
+
 
 void toggle_display_var(_Bool *var);
 void crash_screen_draw_scroll_bar(u32 topY, u32 bottomY, u32 numVisibleEntries, u32 numTotalEntries, u32 currEntry, u32 minScrollBarHeight, RGBA32 color);

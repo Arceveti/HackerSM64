@@ -9,6 +9,7 @@
 #include "game/debug.h"
 #include "game/game_input.h"
 
+
 ALIGNED8 static struct FunctionInStack sAllFunctionStack[STACK_SIZE];
 ALIGNED8 static struct FunctionInStack sKnownFunctionStack[STACK_SIZE];
 static u32 sNumKnownFunctions = 0;
@@ -28,6 +29,7 @@ const enum ControlTypes stackTracePageControls[] = {
     CONT_DESC_TOGGLE_FUNCTIONS,
     CONT_DESC_LIST_END,
 };
+
 
 #ifdef INCLUDE_DEBUG_MAP
 void fill_function_stack_trace(OSThread *thread) {

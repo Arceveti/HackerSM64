@@ -4,6 +4,7 @@
 
 #include "types.h"
 
+
 struct BranchArrow {
     /*0x00*/ uintptr_t startAddr;
     /*0x02*/ s16 branchOffset;
@@ -26,9 +27,11 @@ struct BranchArrow {
 // The number of branch arrows that can be stored per-function.
 #define DISASM_BRANCH_BUFFER_SIZE   0x100
 
+
 extern _Bool gFillBranchBuffer;
 
 extern const enum ControlTypes disasmPageControls[];
+
 
 void draw_disasm(OSThread *thread);
 void crash_screen_input_disasm(void);

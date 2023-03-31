@@ -19,12 +19,14 @@
 #include "crash_controls.h"
 #include "pages/stack_trace.h"
 
+
 _Bool gDrawControls = FALSE;
 
 CrashScreenDirections gCrashScreenDirectionFlags;
 
 static OSTime sCrashScreenInputTimeY = 0;
 static OSTime sCrashScreenInputTimeX = 0;
+
 
 // Input string defines:
 #define STR_A       "A"
@@ -38,7 +40,7 @@ static OSTime sCrashScreenInputTimeX = 0;
 #define STR_L       "L"
 #define STR_R       "R"
 
-//! TODO: Check if this actually saves memory space.
+//! TODO: Check if doing this actually saves memory space.
 const char moveCursor[] = "move cursor";
 
 const struct ControlType gCrashControlsDescriptions[] = {
@@ -54,6 +56,7 @@ const struct ControlType gCrashControlsDescriptions[] = {
     [CONT_DESC_TOGGLE_UNKNOWNS  ] = { .control = STR_A,                                     .description = "toggle unknowns in list"              },
     [CONT_DESC_TOGGLE_FUNCTIONS ] = { .control = STR_B,                                     .description = "toggle function names"                },
 };
+
 
 void update_crash_screen_direction_input(void) {
     OSTime currTime = osGetTime();

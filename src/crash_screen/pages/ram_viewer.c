@@ -9,7 +9,9 @@
 #include "game/debug.h"
 #include "game/game_input.h"
 
+
 static _Bool sRamViewShowAsAscii = FALSE;
+
 
 void draw_ram_viewer(OSThread *thread) {
     __OSThreadContext *tc = &thread->context;
@@ -89,6 +91,7 @@ void draw_ram_viewer(OSThread *thread) {
     osWritebackDCacheAll();
 }
 
+
 const enum ControlTypes ramViewerPageControls[] = {
     CONT_DESC_SWITCH_PAGE,
     CONT_DESC_SHOW_CONTROLS,
@@ -98,6 +101,7 @@ const enum ControlTypes ramViewerPageControls[] = {
     CONT_DESC_TOGGLE_ASCII,
     CONT_DESC_LIST_END,
 };
+
 
 void crash_screen_input_ram_viewer(void) {
     if ((gCrashScreenDirectionFlags.pressed.up)

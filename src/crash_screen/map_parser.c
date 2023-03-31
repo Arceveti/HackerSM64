@@ -6,12 +6,12 @@
 #include "crash_screen.h"
 #include "map_parser.h"
 
-#define STACK_TRAVERSAL_LIMIT 100
 
 extern u8 gMapStrings[];
 extern struct MapEntry gMapEntries[];
 extern size_t gMapEntrySize;
 extern u8 _mapDataSegmentRomStart[];
+
 
 static void headless_dma(uintptr_t devAddr, void *dramAddr, size_t size) {
     u32 stat = IO_READ(PI_STATUS_REG);

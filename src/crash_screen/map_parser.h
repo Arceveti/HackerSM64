@@ -5,6 +5,9 @@
 #include "types.h"
 
 
+#define STACK_TRAVERSAL_LIMIT 100
+
+
 struct MapEntry {
     /*0x00*/ uintptr_t addr;
     /*0x04*/ uintptr_t name_offset;

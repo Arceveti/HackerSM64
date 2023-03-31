@@ -8,6 +8,7 @@
 #include "engine/colors.h"
 #include "game/debug.h"
 
+
 static const char *sCauseDesc[18] = {
     /*EXC_INT       */ "Interrupt",
     /*EXC_MOD       */ "TLB modification",
@@ -50,6 +51,7 @@ static const char *sRegNames[29] = {
     "T9", "GP", "SP",
     "S8", "RA",
 };
+
 
 void crash_screen_print_float_reg(u32 x, u32 y, u32 regNum, void *addr) {
     uintptr_t bits = *(uintptr_t*) addr;
