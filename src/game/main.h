@@ -32,6 +32,13 @@ enum ThreadID {
 #endif
 };
 
+enum VblankHandlers {
+    VBLANK_HANDLER_SOUND_INIT,
+    VBLANK_HANDLER_GAME_INIT,
+    VBLANK_HANDLER_HVQM,
+    NUM_VBLANK_HANDLERS,
+};
+
 extern struct Config gConfig;
 
 // extern OSThread gUnkThread;
@@ -54,9 +61,8 @@ extern OSMesg gMainReceivedMesg;
 extern OSMesgQueue gDmaMesgQueue;
 extern OSMesgQueue gSIEventMesgQueue;
 
-extern struct VblankHandler *gVblankHandler1;
-extern struct VblankHandler *gVblankHandler2;
-extern struct SPTask *gActiveSPTask;
+extern struct VblankHandler* gVblankHandlers[NUM_VBLANK_HANDLERS];
+extern struct SPTask* gActiveSPTask;
 extern s8 sAudioEnabled;
 extern u32 gNumVblanks;
 extern s8 gResetTimer;
@@ -66,9 +72,9 @@ extern s8 gDebugLevelSelect;
 extern s8 gShowDebugText;
 #endif
 
-void set_vblank_handler(s32 index, struct VblankHandler *handler, OSMesgQueue *queue, OSMesg *msg);
-void dispatch_audio_sptask(struct SPTask *spTask);
-void exec_display_list(struct SPTask *spTask);
-void change_vi(OSViMode *mode, int width, int height);
+void set_vblank_handler(s32 index, struct VblankHandler* handler, OSMesgQueue* queue, OSMesg* msg);
+void dispatch_audio_sptask(struct SPTask* spTask);
+void exec_display_list(struct SPTask* spTask);
+void change_vi(OSViMode* mode, int width, int height);
 
 #endif // MAIN_H

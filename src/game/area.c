@@ -32,7 +32,7 @@
 #include "fasttext.h"
 
 struct SpawnInfo gPlayerSpawnInfos[1];
-struct GraphNode *gGraphNodePointers[MODEL_ID_COUNT];
+struct GraphNode* gGraphNodePointers[MODEL_ID_COUNT];
 struct Area gAreaData[AREA_COUNT];
 
 struct WarpTransition gWarpTransition;
@@ -44,14 +44,14 @@ s16 gSavedCourseNum;
 s16 gMenuOptSelectIndex;
 s16 gSaveOptSelectIndex;
 
-struct SpawnInfo *gMarioSpawnInfo = &gPlayerSpawnInfos[0];
-struct GraphNode **gLoadedGraphNodes = gGraphNodePointers;
-struct Area *gAreas = gAreaData;
-struct Area *gCurrentArea = NULL;
-struct CreditsEntry *gCurrCreditsEntry = NULL;
+struct SpawnInfo* gMarioSpawnInfo = &gPlayerSpawnInfos[0];
+struct GraphNode** gLoadedGraphNodes = gGraphNodePointers;
+struct Area* gAreas = gAreaData;
+struct Area* gCurrentArea = NULL;
+struct CreditsEntry* gCurrCreditsEntry = NULL;
 
-Vp *gViewportOverride = NULL;
-Vp *gViewportClip = NULL;
+Vp* gViewportOverride = NULL;
+Vp* gViewportClip = NULL;
 s16 gWarpTransDelay = 0;
 RGBA16FILL gFBSetColor = 0;
 RGBA16FILL gWarpTransFBSetColor = 0;
@@ -97,7 +97,7 @@ Vp gViewport = {
     }
 };
 
-void override_viewport_and_clip(Vp *vpOverride, Vp *vpClip, Color red, Color green, Color blue) {
+void override_viewport_and_clip(Vp* vpOverride, Vp* vpClip, Color red, Color green, Color blue) {
     RGBA16 color = RGBA_TO_RGBA16(red, green, blue, 0xFF);
 
     gFBSetColor = ((color << 16) | color);
@@ -125,9 +125,9 @@ void print_intro_text(void) {
     }
 }
 
-u32 get_mario_spawn_type(struct Object *obj) {
+u32 get_mario_spawn_type(struct Object* obj) {
     s32 i;
-    const BehaviorScript *behavior = virtual_to_segmented(SEGMENT_BEHAVIOR_DATA, obj->behavior);
+    const BehaviorScript* behavior = virtual_to_segmented(SEGMENT_BEHAVIOR_DATA, obj->behavior);
 
     for (i = 0; i < ARRAY_COUNT(sWarpSpawnTypes); i++) {
         if (sWarpSpawnTypes[i].behavior == behavior) {
@@ -138,8 +138,8 @@ u32 get_mario_spawn_type(struct Object *obj) {
     return MARIO_SPAWN_NONE;
 }
 
-struct ObjectWarpNode *area_get_warp_node(u8 id) {
-    struct ObjectWarpNode *node = NULL;
+struct ObjectWarpNode* area_get_warp_node(u8 id) {
+    struct ObjectWarpNode* node = NULL;
 
     for (node = gCurrentArea->warpNodes; node != NULL; node = node->next) {
         if (node->node.id == id) {
@@ -150,16 +150,16 @@ struct ObjectWarpNode *area_get_warp_node(u8 id) {
     return node;
 }
 
-struct ObjectWarpNode *area_get_warp_node_from_params(struct Object *obj) {
+struct ObjectWarpNode* area_get_warp_node_from_params(struct Object* obj) {
     return area_get_warp_node(GET_BPARAM2(obj->oBehParams));
 }
 
 void load_obj_warp_nodes(void) {
-    struct ObjectWarpNode *warpNode;
-    struct Object *children = (struct Object *) gObjParentGraphNode.children;
+    struct ObjectWarpNode* warpNode;
+    struct Object* children = (struct Object*)gObjParentGraphNode.children;
 
     do {
-        struct Object *obj = children;
+        struct Object* obj = children;
 
         if (obj->activeFlags != ACTIVE_FLAG_DEACTIVATED && get_mario_spawn_type(obj) != 0) {
             warpNode = area_get_warp_node_from_params(obj);
@@ -167,8 +167,7 @@ void load_obj_warp_nodes(void) {
                 warpNode->object = obj;
             }
         }
-    } while ((children = (struct Object *) children->header.gfx.node.next)
-             != (struct Object *) gObjParentGraphNode.children);
+    } while ((children = (struct Object*)children->header.gfx.node.next) != (struct Object*)gObjParentGraphNode.children);
 }
 
 void clear_areas(void) {
@@ -233,9 +232,11 @@ void load_area(s32 index) {
         gMarioCurrentRoom = 0;
 
         if (gCurrentArea->terrainData != NULL) {
-            load_area_terrain(index, gCurrentArea->terrainData,
-                                     gCurrentArea->surfaceRooms,
-                                     gCurrentArea->macroObjects);
+            load_area_terrain(index,
+                gCurrentArea->terrainData,
+                gCurrentArea->surfaceRooms,
+                gCurrentArea->macroObjects
+            );
         }
 
         if (gCurrentArea->objectSpawnInfos != NULL) {

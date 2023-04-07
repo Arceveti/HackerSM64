@@ -43,7 +43,7 @@ static inline float softClamp(float x, float a, float b) {
 #define SCRIPT_MEMORY_POOL 0x1000
 
 struct gPuppyStruct gPuppyCam;
-struct sPuppyVolume *sPuppyVolumeStack[MAX_PUPPYCAM_VOLUMES];
+struct sPuppyVolume* sPuppyVolumeStack[MAX_PUPPYCAM_VOLUMES];
 s16 sFloorHeight  = 0;
 u8  gPCOptionOpen = 0;
 s8  gPCOptionSelected = 0;
@@ -51,32 +51,32 @@ s32 gPCOptionTimer = 0;
 u8  gPCOptionIndex = 0;
 u8  gPCOptionScroll = 0;
 u16 gPuppyVolumeCount = 0;
-struct MemoryPool *gPuppyMemoryPool;
+struct MemoryPool* gPuppyMemoryPool;
 s32 gPuppyError = 0;
 
 #if MULTILANG
-static unsigned char  gPCOptionStringsFR[][64] = {{NC_ANALOGUE_FR}, {NC_CAMX_FR}, {NC_CAMY_FR}, {NC_INVERTX_FR}, {NC_INVERTY_FR}, {NC_CAMC_FR}, {NC_SCHEME_FR}, {NC_WIDE_FR}, {OPTION_LANGUAGE_FR}};
-static unsigned char  gPCOptionStringsDE[][64] = {{NC_ANALOGUE_DE}, {NC_CAMX_DE}, {NC_CAMY_DE}, {NC_INVERTX_DE}, {NC_INVERTY_DE}, {NC_CAMC_DE}, {NC_SCHEME_DE}, {NC_WIDE_DE}, {OPTION_LANGUAGE_DE}};
-static unsigned char  gPCFlagStringsFR[][64] = {{OPTION_DISABLED_FR}, {OPTION_ENABLED_FR}, {OPTION_SCHEME1_FR}, {OPTION_SCHEME2_FR}, {OPTION_SCHEME3_FR}, {TEXT_ENGLISH}, {TEXT_FRENCH}, {TEXT_GERMAN}};
-static unsigned char  gPCFlagStringsDE[][64] = {{OPTION_DISABLED_DE}, {OPTION_ENABLED_DE}, {OPTION_SCHEME1_DE}, {OPTION_SCHEME2_DE}, {OPTION_SCHEME3_DE}, {TEXT_ENGLISH}, {TEXT_FRENCH}, {TEXT_GERMAN}};
-static unsigned char  gPCToggleStringsFR[][64] = {{NC_BUTTON_FR}, {NC_BUTTON2_FR}, {NC_OPTION_FR}, {NC_HIGHLIGHT_L}, {NC_HIGHLIGHT_R},};
-static unsigned char  gPCToggleStringsDE[][64] = {{NC_BUTTON_DE}, {NC_BUTTON2_DE}, {NC_OPTION_DE}, {NC_HIGHLIGHT_L}, {NC_HIGHLIGHT_R},};
+static unsigned char gPCOptionStringsFR[][64] = {{NC_ANALOGUE_FR}, {NC_CAMX_FR}, {NC_CAMY_FR}, {NC_INVERTX_FR}, {NC_INVERTY_FR}, {NC_CAMC_FR}, {NC_SCHEME_FR}, {NC_WIDE_FR}, {OPTION_LANGUAGE_FR}};
+static unsigned char gPCOptionStringsDE[][64] = {{NC_ANALOGUE_DE}, {NC_CAMX_DE}, {NC_CAMY_DE}, {NC_INVERTX_DE}, {NC_INVERTY_DE}, {NC_CAMC_DE}, {NC_SCHEME_DE}, {NC_WIDE_DE}, {OPTION_LANGUAGE_DE}};
+static unsigned char gPCFlagStringsFR[][64] = {{OPTION_DISABLED_FR}, {OPTION_ENABLED_FR}, {OPTION_SCHEME1_FR}, {OPTION_SCHEME2_FR}, {OPTION_SCHEME3_FR}, {TEXT_ENGLISH}, {TEXT_FRENCH}, {TEXT_GERMAN}};
+static unsigned char gPCFlagStringsDE[][64] = {{OPTION_DISABLED_DE}, {OPTION_ENABLED_DE}, {OPTION_SCHEME1_DE}, {OPTION_SCHEME2_DE}, {OPTION_SCHEME3_DE}, {TEXT_ENGLISH}, {TEXT_FRENCH}, {TEXT_GERMAN}};
+static unsigned char gPCToggleStringsFR[][64] = {{NC_BUTTON_FR}, {NC_BUTTON2_FR}, {NC_OPTION_FR}, {NC_HIGHLIGHT_L}, {NC_HIGHLIGHT_R},};
+static unsigned char gPCToggleStringsDE[][64] = {{NC_BUTTON_DE}, {NC_BUTTON2_DE}, {NC_OPTION_DE}, {NC_HIGHLIGHT_L}, {NC_HIGHLIGHT_R},};
 #endif
-static unsigned char  gPCOptionStringsEN[][64] = {{NC_ANALOGUE_EN}, {NC_CAMX_EN}, {NC_CAMY_EN}, {NC_INVERTX_EN}, {NC_INVERTY_EN}, {NC_CAMC_EN}, {NC_SCHEME_EN}, {NC_WIDE_EN}, {OPTION_LANGUAGE_EN}};
-static unsigned char  gPCFlagStringsEN[][64] = {{OPTION_DISABLED_EN}, {OPTION_ENABLED_EN}, {OPTION_SCHEME1_EN}, {OPTION_SCHEME2_EN}, {OPTION_SCHEME3_EN}, {TEXT_ENGLISH}, {TEXT_FRENCH}, {TEXT_GERMAN}};
-static unsigned char  gPCToggleStringsEN[][64] = {{NC_BUTTON_EN}, {NC_BUTTON2_EN}, {NC_OPTION_EN}, {NC_HIGHLIGHT_L}, {NC_HIGHLIGHT_R},};
+static unsigned char gPCOptionStringsEN[][64] = {{NC_ANALOGUE_EN}, {NC_CAMX_EN}, {NC_CAMY_EN}, {NC_INVERTX_EN}, {NC_INVERTY_EN}, {NC_CAMC_EN}, {NC_SCHEME_EN}, {NC_WIDE_EN}, {OPTION_LANGUAGE_EN}};
+static unsigned char gPCFlagStringsEN[][64] = {{OPTION_DISABLED_EN}, {OPTION_ENABLED_EN}, {OPTION_SCHEME1_EN}, {OPTION_SCHEME2_EN}, {OPTION_SCHEME3_EN}, {TEXT_ENGLISH}, {TEXT_FRENCH}, {TEXT_GERMAN}};
+static unsigned char gPCToggleStringsEN[][64] = {{NC_BUTTON_EN}, {NC_BUTTON2_EN}, {NC_OPTION_EN}, {NC_HIGHLIGHT_L}, {NC_HIGHLIGHT_R},};
 
 
 #define OPT 32 // Just a temp thing
 
-static unsigned char  (*gPCOptionStringsPtr)[OPT][64] = (unsigned char (*)[OPT][64])&gPCOptionStringsEN;
-static unsigned char  (*gPCFlagStringsPtr  )[OPT][64] = (unsigned char (*)[OPT][64])&gPCFlagStringsEN;
-static unsigned char  (*gPCToggleStringsPtr)[OPT][64] = (unsigned char (*)[OPT][64])&gPCToggleStringsEN;
+static unsigned char (*gPCOptionStringsPtr)[OPT][64] = (unsigned char (*)[OPT][64])&gPCOptionStringsEN;
+static unsigned char (*gPCFlagStringsPtr  )[OPT][64] = (unsigned char (*)[OPT][64])&gPCFlagStringsEN;
+static unsigned char (*gPCToggleStringsPtr)[OPT][64] = (unsigned char (*)[OPT][64])&gPCToggleStringsEN;
 
 
 struct gPCOptionStruct {
     u8   gPCOptionName;  // This is the position in the newcam_options text array. It doesn't have to directly correlate with its position in the struct
-    s16 *gPCOptionVar;   // This is the value that the option is going to directly affect.
+    s16* gPCOptionVar;   // This is the value that the option is going to directly affect.
     u8   gPCOptionStart; // This is where the text array will start. Set it to 255 to have it be ignored.
     s32  gPCOptionMin;   // The minimum value of the option.
     s32  gPCOptionMax;   // The maximum value of the option.
@@ -315,10 +315,10 @@ void puppycam_change_setting(s8 toggle) {
 #endif
 }
 
-void puppycam_print_text(s32 x, s32 y, unsigned char *str, s32 col) {
+void puppycam_print_text(s32 x, s32 y, unsigned char* str, s32 col) {
     s32 textX = get_str_x_pos_from_center(x, str, 10.0f);
     gDPSetEnvColor(gDisplayListHead++, 0, 0, 0, 255);
-    print_generic_string(textX + 1, y - 1, str);
+    print_generic_string((textX + 1), (y - 1), str);
     if (col != 0) {
         gDPSetEnvColor(gDisplayListHead++, 255, 255, 255, 255);
     } else {
@@ -561,11 +561,13 @@ void puppycam_input_centre(void) {
         inputDefault = R_TRIG;
     }
     // Handles L button centering.
-    if ((gPlayer1Controller->buttonPressed & inputDefault)
-     && (gPuppyCam.flags & PUPPYCAM_BEHAVIOUR_YAW_ROTATION)
-     && !(gPuppyCam.flags & PUPPYCAM_BEHAVIOUR_INPUT_8DIR)
-     && !(gPuppyCam.flags & PUPPYCAM_BEHAVIOUR_INPUT_4DIR)
-     && !(gPlayer1Controller->buttonDown & U_JPAD)) {
+    if (
+        (gPlayer1Controller->buttonPressed & inputDefault)  &&
+        (gPuppyCam.flags & PUPPYCAM_BEHAVIOUR_YAW_ROTATION) &&
+        !(gPuppyCam.flags & PUPPYCAM_BEHAVIOUR_INPUT_8DIR)  &&
+        !(gPuppyCam.flags & PUPPYCAM_BEHAVIOUR_INPUT_4DIR)  &&
+        !(gPlayer1Controller->buttonDown & U_JPAD)
+    ) {
         gPuppyCam.yawTarget = gMarioState->faceAngle[1] + 0x8000;
         play_sound(SOUND_MENU_CLICK_CHANGE_VIEW, gGlobalSoundSource);
     }

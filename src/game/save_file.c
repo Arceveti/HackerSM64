@@ -64,12 +64,12 @@ STATIC_ASSERT(ARRAY_COUNT(gLevelToCourseNumTable) == LEVEL_COUNT - 1,
  * Try at most 4 times, and return 0 on success. On failure, return the status returned from
  * osEepromLongRead. It also returns 0 if EEPROM isn't loaded correctly in the system.
  */
-static s32 read_eeprom_data(void *buffer, s32 size) {
+static s32 read_eeprom_data(void* buffer, s32 size) {
     s32 status = 0;
 
     if (gEepromProbe != 0) {
         s32 triesLeft = 4;
-        u32 offset = (u32)((u8 *) buffer - (u8 *) &gSaveBuffer) / 8;
+        u32 offset = (u32)((u8*)buffer - (u8*)&gSaveBuffer) / 8;
 
         do {
             block_until_rumble_pak_free();
@@ -92,12 +92,12 @@ static s32 read_eeprom_data(void *buffer, s32 size) {
  * Try at most 4 times, and return 0 on success. On failure, return the status returned from
  * osEepromLongWrite. Unlike read_eeprom_data, return 1 if EEPROM isn't loaded.
  */
-static s32 write_eeprom_data(void *buffer, s32 size) {
+static s32 write_eeprom_data(void* buffer, s32 size) {
     s32 status = 1;
 
     if (gEepromProbe != 0) {
         s32 triesLeft = 4;
-        u32 offset = ((u32)((u8 *) buffer - (u8 *) &gSaveBuffer) >> 3);
+        u32 offset = ((u32)((u8*)buffer - (u8*)&gSaveBuffer) >> 3);
 
         do {
             block_until_rumble_pak_free();
@@ -121,12 +121,12 @@ static s32 write_eeprom_data(void *buffer, s32 size) {
  * Try at most 4 times, and return 0 on success. On failure, return the status returned from
  * nuPiReadSram. It also returns 0 if SRAM isn't loaded correctly in the system.
  */
-static s32 read_eeprom_data(void *buffer, s32 size) {
+static s32 read_eeprom_data(void* buffer, s32 size) {
     s32 status = 0;
 
     if (gSramProbe != 0) {
         s32 triesLeft = 4;
-        u32 offset = (u32)((u8 *) buffer - (u8 *) &gSaveBuffer);
+        u32 offset = (u32)((u8*)buffer - (u8*)&gSaveBuffer);
 
         do {
             block_until_rumble_pak_free();
@@ -147,12 +147,12 @@ static s32 read_eeprom_data(void *buffer, s32 size) {
  * Try at most 4 times, and return 0 on success. On failure, return the status returned from
  * nuPiWriteSram. Unlike read_eeprom_data, return 1 if SRAM isn't loaded.
  */
-static s32 write_eeprom_data(void *buffer, s32 size) {
+static s32 write_eeprom_data(void* buffer, s32 size) {
     s32 status = 1;
 
     if (gSramProbe != 0) {
         s32 triesLeft = 4;
-        u32 offset = (u32)((u8 *) buffer - (u8 *) &gSaveBuffer);
+        u32 offset = (u32)((u8*)buffer - (u8*)&gSaveBuffer);
 
         do {
             block_until_rumble_pak_free();
@@ -172,7 +172,7 @@ static s32 write_eeprom_data(void *buffer, s32 size) {
  * Sum the bytes in data to data + size - 2. The last two bytes are ignored
  * because that is where the checksum is stored.
  */
-static u16 calc_checksum(u8 *data, s32 size) {
+static u16 calc_checksum(u8* data, s32 size) {
     u16 chksum = 0;
 
     while (size-- > 2) {
@@ -185,8 +185,8 @@ static u16 calc_checksum(u8 *data, s32 size) {
 /**
  * Verify the signature at the end of the block to check if the data is valid.
  */
-static s32 verify_save_block_signature(void *buffer, s32 size, u16 magic) {
-    struct SaveBlockSignature *sig = (struct SaveBlockSignature *) ((size - 4) + (u8 *) buffer);
+static s32 verify_save_block_signature(void* buffer, s32 size, u16 magic) {
+    struct SaveBlockSignature* sig = (struct SaveBlockSignature*)((size - 4) + (u8*)buffer);
 
     if (sig->magic != magic) {
         return FALSE;
@@ -198,8 +198,8 @@ static s32 verify_save_block_signature(void *buffer, s32 size, u16 magic) {
 /**
  * Write a signature at the end of the block to make sure the data is valid
  */
-static void add_save_block_signature(void *buffer, s32 size, u16 magic) {
-    struct SaveBlockSignature *sig = (struct SaveBlockSignature *) ((size - 4) + (u8 *) buffer);
+static void add_save_block_signature(void* buffer, s32 size, u16 magic) {
+    struct SaveBlockSignature* sig = (struct SaveBlockSignature*)((size - 4) + (u8*)buffer);
 
     sig->magic = magic;
     sig->chksum = calc_checksum(buffer, size);
@@ -421,9 +421,11 @@ void puppycam_check_save(void) {
  */
 void save_file_reload(void) {
     // Copy save file data from backup
-    bcopy(&gSaveBuffer.files[SAVE_NUM_TO_INDEX(gCurrSaveFileNum)][1],
-          &gSaveBuffer.files[SAVE_NUM_TO_INDEX(gCurrSaveFileNum)][0],
-          sizeof(gSaveBuffer.files[SAVE_NUM_TO_INDEX(gCurrSaveFileNum)][0]));
+    bcopy(
+        &gSaveBuffer.files[SAVE_NUM_TO_INDEX(gCurrSaveFileNum)][1],
+        &gSaveBuffer.files[SAVE_NUM_TO_INDEX(gCurrSaveFileNum)][0],
+        sizeof(gSaveBuffer.files[SAVE_NUM_TO_INDEX(gCurrSaveFileNum)][0])
+    );
 
     gMainMenuDataModified = FALSE;
     gSaveFileModified = FALSE;
@@ -453,7 +455,7 @@ void save_file_collect_star_or_key(s16 coinScore, s16 starIndex) {
         //! Compares the coin score as a 16 bit value, but only writes the 8 bit
         // truncation. This can allow a high score to decrease.
 
-        if (coinScore > ((u16) save_file_get_max_coin_score(courseIndex) & BITMASK(16))) {
+        if (coinScore > ((u16)save_file_get_max_coin_score(courseIndex) & BITMASK(16))) {
             sUnusedGotGlobalCoinHiScore = TRUE;
         }
 
@@ -516,8 +518,12 @@ u32 save_file_get_max_coin_score(s32 courseIndex) {
             s32 coinScore = save_file_get_course_coin_score(fileIndex, courseIndex);
             s32 scoreAge = get_coin_score_age(fileIndex, courseIndex);
 
-            if (coinScore > maxCoinScore
-             || (coinScore == maxCoinScore && scoreAge > maxScoreAge)) {
+            if (
+                coinScore > maxCoinScore || (
+                    coinScore == maxCoinScore &&
+                    scoreAge > maxScoreAge
+                )
+            ) {
                 maxCoinScore = coinScore;
                 maxScoreAge = scoreAge;
                 maxScoreFileNum = fileIndex + 1;
@@ -543,6 +549,7 @@ s32 save_file_get_course_star_count(s32 fileIndex, s32 courseIndex) {
             count++;
         }
     }
+
     return count;
 }
 #endif
@@ -572,29 +579,32 @@ void save_file_clear_flags(u32 flags) {
 
 u32 save_file_get_flags(void) {
 #ifdef COMPLETE_SAVE_FILE
-    return (SAVE_FLAG_FILE_EXISTS            |
-            SAVE_FLAG_HAVE_WING_CAP          |
-            SAVE_FLAG_HAVE_METAL_CAP         |
-            SAVE_FLAG_HAVE_VANISH_CAP        |
-            SAVE_FLAG_UNLOCKED_BASEMENT_DOOR |
-            SAVE_FLAG_UNLOCKED_UPSTAIRS_DOOR |
-            SAVE_FLAG_MOAT_DRAINED           |
-            SAVE_FLAG_UNLOCKED_PSS_DOOR      |
-            SAVE_FLAG_UNLOCKED_WF_DOOR       |
-            SAVE_FLAG_UNLOCKED_CCM_DOOR      |
-            SAVE_FLAG_UNLOCKED_JRB_DOOR      |
-            SAVE_FLAG_UNLOCKED_BITDW_DOOR    |
-            SAVE_FLAG_UNLOCKED_BITFS_DOOR    |
-            SAVE_FLAG_UNLOCKED_50_STAR_DOOR  |
-            SAVE_FLAG_COLLECTED_TOAD_STAR_1  |
-            SAVE_FLAG_COLLECTED_TOAD_STAR_2  |
-            SAVE_FLAG_COLLECTED_TOAD_STAR_3  |
-            SAVE_FLAG_COLLECTED_MIPS_STAR_1  |
-            SAVE_FLAG_COLLECTED_MIPS_STAR_2);
+    return (
+        SAVE_FLAG_FILE_EXISTS            |
+        SAVE_FLAG_HAVE_WING_CAP          |
+        SAVE_FLAG_HAVE_METAL_CAP         |
+        SAVE_FLAG_HAVE_VANISH_CAP        |
+        SAVE_FLAG_UNLOCKED_BASEMENT_DOOR |
+        SAVE_FLAG_UNLOCKED_UPSTAIRS_DOOR |
+        SAVE_FLAG_MOAT_DRAINED           |
+        SAVE_FLAG_UNLOCKED_PSS_DOOR      |
+        SAVE_FLAG_UNLOCKED_WF_DOOR       |
+        SAVE_FLAG_UNLOCKED_CCM_DOOR      |
+        SAVE_FLAG_UNLOCKED_JRB_DOOR      |
+        SAVE_FLAG_UNLOCKED_BITDW_DOOR    |
+        SAVE_FLAG_UNLOCKED_BITFS_DOOR    |
+        SAVE_FLAG_UNLOCKED_50_STAR_DOOR  |
+        SAVE_FLAG_COLLECTED_TOAD_STAR_1  |
+        SAVE_FLAG_COLLECTED_TOAD_STAR_2  |
+        SAVE_FLAG_COLLECTED_TOAD_STAR_3  |
+        SAVE_FLAG_COLLECTED_MIPS_STAR_1  |
+        SAVE_FLAG_COLLECTED_MIPS_STAR_2
+    );
 #else
     if (gCurrCreditsEntry != NULL || gCurrDemoInput != NULL) {
         return 0;
     }
+
     return gSaveBuffer.files[SAVE_NUM_TO_INDEX(gCurrSaveFileNum)][0].flags;
 #endif
 }
@@ -667,7 +677,7 @@ void save_file_set_cannon_unlocked(void) {
 }
 
 void save_file_set_cap_pos(s16 x, s16 y, s16 z) {
-    struct SaveFile *saveFile = &gSaveBuffer.files[SAVE_NUM_TO_INDEX(gCurrSaveFileNum)][0];
+    struct SaveFile* saveFile = &gSaveBuffer.files[SAVE_NUM_TO_INDEX(gCurrSaveFileNum)][0];
 
     saveFile->capLevel = gCurrLevelNum;
     saveFile->capArea = gCurrAreaIndex;
@@ -676,15 +686,19 @@ void save_file_set_cap_pos(s16 x, s16 y, s16 z) {
 }
 
 s32 save_file_get_cap_pos(Vec3s capPos) {
-    struct SaveFile *saveFile = &gSaveBuffer.files[SAVE_NUM_TO_INDEX(gCurrSaveFileNum)][0];
+    struct SaveFile* saveFile = &gSaveBuffer.files[SAVE_NUM_TO_INDEX(gCurrSaveFileNum)][0];
     s32 flags = save_file_get_flags();
 
-    if (saveFile->capLevel == gCurrLevelNum
-     && saveFile->capArea == gCurrAreaIndex
-     && (flags & SAVE_FLAG_CAP_ON_GROUND)) {
+    if (
+        saveFile->capLevel == gCurrLevelNum &&
+        saveFile->capArea == gCurrAreaIndex &&
+        (flags & SAVE_FLAG_CAP_ON_GROUND)
+    ) {
         vec3s_copy(capPos, saveFile->capPos);
+
         return TRUE;
     }
+
     return FALSE;
 }
 
@@ -716,15 +730,9 @@ u32 save_file_get_sound_mode(void) {
 void save_file_move_cap_to_default_location(void) {
     if (save_file_get_flags() & SAVE_FLAG_CAP_ON_GROUND) {
         switch (gSaveBuffer.files[SAVE_NUM_TO_INDEX(gCurrSaveFileNum)][0].capLevel) {
-            case LEVEL_SSL:
-                save_file_set_flags(SAVE_FLAG_CAP_ON_KLEPTO);
-                break;
-            case LEVEL_SL:
-                save_file_set_flags(SAVE_FLAG_CAP_ON_MR_BLIZZARD);
-                break;
-            case LEVEL_TTM:
-                save_file_set_flags(SAVE_FLAG_CAP_ON_UKIKI);
-                break;
+            case LEVEL_SSL: save_file_set_flags(SAVE_FLAG_CAP_ON_KLEPTO     ); break;
+            case LEVEL_SL:  save_file_set_flags(SAVE_FLAG_CAP_ON_MR_BLIZZARD); break;
+            case LEVEL_TTM: save_file_set_flags(SAVE_FLAG_CAP_ON_UKIKI      ); break;
         }
         save_file_clear_flags(SAVE_FLAG_CAP_ON_GROUND);
     }
@@ -751,7 +759,7 @@ void disable_warp_checkpoint(void) {
  * Checks the upper bit of the WarpNode->destLevel byte to see if the
  * game should set a warp checkpoint.
  */
-void check_if_should_set_warp_checkpoint(struct WarpNode *warpNode) {
+void check_if_should_set_warp_checkpoint(struct WarpNode* warpNode) {
     if (warpNode->destLevel & WARP_CHECKPOINT) {
         // Overwrite the warp checkpoint variables.
         gWarpCheckpoint.actNum = gCurrActNum;
@@ -767,14 +775,16 @@ void check_if_should_set_warp_checkpoint(struct WarpNode *warpNode) {
  * also update the level, area, and destination node of the input WarpNode.
  * returns TRUE if input WarpNode was updated, and FALSE if not.
  */
-s32 check_warp_checkpoint(struct WarpNode *warpNode) {
+s32 check_warp_checkpoint(struct WarpNode* warpNode) {
     s16 warpCheckpointActive = FALSE;
     s16 currCourseNum = gLevelToCourseNumTable[(warpNode->destLevel & WARP_DEST_LEVEL_NUM_MASK) - 1];
 
     // gSavedCourseNum is only used in this function.
-    if (gWarpCheckpoint.courseNum != COURSE_NONE
-     && gSavedCourseNum == currCourseNum
-     && gWarpCheckpoint.actNum == gCurrActNum) {
+    if (
+        gWarpCheckpoint.courseNum != COURSE_NONE &&
+        gSavedCourseNum == currCourseNum &&
+        gWarpCheckpoint.actNum == gCurrActNum
+    ) {
         warpNode->destLevel = gWarpCheckpoint.levelID;
         warpNode->destArea = gWarpCheckpoint.areaNum;
         warpNode->destNode = gWarpCheckpoint.warpNode;

@@ -5,13 +5,13 @@
 
 #include "engine/graph_node.h"
 
-extern struct GraphNodeRoot        *gCurGraphNodeRoot;
-extern struct GraphNodeMasterList  *gCurGraphNodeMasterList;
-extern struct GraphNodePerspective *gCurGraphNodeCamFrustum;
-extern struct GraphNodeCamera      *gCurGraphNodeCamera;
-extern struct GraphNodeObject      *gCurGraphNodeObject;
-extern struct GraphNodeHeldObject  *gCurGraphNodeHeldObject;
-#define gCurGraphNodeObjectNode ((struct Object *)gCurGraphNodeObject)
+extern struct GraphNodeRoot*        gCurGraphNodeRoot;
+extern struct GraphNodeMasterList*  gCurGraphNodeMasterList;
+extern struct GraphNodePerspective* gCurGraphNodeCamFrustum;
+extern struct GraphNodeCamera*      gCurGraphNodeCamera;
+extern struct GraphNodeObject*      gCurGraphNodeObject;
+extern struct GraphNodeHeldObject*  gCurGraphNodeHeldObject;
+#define gCurGraphNodeObjectNode ((struct Object*)gCurGraphNodeObject)
 extern u16 gAreaUpdateCounter;
 extern Vec3f globalLightDirection;
 
@@ -95,7 +95,7 @@ struct RenderModeContainer {
 
 #define RENDER_PHASE_FIRST 0
 
-void geo_process_node_and_siblings(struct GraphNode *firstNode);
-void geo_process_root(struct GraphNodeRoot *node, Vp *b, Vp *c, s32 clearColor);
+void geo_process_node_and_siblings(struct GraphNode* firstNode);
+void geo_process_root(struct GraphNodeRoot* node, Vp* b, Vp* c, s32 clearColor);
 
 #endif // RENDERING_GRAPH_NODE_H

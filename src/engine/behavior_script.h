@@ -17,7 +17,7 @@ enum BhvProc {
 #define cur_obj_set_int(offset, value)   gCurrentObject->OBJECT_FIELD_S32(offset)  = (s32)(value)
 #define cur_obj_or_int(offset, value)    gCurrentObject->OBJECT_FIELD_S32(offset) |= (s32)(value)
 #define cur_obj_and_int(offset, value)   gCurrentObject->OBJECT_FIELD_S32(offset) &= (s32)(value)
-#define cur_obj_set_vptr(offset, value)  gCurrentObject->OBJECT_FIELD_VPTR(offset) = (void *)(value)
+#define cur_obj_set_vptr(offset, value)  gCurrentObject->OBJECT_FIELD_VPTR(offset) = (void*)(value)
 
 #define obj_and_int(object, offset, value)       object->OBJECT_FIELD_S32(offset) &= (s32)(value)
 

@@ -62,7 +62,7 @@ struct Skybox {
 
 struct Skybox sSkyBoxInfo[2];
 
-typedef const Texture *const SkyboxTexture[80 * sqr(SKYBOX_SIZE)];
+typedef const Texture* const SkyboxTexture[80 * sqr(SKYBOX_SIZE)];
 
 extern SkyboxTexture bbh_skybox_ptrlist;
 extern SkyboxTexture bidw_skybox_ptrlist;
@@ -75,7 +75,7 @@ extern SkyboxTexture ssl_skybox_ptrlist;
 extern SkyboxTexture water_skybox_ptrlist;
 extern SkyboxTexture wdw_skybox_ptrlist;
 
-SkyboxTexture *sSkyboxTextures[10] = {
+SkyboxTexture* sSkyboxTextures[10] = {
     &water_skybox_ptrlist,
     &bitfs_skybox_ptrlist,
     &wdw_skybox_ptrlist,
@@ -93,8 +93,8 @@ SkyboxTexture *sSkyboxTextures[10] = {
  * The final color of each pixel is computed from the bitwise AND of the color and the texture.
  */
 ColorRGB sSkyboxColors[] = {
-    COLOR_RGB_JRB_SKY,
     COLOR_RGB_WHITE,
+    COLOR_RGB_JRB_SKY,
 };
 
 /**
@@ -147,6 +147,7 @@ s32 calculate_skybox_scaled_x(s8 player, f32 fov) {
     if (scaledX > SKYBOX_WIDTH) {
         scaledX -= ((scaledX / SKYBOX_WIDTH) * SKYBOX_WIDTH);
     }
+
     return (SKYBOX_WIDTH - scaledX);
 }
 
@@ -188,17 +189,18 @@ static s32 get_top_left_tile_idx(s8 player) {
  *                  into an x and y by modulus and division by SKYBOX_COLS. x and y are then scaled by
  *                  SKYBOX_TILE_WIDTH to get a point in world space.
  */
-Vtx *make_skybox_rect(s32 tileIndex, s8 colorIndex) {
-    Vtx *verts = alloc_display_list(4 * sizeof(*verts));
+Vtx* make_skybox_rect(s32 tileIndex, s8 colorIndex) {
+    Vtx* verts = alloc_display_list(4 * sizeof(*verts));
     s16 x = (tileIndex % SKYBOX_COLS) * SKYBOX_TILE_WIDTH;
     s16 y = SKYBOX_HEIGHT - ((tileIndex / SKYBOX_COLS) * SKYBOX_TILE_HEIGHT);
 
     if (verts != NULL) {
-        make_vertex(verts, 0, x,                     y,                      -1,         0,         0, sSkyboxColors[colorIndex][0], sSkyboxColors[colorIndex][1], sSkyboxColors[colorIndex][2], 255);
-        make_vertex(verts, 1, x,                     y - SKYBOX_TILE_HEIGHT, -1,         0, (31 << 5), sSkyboxColors[colorIndex][0], sSkyboxColors[colorIndex][1], sSkyboxColors[colorIndex][2], 255);
-        make_vertex(verts, 2, x + SKYBOX_TILE_WIDTH, y - SKYBOX_TILE_HEIGHT, -1, (31 << 5), (31 << 5), sSkyboxColors[colorIndex][0], sSkyboxColors[colorIndex][1], sSkyboxColors[colorIndex][2], 255);
-        make_vertex(verts, 3, x + SKYBOX_TILE_WIDTH, y,                      -1, (31 << 5),         0, sSkyboxColors[colorIndex][0], sSkyboxColors[colorIndex][1], sSkyboxColors[colorIndex][2], 255);
+        make_vertex(verts, 0, (x                    ), (y                     ), -1,         0,         0, sSkyboxColors[colorIndex][0], sSkyboxColors[colorIndex][1], sSkyboxColors[colorIndex][2], 255);
+        make_vertex(verts, 1, (x                    ), (y - SKYBOX_TILE_HEIGHT), -1,         0, (31 << 5), sSkyboxColors[colorIndex][0], sSkyboxColors[colorIndex][1], sSkyboxColors[colorIndex][2], 255);
+        make_vertex(verts, 2, (x + SKYBOX_TILE_WIDTH), (y - SKYBOX_TILE_HEIGHT), -1, (31 << 5), (31 << 5), sSkyboxColors[colorIndex][0], sSkyboxColors[colorIndex][1], sSkyboxColors[colorIndex][2], 255);
+        make_vertex(verts, 3, (x + SKYBOX_TILE_WIDTH), (y                     ), -1, (31 << 5),         0, sSkyboxColors[colorIndex][0], sSkyboxColors[colorIndex][1], sSkyboxColors[colorIndex][2], 255);
     }
+
     return verts;
 }
 
@@ -207,7 +209,7 @@ Vtx *make_skybox_rect(s32 tileIndex, s8 colorIndex) {
  * The row and column are converted into an index into the skybox's tile list, which is then drawn in
  * world space so that the tiles will rotate with the camera.
  */
-void draw_skybox_tile_grid(Gfx **dlist, s8 background, s8 player, s8 colorIndex) {
+void draw_skybox_tile_grid(Gfx** dlist, s8 background, s8 player, s8 colorIndex) {
     for (s32 row = 0; row < (3 * SKYBOX_SIZE); row++) {
         for (s32 col = 0; col < (3 * SKYBOX_SIZE); col++) {
             s32 tileIndex = sSkyBoxInfo[player].upperLeftTile + (row * SKYBOX_COLS) + col;
@@ -215,9 +217,8 @@ void draw_skybox_tile_grid(Gfx **dlist, s8 background, s8 player, s8 colorIndex)
                 continue;
             }
 
-            const Texture *const texture =
-                (*(SkyboxTexture *) segmented_to_virtual(sSkyboxTextures[background]))[tileIndex];
-            Vtx *vertices = make_skybox_rect(tileIndex, colorIndex);
+            const Texture* const texture = (*(SkyboxTexture*)segmented_to_virtual(sSkyboxTextures[background]))[tileIndex];
+            Vtx* vertices = make_skybox_rect(tileIndex, colorIndex);
 
             gLoadBlockTexture((*dlist)++, 32, 32, G_IM_FMT_RGBA, texture);
             gSPVertex((*dlist)++, VIRTUAL_TO_PHYSICAL(vertices), 4, 0);
@@ -226,12 +227,12 @@ void draw_skybox_tile_grid(Gfx **dlist, s8 background, s8 player, s8 colorIndex)
     }
 }
 
-void *create_skybox_ortho_matrix(s8 player) {
+void* create_skybox_ortho_matrix(s8 player) {
     f32 left   = sSkyBoxInfo[player].scaledX;
     f32 right  = sSkyBoxInfo[player].scaledX + SCREEN_WIDTH;
     f32 bottom = sSkyBoxInfo[player].scaledY - SCREEN_HEIGHT;
     f32 top    = sSkyBoxInfo[player].scaledY;
-    Mtx *mtx = alloc_display_list(sizeof(*mtx));
+    Mtx* mtx = alloc_display_list(sizeof(*mtx));
 
 #ifdef WIDESCREEN
     f32 half_width = ((4.0f / 3.0f) / GFX_DIMENSIONS_ASPECT_RATIO) * SCREEN_CENTER_X;
@@ -253,7 +254,7 @@ void *create_skybox_ortho_matrix(s8 player) {
 /**
  * Creates the skybox's display list, then draws the 3x3 grid of tiles.
  */
-Gfx *init_skybox_display_list(s8 player, s8 background, s8 colorIndex) {
+Gfx* init_skybox_display_list(s8 player, s8 background, s8 colorIndex) {
     void *skybox = alloc_display_list(
         SIZEOF_GFX_CMD(SPDisplayList(0)) +
         SIZEOF_GFX_CMD(SPMatrix(0,0)) +
@@ -266,12 +267,12 @@ Gfx *init_skybox_display_list(s8 player, s8 background, s8 colorIndex) {
         SIZEOF_GFX_CMD(SPDisplayList(0)) +
         SIZEOF_GFX_CMD(SPEndDisplayList())
     );
-    Gfx *dlist = skybox;
+    Gfx* dlist = skybox;
 
     if (skybox == NULL) {
         return NULL;
     } else {
-        Mtx *ortho = create_skybox_ortho_matrix(player);
+        Mtx* ortho = create_skybox_ortho_matrix(player);
 
         gSPDisplayList(dlist++, dl_skybox_begin);
         gSPMatrix(dlist++, VIRTUAL_TO_PHYSICAL(ortho), (G_MTX_PROJECTION | G_MTX_MUL | G_MTX_NOPUSH));
@@ -280,6 +281,7 @@ Gfx *init_skybox_display_list(s8 player, s8 background, s8 colorIndex) {
         gSPDisplayList(dlist++, dl_skybox_end);
         gSPEndDisplayList(dlist);
     }
+
     return skybox;
 }
 
@@ -294,13 +296,13 @@ Gfx *init_skybox_display_list(s8 player, s8 background, s8 colorIndex) {
  * @param posX,posY,posZ The camera's position
  * @param focX,focY,focZ The camera's focus.
  */
-Gfx *create_skybox_facing_camera(s8 player, s8 background, f32 fov, Vec3f pos, Vec3f focus) {
-    s8 colorIndex = 1;
+Gfx* create_skybox_facing_camera(s8 player, s8 background, f32 fov, Vec3f pos, Vec3f focus) {
+    s8 colorIndex = 0;
 
 #ifdef ENABLE_VANILLA_LEVEL_SPECIFIC_CHECKS
     // For the "Plunder in the Sunken Ship" star in JRB, make the sky darker and slightly green.
     if (background == BACKGROUND_ABOVE_CLOUDS && gCurrActNum == ACT_INDEX_TO_NUM(ACT_INDEX_1)) {
-        colorIndex = 0;
+        colorIndex = 1;
     }
 #endif
 

@@ -49,15 +49,15 @@ enum PuppyLightIterateFlags {
 extern Lights1 gLevelLight;
 extern u16 gNumLights;
 extern u8 levelAmbient;
-extern struct PuppyLight *gPuppyLights[MAX_LIGHTS];
-extern struct MemoryPool *gLightsPool;
-extern void puppylights_run(Lights1 *src, struct Object *obj, s32 flags, u32 baseColour);
-extern void puppylights_object_emit(struct Object *obj);
+extern struct PuppyLight* gPuppyLights[MAX_LIGHTS];
+extern struct MemoryPool* gLightsPool;
+extern void puppylights_run(Lights1* src, struct Object* obj, s32 flags, RGBA32 baseColour);
+extern void puppylights_object_emit(struct Object* obj);
 extern void cur_obj_enable_light(void);
 extern void cur_obj_disable_light(void);
-extern void obj_enable_light(struct Object *obj);
-extern void obj_disable_light(struct Object *obj);
-extern void set_light_properties(struct PuppyLight *light, s32 x, s32 y, s32 z, s32 offsetX, s32 offsetY, s32 offsetZ, s32 yaw, s32 epicentre, s32 colour, s32 flags, s32 room, s32 active);
+extern void obj_enable_light(struct Object* obj);
+extern void obj_disable_light(struct Object* obj);
+extern void set_light_properties(struct PuppyLight* light, s32 x, s32 y, s32 z, s32 offsetX, s32 offsetY, s32 offsetZ, s32 yaw, s32 epicentre, s32 colour, s32 flags, s32 room, s32 active);
 extern void puppylights_allocate(void);
 extern void delete_lights(void);
 

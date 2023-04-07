@@ -98,8 +98,8 @@ struct gPuppyStruct
     f32 shakeForce;             // How violently the camera's shaking
     s32 framesSinceC[2];        // Counts the number of frames since the last C left or right press, to track double presses.
     s16 collisionDistance;      // Tries to be zoom, but will be overwritten by collision detection
-    struct Object *targetObj;   // The object that the focus will base its positioning off. Usually Mario.
-    struct Object *targetObj2;  // This is the second focus point that the camera will focus on. It'll focus between them.
+    struct Object* targetObj;   // The object that the focus will base its positioning off. Usually Mario.
+    struct Object* targetObj2;  // This is the second focus point that the camera will focus on. It'll focus between them.
     s16 povHeight;              // An offset of the focus object's Y value.
     s16 floorY[2];              // Floor offsets, to allow a grace period before following Mario into the air.
     u8  opacity;                // A value set by collision distance, to fade Mario out if you're too close.
@@ -151,7 +151,7 @@ struct sPuppySpline
 struct sPuppyVolume
 {
     s32 (*func)();               // a pointer to a function. Optional.
-    struct sPuppyAngles *angles; // A pointer to a gPuppyAngles struct. Optional
+    struct sPuppyAngles* angles; // A pointer to a gPuppyAngles struct. Optional
     s32 flagsAdd;                // Adds behaviour flags.
     s32 flagsRemove;             // Removes behaviour flags.
     Vec3s pos;                   // The set position of the volume
@@ -188,18 +188,28 @@ enum gPuppyCamBeh
 
     PUPPYCAM_BEHAVIOUR_FREE             = BIT(15), // 0x8000
 
-    PUPPYCAM_BEHAVIOUR_DEFAULT = (PUPPYCAM_BEHAVIOUR_X_MOVEMENT | PUPPYCAM_BEHAVIOUR_Y_MOVEMENT | PUPPYCAM_BEHAVIOUR_Z_MOVEMENT |
-    PUPPYCAM_BEHAVIOUR_YAW_ROTATION | PUPPYCAM_BEHAVIOUR_PITCH_ROTATION | PUPPYCAM_BEHAVIOUR_ZOOM_CHANGE |
-    PUPPYCAM_BEHAVIOUR_HEIGHT_HELPER | PUPPYCAM_BEHAVIOUR_TURN_HELPER | PUPPYCAM_BEHAVIOUR_INPUT_NORMAL | PUPPYCAM_BEHAVIOUR_PANSHIFT | PUPPYCAM_BEHAVIOUR_COLLISION)
+    PUPPYCAM_BEHAVIOUR_DEFAULT = (
+        PUPPYCAM_BEHAVIOUR_X_MOVEMENT     |
+        PUPPYCAM_BEHAVIOUR_Y_MOVEMENT     |
+        PUPPYCAM_BEHAVIOUR_Z_MOVEMENT     |
+        PUPPYCAM_BEHAVIOUR_YAW_ROTATION   |
+        PUPPYCAM_BEHAVIOUR_PITCH_ROTATION |
+        PUPPYCAM_BEHAVIOUR_ZOOM_CHANGE    |
+        PUPPYCAM_BEHAVIOUR_HEIGHT_HELPER  |
+        PUPPYCAM_BEHAVIOUR_TURN_HELPER    |
+        PUPPYCAM_BEHAVIOUR_INPUT_NORMAL   |
+        PUPPYCAM_BEHAVIOUR_PANSHIFT       |
+        PUPPYCAM_BEHAVIOUR_COLLISION
+    )
 };
 
 extern const struct sPuppyAngles puppyAnglesNull;
 extern u8 gPCOptionOpen;
 extern s32 gPuppyError;
 extern struct gPuppyStruct gPuppyCam;
-extern struct sPuppyVolume *sPuppyVolumeStack[MAX_PUPPYCAM_VOLUMES];
+extern struct sPuppyVolume* sPuppyVolumeStack[MAX_PUPPYCAM_VOLUMES];
 extern u16 gPuppyVolumeCount;
-extern struct MemoryPool *gPuppyMemoryPool;
+extern struct MemoryPool* gPuppyMemoryPool;
 extern void puppycam_boot(void);
 extern void puppycam_init(void);
 extern void puppycam_loop(void);

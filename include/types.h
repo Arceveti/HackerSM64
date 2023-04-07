@@ -49,7 +49,7 @@ struct Controller {
 }; /*0x24*/
 
 // -- String --
-typedef char * String;
+typedef char* String;
 
 // -- Booleans --
 typedef u8  Bool8;
@@ -189,13 +189,13 @@ enum SpTaskState {
 
 struct SPTask {
     /*0x00*/ OSTask task;
-    /*0x40*/ OSMesgQueue *msgqueue;
+    /*0x40*/ OSMesgQueue* msgqueue;
     /*0x44*/ OSMesg msg;
     /*0x48*/ enum SpTaskState state;
 }; // size = 0x4C, align = 0x8
 
 struct VblankHandler {
-    OSMesgQueue *queue;
+    OSMesgQueue* queue;
     OSMesg msg;
 };
 
@@ -217,27 +217,27 @@ struct Animation {
     /*0x06*/ s16 loopStart;
     /*0x08*/ s16 loopEnd;
     /*0x0A*/ s16 unusedBoneCount;
-    /*0x0C*/ const AnimValue *values;
-    /*0x10*/ const AnimIndex *index;
+    /*0x0C*/ const AnimValue* values;
+    /*0x10*/ const AnimIndex* index;
     /*0x14*/ u32 length; // only used with Mario animations to determine how much to load. 0 otherwise.
 };
 
-#define ANIMINDEX_NUMPARTS(animindex) (sizeof(animindex) / sizeof(AnimIndex) / 6 - 1)
+#define ANIMINDEX_NUMPARTS(animindex) ((sizeof(animindex) / sizeof(AnimIndex) / 6) - 1)
 
 struct GraphNode {
     /*0x00*/ s16 type; // structure type
     /*0x02*/ s8 drawingLayer;
     /*0x03*/ s8 flags;
-    /*0x04*/ struct GraphNode *prev;
-    /*0x08*/ struct GraphNode *next;
-    /*0x0C*/ struct GraphNode *parent;
-    /*0x10*/ struct GraphNode *children;
+    /*0x04*/ struct GraphNode* prev;
+    /*0x08*/ struct GraphNode* next;
+    /*0x0C*/ struct GraphNode* parent;
+    /*0x10*/ struct GraphNode* children;
 };
 
 struct AnimInfo {
     /*0x00 0x38*/ s16 animID;
     /*0x02 0x3A*/ s16 animYTrans;
-    /*0x04 0x3C*/ struct Animation *curAnim;
+    /*0x04 0x3C*/ struct Animation* curAnim;
     /*0x08 0x40*/ s16 animFrame;
     /*0x0A 0x42*/ u16 animTimer;
     /*0x0C 0x44*/ s32 animFrameAccelAssist;
@@ -246,15 +246,15 @@ struct AnimInfo {
 
 struct GraphNodeObject {
     /*0x00*/ struct GraphNode node;
-    /*0x14*/ struct GraphNode *sharedChild;
+    /*0x14*/ struct GraphNode* sharedChild;
     /*0x18*/ s8 areaIndex;
     /*0x19*/ s8 activeAreaIndex;
     /*0x1A*/ Vec3s angle;
     /*0x20*/ Vec3f pos;
     /*0x2C*/ Vec3f scale;
     /*0x38*/ struct AnimInfo animInfo;
-    /*0x4C*/ struct SpawnInfo *spawnInfo;
-    /*0x50*/ Mat4 *throwMatrix; // matrix ptr
+    /*0x4C*/ struct SpawnInfo* spawnInfo;
+    /*0x50*/ Mat4* throwMatrix; // matrix ptr
     /*0x54*/ Vec3f cameraToObject;
 #ifdef OBJECTS_REJ
     u16 ucode;
@@ -263,8 +263,8 @@ struct GraphNodeObject {
 
 struct ObjectNode {
     struct GraphNodeObject gfx;
-    struct ObjectNode *next;
-    struct ObjectNode *prev;
+    struct ObjectNode* next;
+    struct ObjectNode* prev;
 };
 
 #ifdef PUPPYLIGHTS
@@ -291,12 +291,12 @@ struct PuppyLight {
 
 struct Object {
     /*0x000*/ struct ObjectNode header;
-    /*0x068*/ struct Object *parentObj;
-    /*0x06C*/ struct Object *prevObj;
+    /*0x068*/ struct Object* parentObj;
+    /*0x06C*/ struct Object* prevObj;
     /*0x070*/ u32 collidedObjInteractTypes;
     /*0x074*/ s16 activeFlags;
     /*0x076*/ s16 numCollidedObjs;
-    /*0x078*/ struct Object *collidedObjs[4];
+    /*0x078*/ struct Object* collidedObjs[4];
     /*0x088*/
     union {
         // Object fields. See object_fields.h.
@@ -308,51 +308,50 @@ struct Object {
         s8 asS8[MAX_OBJECT_FIELDS][4];
         f32 asF32[MAX_OBJECT_FIELDS];
 #if !IS_64_BIT
-        s8 *asS8P[MAX_OBJECT_FIELDS];
-        s16 *asS16P[MAX_OBJECT_FIELDS];
-        s32 *asS32P[MAX_OBJECT_FIELDS];
-        f32 *asF32P[MAX_OBJECT_FIELDS];
-        struct Animation **asAnims[MAX_OBJECT_FIELDS];
-        struct Waypoint *asWaypoint[MAX_OBJECT_FIELDS];
-        struct ChainSegment *asChainSegment[MAX_OBJECT_FIELDS];
-        struct Object *asObject[MAX_OBJECT_FIELDS];
-        struct Surface *asSurface[MAX_OBJECT_FIELDS];
-        void *asVoidPtr[MAX_OBJECT_FIELDS];
-        const void *asConstVoidPtr[MAX_OBJECT_FIELDS];
+        s8* asS8P[MAX_OBJECT_FIELDS];
+        s16* asS16P[MAX_OBJECT_FIELDS];
+        s32* asS32P[MAX_OBJECT_FIELDS];
+        f32* asF32P[MAX_OBJECT_FIELDS];
+        struct Animation** asAnims[MAX_OBJECT_FIELDS];
+        struct Waypoint* asWaypoint[MAX_OBJECT_FIELDS];
+        struct ChainSegment* asChainSegment[MAX_OBJECT_FIELDS];
+        struct Object* asObject[MAX_OBJECT_FIELDS];
+        struct Surface* asSurface[MAX_OBJECT_FIELDS];
+        void* asVoidPtr[MAX_OBJECT_FIELDS];
+        const void* asConstVoidPtr[MAX_OBJECT_FIELDS];
 #endif
     } rawData;
 #if IS_64_BIT
     union {
-        s8 *asS8P[MAX_OBJECT_FIELDS];
-        s16 *asS16P[MAX_OBJECT_FIELDS];
-        s32 *asS32P[MAX_OBJECT_FIELDS];
-        f32 *asF32P[MAX_OBJECT_FIELDS];
-        struct Animation **asAnims[MAX_OBJECT_FIELDS];
-        struct Waypoint *asWaypoint[MAX_OBJECT_FIELDS];
-        struct ChainSegment *asChainSegment[MAX_OBJECT_FIELDS];
-        struct Object *asObject[MAX_OBJECT_FIELDS];
-        struct Surface *asSurface[MAX_OBJECT_FIELDS];
-        void *asVoidPtr[MAX_OBJECT_FIELDS];
-        const void *asConstVoidPtr[MAX_OBJECT_FIELDS];
+        s8* asS8P[MAX_OBJECT_FIELDS];
+        s16* asS16P[MAX_OBJECT_FIELDS];
+        s32* asS32P[MAX_OBJECT_FIELDS];
+        f32* asF32P[MAX_OBJECT_FIELDS];
+        struct Animation** asAnims[MAX_OBJECT_FIELDS];
+        struct Waypoint* asWaypoint[MAX_OBJECT_FIELDS];
+        struct ChainSegment* asChainSegment[MAX_OBJECT_FIELDS];
+        struct Object* asObject[MAX_OBJECT_FIELDS];
+        struct Surface* asSurface[MAX_OBJECT_FIELDS];
+        void* asVoidPtr[MAX_OBJECT_FIELDS];
+        const void* asConstVoidPtr[MAX_OBJECT_FIELDS];
     } ptrData;
 #endif
-    /*0x1C8*/ u32 unused1;
-    /*0x1CC*/ const BehaviorScript *curBhvCommand;
-    /*0x1D0*/ u32 bhvStackIndex;
-    /*0x1D4*/ uintptr_t bhvStack[8];
-    /*0x1F4*/ s16 bhvDelayTimer;
-    /*0x1F6*/ s16 respawnInfoType;
-    /*0x1F8*/ f32 hitboxRadius;
-    /*0x1FC*/ f32 hitboxHeight;
-    /*0x200*/ f32 hurtboxRadius;
-    /*0x204*/ f32 hurtboxHeight;
-    /*0x208*/ f32 hitboxDownOffset;
-    /*0x20C*/ const BehaviorScript *behavior;
-    /*0x210*/ u32 unused2;
-    /*0x214*/ struct Object *platform;
-    /*0x218*/ void *collisionData;
-    /*0x21C*/ Mat4 transform;
-    /*0x25C*/ void *respawnInfo;
+    /*0x1C8*/ const BehaviorScript *curBhvCommand;
+
+    /*0x1CC*/ u32 bhvStackIndex;
+    /*0x1D0*/ uintptr_t bhvStack[8];
+    /*0x1F0*/ s16 bhvDelayTimer;
+    /*0x1F2*/ s16 respawnInfoType;
+    /*0x1F4*/ f32 hitboxRadius;
+    /*0x1F8*/ f32 hitboxHeight;
+    /*0x1FC*/ f32 hurtboxRadius;
+    /*0x200*/ f32 hurtboxHeight;
+    /*0x204*/ f32 hitboxDownOffset;
+    /*0x208*/ const BehaviorScript* behavior;
+    /*0x20C*/ struct Object* platform;
+    /*0x210*/ void* collisionData;
+    /*0x214*/ Mat4 transform;
+    /*0x254*/ void* respawnInfo;
 #ifdef PUPPYLIGHTS
     struct PuppyLight puppylight;
 #endif
@@ -393,7 +392,7 @@ struct Surface {
     /*0x16*/ Vec3t vertex3;
     /*0x1C*/ struct Normal normal;
     /*0x28*/ f32 originOffset;
-    /*0x2C*/ struct Object *object;
+    /*0x2C*/ struct Object* object;
 };
 
 #define PUNCH_STATE_TIMER_SIZE 6
@@ -420,7 +419,6 @@ struct MarioBodyState {
     /*0x0C*/ Vec3s torsoAngle;
     /*0x12*/ Vec3s headAngle;
     /*0x18*/ Vec3f heldObjLastPosition; /// also known as HOLP
-    // u8 filler[4];
 };
 
 struct MarioState {
@@ -450,25 +448,25 @@ struct MarioState {
     /*0x54*/ f32 forwardVel;
     /*0x58*/ f32 slideVelX;
     /*0x5C*/ f32 slideVelZ;
-    /*0x60*/ struct Surface *wall;
-    /*0x64*/ struct Surface *ceil;
-    /*0x68*/ struct Surface *floor;
+    /*0x60*/ struct Surface* wall;
+    /*0x64*/ struct Surface* ceil;
+    /*0x68*/ struct Surface* floor;
     /*0x6C*/ f32 ceilHeight;
     /*0x70*/ f32 floorHeight;
     /*0x74*/ s16 floorYaw;
     #define floorAngle floorYaw
     /*0x76*/ s16 waterLevel;
-    /*0x78*/ struct Object *interactObj;
-    /*0x7C*/ struct Object *heldObj;
-    /*0x80*/ struct Object *usedObj;
-    /*0x84*/ struct Object *riddenObj;
-    /*0x88*/ struct Object *marioObj;
-    /*0x8C*/ struct SpawnInfo *spawnInfo;
-    /*0x90*/ struct Area *area;
-    /*0x94*/ struct PlayerCameraState *statusForCamera;
-    /*0x98*/ struct MarioBodyState *marioBodyState;
-    /*0x9C*/ struct Controller *controller;
-    /*0xA0*/ struct DmaHandlerList *animList;
+    /*0x78*/ struct Object* interactObj;
+    /*0x7C*/ struct Object* heldObj;
+    /*0x80*/ struct Object* usedObj;
+    /*0x84*/ struct Object* riddenObj;
+    /*0x88*/ struct Object* marioObj;
+    /*0x8C*/ struct SpawnInfo* spawnInfo;
+    /*0x90*/ struct Area* area;
+    /*0x94*/ struct PlayerCameraState* statusForCamera;
+    /*0x98*/ struct MarioBodyState* marioBodyState;
+    /*0x9C*/ struct Controller* controller;
+    /*0xA0*/ struct DmaHandlerList* animList;
     /*0xA4*/ u32 collidedObjInteractTypes;
     /*0xA8*/ s16 numCoins;
     /*0xAA*/ s16 numStars;
@@ -486,7 +484,7 @@ struct MarioState {
     /*0xC0*/ f32 quicksandDepth;
     /*0xC4*/ f32 windGravity;
     // -- HackerSM64 MarioState fields begin --
-            struct Object *paintingObj; // The painting Mario is currently entering.
+            struct Object* paintingObj; // The painting Mario is currently entering.
 #ifdef BREATH_METER
              s16 breath;
              u8  breathCounter;

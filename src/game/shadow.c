@@ -23,8 +23,8 @@
  * An array consisting of all the hardcoded rectangle shadows in the game.
  */
 static const ShadowRectangle sShadowRectangles[2] = {
-    { .scaleX = 7.2f, .scaleZ = 4.6f, .scaleWithDistance = TRUE }, // Spindel
-    { .scaleX = 4.0f, .scaleZ = 3.6f, .scaleWithDistance = TRUE }, // Whomp
+    [SHADOW_RECTANGLE_SPINDEL - SHADOW_RECTANGLE_HARDCODED_OFFSET] = { .scaleX = 7.2f, .scaleZ = 4.6f, .scaleWithDistance = TRUE }, // Spindel
+    [SHADOW_RECTANGLE_WHOMP   - SHADOW_RECTANGLE_HARDCODED_OFFSET] = { .scaleX = 4.0f, .scaleZ = 3.6f, .scaleWithDistance = TRUE }, // Whomp
 };
 
 /**
@@ -93,7 +93,7 @@ static s32 linearly_interpolate_negative(Alpha initialSolidity, s16 curr, s16 st
  */
 s32 set_player_shadow_scale_solidity(Vec3f scaleVec, f32 distToShadow, s16 shadowScale, Alpha solidity) {
     // Set the shadow solidity manually for certain Mario animations.
-    struct AnimInfo *animInfo = &gMarioObject->header.gfx.animInfo;
+    struct AnimInfo* animInfo = &gMarioObject->header.gfx.animInfo;
     s16 animFrame = animInfo->animFrame;
 
     shadowScale = scale_shadow_with_distance(shadowScale, distToShadow);
@@ -175,7 +175,7 @@ s32 correct_lava_shadow_height(f32 *floorHeight) {
  * shadowType 0 uses a circle texture, the rest use a square texture.
  * Uses environment alpha for shadow solidity.
  */
-static Gfx *shadow_display_list(s8 shadowType, Alpha solidity, s8 isDecal) {
+static Gfx* shadow_display_list(s8 shadowType, Alpha solidity, _Bool isDecal) {
     const ColorRGB shadowColor = { 0x00, 0x00, 0x00 };
 
     Gfx *gfxHead = alloc_display_list(
@@ -188,9 +188,9 @@ static Gfx *shadow_display_list(s8 shadowType, Alpha solidity, s8 isDecal) {
     if (gfxHead == NULL) {
         return NULL;
     }
-    Gfx *gfx = gfxHead;
-    Gfx *dl_shadow_begin = isDecal ? dl_shadow_begin_decal : dl_shadow_begin_non_decal;
-    Gfx *dl_shadow_shape = (shadowType == SHADOW_CIRCLE) ? dl_shadow_circle : dl_shadow_square;
+    Gfx* gfx = gfxHead;
+    Gfx* dl_shadow_begin = isDecal ? dl_shadow_begin_decal : dl_shadow_begin_non_decal;
+    Gfx* dl_shadow_shape = (shadowType == SHADOW_CIRCLE) ? dl_shadow_circle : dl_shadow_square;
 
     gSPDisplayList(gfx++, dl_shadow_begin);
     gSPDisplayList(gfx++, dl_shadow_shape);
@@ -200,56 +200,62 @@ static Gfx *shadow_display_list(s8 shadowType, Alpha solidity, s8 isDecal) {
 
     return gfxHead;
 }
+// extern s32 gCrashPrintValue;
+f32 get_shadow_floor(f32 x, f32 y, f32 z, struct Surface** floor, struct Object* obj, _Bool isPlayer, _Bool* shifted) {
+    struct MarioState* m = gMarioState;
+    f32 floorHeight = FLOOR_LOWER_LIMIT_MISC;
+    _Bool notHeldObj = (gCurGraphNodeHeldObject == NULL);
+
+    // Attempt to use existing floors before finding a new one.
+    if (notHeldObj && isPlayer && m->floor != NULL) {
+        // The object is Mario and has a referenced floor.
+        *floor      = m->floor;
+        floorHeight = m->floorHeight;
+    } else if (notHeldObj && (gCurGraphNodeObject != &gMirrorMario) && obj->oFloor != NULL) {
+        // The object is not Mario but has a referenced floor.
+        //! Some objects only get their oFloor from bhv_init_room, which skips dynamic floors.
+        *floor      = obj->oFloor;
+        floorHeight = obj->oFloorHeight;
+        // gCrashPrintValue = floorHeight;
+    } else {
+        // The object has no referenced floor, so find a new one.
+        floorHeight = find_floor(x, y, z, floor);
+        // Skip shifting the shadow height later, since the find_floor call above uses the already shifted position.
+        *shifted = FALSE;
+    }
+
+    return floorHeight;
+}
 
 //! TODO: Split create_shadow_below_xyz into multiple functions/
 /**
  * Create a shadow at the absolute position given, with the given parameters.
  * Return a pointer to the display list representing the shadow.
  */
-Gfx *create_shadow_below_xyz(Vec3f pos, Vec3f floorNormal, Vec3f scaleVec, s16 shadowScale, u8 solidity, s8 shadowType, s8 shifted, s8 *isDecal) {
-    struct Object *obj = gCurGraphNodeObjectNode;
+Gfx* create_shadow_below_xyz(Vec3f pos, Vec3f floorNormal, Vec3f scaleVec, s16 shadowScale, u8 solidity, s8 shadowType, _Bool shifted, _Bool* isDecal) {
+    struct Object* obj = gCurGraphNodeObjectNode;
 
-    // Check if the object exists.
+    // Make sure the object exists.
     if (obj == NULL) {
         return NULL;
     }
 
     // The floor underneath the object.
     struct Surface *floor = NULL;
-    // The y-position of the floor (or water or lava) underneath the object.
-    f32 floorHeight = FLOOR_LOWER_LIMIT_MISC;
-    f32 heightOffset = 0;
-    f32 x = pos[0];
-    f32 y = pos[1];
-    f32 z = pos[2];
-    s8 isPlayer = (obj == gMarioObject);
-    s8 notHeldObj = (gCurGraphNodeHeldObject == NULL);
-
-    struct MarioState *m = gMarioState;
 
     // -- Check for floors --
 
-    // Attempt to use existing floors before finding a new one.
-    if (notHeldObj && isPlayer && m->floor) {
-        // The object is Mario and has a referenced floor.
-        floor       = m->floor;
-        floorHeight = m->floorHeight;
-    } else if (notHeldObj && (gCurGraphNodeObject != &gMirrorMario) && obj->oFloor) {
-        // The object is not Mario but has a referenced floor.
-        //! Some objects only get their oFloor from bhv_init_room, which skips dynamic floors.
-        floor       = obj->oFloor;
-        floorHeight = obj->oFloorHeight;
-    } else {
-        // The object has no referenced floor, so find a new one.
-        floorHeight = find_floor(x, y, z, &floor);
+    f32 x = pos[0];
+    f32 y = pos[1];
+    f32 z = pos[2];
+    _Bool isPlayer = (obj == gMarioObject);
 
-        // No shadow if the position is OOB.
-        if (floor == NULL) {
-            return NULL;
-        }
+    // The y-position of the floor (or water or lava) underneath the object.
+    f32 floorHeight = get_shadow_floor(x, y, z, &floor, obj, isPlayer, &shifted);
 
-        // Skip shifting the shadow height later, since the find_floor call above uses the already shifted position.
-        shifted = FALSE;
+    // No shadow if the position is OOB.
+    if (floor == NULL) {
+        return NULL;
     }
 
     // -- Handle water and other translucent surfaces --
@@ -258,15 +264,20 @@ Gfx *create_shadow_below_xyz(Vec3f pos, Vec3f floorNormal, Vec3f scaleVec, s16 s
     *isDecal = TRUE;
 
     // Check for water under the shadow.
-    struct Surface *waterFloor = NULL;
+    struct Surface* waterFloor = NULL;
     f32 waterLevel = find_water_level_and_floor(x, y, z, &waterFloor);
 
     // Whether the floor is an environment box rather than an actual surface.
     s32 isEnvBox = FALSE;
 
-    if (waterLevel > FLOOR_LOWER_LIMIT_MISC
-     && y >= waterLevel
-     && floorHeight <= waterLevel) {
+    // An offset to apply to the shadow's height at the end.
+    f32 heightOffset = 0.0f;
+
+    if (
+        waterLevel > FLOOR_LOWER_LIMIT_MISC &&
+        y >= waterLevel &&
+        floorHeight <= waterLevel
+    ) { // Water:
         // Skip shifting the shadow height later, since the find_water_level_and_floor call above uses the already shifted position.
         shifted = FALSE;
 
@@ -293,11 +304,12 @@ Gfx *create_shadow_below_xyz(Vec3f pos, Vec3f floorNormal, Vec3f scaleVec, s16 s
             *isDecal = correct_lava_shadow_height(&floorHeight);
 #endif
         } else {
-            obj = floor->object;
+            struct Object* floorObj = floor->object;
             // Check if the shadow is on the flying carpet.
-            if (obj != NULL
-             && obj_has_behavior(obj, bhvPlatformOnTrack)
-             && obj->oPlatformOnTrackType == PLATFORM_ON_TRACK_TYPE_CARPET) {
+            if (floorObj != NULL &&
+                obj_has_behavior(floorObj, bhvPlatformOnTrack) &&
+                floorObj->oPlatformOnTrackType == PLATFORM_ON_TRACK_TYPE_CARPET
+            ) {
                 // Raise the shadow 5 units on the flying carpet to avoid clipping issues.
                 heightOffset += 5;
                 // The flying carpet is transparent.

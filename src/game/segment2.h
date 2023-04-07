@@ -4,9 +4,9 @@
 #include <PR/ultratypes.h>
 #include <PR/gbi.h>
 
-extern void *puppyprint_font_lut[];
-extern void *puppyprint_kerning_lut[][82];
-extern const struct PPTextFont *const gPuppyPrintFontTable[];
+extern void* puppyprint_font_lut[];
+extern void* puppyprint_kerning_lut[][82];
+extern const struct PPTextFont* const gPuppyPrintFontTable[];
 
 extern u8 seg2_course_name_table[];
 extern u8 seg2_act_name_table[];
@@ -85,20 +85,20 @@ extern Gfx dl_paintings_env_mapped_begin[];
 extern Gfx dl_paintings_env_mapped_end[];
 extern PaintingData painting_data_vertices[];
 extern PaintingData painting_data_triangles[];
-extern Texture *main_hud_lut[58];
+extern Texture* main_hud_lut[58];
 extern Gfx dl_hud_img_load_tex_block[];
 extern Gfx dl_hud_img_begin[];
 extern Gfx dl_hud_img_end[];
-extern void *main_font_lut[];
+extern void* main_font_lut[];
 extern Gfx dl_ia_text_tex_settings[];
 extern Gfx dl_rgba16_load_tex_block[];
-extern void *main_credits_font_lut[];
-extern Texture *main_hud_camera_lut[6];
+extern void* main_credits_font_lut[];
+extern Texture* main_hud_camera_lut[6];
 extern Gfx dl_shade_screen_begin[];
 extern Gfx dl_shade_screen_end[];
 extern Gfx dl_draw_text_bg_box[];
 extern Gfx dl_draw_triangle[];
-extern void *seg2_dialog_table[];
+extern void* seg2_dialog_table[];
 extern Gfx dl_billboard_num_0[];
 extern Gfx dl_billboard_num_1[];
 extern Gfx dl_billboard_num_2[];

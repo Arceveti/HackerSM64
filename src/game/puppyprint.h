@@ -21,10 +21,10 @@
 #endif
 
 struct PPTextFont {
-    Texture *tex;   // Pointer to the texture for the font.
-    u8  *kern;      // Pointer to the kerning table.
-    u16 *offset;    // Pointer to the character offset table.
-    u8  *pal;       // Pointer to the texture pallete. Coming.
+    Texture* tex;   // Pointer to the texture for the font.
+    u8*  kern;      // Pointer to the kerning table.
+    u16* offset;    // Pointer to the character offset table.
+    u8*  pal;       // Pointer to the texture pallete. Coming.
     u8   fmt;       // Texture format, same as F3D macros.
     u8   siz;       // Texture size, same as F3D macros.
     u16  imW;       // Texture width.
@@ -122,22 +122,22 @@ extern void puppyprint_render_profiler(void);
 extern s32 print_set_envcolour(u8 r, u8 g, u8 b, u8 a);
 extern void prepare_blank_box(void);
 extern void finish_blank_box(void);
-extern void print_small_text(s32 x, s32 y, const char *str, s32 align, s32 amount, u8 font);
-extern void render_multi_image(Texture *image, s32 x, s32 y, s32 width, s32 height, s32 scaleX, s32 scaleY, s32 mode);
-extern s32  get_text_height(const char *str);
-extern s32  get_text_width(const char *str, s32 font);
+extern void print_small_text(s32 x, s32 y, const char* str, s32 align, s32 amount, u8 font);
+extern void render_multi_image(Texture* image, s32 x, s32 y, s32 width, s32 height, s32 scaleX, s32 scaleY, s32 mode);
+extern s32 get_text_height(const char* str);
+extern s32 get_text_width(const char* str, s32 font);
 extern void prepare_blank_box(void);
 extern void finish_blank_box(void);
 extern void render_blank_box(s32 x1, s32 y1, s32 x2, s32 y2, u8 r, u8 g, u8 b, u8 a);
 extern void render_blank_box_rounded(s32 x1, s32 y1, s32 x2, s32 y2, u8 r, u8 g, u8 b, u8 a);
-extern void append_puppyprint_log(const char *str, ...);
+extern void append_puppyprint_log(const char* str, ...);
 extern char consoleLogTable[LOG_BUFFER_SIZE][255];
-extern void print_small_text_buffered(s32 x, s32 y, const char *str, u8 align, s32 amount, u8 font);
+extern void print_small_text_buffered(s32 x, s32 y, const char* str, u8 align, s32 amount, u8 font);
 extern void puppyprint_print_deferred(void);
-extern s32 puppyprint_strlen(const char *str);
+extern s32 puppyprint_strlen(const char* str);
 extern void set_segment_memory_printout(u32 segment, u32 amount);
-extern void print_small_text_light(s32 x, s32 y, const char *str, s32 align, s32 amount, u8 font);
-extern void print_small_text_buffered_light(s32 x, s32 y, const char *str, u8 align, s32 amount, u8 font);
+extern void print_small_text_light(s32 x, s32 y, const char* str, s32 align, s32 amount, u8 font);
+extern void print_small_text_buffered_light(s32 x, s32 y, const char* str, u8 align, s32 amount, u8 font);
 void puppyprint_profiler_process(void);
-s32 text_iterate_command(const char *str, s32 i, s32 runCMD);
-void get_char_from_byte(s32 *textX, s32 *textPos, u8 letter, u8 *wideX, u8 *spaceX, s8 *offsetY, u8 font);
+s32 text_iterate_command(const char* str, s32 i, s32 runCMD);
+void get_char_from_byte(s32* textX, s32* textPos, u8 letter, u8* wideX, u8* spaceX, s8* offsetY, u8 font);

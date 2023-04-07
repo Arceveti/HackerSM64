@@ -83,15 +83,15 @@ extern s16 gDebugInfoOverwrite[][8];
 extern u32 gTimeStopState;
 extern struct Object gObjectPool[];
 extern struct Object gMacroObjectDefaultParent;
-extern struct ObjectNode *gObjectLists;
+extern struct ObjectNode* gObjectLists;
 extern struct ObjectNode gFreeObjectList;
 
-extern struct Object *gMarioObject;
-extern struct Object *gLuigiObject;
-extern struct Object *gCurrentObject;
+extern struct Object* gMarioObject;
+extern struct Object* gLuigiObject;
+extern struct Object* gCurrentObject;
 #define o gCurrentObject
 
-extern const BehaviorScript *gCurBhvCommand;
+extern const BehaviorScript* gCurBhvCommand;
 extern s16 gPrevFrameObjectCount;
 
 extern s32 gSurfaceNodesAllocated;
@@ -101,7 +101,7 @@ extern s32 gNumStaticSurfaces;
 
 #define OBJECT_MEMORY_POOL 0x800
 
-extern struct MemoryPool *gObjectMemoryPool;
+extern struct MemoryPool* gObjectMemoryPool;
 
 enum CollisionFlags {
     COLLISION_FLAGS_NONE              = 0x0,
@@ -113,7 +113,7 @@ enum CollisionFlags {
 
 extern s16 gCollisionFlags;
 
-extern TerrainData *gEnvironmentRegions;
+extern TerrainData* gEnvironmentRegions;
 extern s32 gEnvironmentLevels[20];
 
 /**
@@ -140,9 +140,9 @@ extern s16 gMarioOnMerryGoRound;
 
 
 void bhv_mario_update(void);
-void set_object_respawn_info_bits(struct Object *obj, u8 bits);
+void set_object_respawn_info_bits(struct Object* obj, u8 bits);
 void unload_objects_from_area(s32 areaIndex);
-void spawn_objects_from_info(struct SpawnInfo *spawnInfo);
+void spawn_objects_from_info(struct SpawnInfo* spawnInfo);
 void clear_objects(void);
 void update_objects(void);
 

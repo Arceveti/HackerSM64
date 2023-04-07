@@ -19,8 +19,8 @@ struct GfxPool {
 };
 
 enum ZBmodes {
-    KEEP_ZBUFFER = 0,
-    CLEAR_ZBUFFER = 1,
+    KEEP_ZBUFFER,
+    CLEAR_ZBUFFER,
 };
 
 extern OSMesgQueue gGameVblankQueue;
@@ -30,20 +30,20 @@ extern OSMesg gGfxMesgBuf[1];
 extern struct VblankHandler gGameVblankHandler;
 extern uintptr_t gPhysicalFramebuffers[3];
 extern uintptr_t gPhysicalZBuffer;
-extern void *gMarioAnimsMemAlloc;
-extern void *gDemoInputsMemAlloc;
-extern struct SPTask *gGfxSPTask;
-extern Gfx *gDisplayListHead;
-extern u8 *gGfxPoolEnd;
-extern struct GfxPool *gGfxPool;
+extern void* gMarioAnimsMemAlloc;
+extern void* gDemoInputsMemAlloc;
+extern struct SPTask* gGfxSPTask;
+extern Gfx* gDisplayListHead;
+extern u8* gGfxPoolEnd;
+extern struct GfxPool* gGfxPool;
 extern u8 gIsConsole;
 extern u8 gCacheEmulated;
 extern u8 gBorderHeight;
 #ifdef VANILLA_STYLE_CUSTOM_DEBUG
 extern u8 gCustomDebugMode;
 #endif
-extern u8 *gAreaSkyboxStart[AREA_COUNT];
-extern u8 *gAreaSkyboxEnd[AREA_COUNT];
+extern u8* gAreaSkyboxStart[AREA_COUNT];
+extern u8* gAreaSkyboxEnd[AREA_COUNT];
 #ifdef EEP
 extern s8 gEepromProbe;
 #endif
@@ -66,10 +66,10 @@ extern u16 sRenderingFramebuffer;
 extern u32 gGlobalTimer;
 
 void setup_game_memory(void);
-void thread5_game_loop(UNUSED void *arg);
+void thread5_game_loop(UNUSED void* arg);
 void clear_framebuffer(RGBA16FILL color);
-void clear_viewport(Vp *viewport, RGBA16FILL color);
-void make_viewport_clip_rect(Vp *viewport);
+void clear_viewport(Vp* viewport, RGBA16FILL color);
+void make_viewport_clip_rect(Vp* viewport);
 void init_rcp(s32 resetZB);
 void end_master_display_list(void);
 void render_init(void);

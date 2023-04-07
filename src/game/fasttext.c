@@ -35,7 +35,7 @@ int computeS(unsigned char letter) {
         idx -= (3);
     }
 
-    return (idx - TEX_ASCII_START) * 8;
+    return ((idx - TEX_ASCII_START) * 8);
 }
 
 static const u8 fast_text_font_kerning[] = {
@@ -47,20 +47,20 @@ static const u8 fast_text_font_kerning[] = {
     /*p*/ 6, /*q*/ 6, /*r*/ 6, /*s*/ 6, /*t*/ 6, /*u*/ 6, /*v*/ 6, /*w*/ 6, /*x*/ 6, /*y*/ 6, /*z*/ 6, /*{*/ 0, /*|*/ 0, /*}*/ 0, /*~*/ 7,
 };
 
-void drawSmallString_impl(Gfx **dl, int x, int y, const char* string, int r, int g, int b) {
+void drawSmallString_impl(Gfx** dl, int x, int y, const char* string, int r, int g, int b) {
     int i = 0;
     int xPos = x;
     int yPos = y;
     int s = 0;
-    Gfx *dlHead = *dl;
+    Gfx* dlHead = *dl;
 
-    gDPLoadTextureBlock_4bS(dlHead++, fast_font, G_IM_FMT_IA, 672, 12, 0, G_TX_MIRROR | G_TX_WRAP, G_TX_MIRROR | G_TX_WRAP, G_TX_NOMASK, G_TX_NOMASK, G_TX_NOLOD, G_TX_NOLOD);
+    gDPLoadTextureBlock_4bS(dlHead++, fast_font, G_IM_FMT_IA, 672, 12, 0, (G_TX_MIRROR | G_TX_WRAP), (G_TX_MIRROR | G_TX_WRAP), G_TX_NOMASK, G_TX_NOMASK, G_TX_NOLOD, G_TX_NOLOD);
     gDPSetPrimColor(dlHead++, 0, 0, r, g, b, 255);
     gDPPipeSync(dlHead++);
 
     while (string[i] != '\0') {
         unsigned int cur_char = string[i];
-        s32 goddamnJMeasure = string[i] == 'j' ? -1 : 0;
+        s32 goddamnJMeasure = (string[i] == 'j') ? -1 : 0;
 
         if (cur_char == '\n') {
             xPos = x;
@@ -70,13 +70,13 @@ void drawSmallString_impl(Gfx **dl, int x, int y, const char* string, int r, int
         }
 
         if (cur_char == '\t') {
-            int xDist = xPos - x + 1;
+            int xDist = (xPos - x) + 1;
             int tabCount = (xDist + TAB_WIDTH - 1) / TAB_WIDTH;
-            xPos = tabCount * TAB_WIDTH + x;
+            xPos = (tabCount * TAB_WIDTH) + x;
         } else {
             if (cur_char != ' ') {
                 s = computeS(cur_char);
-                gSPTextureRectangle(dlHead++, (xPos + 0) << 2, (yPos + 0) << 2, (xPos + 8) << 2, (yPos + 12) << 2, 0, (s << 5) - goddamnJMeasure, 0, 1 << 10, 1 << 10);
+                gSPTextureRectangle(dlHead++, ((xPos + 0) << 2), ((yPos + 0) << 2), ((xPos + 8) << 2), ((yPos + 12) << 2), 0, ((s << 5) - goddamnJMeasure), 0, (1 << 10), (1 << 10));
             }
             xPos += fast_text_font_kerning[cur_char - ' '];
         }

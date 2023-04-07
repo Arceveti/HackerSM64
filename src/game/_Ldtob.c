@@ -5,8 +5,8 @@
 
 #define BUFF_LEN 0x20
 
-static s16 _Ldunscale(s16 *pex, printf_struct *px);
-static void _Genld(printf_struct *px, u8 code, u8 *p, s16 nsig, s16 xexp);
+static s16 _Ldunscale(s16* pex, printf_struct* px);
+static void _Genld(printf_struct* px, u8 code, u8* p, s16 nsig, s16 xexp);
 
 const double D_80338670[] = { 10e0L, 10e1L, 10e3L, 10e7L, 10e15L, 10e31L, 10e63L, 10e127L, 10e255L };
 
@@ -43,9 +43,9 @@ const double D_80338670[] = { 10e0L, 10e1L, 10e3L, 10e7L, 10e15L, 10e31L, 10e63L
 #define _D3 3
 #endif
 
-void _Ldtob(printf_struct *args, u8 type) {
+void _Ldtob(printf_struct* args, u8 type) {
     u8 buff[BUFF_LEN];
-    u8 *ptr;
+    u8* ptr;
     UNUSED u32 sp70;
     f64 val;
     /* maybe struct? */
@@ -130,10 +130,11 @@ void _Ldtob(printf_struct *args, u8 type) {
 
         gen = ptr - &buff[1];
         for (ptr = &buff[1], exp += 7; *ptr == '0'; ptr++) {
-            --gen, --exp;
+            --gen;
+            --exp;
         }
 
-        nsig = ((type == 'f') ? exp + 1 : ((type == 'e' || type == 'E') ? 1 : 0)) + args->precision;
+        nsig = ((type == 'f') ? (exp + 1) : ((type == 'e' || type == 'E') ? 1 : 0)) + args->precision;
         if (gen < nsig) {
             nsig = gen;
         }
@@ -151,15 +152,17 @@ void _Ldtob(printf_struct *args, u8 type) {
                 ptr[n2]++;
             }
             if (n2 < 0) {
-                --ptr, ++nsig, ++exp;
+                --ptr;
+                ++nsig;
+                ++exp;
             }
         }
     }
     _Genld(args, type, ptr, nsig, exp);
 }
 
-static s16 _Ldunscale(s16 *pex, printf_struct *px) {
-    unsigned short *ps = (unsigned short *) px;
+static s16 _Ldunscale(s16* pex, printf_struct* px) {
+    unsigned short* ps = (unsigned short*)px;
     short xchar = (ps[_D0] & _DMASK) >> _DOFF;
     if (xchar == _DMAX) { /* NaN or INF */
         *pex = 0;
@@ -177,12 +180,12 @@ static s16 _Ldunscale(s16 *pex, printf_struct *px) {
     }
 }
 
-static void _Genld(printf_struct *px, u8 code, u8 *p, s16 nsig, s16 xexp) {
+static void _Genld(printf_struct* px, u8 code, u8* p, s16 nsig, s16 xexp) {
     u8 point = '.';
     if (nsig <= 0) {
         nsig = 1,
 
-        p = (u8 *) "0";
+        p = (u8*)"0";
     }
 
     if (code == 'f'
@@ -255,7 +258,7 @@ static void _Genld(printf_struct *px, u8 code, u8 *p, s16 nsig, s16 xexp) {
             px->part2_len += nsig;
             px->num_mid_zeros = px->precision - nsig;
         }
-        p = (u8 *) &px->buff[px->part2_len]; /* put exponent */
+        p = (u8*)&px->buff[px->part2_len]; /* put exponent */
         *p++ = code;
         if (0 <= xexp) {
             *p++ = '+';
@@ -271,7 +274,7 @@ static void _Genld(printf_struct *px, u8 code, u8 *p, s16 nsig, s16 xexp) {
         }
         *p++ = xexp / 10 + '0', xexp %= 10;
         *p++ = xexp + '0';
-        px->part3_len = p - (u8 *) &px->buff[px->part2_len];
+        px->part3_len = p - (u8*)&px->buff[px->part2_len];
     }
     if ((px->flags & (FLAGS_ZERO | FLAGS_MINUS)) == FLAGS_ZERO) { /* pad with leading zeros */
         int n =

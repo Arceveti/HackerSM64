@@ -34,10 +34,10 @@
 #include "profiling.h"
 
 // Gfx handlers
-struct SPTask *gGfxSPTask;
-Gfx *gDisplayListHead;
-u8 *gGfxPoolEnd;
-struct GfxPool *gGfxPool;
+struct SPTask* gGfxSPTask;
+Gfx* gDisplayListHead;
+u8* gGfxPoolEnd;
+struct GfxPool* gGfxPool;
 
 u8 gIsConsole = TRUE; // Needs to be initialized before audio_reset_session is called
 u8 gCacheEmulated = TRUE;
@@ -64,15 +64,15 @@ uintptr_t gPhysicalFramebuffers[3];
 uintptr_t gPhysicalZBuffer;
 
 // Mario Anims and Demo allocation
-void *gMarioAnimsMemAlloc;
-void *gDemoInputsMemAlloc;
+void* gMarioAnimsMemAlloc;
+void* gDemoInputsMemAlloc;
 struct DmaHandlerList gMarioAnimsBuf;
 struct DmaHandlerList gDemoInputsBuf;
 
 // General timer that runs as the game starts
 u32 gGlobalTimer = 0;
-u8 *gAreaSkyboxStart[AREA_COUNT];
-u8 *gAreaSkyboxEnd[AREA_COUNT];
+u8* gAreaSkyboxStart[AREA_COUNT];
+u8* gAreaSkyboxEnd[AREA_COUNT];
 
 // Framebuffer rendering values (max 3)
 u16 sRenderedFramebuffer = 0;
@@ -137,7 +137,7 @@ void my_rsp_init(void) {
  * Initialize the z buffer for the current frame.
  */
 void init_z_buffer(s32 resetZB) {
-    Gfx *dlHead = gDisplayListHead;
+    Gfx* dlHead = gDisplayListHead;
 
     gDPPipeSync(dlHead++);
 
@@ -162,7 +162,7 @@ void init_z_buffer(s32 resetZB) {
  * Tells the RDP which of the three framebuffers it shall draw to.
  */
 void select_framebuffer(void) {
-    Gfx *dlHead = gDisplayListHead;
+    Gfx* dlHead = gDisplayListHead;
 
     gDPPipeSync(dlHead++);
 
@@ -180,7 +180,7 @@ void select_framebuffer(void) {
  * Information about the color argument: https://jrra.zone/n64/doc/n64man/gdp/gDPSetFillColor.htm
  */
 void clear_framebuffer(RGBA16FILL color) {
-    Gfx *dlHead = gDisplayListHead;
+    Gfx* dlHead = gDisplayListHead;
 
     gDPPipeSync(dlHead++);
 
@@ -189,8 +189,9 @@ void clear_framebuffer(RGBA16FILL color) {
 
     gDPSetFillColor(dlHead++, color);
     gDPFillRectangle(dlHead++,
-                     GFX_DIMENSIONS_RECT_FROM_LEFT_EDGE(0), gBorderHeight,
-                     GFX_DIMENSIONS_RECT_FROM_RIGHT_EDGE(0) - 1, SCREEN_HEIGHT - gBorderHeight - 1);
+        GFX_DIMENSIONS_RECT_FROM_LEFT_EDGE(0), gBorderHeight,
+        (GFX_DIMENSIONS_RECT_FROM_RIGHT_EDGE(0) - 1), ((SCREEN_HEIGHT - gBorderHeight) - 1)
+    );
 
     gDPPipeSync(dlHead++);
 
@@ -202,7 +203,7 @@ void clear_framebuffer(RGBA16FILL color) {
 /**
  * Resets the viewport, readying it for the final image.
  */
-void clear_viewport(Vp *viewport, RGBA16FILL color) {
+void clear_viewport(Vp* viewport, RGBA16FILL color) {
     s16 vpUlx = (viewport->vp.vtrans[0] - viewport->vp.vscale[0]) / 4 + 1;
     s16 vpUly = (viewport->vp.vtrans[1] - viewport->vp.vscale[1]) / 4 + 1;
     s16 vpLrx = (viewport->vp.vtrans[0] + viewport->vp.vscale[0]) / 4 - 2;
@@ -213,7 +214,7 @@ void clear_viewport(Vp *viewport, RGBA16FILL color) {
     vpLrx = GFX_DIMENSIONS_RECT_FROM_RIGHT_EDGE(SCREEN_WIDTH - vpLrx);
 #endif
 
-    Gfx *dlHead = gDisplayListHead;
+    Gfx* dlHead = gDisplayListHead;
 
     gDPPipeSync(dlHead++);
 
@@ -234,7 +235,7 @@ void clear_viewport(Vp *viewport, RGBA16FILL color) {
  * Draw the horizontal screen borders.
  */
 void draw_screen_borders(void) {
-    Gfx *dlHead = gDisplayListHead;
+    Gfx* dlHead = gDisplayListHead;
 
     gDPPipeSync(dlHead++);
 
@@ -246,10 +247,10 @@ void draw_screen_borders(void) {
 
     if (gBorderHeight) {
         gDPFillRectangle(dlHead++, GFX_DIMENSIONS_RECT_FROM_LEFT_EDGE(0), 0,
-                        GFX_DIMENSIONS_RECT_FROM_RIGHT_EDGE(0) - 1, gBorderHeight - 1);
+                        (GFX_DIMENSIONS_RECT_FROM_RIGHT_EDGE(0) - 1), (gBorderHeight - 1));
         gDPFillRectangle(dlHead++,
                         GFX_DIMENSIONS_RECT_FROM_LEFT_EDGE(0), SCREEN_HEIGHT - gBorderHeight,
-                        GFX_DIMENSIONS_RECT_FROM_RIGHT_EDGE(0) - 1, SCREEN_HEIGHT - 1);
+                        (GFX_DIMENSIONS_RECT_FROM_RIGHT_EDGE(0) - 1), (SCREEN_HEIGHT - 1));
     }
 
     gDisplayListHead = dlHead;
@@ -260,10 +261,10 @@ void draw_screen_borders(void) {
  * Scissoring: https://jrra.zone/n64/doc/pro-man/pro12/12-03.htm#01
  */
 void make_viewport_clip_rect(Vp *viewport) {
-    s16 vpUlx = (viewport->vp.vtrans[0] - viewport->vp.vscale[0]) / 4 + 1;
-    s16 vpPly = (viewport->vp.vtrans[1] - viewport->vp.vscale[1]) / 4 + 1;
-    s16 vpLrx = (viewport->vp.vtrans[0] + viewport->vp.vscale[0]) / 4 - 1;
-    s16 vpLry = (viewport->vp.vtrans[1] + viewport->vp.vscale[1]) / 4 - 1;
+    s16 vpUlx = ((viewport->vp.vtrans[0] - viewport->vp.vscale[0]) / 4) + 1;
+    s16 vpPly = ((viewport->vp.vtrans[1] - viewport->vp.vscale[1]) / 4) + 1;
+    s16 vpLrx = ((viewport->vp.vtrans[0] + viewport->vp.vscale[0]) / 4) - 1;
+    s16 vpLry = ((viewport->vp.vtrans[1] + viewport->vp.vscale[1]) / 4) - 1;
 
     gDPSetScissor(gDisplayListHead++, G_SC_NON_INTERLACE, vpUlx, vpPly, vpLrx, vpLry);
 }
@@ -276,10 +277,10 @@ void create_gfx_task_structure(void) {
     s32 entries = gDisplayListHead - gGfxPool->buffer;
 
     gGfxSPTask->msgqueue = &gGfxVblankQueue;
-    gGfxSPTask->msg = (OSMesg) 2;
+    gGfxSPTask->msg = (OSMesg)2; //! TODO: enum
     gGfxSPTask->task.t.type = M_GFXTASK;
     gGfxSPTask->task.t.ucode_boot = rspbootTextStart;
-    gGfxSPTask->task.t.ucode_boot_size = ((u8 *) rspbootTextEnd - (u8 *) rspbootTextStart);
+    gGfxSPTask->task.t.ucode_boot_size = ((u8*)rspbootTextEnd - (u8*)rspbootTextStart);
 #if defined(F3DEX_GBI_SHARED) && defined(OBJECTS_REJ)
     gGfxSPTask->task.t.flags = (OS_TASK_LOADABLE | OS_TASK_DP_WAIT);
 #else
@@ -288,52 +289,51 @@ void create_gfx_task_structure(void) {
 #ifdef L3DEX2_ALONE
     gGfxSPTask->task.t.ucode           = gspL3DEX2_fifoTextStart;
     gGfxSPTask->task.t.ucode_data      = gspL3DEX2_fifoDataStart;
-    gGfxSPTask->task.t.ucode_size      = ((u8 *) gspL3DEX2_fifoTextEnd - (u8 *) gspL3DEX2_fifoTextStart);
-    gGfxSPTask->task.t.ucode_data_size = ((u8 *) gspL3DEX2_fifoDataEnd - (u8 *) gspL3DEX2_fifoDataStart);
+    gGfxSPTask->task.t.ucode_size      = ((u8*)gspL3DEX2_fifoTextEnd - (u8*)gspL3DEX2_fifoTextStart);
+    gGfxSPTask->task.t.ucode_data_size = ((u8*)gspL3DEX2_fifoDataEnd - (u8*)gspL3DEX2_fifoDataStart);
 #elif F3DZEX_GBI_2
     gGfxSPTask->task.t.ucode           = gspF3DZEX2_PosLight_fifoTextStart;
     gGfxSPTask->task.t.ucode_data      = gspF3DZEX2_PosLight_fifoDataStart;
-    gGfxSPTask->task.t.ucode_size      = ((u8 *) gspF3DZEX2_PosLight_fifoTextEnd - (u8 *) gspF3DZEX2_PosLight_fifoTextStart);
-    gGfxSPTask->task.t.ucode_data_size = ((u8 *) gspF3DZEX2_PosLight_fifoDataEnd - (u8 *) gspF3DZEX2_PosLight_fifoDataStart);
+    gGfxSPTask->task.t.ucode_size      = ((u8*)gspF3DZEX2_PosLight_fifoTextEnd - (u8*)gspF3DZEX2_PosLight_fifoTextStart);
+    gGfxSPTask->task.t.ucode_data_size = ((u8*)gspF3DZEX2_PosLight_fifoDataEnd - (u8*)gspF3DZEX2_PosLight_fifoDataStart);
 #elif F3DZEX_NON_GBI_2
     gGfxSPTask->task.t.ucode           = gspF3DZEX2_NoN_PosLight_fifoTextStart;
     gGfxSPTask->task.t.ucode_data      = gspF3DZEX2_NoN_PosLight_fifoDataStart;
-    gGfxSPTask->task.t.ucode_size      = ((u8 *) gspF3DZEX2_NoN_PosLight_fifoTextEnd - (u8 *) gspF3DZEX2_NoN_PosLight_fifoTextStart);
-    gGfxSPTask->task.t.ucode_data_size = ((u8 *) gspF3DZEX2_NoN_PosLight_fifoDataEnd - (u8 *) gspF3DZEX2_NoN_PosLight_fifoDataStart);
+    gGfxSPTask->task.t.ucode_size      = ((u8*)gspF3DZEX2_NoN_PosLight_fifoTextEnd - (u8*)gspF3DZEX2_NoN_PosLight_fifoTextStart);
+    gGfxSPTask->task.t.ucode_data_size = ((u8*)gspF3DZEX2_NoN_PosLight_fifoDataEnd - (u8*)gspF3DZEX2_NoN_PosLight_fifoDataStart);
 #elif F3DEX2PL_GBI
     gGfxSPTask->task.t.ucode           = gspF3DEX2_PosLight_fifoTextStart;
     gGfxSPTask->task.t.ucode_data      = gspF3DEX2_PosLight_fifoDataStart;
-    gGfxSPTask->task.t.ucode_size      = ((u8 *) gspF3DEX2_PosLight_fifoTextEnd - (u8 *) gspF3DEX2_PosLight_fifoTextStart);
-    gGfxSPTask->task.t.ucode_data_size = ((u8 *) gspF3DEX2_PosLight_fifoDataEnd - (u8 *) gspF3DEX2_PosLight_fifoDataStart);
+    gGfxSPTask->task.t.ucode_size      = ((u8*)gspF3DEX2_PosLight_fifoTextEnd - (u8*)gspF3DEX2_PosLight_fifoTextStart);
+    gGfxSPTask->task.t.ucode_data_size = ((u8*)gspF3DEX2_PosLight_fifoDataEnd - (u8*)gspF3DEX2_PosLight_fifoDataStart);
 #elif F3DEX_GBI_2
     gGfxSPTask->task.t.ucode           = gspF3DEX2_fifoTextStart;
     gGfxSPTask->task.t.ucode_data      = gspF3DEX2_fifoDataStart;
-    gGfxSPTask->task.t.ucode_size      = ((u8 *) gspF3DEX2_fifoTextEnd - (u8 *) gspF3DEX2_fifoTextStart);
-    gGfxSPTask->task.t.ucode_data_size = ((u8 *) gspF3DEX2_fifoDataEnd - (u8 *) gspF3DEX2_fifoDataStart);
+    gGfxSPTask->task.t.ucode_size      = ((u8*)gspF3DEX2_fifoTextEnd - (u8*)gspF3DEX2_fifoTextStart);
+    gGfxSPTask->task.t.ucode_data_size = ((u8*)gspF3DEX2_fifoDataEnd - (u8*)gspF3DEX2_fifoDataStart);
 #elif F3DEX_GBI
     gGfxSPTask->task.t.ucode           = gspF3DEX_fifoTextStart;
     gGfxSPTask->task.t.ucode_data      = gspF3DEX_fifoDataStart;
-    gGfxSPTask->task.t.ucode_size      = ((u8 *) gspF3DEX_fifoTextEnd - (u8 *) gspF3DEX_fifoTextStart);
-    gGfxSPTask->task.t.ucode_data_size = ((u8 *) gspF3DEX_fifoDataEnd - (u8 *) gspF3DEX_fifoDataStart);
+    gGfxSPTask->task.t.ucode_size      = ((u8*)gspF3DEX_fifoTextEnd - (u8*)gspF3DEX_fifoTextStart);
+    gGfxSPTask->task.t.ucode_data_size = ((u8*)gspF3DEX_fifoDataEnd - (u8*)gspF3DEX_fifoDataStart);
 #elif SUPER3D_GBI
     gGfxSPTask->task.t.ucode           = gspSuper3DTextStart;
     gGfxSPTask->task.t.ucode_data      = gspSuper3DDataStart;
-    gGfxSPTask->task.t.ucode_size      = ((u8 *) gspSuper3DTextEnd - (u8 *) gspSuper3DTextStart);
-    gGfxSPTask->task.t.ucode_data_size = ((u8 *) gspSuper3DDataEnd - (u8 *) gspSuper3DDataStart);
+    gGfxSPTask->task.t.ucode_size      = ((u8*)gspSuper3DTextEnd - (u8*)gspSuper3DTextStart);
+    gGfxSPTask->task.t.ucode_data_size = ((u8*)gspSuper3DDataEnd - (u8*)gspSuper3DDataStart);
 #else
     gGfxSPTask->task.t.ucode           = gspFast3D_fifoTextStart;
     gGfxSPTask->task.t.ucode_data      = gspFast3D_fifoDataStart;
-    gGfxSPTask->task.t.ucode_size      = ((u8 *) gspFast3D_fifoTextEnd - (u8 *) gspFast3D_fifoTextStart);
-    gGfxSPTask->task.t.ucode_data_size = ((u8 *) gspFast3D_fifoDataEnd - (u8 *) gspFast3D_fifoDataStart);
+    gGfxSPTask->task.t.ucode_size      = ((u8*)gspFast3D_fifoTextEnd - (u8*)gspFast3D_fifoTextStart);
+    gGfxSPTask->task.t.ucode_data_size = ((u8*)gspFast3D_fifoDataEnd - (u8*)gspFast3D_fifoDataStart);
 #endif
-    gGfxSPTask->task.t.dram_stack = (u64 *) gGfxSPTaskStack;
+    gGfxSPTask->task.t.dram_stack = (u64*)gGfxSPTaskStack;
     gGfxSPTask->task.t.dram_stack_size = SP_DRAM_STACK_SIZE8;
     gGfxSPTask->task.t.output_buff = gGfxSPTaskOutputBuffer;
-    gGfxSPTask->task.t.output_buff_size =
-        (u64 *)((u8 *) gGfxSPTaskOutputBuffer + sizeof(gGfxSPTaskOutputBuffer));
-    gGfxSPTask->task.t.data_ptr = (u64 *) &gGfxPool->buffer;
+    gGfxSPTask->task.t.output_buff_size = (u64*)((u8*)gGfxSPTaskOutputBuffer + sizeof(gGfxSPTaskOutputBuffer));
+    gGfxSPTask->task.t.data_ptr = (u64*)&gGfxPool->buffer;
     gGfxSPTask->task.t.data_size = entries * sizeof(Gfx);
-    gGfxSPTask->task.t.yield_data_ptr = (u64 *) gGfxSPTaskYieldBuffer;
+    gGfxSPTask->task.t.yield_data_ptr = (u64*)gGfxSPTaskYieldBuffer;
     gGfxSPTask->task.t.yield_data_size = OS_YIELD_DATA_SIZE;
 }
 
@@ -376,7 +376,7 @@ void end_master_display_list(void) {
 void draw_reset_bars(void) {
     s32 width, height;
     s32 fbNum;
-    u64 *fbPtr;
+    u64* fbPtr;
 
     if (gResetTimer != 0 && gNmiResetBarsTimer < 15) {
         if (sRenderedFramebuffer == 0) {
@@ -385,7 +385,7 @@ void draw_reset_bars(void) {
             fbNum = sRenderedFramebuffer - 1;
         }
 
-        fbPtr = (u64 *) PHYSICAL_TO_VIRTUAL(gPhysicalFramebuffers[fbNum]);
+        fbPtr = (u64*)PHYSICAL_TO_VIRTUAL(gPhysicalFramebuffers[fbNum]);
         fbPtr += gNmiResetBarsTimer++ * (SCREEN_WIDTH / 4);
 
         for (width = 0; width < ((SCREEN_HEIGHT / 16) + 1); width++) {
@@ -412,7 +412,7 @@ void render_init(void) {
     set_segment_base_addr(SEGMENT_RENDER, gGfxPool->buffer);
     gGfxSPTask = &gGfxPool->spTask;
     gDisplayListHead = gGfxPool->buffer;
-    gGfxPoolEnd = (u8 *)(gGfxPool->buffer + GFX_POOL_SIZE);
+    gGfxPoolEnd = (u8*)(gGfxPool->buffer + GFX_POOL_SIZE);
     init_rcp(CLEAR_ZBUFFER);
     clear_framebuffer(0);
     end_master_display_list();
@@ -435,7 +435,7 @@ void select_gfx_pool(void) {
     set_segment_base_addr(SEGMENT_RENDER, gGfxPool->buffer);
     gGfxSPTask = &gGfxPool->spTask;
     gDisplayListHead = gGfxPool->buffer;
-    gGfxPoolEnd = (u8 *) (gGfxPool->buffer + GFX_POOL_SIZE);
+    gGfxPoolEnd = (u8*)(gGfxPool->buffer + GFX_POOL_SIZE);
 }
 
 /**
@@ -455,7 +455,7 @@ void display_and_vsync(void) {
 #ifndef UNLOCK_FPS
     osRecvMesg(&gGameVblankQueue, &gMainReceivedMesg, OS_MESG_BLOCK);
 #endif
-    osViSwapBuffer((void *) PHYSICAL_TO_VIRTUAL(gPhysicalFramebuffers[sRenderedFramebuffer]));
+    osViSwapBuffer((void*)PHYSICAL_TO_VIRTUAL(gPhysicalFramebuffers[sRenderedFramebuffer]));
 #ifndef UNLOCK_FPS
     osRecvMesg(&gGameVblankQueue, &gMainReceivedMesg, OS_MESG_BLOCK);
 #endif
@@ -479,9 +479,9 @@ void display_and_vsync(void) {
  */
 void setup_game_memory(void) {
     // Setup general Segment 0
-    set_segment_base_addr(SEGMENT_MAIN, (void *)RAM_START);
+    set_segment_base_addr(SEGMENT_MAIN, (void*)RAM_START);
     // Create Mesg Queues
-    osCreateMesgQueue(&gGfxVblankQueue, gGfxMesgBuf, ARRAY_COUNT(gGfxMesgBuf));
+    osCreateMesgQueue(&gGfxVblankQueue,  gGfxMesgBuf,  ARRAY_COUNT(gGfxMesgBuf));
     osCreateMesgQueue(&gGameVblankQueue, gGameMesgBuf, ARRAY_COUNT(gGameMesgBuf));
     // Setup z buffer and framebuffer
     gPhysicalZBuffer = VIRTUAL_TO_PHYSICAL(gZBuffer);
@@ -490,7 +490,7 @@ void setup_game_memory(void) {
     gPhysicalFramebuffers[2] = VIRTUAL_TO_PHYSICAL(gFramebuffers[2]);
     // Setup Mario Animations
     gMarioAnimsMemAlloc = main_pool_alloc(MARIO_ANIMS_POOL_SIZE, MEMORY_POOL_LEFT);
-    set_segment_base_addr(SEGMENT_MARIO_ANIMS, (void *) gMarioAnimsMemAlloc);
+    set_segment_base_addr(SEGMENT_MARIO_ANIMS, (void*)gMarioAnimsMemAlloc);
     setup_dma_table_list(&gMarioAnimsBuf, gMarioAnims, gMarioAnimsMemAlloc);
 #ifdef PUPPYPRINT_DEBUG
     set_segment_memory_printout(SEGMENT_MARIO_ANIMS, MARIO_ANIMS_POOL_SIZE);
@@ -498,7 +498,7 @@ void setup_game_memory(void) {
 #endif
     // Setup Demo Inputs List
     gDemoInputsMemAlloc = main_pool_alloc(DEMO_INPUTS_POOL_SIZE, MEMORY_POOL_LEFT);
-    set_segment_base_addr(SEGMENT_DEMO_INPUTS, (void *) gDemoInputsMemAlloc);
+    set_segment_base_addr(SEGMENT_DEMO_INPUTS, (void*)gDemoInputsMemAlloc);
     setup_dma_table_list(&gDemoInputsBuf, gDemoInputs, gDemoInputsMemAlloc);
     // Setup Level Script Entry
     load_segment(SEGMENT_LEVEL_ENTRY, _entrySegmentRomStart, _entrySegmentRomEnd, MEMORY_POOL_LEFT, NULL, NULL);
@@ -509,7 +509,7 @@ void setup_game_memory(void) {
 /**
  * Main game loop thread. Runs forever as long as the game continues.
  */
-void thread5_game_loop(UNUSED void *arg) {
+void thread5_game_loop(UNUSED void* arg) {
     setup_game_memory();
     init_controllers();
 #ifdef EEP
@@ -532,10 +532,10 @@ void thread5_game_loop(UNUSED void *arg) {
     puppycam_boot();
 #endif
 
-    set_vblank_handler(2, &gGameVblankHandler, &gGameVblankQueue, (OSMesg) 1);
+    set_vblank_handler(VBLANK_HANDLER_GAME_INIT, &gGameVblankHandler, &gGameVblankQueue, (OSMesg)1);
 
     // Point address to the entry point into the level script data.
-    struct LevelCommand *addr = segmented_to_virtual(level_script_entry);
+    struct LevelCommand* addr = segmented_to_virtual(level_script_entry);
 
     play_music(SEQ_PLAYER_SFX, SEQUENCE_ARGS(0, SEQ_SOUND_PLAYER), 0);
     set_sound_mode(save_file_get_sound_mode());
@@ -578,7 +578,7 @@ void thread5_game_loop(UNUSED void *arg) {
         if (gShowDebugText) {
             // subtract the end of the gfx pool with the display list to obtain the
             // amount of free space remaining.
-            print_text_fmt_int(180, 20, "BUF %d", gGfxPoolEnd - (u8 *) gDisplayListHead);
+            print_text_fmt_int(180, 20, "BUF %d", (gGfxPoolEnd - (u8*)gDisplayListHead));
         }
 #endif
 #if 0

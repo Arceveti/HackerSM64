@@ -8,7 +8,7 @@
 #include "engine/graph_node.h"
 
 struct WarpSpawnType {
-    /*0x00*/ const BehaviorScript *behavior;
+    /*0x00*/ const BehaviorScript* behavior;
     /*0x04*/ u32 spawnType;
 }; /*0x08*/
 
@@ -21,8 +21,8 @@ struct WarpNode {
 
 struct ObjectWarpNode {
     /*0x00*/ struct WarpNode node;
-    /*0x04*/ struct Object *object;
-    /*0x08*/ struct ObjectWarpNode *next;
+    /*0x04*/ struct Object* object;
+    /*0x08*/ struct ObjectWarpNode* next;
 };
 
 struct InstantWarp {
@@ -37,9 +37,9 @@ struct SpawnInfo {
     /*0x0C*/ s8 areaIndex;
     /*0x0D*/ s8 activeAreaIndex;
     /*0x10*/ u32 behaviorArg;
-    /*0x14*/ void *behaviorScript;
-    /*0x18*/ struct GraphNode *model;
-    /*0x1C*/ struct SpawnInfo *next;
+    /*0x14*/ void* behaviorScript;
+    /*0x18*/ struct GraphNode* model;
+    /*0x1C*/ struct SpawnInfo* next;
 };
 
 struct UnusedArea28 {
@@ -64,16 +64,16 @@ struct Area {
     /*0x00*/ s8 index;
     /*0x01*/ s8 flags; // Only has 1 flag: 0x01 = Is this the active area?
     /*0x02*/ TerrainData terrainType; // default terrain of the level (set from level script cmd 0x31)
-    /*0x04*/ struct GraphNodeRoot *graphNode; // geometry layout data
-    /*0x08*/ TerrainData *terrainData; // collision data (set from level script cmd 0x2E)
-    /*0x0C*/ RoomData *surfaceRooms; // (set from level script cmd 0x2F)
-    /*0x10*/ MacroObject *macroObjects; // Macro Objects Ptr (set from level script cmd 0x39)
-    /*0x14*/ struct ObjectWarpNode *warpNodes;
-    /*0x18*/ struct InstantWarp *instantWarps;
-    /*0x1C*/ struct SpawnInfo *objectSpawnInfos;
-    /*0x20*/ struct Camera *camera;
-    /*0x24*/ struct UnusedArea28 *unused; // Filled by level script 0x3A, but is unused.
-    /*0x28*/ struct Whirlpool *whirlpools[2];
+    /*0x04*/ struct GraphNodeRoot* graphNode; // geometry layout data
+    /*0x08*/ TerrainData* terrainData; // collision data (set from level script cmd 0x2E)
+    /*0x0C*/ RoomData* surfaceRooms; // (set from level script cmd 0x2F)
+    /*0x10*/ MacroObject* macroObjects; // Macro Objects Ptr (set from level script cmd 0x39)
+    /*0x14*/ struct ObjectWarpNode* warpNodes;
+    /*0x18*/ struct InstantWarp* instantWarps;
+    /*0x1C*/ struct SpawnInfo* objectSpawnInfos;
+    /*0x20*/ struct Camera* camera;
+    /*0x24*/ struct UnusedArea28* unused; // Filled by level script 0x3A, but is unused.
+    /*0x28*/ struct Whirlpool* whirlpools[2];
     /*0x30*/ u8 dialog[2]; // Level start dialog number (set by level script cmd 0x30)
     /*0x32*/ u16 musicSettingsPreset;
     /*0x34*/ u16 musicSeqId;
@@ -167,9 +167,9 @@ enum MenuOption {
     MENU_OPT_CONTINUE_DONT_SAVE = MENU_OPT_3,
 };
 
-extern struct GraphNode **gLoadedGraphNodes;
+extern struct GraphNode** gLoadedGraphNodes;
 extern struct SpawnInfo gPlayerSpawnInfos[];
-extern struct GraphNode *gGraphNodePointers[MODEL_ID_COUNT];
+extern struct GraphNode* gGraphNodePointers[MODEL_ID_COUNT];
 extern struct Area gAreaData[AREA_COUNT];
 extern struct WarpTransition gWarpTransition;
 extern s16 gCurrCourseNum;
@@ -179,19 +179,19 @@ extern s16 gSavedCourseNum;
 extern s16 gMenuOptSelectIndex;
 extern s16 gSaveOptSelectIndex;
 
-extern struct SpawnInfo *gMarioSpawnInfo;
+extern struct SpawnInfo* gMarioSpawnInfo;
 
-extern struct Area *gAreas;
-extern struct Area *gCurrentArea;
+extern struct Area* gAreas;
+extern struct Area* gCurrentArea;
 
 extern s16 gCurrSaveFileNum;
 extern s16 gCurrLevelNum;
 
 
-void override_viewport_and_clip(Vp *vpOverride, Vp *vpClip, Color red, Color green, Color blue);
+void override_viewport_and_clip(Vp* vpOverride, Vp* vpClip, Color red, Color green, Color blue);
 void print_intro_text(void);
-u32 get_mario_spawn_type(struct Object *obj);
-struct ObjectWarpNode *area_get_warp_node(u8 id);
+u32 get_mario_spawn_type(struct Object* obj);
+struct ObjectWarpNode* area_get_warp_node(u8 id);
 void clear_areas(void);
 void clear_area_graph_nodes(void);
 void load_area(s32 index);

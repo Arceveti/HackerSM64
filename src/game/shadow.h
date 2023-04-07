@@ -10,7 +10,7 @@
  * Shadow types. Shadows are circles, squares, or hardcoded rectangles, and
  * can be composed of either 4 or 9 vertices.
  */
-enum ShadowType {
+enum ShadowTypes {
 #ifdef LEGACY_SHADOW_IDS
     LEGACY_SHADOW_CIRCLE_9_VERTS             =  0,
     LEGACY_SHADOW_CIRCLE_4_VERTS             =  1,
@@ -74,13 +74,13 @@ typedef struct {
     /* Z scale of the rectangle. */
     /*0x04*/ f32 scaleZ;
     /* Flag for if this shadow be smaller when its object is further away. */
-    /*0x08*/ u8 scaleWithDistance : 1;
+    /*0x08*/ _Bool scaleWithDistance;
 } ShadowRectangle; /*0x0C*/
 
 /**
  * Given the (x, y, z) location of an object, create a shadow below that object
  * with the given initial solidity and "shadowType" (described above).
  */
-Gfx *create_shadow_below_xyz(Vec3f pos, Vec3f floorNormal, Vec3f scaleVec, s16 shadowScale, u8 shadowSolidity, s8 shadowType, s8 shifted, s8 *isDecal);
+Gfx* create_shadow_below_xyz(Vec3f pos, Vec3f floorNormal, Vec3f scaleVec, s16 shadowScale, u8 shadowSolidity, s8 shadowType, _Bool shifted, _Bool* isDecal);
 
 #endif // SHADOW_H

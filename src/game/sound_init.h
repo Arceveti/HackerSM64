@@ -47,6 +47,6 @@ void play_cap_music(u16 seqArgs);
 void fadeout_cap_music(void);
 void stop_cap_music(void);
 void audio_game_loop_tick(void);
-void thread4_sound(UNUSED void *arg);
+void thread4_sound(UNUSED void* arg);
 
 #endif // SOUND_INIT_H

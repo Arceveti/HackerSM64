@@ -62,14 +62,12 @@ OSViMode VI;
 
 struct Config gConfig;
 
-struct VblankHandler *gVblankHandler1       = NULL;
-struct VblankHandler *gVblankHandler2       = NULL;
-struct VblankHandler *gVblankHandler3       = NULL;
-struct SPTask        *gActiveSPTask         = NULL;
-struct SPTask        *sCurrentAudioSPTask   = NULL;
-struct SPTask        *sCurrentDisplaySPTask = NULL;
-struct SPTask        *sNextAudioSPTask      = NULL;
-struct SPTask        *sNextDisplaySPTask    = NULL;
+struct VblankHandler* gVblankHandlers[NUM_VBLANK_HANDLERS];
+struct SPTask*        gActiveSPTask         = NULL;
+struct SPTask*        sCurrentAudioSPTask   = NULL;
+struct SPTask*        sCurrentDisplaySPTask = NULL;
+struct SPTask*        sNextAudioSPTask      = NULL;
+struct SPTask*        sNextDisplaySPTask    = NULL;
 s8  sAudioEnabled      = TRUE;
 u32 gNumVblanks        = 0;
 s8  gResetTimer        = 0;
@@ -105,16 +103,16 @@ void setup_mesg_queues(void) {
 
     osCreateMesgQueue(&gSPTaskMesgQueue, gUnknownMesgBuf, ARRAY_COUNT(gUnknownMesgBuf));
     osCreateMesgQueue(&gIntrMesgQueue, gIntrMesgBuf, ARRAY_COUNT(gIntrMesgBuf));
-    osViSetEvent(&gIntrMesgQueue, (OSMesg) MESG_VI_VBLANK, 1);
+    osViSetEvent(&gIntrMesgQueue, (OSMesg)MESG_VI_VBLANK, 1);
 
-    osSetEventMesg(OS_EVENT_SP,     &gIntrMesgQueue, (OSMesg) MESG_SP_COMPLETE);
-    osSetEventMesg(OS_EVENT_DP,     &gIntrMesgQueue, (OSMesg) MESG_DP_COMPLETE);
-    osSetEventMesg(OS_EVENT_PRENMI, &gIntrMesgQueue, (OSMesg) MESG_NMI_REQUEST);
+    osSetEventMesg(OS_EVENT_SP,     &gIntrMesgQueue, (OSMesg)MESG_SP_COMPLETE);
+    osSetEventMesg(OS_EVENT_DP,     &gIntrMesgQueue, (OSMesg)MESG_DP_COMPLETE);
+    osSetEventMesg(OS_EVENT_PRENMI, &gIntrMesgQueue, (OSMesg)MESG_NMI_REQUEST);
 }
 
 void alloc_pool(void) {
-    void *start = (void *) SEG_POOL_START;
-    void *end = (void *) (SEG_POOL_START + POOL_SIZE);
+    void* start = (void*)SEG_POOL_START;
+    void* end = (void*)(SEG_POOL_START + POOL_SIZE);
 
     main_pool_init(start, end);
     gEffectsMemoryPool = mem_pool_init(EFFECTS_MEMORY_POOL, MEMORY_POOL_LEFT);
@@ -123,7 +121,7 @@ void alloc_pool(void) {
 #endif
 }
 
-void create_thread(OSThread *thread, OSId id, void (*entry)(void *), void *arg, void *sp, OSPri pri) {
+void create_thread(OSThread* thread, OSId id, void (*entry)(void*), void* arg, void* sp, OSPri pri) {
     thread->next = NULL;
     thread->queue = NULL;
     osCreateThread(thread, id, entry, arg, sp, pri);
@@ -145,9 +143,9 @@ void handle_nmi_request(void) {
 }
 
 void receive_new_tasks(void) {
-    struct SPTask *spTask;
+    struct SPTask* spTask;
 
-    while (osRecvMesg(&gSPTaskMesgQueue, (OSMesg *) &spTask, OS_MESG_NOBLOCK) != -1) {
+    while (osRecvMesg(&gSPTaskMesgQueue, (OSMesg*)&spTask, OS_MESG_NOBLOCK) != -1) {
         spTask->state = SPTASK_STATE_NOT_STARTED;
         switch (spTask->task.t.type) {
             case M_AUDTASK:
@@ -190,9 +188,11 @@ void interrupt_gfx_sptask(void) {
 }
 
 void start_gfx_sptask(void) {
-    if (gActiveSPTask == NULL
-     && sCurrentDisplaySPTask != NULL
-     && sCurrentDisplaySPTask->state == SPTASK_STATE_NOT_STARTED) {
+    if (
+        gActiveSPTask == NULL &&
+        sCurrentDisplaySPTask != NULL &&
+        sCurrentDisplaySPTask->state == SPTASK_STATE_NOT_STARTED
+    ) {
         start_sptask(M_GFXTASK);
         profiler_rsp_started(PROFILER_RSP_GFX);
     }
@@ -201,7 +201,7 @@ void start_gfx_sptask(void) {
 void pretend_audio_sptask_done(void) {
     gActiveSPTask = sCurrentAudioSPTask;
     gActiveSPTask->state = SPTASK_STATE_RUNNING;
-    osSendMesg(&gIntrMesgQueue, (OSMesg) MESG_SP_COMPLETE, OS_MESG_NOBLOCK);
+    osSendMesg(&gIntrMesgQueue, (OSMesg)MESG_SP_COMPLETE, OS_MESG_NOBLOCK);
 }
 
 void handle_vblank(void) {
@@ -228,25 +228,27 @@ void handle_vblank(void) {
             }
             profiler_rsp_started(PROFILER_RSP_AUDIO);
         }
-    } else {
-        if (gActiveSPTask == NULL
-         && sCurrentDisplaySPTask != NULL
-         && sCurrentDisplaySPTask->state != SPTASK_STATE_FINISHED) {
-            start_sptask(M_GFXTASK);
-            profiler_rsp_started(PROFILER_RSP_GFX);
-        }
+    } else if (
+        gActiveSPTask == NULL &&
+        sCurrentDisplaySPTask != NULL &&
+        sCurrentDisplaySPTask->state != SPTASK_STATE_FINISHED
+    ) {
+        start_sptask(M_GFXTASK);
+        profiler_rsp_started(PROFILER_RSP_GFX);
     }
 
     rumble_thread_update_vi();
 
     // Notify the game loop about the vblank.
-    if (gVblankHandler1 != NULL) osSendMesg(gVblankHandler1->queue, gVblankHandler1->msg, OS_MESG_NOBLOCK);
-    if (gVblankHandler2 != NULL) osSendMesg(gVblankHandler2->queue, gVblankHandler2->msg, OS_MESG_NOBLOCK);
-    if (gVblankHandler3 != NULL) osSendMesg(gVblankHandler3->queue, gVblankHandler3->msg, OS_MESG_NOBLOCK);
+    for (int i = 0; i < ARRAY_COUNT(gVblankHandlers); i++) {
+        if (gVblankHandlers[i] != NULL) {
+            osSendMesg(gVblankHandlers[i]->queue, gVblankHandlers[i]->msg, OS_MESG_NOBLOCK);   
+        }
+    }
 }
 
 void handle_sp_complete(void) {
-    struct SPTask *curSPTask = gActiveSPTask;
+    struct SPTask* curSPTask = gActiveSPTask;
 
     gActiveSPTask = NULL;
 
@@ -307,7 +309,7 @@ void handle_dp_complete(void) {
 
 OSTimer RCPHangTimer;
 void start_rcp_hang_timer(void) {
-    osSetTimer(&RCPHangTimer, OS_USEC_TO_CYCLES(3000000), (OSTime) 0, &gIntrMesgQueue, (OSMesg) MESG_RCP_HUNG);
+    osSetTimer(&RCPHangTimer, OS_USEC_TO_CYCLES(3000000), (OSTime)0, &gIntrMesgQueue, (OSMesg)MESG_RCP_HUNG);
 }
 
 void stop_rcp_hang_timer(void) {
@@ -359,7 +361,7 @@ void check_stack_validity(void) {
 }
 #endif // DEBUG
 
-void thread3_main(UNUSED void *arg) {
+void thread3_main(UNUSED void* arg) {
     setup_mesg_queues();
     alloc_pool();
     load_engine_code_segment();
@@ -426,7 +428,7 @@ void thread3_main(UNUSED void *arg) {
 #ifdef DEBUG
         check_stack_validity();
 #endif
-        switch ((uintptr_t) msg) {
+        switch ((uintptr_t)msg) {
             case MESG_VI_VBLANK:
                 handle_vblank();
                 break;
@@ -451,43 +453,33 @@ void thread3_main(UNUSED void *arg) {
     }
 }
 
-void set_vblank_handler(s32 index, struct VblankHandler *handler, OSMesgQueue *queue, OSMesg *msg) {
+void set_vblank_handler(s32 index, struct VblankHandler* handler, OSMesgQueue* queue, OSMesg* msg) {
     handler->queue = queue;
     handler->msg = msg;
 
-    switch (index) {
-        case 1: // sound_init
-            gVblankHandler1 = handler;
-            break;
-        case 2: // game_init
-            gVblankHandler2 = handler;
-            break;
-        case 3:
-            gVblankHandler3 = handler;
-            break;
-    }
+    gVblankHandlers[index] = handler;
 }
 
-void send_sp_task_message(OSMesg *msg) {
+void send_sp_task_message(OSMesg* msg) {
     osWritebackDCacheAll();
     osSendMesg(&gSPTaskMesgQueue, msg, OS_MESG_NOBLOCK);
 }
 
-void dispatch_audio_sptask(struct SPTask *spTask) {
+void dispatch_audio_sptask(struct SPTask* spTask) {
     if (sAudioEnabled && spTask != NULL) {
         osWritebackDCacheAll();
         osSendMesg(&gSPTaskMesgQueue, spTask, OS_MESG_NOBLOCK);
     }
 }
 
-void exec_display_list(struct SPTask *spTask) {
+void exec_display_list(struct SPTask* spTask) {
     if (spTask != NULL) {
         osWritebackDCacheAll();
         spTask->state = SPTASK_STATE_NOT_STARTED;
         if (sCurrentDisplaySPTask == NULL) {
             sCurrentDisplaySPTask = spTask;
             sNextDisplaySPTask = NULL;
-            osSendMesg(&gIntrMesgQueue, (OSMesg) MESG_START_GFX_SPTASK, OS_MESG_NOBLOCK);
+            osSendMesg(&gIntrMesgQueue, (OSMesg)MESG_START_GFX_SPTASK, OS_MESG_NOBLOCK);
         } else {
             sNextDisplaySPTask = spTask;
         }
@@ -505,7 +497,7 @@ void turn_off_audio(void) {
     }
 }
 
-void change_vi(OSViMode *mode, int width, int height) {
+void change_vi(OSViMode* mode, int width, int height) {
     mode->comRegs.width = width;
     mode->comRegs.xScale = ((width * 512) / 320);
     if (height > 240) {
@@ -526,13 +518,13 @@ void change_vi(OSViMode *mode, int width, int height) {
 void get_audio_frequency(void) {
     switch (gConfig.tvType) {
 #if defined(VERSION_JP) || defined(VERSION_US)
-    case MODE_NTSC: gConfig.audioFrequency = 1.0f;    break;
-    case MODE_MPAL: gConfig.audioFrequency = 0.9915f; break;
-    case MODE_PAL:  gConfig.audioFrequency = 0.9876f; break;
+        case MODE_NTSC: gConfig.audioFrequency = 1.0f;    break;
+        case MODE_MPAL: gConfig.audioFrequency = 0.9915f; break;
+        case MODE_PAL:  gConfig.audioFrequency = 0.9876f; break;
 #else
-    case MODE_NTSC: gConfig.audioFrequency = 1.0126f; break;
-    case MODE_MPAL: gConfig.audioFrequency = 1.0086f; break;
-    case MODE_PAL:  gConfig.audioFrequency = 1.0f;    break;
+        case MODE_NTSC: gConfig.audioFrequency = 1.0126f; break;
+        case MODE_MPAL: gConfig.audioFrequency = 1.0086f; break;
+        case MODE_PAL:  gConfig.audioFrequency = 1.0f;    break;
 #endif
     }
 }
@@ -540,9 +532,9 @@ void get_audio_frequency(void) {
 /**
  * Initialize hardware, start main thread, then idle.
  */
-void thread1_idle(UNUSED void *arg) {
+void thread1_idle(UNUSED void* arg) {
     osCreateViManager(OS_PRIORITY_VIMGR);
-    const OSViMode *osVIModes[] = {
+    const OSViMode* osVIModes[] = {
 #if (RESOLUTION_MULTIPLIER >= 2)
         [OS_TV_PAL ] = &osViModePalHan1,
         [OS_TV_NTSC] = &osViModeNtscHan1,

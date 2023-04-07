@@ -13,7 +13,6 @@
 #include "engine/math_util.h"
 #include "engine/surface_collision.h"
 #include "game_init.h"
-#include "helper_macros.h"
 #include "ingame_menu.h"
 #include "interaction.h"
 #include "level_table.h"

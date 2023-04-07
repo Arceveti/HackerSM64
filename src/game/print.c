@@ -23,7 +23,7 @@ struct TextLabel {
  * Stores the text to be rendered on screen
  * and how they are to be rendered.
  */
-struct TextLabel *sTextLabels[52];
+struct TextLabel* sTextLabels[52];
 s16 sTextLabelsCount = 0;
 
 /**
@@ -44,7 +44,7 @@ s32 int_pow(s32 n, s32 exponent) {
  * Formats an integer n for print by fitting it to width, prefixing with a negative,
  * and converting the base.
  */
-void format_integer(s32 n, s32 base, char *dest, s32 *totalLength, u8 width, s8 zeroPad) {
+void format_integer(s32 n, s32 base, char* dest, s32* totalLength, u8 width, s8 zeroPad) {
     u32 powBase;
     s32 numDigits = 0;
     s32 i;
@@ -124,7 +124,7 @@ void format_integer(s32 n, s32 base, char *dest, s32 *totalLength, u8 width, s8 
  * Additionally, this determines if a number should be zero-padded,
  * writing to 'zeroPad'.
  */
-void parse_width_field(const char *str, s32 *srcIndex, u8 *width, s8 *zeroPad) {
+void parse_width_field(const char* str, s32* srcIndex, u8* width, s8* zeroPad) {
     s8 digits[12]; // unknown length
     s8 digitsLen = 0;
     s16 i;
@@ -135,10 +135,12 @@ void parse_width_field(const char *str, s32 *srcIndex, u8 *width, s8 *zeroPad) {
     }
 
     // Read width digits up until the 'd' or 'x' format specifier.
-    while (str[*srcIndex] != 'b'
-        && str[*srcIndex] != 'o'
-        && str[*srcIndex] != 'd'
-        && str[*srcIndex] != 'x') {
+    while (
+        str[*srcIndex] != 'b' &&
+        str[*srcIndex] != 'o' &&
+        str[*srcIndex] != 'd' &&
+        str[*srcIndex] != 'x'
+    ) {
         digits[digitsLen] = str[*srcIndex] - '0';
 
         if (digits[digitsLen] < 0 || digits[digitsLen] >= 10) { // not a valid digit
@@ -170,7 +172,7 @@ void parse_width_field(const char *str, s32 *srcIndex, u8 *width, s8 *zeroPad) {
  * Warning: this fails on too large numbers, because format_integer has bugs
  * related to overflow. For romhacks, prefer sprintf + print_text.
  */
-void print_text_fmt_int(s32 x, s32 y, const char *str, s32 n) {
+void print_text_fmt_int(s32 x, s32 y, const char* str, s32 n) {
     char c = 0;
     s8 zeroPad = FALSE;
     u8 width = 0;
@@ -195,10 +197,12 @@ void print_text_fmt_int(s32 x, s32 y, const char *str, s32 n) {
 
             parse_width_field(str, &srcIndex, &width, &zeroPad);
 
-            if (str[srcIndex] != 'b'
-             && str[srcIndex] != 'o'
-             && str[srcIndex] != 'd'
-             && str[srcIndex] != 'x') {
+            if (
+                str[srcIndex] != 'b' &&
+                str[srcIndex] != 'o' &&
+                str[srcIndex] != 'd' &&
+                str[srcIndex] != 'x'
+            ) {
                 break;
             }
             if (str[srcIndex] == 'b') base =  2;
@@ -230,8 +234,7 @@ void print_text(s32 x, s32 y, const char *str) {
     s32 srcIndex = 0;
 
     // Don't continue if there is no memory to do so.
-    if ((sTextLabels[sTextLabelsCount] = mem_pool_alloc(gEffectsMemoryPool,
-                                                        sizeof(struct TextLabel))) == NULL) {
+    if ((sTextLabels[sTextLabelsCount] = mem_pool_alloc(gEffectsMemoryPool, sizeof(struct TextLabel))) == NULL) {
         return;
     }
 
@@ -255,14 +258,13 @@ void print_text(s32 x, s32 y, const char *str) {
 /**
  * Prints text in the colorful lettering centered at given X, Y coordinates.
  */
-void print_text_centered(s32 x, s32 y, const char *str) {
+void print_text_centered(s32 x, s32 y, const char* str) {
     char c = 0;
     s32 length = 0;
     s32 srcIndex = 0;
 
     // Don't continue if there is no memory to do so.
-    if ((sTextLabels[sTextLabelsCount] = mem_pool_alloc(gEffectsMemoryPool,
-                                                        sizeof(struct TextLabel))) == NULL) {
+    if ((sTextLabels[sTextLabelsCount] = mem_pool_alloc(gEffectsMemoryPool, sizeof(struct TextLabel))) == NULL) {
         return;
     }
 
@@ -286,9 +288,9 @@ void print_text_centered(s32 x, s32 y, const char *str) {
  * Converts a char into the proper colorful glyph for the char.
  */
 s32 char_to_glyph_index(char c) {
-    if (c >= 'A' && c <= 'Z') return (c - 55);
-    if (c >= 'a' && c <= 'z') return (c - 87);
-    if (c >= '0' && c <= '9') return (c - 48);
+    if (c >= 'A' && c <= 'Z') return (c - ('A' - 10));
+    if (c >= 'a' && c <= 'z') return (c - ('a' - 10));
+    if (c >= '0' && c <= '9') return (c - '0');
     if (c == ' ') return GLYPH_SPACE;
     if (c == '!') return GLYPH_EXCLAMATION_PNT; // !, JP only
     if (c == '#') return GLYPH_TWO_EXCLAMATION; // !!, JP only
@@ -312,7 +314,7 @@ s32 char_to_glyph_index(char c) {
  * Adds an individual glyph to be rendered.
  */
 void add_glyph_texture(s8 glyphIndex) {
-    const Texture *const *glyphs = segmented_to_virtual(main_hud_lut);
+    const Texture* const* glyphs = segmented_to_virtual(main_hud_lut);
 
     Gfx* dlHead = gDisplayListHead;
 
@@ -327,7 +329,7 @@ void add_glyph_texture(s8 glyphIndex) {
 /**
  * Clips textrect into the boundaries defined.
  */
-void clip_to_bounds(s32 *x, s32 *y) {
+void clip_to_bounds(s32* x, s32* y) {
     *x = CLAMP(*x, TEXRECT_MIN_X, TEXRECT_MAX_X);
     *y = CLAMP(*y, TEXRECT_MIN_Y, TEXRECT_MAX_Y);
 }
@@ -364,7 +366,7 @@ void render_text_labels(void) {
         return;
     }
 
-    Mtx *mtx = alloc_display_list(sizeof(*mtx));
+    Mtx* mtx = alloc_display_list(sizeof(*mtx));
 
     if (mtx == NULL) {
         sTextLabelsCount = 0;

@@ -7,6 +7,6 @@ struct LevelCommand;
 
 extern LevelScript level_script_entry[];
 
-struct LevelCommand *level_script_execute(struct LevelCommand *cmd);
+struct LevelCommand* level_script_execute(struct LevelCommand* cmd);
 
 #endif // LEVEL_SCRIPT_H

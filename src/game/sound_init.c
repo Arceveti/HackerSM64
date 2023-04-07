@@ -83,7 +83,7 @@ static u32 sMenuSoundsExtra[] = {
     SOUND_ENV_ELEVATOR4,
 };
 
-void play_menu_sounds_extra(s32 a, void *b);
+void play_menu_sounds_extra(s32 a, void* b);
 
 /**
  * Called from threads: thread5_game_loop
@@ -191,12 +191,14 @@ void play_menu_sounds(s16 soundMenuFlags) {
  */
 void play_infinite_stairs_music(void) {
 #ifdef ENABLE_VANILLA_LEVEL_SPECIFIC_CHECKS
-    u8 shouldPlay = (gCurrLevelNum == LEVEL_CASTLE
-                    && gCurrAreaIndex == 2
-                    && gMarioState->numStars < 70
-                    && gMarioState->floor != NULL
-                    && gMarioState->floor->room == 6
-                    && gMarioState->pos[2] < 2540.0f);
+    u8 shouldPlay = (
+        gCurrLevelNum == LEVEL_CASTLE &&
+        gCurrAreaIndex == 2           &&
+        gMarioState->numStars < 70    &&
+        gMarioState->floor != NULL    &&
+        gMarioState->floor->room == 6 &&
+        gMarioState->pos[2] < 2540.0f
+    );
 
     if (sPlayingInfiniteStairs ^ shouldPlay) {
         sPlayingInfiniteStairs = shouldPlay;
@@ -325,7 +327,7 @@ void stop_cap_music(void) {
 /**
  * Called from threads: thread5_game_loop
  */
-void play_menu_sounds_extra(s32 a, void *b) {
+void play_menu_sounds_extra(s32 a, void* b) {
     play_sound(sMenuSoundsExtra[a], b);
 }
 
@@ -339,12 +341,12 @@ void audio_game_loop_tick(void) {
 /**
  * Sound processing thread. Runs at 60 FPS.
  */
-void thread4_sound(UNUSED void *arg) {
+void thread4_sound(UNUSED void* arg) {
     audio_init();
     sound_init();
 
     osCreateMesgQueue(&sSoundMesgQueue, sSoundMesgBuf, ARRAY_COUNT(sSoundMesgBuf));
-    set_vblank_handler(1, &sSoundVblankHandler, &sSoundMesgQueue, (OSMesg) 512);
+    set_vblank_handler(VBLANK_HANDLER_SOUND_INIT, &sSoundVblankHandler, &sSoundMesgQueue, (OSMesg)512);
 
     while (TRUE) {
         OSMesg msg;
@@ -352,7 +354,7 @@ void thread4_sound(UNUSED void *arg) {
         osRecvMesg(&sSoundMesgQueue, &msg, OS_MESG_BLOCK);
         profiler_audio_started(); // also starts PROFILER_TIME_SUB_AUDIO_UPDATE inside
         if (gResetTimer < 25) {
-            struct SPTask *spTask = create_next_audio_frame_task();
+            struct SPTask* spTask = create_next_audio_frame_task();
             if (spTask != NULL) {
                 dispatch_audio_sptask(spTask);
             }

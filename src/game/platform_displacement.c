@@ -18,17 +18,19 @@
  * within 4 units of the floor. Set his referenced platform object accordingly.
  */
 void update_mario_platform(void) {
-    struct Surface *floor = gMarioState->floor;
+    struct Surface* floor = gMarioState->floor;
 
     if (gMarioObject == NULL || floor == NULL) {
         return;
     }
 
-    struct Object *floorObj = floor->object;
+    struct Object* floorObj = floor->object;
 
-    if (floor != NULL
-     && floorObj != NULL
-     && absf(gMarioObject->oPosY - gMarioState->floorHeight) < 4.0f) {
+    if (
+        floor != NULL &&
+        floorObj != NULL &&
+        absf(gMarioObject->oPosY - gMarioState->floorHeight) < 4.0f
+    ) {
         gMarioObject->platform = floorObj;
     } else {
         gMarioObject->platform = NULL;
@@ -45,7 +47,7 @@ extern s32 gGlobalTimer;
  * Apply one frame of platform displacement to Mario or an object using the given
  * platform.
  */
-void apply_platform_displacement(struct PlatformDisplacementInfo *displaceInfo, Vec3f pos, s16 *yaw, struct Object *platform) {
+void apply_platform_displacement(struct PlatformDisplacementInfo* displaceInfo, Vec3f pos, s16* yaw, struct Object* platform) {
     Vec3f platformPos;
     Vec3f posDifference;
     Vec3f yawVec;
@@ -54,7 +56,9 @@ void apply_platform_displacement(struct PlatformDisplacementInfo *displaceInfo, 
     s16 yawDifference = *yaw - displaceInfo->prevYaw;
 
     // Avoid a crash if the platform unloaded its collision while stood on
-    if (platform->header.gfx.throwMatrix == NULL) return;
+    if (platform->header.gfx.throwMatrix == NULL) {
+        return;
+    }
 
     vec3f_copy(platformPos, (*platform->header.gfx.throwMatrix)[3]);
 
@@ -152,7 +156,7 @@ static void apply_mario_inertia(void) {
  */
 void apply_mario_platform_displacement(void) {
     if (!(gTimeStopState & TIME_STOP_ACTIVE) && gMarioObject != NULL) {
-        struct Object *platform = gMarioObject->platform;
+        struct Object* platform = gMarioObject->platform;
 
         if (platform != NULL) {
             apply_platform_displacement(&sMarioDisplacementInfo, gMarioState->pos, &gMarioState->faceAngle[1], platform);
@@ -171,7 +175,7 @@ void apply_mario_platform_displacement(void) {
  * Apply one frame of platform rotation to Mario or an object using the given
  * platform. If isMario is false, use gCurrentObject.
  */
-void apply_platform_displacement(u32 isMario, struct Object *platform) {
+void apply_platform_displacement(u32 isMario, struct Object* platform) {
     Vec3f pos;
     Vec3f platformPos;
     Vec3f currentObjectOffset;
@@ -227,7 +231,7 @@ void apply_platform_displacement(u32 isMario, struct Object *platform) {
  */
 void apply_mario_platform_displacement(void) {
     if (!(gTimeStopState & TIME_STOP_ACTIVE) && gMarioObject != NULL) {
-        struct Object *platform = gMarioObject->platform;
+        struct Object* platform = gMarioObject->platform;
 
         if (platform != NULL) {
             apply_platform_displacement(TRUE, platform);

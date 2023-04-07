@@ -11,7 +11,7 @@ typedef struct
         u32 u32;
         u16 u16;
     } value;
-    /* 08 */ char *buff;
+    /* 08 */ char* buff;
     /* 0c */ s32 part1_len;
     /* 10 */ s32 num_leading_zeros;
     /* 14 */ s32 part2_len;
@@ -33,7 +33,7 @@ enum PrintfFlags {
     FLAGS_ZERO  = (1 << 4), // 0x10
 };
 
-s32 _Printf(char *(*prout)(char *, const char *, size_t), char *dst, const char *fmt, va_list args);
-void _Litob(printf_struct *args, u8 type);
-void _Ldtob(printf_struct *args, u8 type);
+s32 _Printf(char*(*prout)(char*, const char*, size_t), char* dst, const char* fmt, va_list args);
+void _Litob(printf_struct* args, u8 type);
+void _Ldtob(printf_struct* args, u8 type);
 #endif

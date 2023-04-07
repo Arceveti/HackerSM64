@@ -13,7 +13,7 @@ s32 check_if_moving_over_floor(f32 maxDist, f32 offset);
 s32 arc_to_goal_pos(Vec3f a0, Vec3f a1, f32 yVel, f32 gravity);
 void tox_box_move(f32 forwardVel, f32 a1, s16 deltaPitch, s16 deltaRoll);
 void play_penguin_walking_sound(s32 walk);
-s32 update_angle_from_move_flags(s32 *angle);
+s32 update_angle_from_move_flags(s32* angle);
 void cur_obj_spawn_strong_wind_particles(s32 windSpread, f32 scale, f32 relPosX, f32 relPosY, f32 relPosZ);
 
 //! Lots of these are duplicates
@@ -550,25 +550,25 @@ void bhv_dust_smoke_loop(void);
 void bhv_yoshi_loop(void);
 void bhv_volcano_trap_loop(void);
 
-Gfx *geo_move_mario_part_from_parent(s32 callContext, UNUSED struct GraphNode *node, Mat4 mtx);
+Gfx* geo_move_mario_part_from_parent(s32 callContext, UNUSED struct GraphNode* node, Mat4 mtx);
 
 // Bowser
-Gfx *geo_bits_bowser_coloring(s32 callContext, struct GraphNode *node, UNUSED s32 context);
-Gfx *geo_update_body_rot_from_parent(s32 callContext, UNUSED struct GraphNode *node, Mat4 mtx);
-Gfx *geo_switch_bowser_eyes(s32 callContext, struct GraphNode *node, UNUSED Mat4 *mtx);
+Gfx* geo_bits_bowser_coloring(s32 callContext, struct GraphNode* node, UNUSED s32 context);
+Gfx* geo_update_body_rot_from_parent(s32 callContext, UNUSED struct GraphNode* node, Mat4 mtx);
+Gfx* geo_switch_bowser_eyes(s32 callContext, struct GraphNode* node, UNUSED Mat4* mtx);
 
 // Tuxie
-Gfx *geo_switch_tuxie_mother_eyes(s32 callContext, struct GraphNode *node, UNUSED Mat4 *mtx);
+Gfx* geo_switch_tuxie_mother_eyes(s32 callContext, struct GraphNode* node, UNUSED Mat4* mtx);
 
 // Cap switch
-Gfx *geo_update_held_mario_pos(s32 callContext, UNUSED struct GraphNode *node, Mat4 mtx);
+Gfx* geo_update_held_mario_pos(s32 callContext, UNUSED struct GraphNode* node, Mat4 mtx);
 
 // Snufit
-Gfx *geo_snufit_move_mask(s32 callContext, struct GraphNode *node, UNUSED Mat4 *mtx);
-Gfx *geo_snufit_scale_body(s32 callContext, struct GraphNode *node, UNUSED Mat4 *mtx);
+Gfx* geo_snufit_move_mask(s32 callContext, struct GraphNode* node, UNUSED Mat4* mtx);
+Gfx* geo_snufit_scale_body(s32 callContext, struct GraphNode* node, UNUSED Mat4* mtx);
 
 // Bowser key cutscene
-Gfx *geo_scale_bowser_key(s32 callContext, struct GraphNode *node, UNUSED Mat4 mtx);
+Gfx* geo_scale_bowser_key(s32 callContext, struct GraphNode* node, UNUSED Mat4 mtx);
 
 // Water splash
 extern struct WaterDropletParams gShallowWaterSplashDropletParams;

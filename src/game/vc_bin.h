@@ -2,6 +2,6 @@
 
 #include <ultra64.h>
 
-s32 osEepromReadVC(OSMesgQueue *mq, u8 address, u8 *buffer);
-s32 osEepromWriteVC(OSMesgQueue *mq, u8 address, u8 *buffer);
-s32 __osEepStatusVC(OSMesgQueue *mq, OSContStatus *data);
+s32 osEepromReadVC(OSMesgQueue* mq, u8 address, u8* buffer);
+s32 osEepromWriteVC(OSMesgQueue* mq, u8 address, u8* buffer);
+s32 __osEepStatusVC(OSMesgQueue* mq, OSContStatus* data);

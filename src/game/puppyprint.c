@@ -203,7 +203,7 @@ void swapu(u8* xp, u8* yp) {
     *yp = temp;
 }
 
-void sort_numbers(s32 *values, u8 *values2) {
+void sort_numbers(s32* values, u8* values2) {
     int i, j, min_idx;
 
     // One by one move boundary of unsorted subarray
@@ -283,7 +283,7 @@ void print_ram_overview(void) {
     }
 }
 
-static const char *audioPoolNames[NUM_AUDIO_POOLS] = {
+static const char* audioPoolNames[NUM_AUDIO_POOLS] = {
     "Audio Init Pool:\t\t\t\t  ",
     "Notes And Buffers Pool:\t  ",
     "Persistent Sequence Pool:  ",
@@ -296,7 +296,7 @@ static const char *audioPoolNames[NUM_AUDIO_POOLS] = {
 };
 
 #ifdef AUDIO_PROFILING
-static const char *audioBenchmarkNames[PROFILER_TIME_SUB_AUDIO_END - PROFILER_TIME_SUB_AUDIO_START] = {
+static const char* audioBenchmarkNames[PROFILER_TIME_SUB_AUDIO_END - PROFILER_TIME_SUB_AUDIO_START] = {
     "Sequence Processing:\t  ",
     "  Script Parsing:\t\t\t    ",
     "  Reclaim Notes:\t\t\t    ",
@@ -311,7 +311,7 @@ static const char *audioBenchmarkNames[PROFILER_TIME_SUB_AUDIO_END - PROFILER_TI
 STATIC_ASSERT((ARRAY_COUNT(audioBenchmarkNames) == (PROFILER_TIME_SUB_AUDIO_END - PROFILER_TIME_SUB_AUDIO_START)), "audioBenchmarkNames has incorrect number of entries!");
 #endif
 
-static void print_audio_ram_overview(s32 x, char *textBytes) {
+static void print_audio_ram_overview(s32 x, char* textBytes) {
     s32 percentage = 0;
     s32 y = (SCREEN_HEIGHT - 6);
     s32 totalMemory[2] = { 0, 0 };
@@ -418,11 +418,11 @@ static void print_audio_overview(void) {
 
 char consoleLogTable[LOG_BUFFER_SIZE][255];
 
-static char *write_to_buf(char *buffer, const char *data, size_t size) {
-    return ((char *) memcpy(buffer, data, size) + size);
+static char* write_to_buf(char* buffer, const char* data, size_t size) {
+    return ((char*)memcpy(buffer, data, size) + size);
 }
 
-void append_puppyprint_log(const char *str, ...) {
+void append_puppyprint_log(const char* str, ...) {
     char textBytes[255];
 
     memset(textBytes, 0, sizeof(textBytes));
@@ -936,7 +936,7 @@ u8 textOffsets[2]; // Represents the dimensions of the text (12 x 8), and writte
 u8 topLineHeight; // Represents the peak line height of the current line. Prevents vertical overlapping.
 u8 gMonoSpace = FALSE; // Ignore kerning.
 
-s32 get_text_width(const char *str, s32 font) {
+s32 get_text_width(const char* str, s32 font) {
     s32 i       = 0;
     s32 textPos = 0;
     s32 wideX   = 0;
@@ -975,7 +975,7 @@ s32 get_text_width(const char *str, s32 font) {
     return wideX;
 }
 
-s32 get_text_height(const char *str) {
+s32 get_text_height(const char* str) {
     s32 i= 0;
     s32 textPos;
     s32 strLen = (signed)strlen(str);
@@ -1036,7 +1036,7 @@ static s8 sTextShakeTable[] = {
     1, 1, 0, 1, 0, 1, 0, 0
 };
 
-void print_small_text(s32 x, s32 y, const char *str, s32 align, s32 amount, u8 font) {
+void print_small_text(s32 x, s32 y, const char* str, s32 align, s32 amount, u8 font) {
     s32 textX = 0;
     s32 textPos[2] = { 0, 0 };
     u16 wideX[16] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
@@ -1190,7 +1190,7 @@ void print_small_text(s32 x, s32 y, const char *str, s32 align, s32 amount, u8 f
 // Strips all text modifiers so that only standard text remains.
 // Can still support external colouring.
 // Around 30% faster than regular printing.
-void print_small_text_light(s32 x, s32 y, const char *str, s32 align, s32 amount, u8 font) {
+void print_small_text_light(s32 x, s32 y, const char* str, s32 align, s32 amount, u8 font) {
     s32 textX = 0;
     s32 textPos[2] = { 0, 0 };
     u16 wideX[16] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
@@ -1280,7 +1280,7 @@ void print_small_text_light(s32 x, s32 y, const char *str, s32 align, s32 amount
 }
 
 // Return color hex nibble
-s32 get_hex_value_at_offset(const char *str, s32 primaryOffset, u32 nibbleOffset, u32 garbageReturnsEnv) {
+s32 get_hex_value_at_offset(const char* str, s32 primaryOffset, u32 nibbleOffset, u32 garbageReturnsEnv) {
     s32 val = str[primaryOffset + nibbleOffset];
     s32 shiftVal = 4 * ((nibbleOffset + 1) % 2);
 
@@ -1306,9 +1306,9 @@ s32 get_hex_value_at_offset(const char *str, s32 primaryOffset, u32 nibbleOffset
     return 0;
 }
 
-s32 text_iterate_command(const char *str, s32 i, s32 runCMD) {
+s32 text_iterate_command(const char* str, s32 i, s32 runCMD) {
     s32 len = 0;
-    const char *newStr = &str[i];
+    const char* newStr = &str[i];
     s32 lastCharIndex = (signed)strlen(newStr) - 1;
 
     while ((newStr[len] != '>') && (len < lastCharIndex)) {
@@ -1394,11 +1394,11 @@ s32 text_iterate_command(const char *str, s32 i, s32 runCMD) {
     return len;
 }
 
-void get_char_from_byte(s32 *textX, s32 *textPos, u8 letter, u8 *wideX, u8 *spaceX, s8 *offsetY, u8 font) {
+void get_char_from_byte(s32* textX, s32* textPos, u8 letter, u8* wideX, u8* spaceX, s8* offsetY, u8 font) {
     *offsetY = 0;
     u32 let = letter - '!';
-    struct PPTextFont **fntPtr = segmented_to_virtual(gPuppyPrintFontTable);
-    struct PPTextFont *fnt = segmented_to_virtual(fntPtr[font]);
+    struct PPTextFont** fntPtr = segmented_to_virtual(gPuppyPrintFontTable);
+    struct PPTextFont* fnt = segmented_to_virtual(fntPtr[font]);
 
     if (letter == ' ') {
         *spaceX = 2;
@@ -1418,7 +1418,7 @@ void get_char_from_byte(s32 *textX, s32 *textPos, u8 letter, u8 *wideX, u8 *spac
     if (fnt->kern == NULL || gMonoSpace) {
         *spaceX = fnt->txW;
     } else {
-        u8 *kern = segmented_to_virtual(fnt->kern);
+        u8* kern = segmented_to_virtual(fnt->kern);
         *spaceX = kern[let];
 
     }
@@ -1426,18 +1426,18 @@ void get_char_from_byte(s32 *textX, s32 *textPos, u8 letter, u8 *wideX, u8 *spac
         *textX = let >> 2;
         *wideX = fnt->txW;
     } else {
-        u16 *off = segmented_to_virtual(fnt->offset);
+        u16* off = segmented_to_virtual(fnt->offset);
         *textX = off[let] >> 1;
         *wideX = (off[let + 1] - off[let]);
     }
 
     switch (letter) {
         // This is for the letters that sit differently on the line. It just moves them down a bit.
-        case 'g': *offsetY = 2 * textSizeTotal; break;
-        case 'q': *offsetY = 2 * textSizeTotal; break;
-        case 'j': *offsetY = 2 * textSizeTotal; break;
-        case 'p': *offsetY = 2 * textSizeTotal; break;
-        case 'y': *offsetY = 2 * textSizeTotal; break;
+        case 'g':
+        case 'q':
+        case 'j':
+        case 'p':
+        case 'y': *offsetY = (2 * textSizeTotal); break;
     }
 }
 
@@ -1464,7 +1464,7 @@ static u8 gIsLightText = FALSE;
 // The data afterwards is the text data itself, using the string length byte to know when to stop.
 #define HEADERSIZE sizeof(struct PuppyprintDeferredBufferHeader)
 #define MAX_U8_STRING_SIZE (U8_MAX - 1) // Needs 255th character reserved for null terminator
-void print_small_text_buffered(s32 x, s32 y, const char *str, u8 align, s32 amount, u8 font) {
+void print_small_text_buffered(s32 x, s32 y, const char* str, u8 align, s32 amount, u8 font) {
     s32 strLen = strlen(str);
 
     if (amount <= PRINT_ALL || amount > MAX_U8_STRING_SIZE) {
@@ -1501,7 +1501,7 @@ void print_small_text_buffered(s32 x, s32 y, const char *str, u8 align, s32 amou
     sPuppyprintTextBuffer[sPuppyprintTextBufferPos++] = '\0'; // Apply null terminator onto end of string
 }
 
-void print_small_text_buffered_light(s32 x, s32 y, const char *str, u8 align, s32 amount, u8 font) {
+void print_small_text_buffered_light(s32 x, s32 y, const char* str, u8 align, s32 amount, u8 font) {
     gIsLightText = TRUE;
     print_small_text_buffered(x, y, str, align, amount, font);
     gIsLightText = FALSE;
@@ -1526,7 +1526,7 @@ void puppyprint_print_deferred(void) {
         ColorRGBA originalEnvCol = {gCurrEnvCol[0], gCurrEnvCol[1], gCurrEnvCol[2], gCurrEnvCol[3]};
         print_set_envcolour(header.red, header.green, header.blue, header.alpha);
 
-        char *text = (char *) &sPuppyprintTextBuffer[i];
+        char* text = (char*)&sPuppyprintTextBuffer[i];
         if (header.isLightText) {
             print_small_text_light(x, y, text, header.alignment, header.textBufferLength, header.font);
         } else {

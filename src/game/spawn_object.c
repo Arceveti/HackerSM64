@@ -19,8 +19,8 @@
  * to the end of destList (doubly linked). Return the object, or NULL if
  * freeList is empty.
  */
-struct Object *try_allocate_object(struct ObjectNode *destList, struct ObjectNode *freeList) {
-    struct ObjectNode *nextObj = freeList->next;
+struct Object* try_allocate_object(struct ObjectNode* destList, struct ObjectNode* freeList) {
+    struct ObjectNode* nextObj = freeList->next;
 
     if (nextObj != NULL) {
         // Remove from free list
@@ -38,7 +38,7 @@ struct Object *try_allocate_object(struct ObjectNode *destList, struct ObjectNod
     geo_remove_child(&nextObj->gfx.node);
     geo_add_child(&gObjParentGraphNode, &nextObj->gfx.node);
 
-    return (struct Object *) nextObj;
+    return (struct Object*)nextObj;
 }
 
 /**
@@ -63,8 +63,8 @@ void init_free_object_list(void) {
     s32 poolLength = OBJECT_POOL_CAPACITY;
 
     // Add the first object in the pool to the free list
-    struct Object *obj = &gObjectPool[0];
-    gFreeObjectList.next = (struct ObjectNode *) obj;
+    struct Object* obj = &gObjectPool[0];
+    gFreeObjectList.next = (struct ObjectNode*)obj;
 
     // Link each object in the pool to the following object
     for (i = 0; i < poolLength - 1; i++) {
@@ -79,7 +79,7 @@ void init_free_object_list(void) {
 /**
  * Clear each object list, without adding the objects back to the free list.
  */
-void clear_object_lists(struct ObjectNode *objLists) {
+void clear_object_lists(struct ObjectNode* objLists) {
     s32 i;
 
     for (i = 0; i < NUM_OBJ_LISTS; i++) {
@@ -91,7 +91,7 @@ void clear_object_lists(struct ObjectNode *objLists) {
 /**
  * Free the given object.
  */
-void unload_object(struct Object *obj) {
+void unload_object(struct Object* obj) {
     obj_mark_for_deletion(obj);
     obj->prevObj = NULL;
 
@@ -110,16 +110,15 @@ void unload_object(struct Object *obj) {
  * an unimportant object if necessary. If this is not possible, hang using an
  * infinite loop.
  */
-struct Object *allocate_object(struct ObjectNode *objList) {
-    s32 i;
-    struct Object *obj = try_allocate_object(objList, &gFreeObjectList);
+struct Object* allocate_object(struct ObjectNode* objList) {
+    struct Object* obj = try_allocate_object(objList, &gFreeObjectList);
 
     // The object list is full if the newly created pointer is NULL.
     // If this happens, we first attempt to unload unimportant objects
     // in order to finish allocating the object.
     if (obj == NULL) {
         // Look for an unimportant object to kick out.
-        struct Object *unimportantObj = find_unimportant_object();
+        struct Object* unimportantObj = find_unimportant_object();
 
         // If no unimportant object exists, then the object pool is exhausted.
         if (unimportantObj == NULL) {
@@ -147,18 +146,8 @@ struct Object *allocate_object(struct ObjectNode *objList) {
     obj->collidedObjInteractTypes = 0;
     obj->numCollidedObjs = 0;
 
-#if IS_64_BIT
-    for (i = 0; i < MAX_OBJECT_FIELDS; i++) {
-        obj->rawData.asS32[i] = 0;
-        obj->ptrData.asVoidPtr[i] = NULL;
-    }
-#else
-    for (i = 0; i < MAX_OBJECT_FIELDS; i++) {
-        obj->rawData.asS32[i] = 0;
-    }
-#endif
+    bzero(&obj->rawData, sizeof(obj->rawData));
 
-    obj->unused1 = 0;
     obj->bhvStackIndex = 0;
     obj->bhvDelayTimer = 0;
 
@@ -167,7 +156,6 @@ struct Object *allocate_object(struct ObjectNode *objList) {
     obj->hurtboxRadius = 0.0f;
     obj->hurtboxHeight = 0.0f;
     obj->hitboxDownOffset = 0.0f;
-    obj->unused2 = 0;
 
     obj->platform = NULL;
     obj->collisionData = NULL;
@@ -202,9 +190,9 @@ struct Object *allocate_object(struct ObjectNode *objList) {
 /**
  * Spawn an object at the origin with the behavior script at virtual address bhvScript.
  */
-struct Object *create_object(const BehaviorScript *bhvScript) {
-    struct Object *obj;
-    struct ObjectNode *objList;
+struct Object* create_object(const BehaviorScript* bhvScript) {
+    struct Object* obj;
+    struct ObjectNode* objList;
 
     u32 objListIndex = get_object_list_from_behavior(bhvScript);
 

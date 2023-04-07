@@ -191,12 +191,14 @@ float profiler_get_fps() {
 u32 profiler_get_cpu_cycles() {
     u32 cpu_normal_time = (all_profiling_data[PROFILER_TIME_TOTAL].total / PROFILING_BUFFER_SIZE);
     u32 cpu_audio_time  = (all_profiling_data[PROFILER_TIME_AUDIO].total / PROFILING_BUFFER_SIZE);
+
     return (cpu_normal_time + (cpu_audio_time * 2));
 }
 
 u32 profiler_get_rsp_cycles() {
     u32 rsp_graphics_time = (all_profiling_data[PROFILER_TIME_RSP_GFX  ].total / PROFILING_BUFFER_SIZE);
     u32 rsp_audio_time    = (all_profiling_data[PROFILER_TIME_RSP_AUDIO].total / PROFILING_BUFFER_SIZE);
+
     return rsp_graphics_time + rsp_audio_time;
 }
 
@@ -213,12 +215,14 @@ u32 profiler_get_rdp_cycles() {
 u32 profiler_get_cpu_microseconds() {
     u32 cpu_normal_time = OS_CYCLES_TO_USEC(all_profiling_data[PROFILER_TIME_TOTAL].total / PROFILING_BUFFER_SIZE);
     u32 cpu_audio_time  = OS_CYCLES_TO_USEC(all_profiling_data[PROFILER_TIME_AUDIO].total / PROFILING_BUFFER_SIZE);
+
     return (cpu_normal_time + (cpu_audio_time * 2));
 }
 
 u32 profiler_get_rsp_microseconds() {
     u32 rsp_graphics_time = OS_CYCLES_TO_USEC(all_profiling_data[PROFILER_TIME_RSP_GFX  ].total / PROFILING_BUFFER_SIZE);
     u32 rsp_audio_time    = OS_CYCLES_TO_USEC(all_profiling_data[PROFILER_TIME_RSP_AUDIO].total / PROFILING_BUFFER_SIZE);
+
     return (rsp_graphics_time + rsp_audio_time);
 }
 
@@ -242,9 +246,11 @@ void profiler_print_times() {
 
 #ifndef PUPPYPRINT_DEBUG
     static u8 show_profiler = 0;
-    if ((gPlayer1Controller->buttonPressed & (L_TRIG | U_JPAD))
-     && (gPlayer1Controller->buttonDown & L_TRIG)
-     && (gPlayer1Controller->buttonDown & U_JPAD)) {
+    if (
+        (gPlayer1Controller->buttonPressed & (L_TRIG | U_JPAD)) &&
+        (gPlayer1Controller->buttonDown & L_TRIG) &&
+        (gPlayer1Controller->buttonDown & U_JPAD)
+    ) {
         show_profiler ^= 1;
     }
 #endif
