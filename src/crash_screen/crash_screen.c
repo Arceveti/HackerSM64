@@ -87,11 +87,14 @@ void clamp_view_to_selection(const u32 numRows, const u32 step) {
     gScrollAddress = ALIGN(gScrollAddress, step);
 }
 
+s32 gCrashPrintValue = 0;
+
 // Draw the header.
 void print_crash_screen_heaader(void) {
     u32 line = 0;
     // "HackerSM64 vX.X.X"
     crash_screen_print(TEXT_X(0), TEXT_Y(line),
+        // "%d", gCrashPrintValue
         STR_COLOR_PREFIX"%s v%s",
         COLOR_RGBA32_CRASH_HEADER,
         "HackerSM64",
@@ -179,6 +182,46 @@ OSThread* get_crashed_thread(void) {
     return NULL;
 }
 
+#ifdef CRASH_SCREEN_CRASH_SCREEN
+// void crash_screen_loop(struct CrashScreen* crashScreen);
+void thread20_crash_screen_crash_screen(UNUSED void* arg) {
+    // crash_screen_loop(&gCrashScreen2);
+    OSMesg mesg;
+    OSThread* thread = NULL;
+
+    osSetEventMesg(OS_EVENT_CPU_BREAK, &gCrashScreen2.mesgQueue, (OSMesg)CRASH_SCREEN_MSG_CPU_BREAK);
+    osSetEventMesg(OS_EVENT_FAULT,     &gCrashScreen2.mesgQueue, (OSMesg)CRASH_SCREEN_MSG_FAULT);
+
+    while (TRUE) {
+        if (thread == NULL) {
+            osRecvMesg(&gCrashScreen2.mesgQueue, &mesg, OS_MESG_BLOCK);
+            thread = get_crashed_thread();
+
+            if (thread != NULL) {
+ #ifdef FUNNY_CRASH_SOUND
+                play_crash_sound(&gCrashScreen2, SOUND_MARIO_MAMA_MIA);
+ #endif
+                crash_screen_reset_framebuffer(FALSE);
+                draw_crashed_image_i4();
+                draw_crash_context(thread);
+
+                osWritebackDCacheAll();
+                osViBlack(FALSE);
+                osViSwapBuffer((void*)PHYSICAL_TO_VIRTUAL(gFramebuffers[sRenderingFramebuffer]));
+            }
+        }
+    }
+}
+
+void crash_screen_crash_screen_init(void) {
+    osCreateMesgQueue(&gCrashScreen2.mesgQueue, &gCrashScreen2.mesg, 1);
+    osCreateThread(&gCrashScreen2.thread, THREAD_20_CRASH_SCREEN_CRASH_SCREEN, thread20_crash_screen_crash_screen, NULL,
+                ((u8*)gCrashScreen2.stack + sizeof(gCrashScreen2.stack)),
+                OS_PRIORITY_APPMAX);
+    osStartThread(&gCrashScreen2.thread);
+}
+#endif // CRASH_SCREEN_CRASH_SCREEN
+
 #ifdef FUNNY_CRASH_SOUND
 void crash_screen_sleep(u32 ms) {
     u64 cycles = (((ms * 1000LL) * osClockRate) / 1000000ULL);
@@ -202,56 +245,18 @@ void play_crash_sound(struct CrashScreen* crashScreen, s32 sound) {
 }
 #endif
 
-#ifdef CRASH_SCREEN_CRASH_SCREEN
-void thread20_crash_screen_crash_screen(UNUSED void* arg) {
+void crash_screen_loop(struct CrashScreen* crashScreen) {
     OSMesg mesg;
     OSThread* thread = NULL;
 
-    osSetEventMesg(OS_EVENT_CPU_BREAK, &gCrashScreen2.mesgQueue, (OSMesg)CRASH_SCREEN_MSG_CPU_BREAK);
-    osSetEventMesg(OS_EVENT_FAULT,     &gCrashScreen2.mesgQueue, (OSMesg)CRASH_SCREEN_MSG_FAULT);
+    osSetEventMesg(OS_EVENT_CPU_BREAK, &crashScreen->mesgQueue, (OSMesg)CRASH_SCREEN_MSG_CPU_BREAK);
+    osSetEventMesg(OS_EVENT_FAULT,     &crashScreen->mesgQueue, (OSMesg)CRASH_SCREEN_MSG_FAULT);
 
     while (TRUE) {
         if (thread == NULL) {
-            osRecvMesg(&gCrashScreen2.mesgQueue, &mesg, OS_MESG_BLOCK);
-            thread = get_crashed_thread();
+            osRecvMesg(&crashScreen->mesgQueue, &mesg, OS_MESG_BLOCK);
 
-            if (thread != NULL) {
- #ifdef FUNNY_CRASH_SOUND
-                play_crash_sound(&gCrashScreen2, SOUND_MARIO_MAMA_MIA);
- #endif
-                crash_screen_reset_framebuffer(FALSE);
-                draw_crashed_image_i4();
-                draw_crash_context(thread);
-
-                osWritebackDCacheAll();
-                osViBlack(FALSE);
-                osViSwapBuffer((void*) PHYSICAL_TO_VIRTUAL(gFramebuffers[sRenderingFramebuffer]));
-            }
-        }
-    }
-}
-
-void crash_screen_crash_screen_init(void) {
-    osCreateMesgQueue(&gCrashScreen2.mesgQueue, &gCrashScreen2.mesg, 1);
-    osCreateThread(&gCrashScreen2.thread, THREAD_20_CRASH_SCREEN_CRASH_SCREEN, thread20_crash_screen_crash_screen, NULL,
-                ((u8*)gCrashScreen2.stack + sizeof(gCrashScreen2.stack)),
-                OS_PRIORITY_APPMAX);
-    osStartThread(&gCrashScreen2.thread);
-}
-#endif // CRASH_SCREEN_CRASH_SCREEN
-
-void thread2_crash_screen(UNUSED void* arg) {
-    OSMesg mesg;
-    OSThread* thread = NULL;
-
-    osSetEventMesg(OS_EVENT_CPU_BREAK, &gCrashScreen.mesgQueue, (OSMesg)CRASH_SCREEN_MSG_CPU_BREAK);
-    osSetEventMesg(OS_EVENT_FAULT,     &gCrashScreen.mesgQueue, (OSMesg)CRASH_SCREEN_MSG_FAULT);
-
-    while (TRUE) {
-        if (thread == NULL) {
-            osRecvMesg(&gCrashScreen.mesgQueue, &mesg, OS_MESG_BLOCK);
-
-            osViSetEvent(&gCrashScreen.mesgQueue, (OSMesg)CRASH_SCREEN_MSG_VI_VBLANK, 1);
+            osViSetEvent(&crashScreen->mesgQueue, (OSMesg)CRASH_SCREEN_MSG_VI_VBLANK, 1);
 
             // Save a screenshot of the game to the Z buffer's memory space.
             crash_screen_take_screenshot(gZBuffer);
@@ -260,7 +265,7 @@ void thread2_crash_screen(UNUSED void* arg) {
 
             if (thread != NULL) {
 #ifdef FUNNY_CRASH_SOUND
-                play_crash_sound(&gCrashScreen, SOUND_MARIO_WAAAOOOW);
+                play_crash_sound(crashScreen, SOUND_MARIO_WAAAOOOW);
 #endif
                 __OSThreadContext* tc = &thread->context;
                 // Default to the assert page if the crash was caused by an assert.
@@ -288,6 +293,10 @@ void thread2_crash_screen(UNUSED void* arg) {
             gCrashScreenSwitchedPage = FALSE;
         }
     }
+}
+
+void thread2_crash_screen(UNUSED void* arg) {
+    crash_screen_loop(&gCrashScreen);
 }
 
 void crash_screen_init(void) {
