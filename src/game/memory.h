@@ -7,7 +7,7 @@
 
 enum MemoryPoolSide {
     MEMORY_POOL_LEFT,
-    MEMORY_POOL_RIGHT
+    MEMORY_POOL_RIGHT,
 };
 
 #define NUM_TLB_SEGMENTS 32

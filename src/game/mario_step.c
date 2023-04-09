@@ -274,7 +274,7 @@ s32 stationary_ground_step(struct MarioState *m) {
     if (takeStep) {
         stepResult = perform_ground_step(m);
     } else {
-        //! TODO - This is responsible for many stationary downwarps but is
+        //! TODO: - This is responsible for many stationary downwarps but is
         // important for stuff like catching Bowser in midair, figure out a good way to fix
         m->pos[1] = m->floorHeight;
 
