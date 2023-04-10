@@ -22,8 +22,8 @@
  */
 
 struct EnvFxBubblesState EnvFxBubbleConfig;
-struct EnvFxBubblesState *gEnvFxBubbleConfig = &EnvFxBubbleConfig;
-static Gfx *sGfxCursor; // points to end of display list for bubble particles
+struct EnvFxBubblesState* gEnvFxBubbleConfig = &EnvFxBubbleConfig;
+static Gfx* sGfxCursor; // points to end of display list for bubble particles
 static s32 sBubbleParticleCount;
 static s32 sBubbleParticleMaxCount;
 
@@ -70,7 +70,7 @@ s32 random_flower_offset(void) {
  * camera, and can land on any ground
  */
 void envfx_update_flower(Vec3s centerPos) {
-    struct EnvFxParticle *particle = gEnvFxBuffer;
+    struct EnvFxParticle* particle = gEnvFxBuffer;
     s32 i;
     s32 globalTimer = gGlobalTimer;
 
@@ -106,8 +106,8 @@ void envfx_update_flower(Vec3s centerPos) {
  * camera below the lava plane.
  */
 void envfx_set_lava_bubble_position(s32 index, Vec3s centerPos) {
-    struct EnvFxParticle *particle = (gEnvFxBuffer + index);
-    struct Surface *surface;
+    struct EnvFxParticle* particle = (gEnvFxBuffer + index);
+    struct Surface* surface;
 
     s16 centerX = centerPos[0];
     s16 centerY = centerPos[1];
@@ -144,7 +144,7 @@ void envfx_set_lava_bubble_position(s32 index, Vec3s centerPos) {
  * animation is over.
  */
 void envfx_update_lava(Vec3s centerPos) {
-    struct EnvFxParticle *particle = gEnvFxBuffer;
+    struct EnvFxParticle* particle = gEnvFxBuffer;
     s32 i;
     s32 globalTimer = gGlobalTimer;
 
@@ -185,9 +185,9 @@ void envfx_rotate_around_whirlpool(Vec3i pos) {
     f32 rotatedY = (vecX * sinMYaw ) + (cosPitch * cosMYaw  * vecY) - (sinPitch * cosMYaw * vecZ);
     f32 rotatedZ = (vecY * sinPitch) + (cosPitch * vecZ);
 
-    pos[0] = gEnvFxBubbleConfig->dest[0] + (s32) rotatedX;
-    pos[1] = gEnvFxBubbleConfig->dest[1] + (s32) rotatedY;
-    pos[2] = gEnvFxBubbleConfig->dest[2] + (s32) rotatedZ;
+    pos[0] = gEnvFxBubbleConfig->dest[0] + (s32)rotatedX;
+    pos[1] = gEnvFxBubbleConfig->dest[1] + (s32)rotatedY;
+    pos[2] = gEnvFxBubbleConfig->dest[2] + (s32)rotatedZ;
 }
 
 /**
@@ -195,15 +195,10 @@ void envfx_rotate_around_whirlpool(Vec3i pos) {
  * low or close to the center.
  */
 s32 envfx_is_whirlpool_bubble_alive(s32 index) {
-    if ((gEnvFxBuffer + index)->bubbleY < gEnvFxBubbleConfig->dest[1] - 100) {
-        return FALSE;
-    }
-
-    if ((gEnvFxBuffer + index)->distFromCenter < 10) {
-        return FALSE;
-    }
-
-    return TRUE;
+    return !(
+        (gEnvFxBuffer + index)->bubbleY < gEnvFxBubbleConfig->dest[1] - 100 ||
+        (gEnvFxBuffer + index)->distFromCenter < 10
+    );
 }
 
 /**
@@ -211,7 +206,7 @@ s32 envfx_is_whirlpool_bubble_alive(s32 index) {
  * the center and get sucked into the sink in a spiraling motion.
  */
 void envfx_update_whirlpool(void) {
-    struct EnvFxParticle *particle = gEnvFxBuffer;
+    struct EnvFxParticle* particle = gEnvFxBuffer;
     s32 i;
 
     for (i = 0; i < sBubbleParticleMaxCount; i++) {
@@ -256,13 +251,10 @@ void envfx_update_whirlpool(void) {
  * 1000 units away from the source or 1500 units above it.
  */
 s32 envfx_is_jestream_bubble_alive(s32 index) {
-    if (!particle_is_laterally_close(index, gEnvFxBubbleConfig->src[0],
-                                     gEnvFxBubbleConfig->src[2], 1000)
-        || gEnvFxBubbleConfig->src[1] + 1500 < (gEnvFxBuffer + index)->pos[1]) {
-        return FALSE;
-    }
-
-    return TRUE;
+    return !(
+        !particle_is_laterally_close(index, gEnvFxBubbleConfig->src[0], gEnvFxBubbleConfig->src[2], 1000) ||
+        gEnvFxBubbleConfig->src[1] + 1500 < (gEnvFxBuffer + index)->pos[1]
+    );
 }
 
 /**
@@ -270,7 +262,7 @@ s32 envfx_is_jestream_bubble_alive(s32 index) {
  * They move up and outwards.
  */
 void envfx_update_jetstream(void) {
-    struct EnvFxParticle *particle = gEnvFxBuffer;
+    struct EnvFxParticle* particle = gEnvFxBuffer;
     s32 i;
 
     for (i = 0; i < sBubbleParticleMaxCount; i++) {
@@ -390,7 +382,7 @@ void envfx_bubbles_update_switch(s32 mode, Vec3s camTo, Vec3s vertex1, Vec3s ver
  * the global sGfxCursor instead.
  */
 void envfx_set_bubble_texture(s32 mode, s16 index) {
-    void **imageArr = NULL;
+    void** imageArr = NULL;
     s16 frame = (gEnvFxBuffer + index)->animFrame;
 
     switch (mode) {
@@ -421,7 +413,7 @@ void envfx_set_bubble_texture(s32 mode, s16 index) {
  * Updates the bubble particle positions, then generates and returns a display
  * list drawing them.
  */
-Gfx *envfx_update_bubble_particles(s32 mode, UNUSED Vec3s marioPos, Vec3s camFrom, Vec3s camTo) {
+Gfx* envfx_update_bubble_particles(s32 mode, UNUSED Vec3s marioPos, Vec3s camFrom, Vec3s camTo) {
     s32 i;
     s16 radius, pitch, yaw;
 
@@ -429,7 +421,7 @@ Gfx *envfx_update_bubble_particles(s32 mode, UNUSED Vec3s marioPos, Vec3s camFro
     Vec3s vertex2;
     Vec3s vertex3;
 
-    Gfx *gfxStart = alloc_display_list(
+    Gfx* gfxStart = alloc_display_list(
         SIZEOF_GFX_CMD(SPDisplayList(0)) +
         (sBubbleParticleMaxCount * (
             SIZEOF_GFX_CMD(DPPipeSync()) +
@@ -455,7 +447,7 @@ Gfx *envfx_update_bubble_particles(s32 mode, UNUSED Vec3s marioPos, Vec3s camFro
     for (i = 0; i < sBubbleParticleMaxCount; i += 5) {
         gDPPipeSync(sGfxCursor++);
         envfx_set_bubble_texture(mode, i);
-        append_particle_vertex_buffer(sGfxCursor++, i, vertex1, vertex2, vertex3, (Vtx *) &gBubbleTempVtx);
+        append_particle_vertex_buffer(sGfxCursor++, i, vertex1, vertex2, vertex3, (Vtx*)&gBubbleTempVtx);
         gSP2Triangles(sGfxCursor++,  0,  1,  2, 0x0,  3,  4,  5, 0x0);
         gSP2Triangles(sGfxCursor++,  6,  7,  8, 0x0,  9, 10, 11, 0x0);
         gSP1Triangle( sGfxCursor++, 12, 13, 14, 0x0);
@@ -485,8 +477,8 @@ void envfx_set_max_bubble_particles(s32 mode) {
  * lower modes are snow effects which are updated in a different function.
  * Returns a display list drawing the particles.
  */
-Gfx *envfx_update_bubbles(s32 mode, Vec3s marioPos, Vec3s camTo, Vec3s camFrom) {
-    Gfx *gfx;
+Gfx* envfx_update_bubbles(s32 mode, Vec3s marioPos, Vec3s camTo, Vec3s camFrom) {
+    Gfx* gfx;
 
     if (gEnvFxMode == ENVFX_MODE_NONE && !envfx_init_bubble(mode)) {
         return NULL;
@@ -500,19 +492,10 @@ Gfx *envfx_update_bubbles(s32 mode, Vec3s marioPos, Vec3s camTo, Vec3s camFrom) 
 
     switch (mode) {
         case ENVFX_FLOWERS:
-            gfx = envfx_update_bubble_particles(ENVFX_FLOWERS, marioPos, camFrom, camTo);
-            break;
-
         case ENVFX_LAVA_BUBBLES:
-            gfx = envfx_update_bubble_particles(ENVFX_LAVA_BUBBLES, marioPos, camFrom, camTo);
-            break;
-
         case ENVFX_WHIRLPOOL_BUBBLES:
-            gfx = envfx_update_bubble_particles(ENVFX_WHIRLPOOL_BUBBLES, marioPos, camFrom, camTo);
-            break;
-
         case ENVFX_JETSTREAM_BUBBLES:
-            gfx = envfx_update_bubble_particles(ENVFX_JETSTREAM_BUBBLES, marioPos, camFrom, camTo);
+            gfx = envfx_update_bubble_particles(mode, marioPos, camFrom, camTo);
             break;
 
         default:

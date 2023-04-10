@@ -564,7 +564,7 @@ void movtex_change_texture_format(s32 quadCollectionId, Gfx** gfx) {
  * of the corresponding water region. The node's parameter determines which quad
  * collection is drawn, see moving_texture.h.
  */
-Gfx *geo_movtex_draw_water_regions(s32 callContext, struct GraphNode* node, UNUSED Mat4 mtx) {
+Gfx* geo_movtex_draw_water_regions(s32 callContext, struct GraphNode* node, UNUSED Mat4 mtx) {
     Gfx* gfxHead = NULL;
     Gfx* gfx = NULL;
     Gfx* subList;
@@ -882,7 +882,7 @@ Gfx* geo_movtex_draw_colored_2_no_update(s32 callContext, struct GraphNode* node
  * Note that the final TTC only has one big treadmill though.
  */
 Gfx* geo_movtex_update_horizontal(s32 callContext, struct GraphNode* node, UNUSED Mat4 mtx) {
-    void *movtexVerts = NULL;
+    void* movtexVerts = NULL;
 
     if (callContext == GEO_CONTEXT_RENDER) {
         struct GraphNodeGenerated* asGenerated = (struct GraphNodeGenerated*)node;

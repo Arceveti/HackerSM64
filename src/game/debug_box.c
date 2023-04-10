@@ -206,13 +206,15 @@ s32 gVisualOffset;
 extern s32 gSurfaceNodesAllocated;
 extern s32 gSurfacesAllocated;
 
-void iterate_surfaces_visual(s32 x, s32 z, Vtx *verts) {
-    struct SurfaceNode *node;
-    struct Surface *surf;
+void iterate_surfaces_visual(s32 x, s32 z, Vtx* verts) {
+    struct SurfaceNode* node;
+    struct Surface* surf;
     s32 i = 0;
     ColorRGB col = COLOR_RGB_RED;
 
-    if (is_outside_level_bounds(x, z)) return;
+    if (is_outside_level_bounds(x, z)) {
+        return;
+    }
 
     s32 cellX = get_cell_coord(x);
     s32 cellZ = get_cell_coord(z);
@@ -248,8 +250,8 @@ void iterate_surfaces_visual(s32 x, s32 z, Vtx *verts) {
     }
 }
 
-void iterate_surfaces_envbox(Vtx *verts) {
-    TerrainData *p = gEnvironmentRegions;
+void iterate_surfaces_envbox(Vtx* verts) {
+    TerrainData* p = gEnvironmentRegions;
     ColorRGB col = COLOR_RGB_YELLOW;
     s32 i = 0;
 
@@ -280,7 +282,7 @@ void iterate_surfaces_envbox(Vtx *verts) {
 #define VERTCOUNT 12
 #endif // OBJECTS_REJ
 
-void visual_surface_display(Vtx *verts, s32 iteration) {
+void visual_surface_display(Vtx* verts, s32 iteration) {
     s32 vts = (iteration ? gVisualOffset : gVisualSurfaceCount);
     s32 vtl = 0;
     s32 count = VERTCOUNT;
@@ -320,10 +322,10 @@ void visual_surface_display(Vtx *verts, s32 iteration) {
 }
 
 u32 iterate_surface_count(s32 x, s32 z) {
-    struct SurfaceNode *node;
+    struct SurfaceNode* node;
     s32 i = 0;
     u32 nodes = 0;
-    TerrainData *p = gEnvironmentRegions;
+    TerrainData* p = gEnvironmentRegions;
     s32 numRegions;
 
     if (is_outside_level_bounds(x, z)) {
@@ -359,14 +361,16 @@ u32 iterate_surface_count(s32 x, s32 z) {
 }
 
 void visual_surface_loop(s32 isDecal) {
-    if (!gSurfaceNodesAllocated
-     || !gSurfacesAllocated
-     || !gMarioState->marioObj) {
+    if (
+        !gSurfaceNodesAllocated ||
+        !gSurfacesAllocated     ||
+        !gMarioState->marioObj
+    ) {
         return;
     }
 
     u32 nodes = iterate_surface_count(gMarioState->pos[0], gMarioState->pos[2]);
-    Vtx *verts = alloc_display_list((nodes * 3) * sizeof(Vtx));
+    Vtx* verts = alloc_display_list((nodes * 3) * sizeof(Vtx));
 
     gVisualSurfaceCount = 0;
     gVisualOffset = 0;
@@ -472,12 +476,12 @@ void debug_box_pos_rot(Vec3f pMin, Vec3f pMax, s16 yaw, s32 type) {
 }
 
 static void render_box(int index) {
-    struct DebugBox *box = &sBoxes[index];
+    struct DebugBox* box = &sBoxes[index];
     s32 color = box->color;
     Mat4 mtxFloat;
 
     // Allocate the transformation matrix for this box
-    Mtx *mtx = alloc_display_list(sizeof(Mtx));
+    Mtx* mtx = alloc_display_list(sizeof(Mtx));
 
     if (mtx == NULL) return;
 
@@ -522,8 +526,13 @@ void render_debug_boxes(s32 type) {
 
     debug_box_color(DBG_BOX_DEF_COLOR);
 
-    if (sNumBoxes == 0) return;
-    if (gAreaUpdateCounter < 3) return;
+    if (sNumBoxes == 0) {
+        return;
+    }
+
+    if (gAreaUpdateCounter < 3) {
+        return;
+    }
 
     gSPDisplayList(gDisplayListHead++, dl_debug_box_begin);
 

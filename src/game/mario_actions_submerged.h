@@ -33,6 +33,6 @@ enum WaterPlungeFlags { // act_water_plunge
     PLUNGE_FLAG_METAL_CAP   = BIT(2), // 0x4
 };
 
-s32 mario_execute_submerged_action(struct MarioState *m);
+s32 mario_execute_submerged_action(struct MarioState* m);
 
 #endif // MARIO_ACTIONS_SUBMERGED_H

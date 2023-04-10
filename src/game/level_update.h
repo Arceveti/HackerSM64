@@ -80,17 +80,17 @@ struct CreditsEntry {
     /*0x0C*/ s16 yawVel;
     /*0x0E*/ u8 isTop   : 1;
     /*0x0F*/ u8 isRight : 1;
-    /*0x10*/ const char **string;
+    /*0x10*/ const char** string;
 }; /*0x14*/
 
-extern struct CreditsEntry *gCurrCreditsEntry;
+extern struct CreditsEntry* gCurrCreditsEntry;
 
 extern struct MarioState gMarioStates[];
-extern struct MarioState *gMarioState;
+extern struct MarioState* gMarioState;
 
 extern s16 sCurrPlayMode;
 extern s16 sTransitionTimer;
-extern void (*sTransitionUpdate)(s16 *);
+extern void (*sTransitionUpdate)(s16*);
 extern void load_language_text(void);
 
 struct WarpDest {
@@ -482,7 +482,7 @@ enum WarpsTTM {
 u32 level_control_timer(s32 timerOp);
 void fade_into_special_warp(u32 warpArg, u32 color);
 void load_level_init_text(u32 areaDialogIdx);
-s32 level_trigger_warp(struct MarioState *m, s32 warpOp);
+s32 level_trigger_warp(struct MarioState* m, s32 warpOp);
 void level_set_transition(s16 length, void (*updateFunction)());
 
 s32 is_bowser_level(u32 level);

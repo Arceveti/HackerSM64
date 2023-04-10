@@ -17,8 +17,7 @@ enum ObjCollisionFlags {
 };
 
 //! Lots of these are duplicates
-void set_yoshi_as_not_dead(void);
-s32 coin_step(s16 *collisionFlagsPtr);
+s32 coin_step(s16* collisionFlagsPtr);
 void moving_coin_flicker(void);
 void coin_collected(void);
 void bhv_moving_yellow_coin_init(void);
@@ -45,7 +44,7 @@ void bobomb_free_loop(void);
 void bobomb_held_loop(void);
 void bobomb_dropped_loop(void);
 void bobomb_thrown_loop(void);
-void curr_obj_random_blink(s32 *blinkTimer);
+void curr_obj_random_blink(s32* blinkTimer);
 void bhv_bobomb_loop(void);
 void bhv_bobomb_fuse_smoke_init(void);
 void bhv_bobomb_buddy_init(void);
@@ -96,7 +95,7 @@ void bhv_bobomb_bully_death_smoke_init(void);
 void bhv_bobomb_explosion_bubble_init(void);
 void bhv_bobomb_explosion_bubble_loop(void);
 void bhv_respawner_loop(void);
-void create_respawner(ModelID32 model, const BehaviorScript *behToSpawn, s32 minSpawnDist);
+void create_respawner(ModelID32 model, const BehaviorScript* behToSpawn, s32 minSpawnDist);
 void bhv_small_bully_init(void);
 void bhv_big_bully_init(void);
 void bully_check_mario_collision(void);
@@ -116,7 +115,7 @@ void bhv_big_bully_with_minions_loop(void);
 f32 water_ring_calc_mario_dist(void);
 void water_ring_init(void);
 void bhv_jet_stream_water_ring_init(void);
-void water_ring_check_collection(f32 avgScale, struct Object *ringManager);
+void water_ring_check_collection(f32 avgScale, struct Object* ringManager);
 void water_ring_set_scale(f32 avgScale);
 void water_ring_act_collected(void);
 void water_ring_act_not_collected(void);

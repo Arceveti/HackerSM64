@@ -37,7 +37,7 @@ s32 get_cell_coord(s32 coord);
 f32 get_surface_height_at_pos(f32 xPos, f32 zPos, struct Surface* surf);
 s32 get_surface_yaw(struct Surface* surf);
 s32 f32_find_wall_collision(f32* xPtr, f32* yPtr, f32* zPtr, f32 offsetY, f32 radius);
-s32 find_wall_collisions(struct WallCollisionData *colData);
+s32 find_wall_collisions(struct WallCollisionData* colData);
 void resolve_and_return_wall_collisions(Vec3f pos, f32 offset, f32 radius, struct WallCollisionData* collisionData);
 void raycast_collision_walls(Vec3f pos, Vec3f intendedPos, f32 yOffset);
 f32 find_ceil(f32 posX, f32 posY, f32 posZ, struct Surface** pceil);

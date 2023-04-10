@@ -23,7 +23,7 @@ s32 convert_rotation(s16 inRotation) {
         case 0xBF00: rotation = 0xC000; break;
         case 0xFF00: rotation = 0x0000; break;
     }
-    return (s16) rotation;
+    return (s16)rotation;
 }
 
 /*
@@ -31,11 +31,11 @@ s32 convert_rotation(s16 inRotation) {
  * parameters filling up the upper 2 bytes of newObj->oBehParams.
  * The object will not spawn if 'behavior' is NULL.
  */
-void spawn_macro_abs_yrot_2params(ModelID32 model, const BehaviorScript *behavior, s16 x, s16 y, s16 z, s16 ry, s16 params) {
+void spawn_macro_abs_yrot_2params(ModelID32 model, const BehaviorScript* behavior, s16 x, s16 y, s16 z, s16 ry, s16 params) {
     if (behavior != NULL) {
-        struct Object *newObj =
+        struct Object* newObj =
             spawn_object_abs_with_rot(&gMacroObjectDefaultParent, 0, model, behavior, x, y, z, 0, convert_rotation(ry), 0);
-        newObj->oBehParams = ((u32) params << 16);
+        newObj->oBehParams = ((u32)params << 16);
     }
 }
 
@@ -44,11 +44,11 @@ void spawn_macro_abs_yrot_2params(ModelID32 model, const BehaviorScript *behavio
  * a single parameter filling up the upper byte of newObj->oBehParams.
  * The object will not spawn if 'behavior' is NULL.
  */
-void spawn_macro_abs_yrot_param1(ModelID32 model, const BehaviorScript *behavior, s16 x, s16 y, s16 z, s16 ry, s16 param) {
+void spawn_macro_abs_yrot_param1(ModelID32 model, const BehaviorScript* behavior, s16 x, s16 y, s16 z, s16 ry, s16 param) {
     if (behavior != NULL) {
-        struct Object *newObj =
+        struct Object* newObj =
             spawn_object_abs_with_rot(&gMacroObjectDefaultParent, 0, model, behavior, x, y, z, 0, convert_rotation(ry), 0);
-        newObj->oBehParams = ((u32) param << 24);
+        newObj->oBehParams = ((u32)param << 24);
     }
 }
 
@@ -56,19 +56,19 @@ void spawn_macro_abs_yrot_param1(ModelID32 model, const BehaviorScript *behavior
  * Spawns an object at an absolute location with currently 3 unknown variables that get converted to
  * floats. Oddly enough, this function doesn't care if 'behavior' is NULL or not.
  */
-void spawn_macro_abs_special(ModelID32 model, const BehaviorScript *behavior, s16 x, s16 y, s16 z, s16 unkA, s16 unkB, s16 unkC) {
-    struct Object *newObj =
+void spawn_macro_abs_special(ModelID32 model, const BehaviorScript* behavior, s16 x, s16 y, s16 z, s16 unkA, s16 unkB, s16 unkC) {
+    struct Object* newObj =
         spawn_object_abs_with_rot(&gMacroObjectDefaultParent, 0, model, behavior, x, y, z, 0, 0, 0);
 
     // Are all three of these values unused?
-    newObj->oMacroUnk108 = (f32) unkA;
-    newObj->oMacroUnk10C = (f32) unkB;
-    newObj->oMacroUnk110 = (f32) unkC;
+    newObj->oMacroUnk108 = (f32)unkA;
+    newObj->oMacroUnk10C = (f32)unkB;
+    newObj->oMacroUnk110 = (f32)unkC;
 }
 
-void spawn_macro_objects(s32 areaIndex, MacroObject *macroObjList) {
+void spawn_macro_objects(s32 areaIndex, MacroObject* macroObjList) {
     s32 presetID;
-    struct Object *newObj;
+    struct Object* newObj;
     struct MacroPreset preset;
     MacroObject yaw;
     MacroObject x, y, z;
@@ -129,7 +129,7 @@ void spawn_macro_objects(s32 areaIndex, MacroObject *macroObjList) {
     }
 }
 
-void spawn_special_objects(s32 areaIndex, TerrainData **specialObjList) {
+void spawn_special_objects(s32 areaIndex, TerrainData** specialObjList) {
     s32 i;
     Vec3s pos;
     TerrainData extraParams[4];
@@ -137,7 +137,7 @@ void spawn_special_objects(s32 areaIndex, TerrainData **specialObjList) {
     u8 type;
     u8 presetID;
     u8 defaultParam;
-    const BehaviorScript *behavior;
+    const BehaviorScript* behavior;
 
     s32 numOfSpecialObjects = *(*specialObjList)++;
 
@@ -150,7 +150,7 @@ void spawn_special_objects(s32 areaIndex, TerrainData **specialObjList) {
         pos[1]   = *(*specialObjList)++;
         pos[2]   = *(*specialObjList)++;
 
-        struct SpecialPreset *preset = &SpecialObjectPresets[presetID];
+        struct SpecialPreset* preset = &SpecialObjectPresets[presetID];
 
         model        = preset->model;
         behavior     = preset->behavior;
@@ -187,18 +187,18 @@ void spawn_special_objects(s32 areaIndex, TerrainData **specialObjList) {
 }
 
 #ifdef NO_SEGMENTED_MEMORY
-u32 get_special_objects_size(MacroObject *data) {
-    MacroObject *startPos = data;
+u32 get_special_objects_size(MacroObject* data) {
+    MacroObject* startPos = data;
     s32 i;
     u8 presetID;
 
     s32 numOfSpecialObjects = *data++;
 
     for (i = 0; i < numOfSpecialObjects; i++) {
-        presetID = (u8) *data++;
+        presetID = (u8)*data++;
         data += 3;
 
-        struct SpecialPreset *preset = &SpecialObjectPresets[presetID];
+        struct SpecialPreset* preset = &SpecialObjectPresets[presetID];
 
         switch (preset->type) {
             case SPTYPE_NO_YROT_OR_PARAMS:

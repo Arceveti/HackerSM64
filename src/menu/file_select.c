@@ -1581,8 +1581,10 @@ void erase_menu_display_message(s8 messageID) {
 void erase_menu_update_message(void) {
     switch (sMainMenuButtons[MENU_BUTTON_ERASE]->oMenuButtonActionPhase) {
         case ERASE_PHASE_MAIN:
-            if (sMainMenuTimer == FADEOUT_TIMER
-                && sStatusMessageID == ERASE_MSG_NOSAVE_EXISTS) {
+            if (
+                sMainMenuTimer == FADEOUT_TIMER &&
+                sStatusMessageID == ERASE_MSG_NOSAVE_EXISTS
+            ) {
                 sFadeOutText = TRUE;
             }
             if (update_text_fade_out()) {
@@ -1822,7 +1824,7 @@ void print_save_file_scores(s8 fileIndex) {
     const unsigned char textHiScore[] = { TEXT_HI_SCORE };
     const unsigned char textMyScore[] = { TEXT_MY_SCORE };
     unsigned char textFileLetter[] = { TEXT_ZERO };
-    const void **levelNameTable = segmented_to_virtual(languageTable[gInGameLanguage][1]);
+    const void** levelNameTable = segmented_to_virtual(languageTable[gInGameLanguage][1]);
 
     textFileLetter[0] = fileIndex + ASCII_TO_DIALOG('A'); // get letter of file selected
 

@@ -43,6 +43,6 @@ extern s16 gGeoLayoutReturnIndex;
 extern u8* gGeoLayoutCommand;
 extern struct GraphNode gObjParentGraphNode;
 
-struct GraphNode *process_geo_layout(struct AllocOnlyPool* pool, void* segptr);
+struct GraphNode* process_geo_layout(struct AllocOnlyPool* pool, void* segptr);
 
 #endif // GEO_LAYOUT_H

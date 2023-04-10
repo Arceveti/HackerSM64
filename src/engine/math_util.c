@@ -56,7 +56,7 @@ u16 random_u16(void) {
 
 // Generate a pseudorandom float in the range [0, 1).
 f32 random_float(void) {
-    return ((f32) random_u16() / (f32) 0x10000);
+    return ((f32)random_u16() / (f32)0x10000);
 }
 
 // Return either -1 or 1 with a 50:50 chance.
@@ -883,7 +883,7 @@ void mtxf_mul(Mat4 dest, Mat4 a, Mat4 b) {
 /**
  * Returns a float value from an index in a fixed point matrix.
  */
-f32 mtx_get_float(Mtx *mtx, u32 xIndex, u32 yIndex) {
+f32 mtx_get_float(Mtx* mtx, u32 xIndex, u32 yIndex) {
     PUPPYPRINT_ADD_COUNTER(gPuppyCallCounter.matrix);
     f32 ret = 0.0f;
     u32 index = (yIndex * 4) + xIndex;
@@ -900,7 +900,7 @@ f32 mtx_get_float(Mtx *mtx, u32 xIndex, u32 yIndex) {
 /**
  * Writes a float value to a fixed point matrix.
  */
-void mtx_set_float(Mtx *mtx, f32 val, u32 xIndex, u32 yIndex) {
+void mtx_set_float(Mtx* mtx, f32 val, u32 xIndex, u32 yIndex) {
     PUPPYPRINT_ADD_COUNTER(gPuppyCallCounter.matrix);
     u32 index = (yIndex * 4) + xIndex;
     if (index < 16) {
@@ -918,7 +918,7 @@ void mtx_set_float(Mtx *mtx, f32 val, u32 xIndex, u32 yIndex) {
 #define MATENTRY(a, b)                          \
     ((s16*)mtx)[(a)     ] = (((s32)(b)) >> 16); \
     ((s16*)mtx)[(a) + 16] = (((s32)(b)) & BITMASK(16));
-void mtx_rotate_xy(Mtx *mtx, s16 angle) {
+void mtx_rotate_xy(Mtx* mtx, s16 angle) {
     PUPPYPRINT_ADD_COUNTER(gPuppyCallCounter.matrix);
     s32 c = (coss(angle) * 0x10000);
     s32 s = (sins(angle) * 0x10000);

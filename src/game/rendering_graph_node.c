@@ -661,8 +661,8 @@ void setup_global_light() {
  * Process a camera node.
  */
 void geo_process_camera(struct GraphNodeCamera* node) {
-    Mtx *rollMtx = alloc_display_list(sizeof(*rollMtx));
-    Mtx *viewMtx = alloc_display_list(sizeof(Mtx));
+    Mtx* rollMtx = alloc_display_list(sizeof(*rollMtx));
+    Mtx* viewMtx = alloc_display_list(sizeof(Mtx));
 
     if (node->fnNode.func != NULL) {
         node->fnNode.func(GEO_CONTEXT_RENDER, &node->fnNode.node, gMatStack[gMatStackIndex]);

@@ -564,7 +564,7 @@ void clear_dynamic_surfaces(void) {
  * Applies an object's transformation to the object's vertices.
  */
 void transform_object_vertices(TerrainData** data, TerrainData* vertexData, struct Object* obj) {
-    Mat4 *objectTransform = &obj->transform;
+    Mat4* objectTransform = &obj->transform;
 
     s32 numVertices = *(*data)++;
 

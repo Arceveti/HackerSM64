@@ -53,8 +53,8 @@ extern Vec3s gVec3sOne;
 extern const f32 gSineTable[];
 #define gCosineTable (gSineTable + 0x400)
 
-#define sins(x) gSineTable[  (u16) (x) >> 4]
-#define coss(x) gCosineTable[(u16) (x) >> 4]
+#define sins(x) gSineTable[  (u16)(x) >> 4]
+#define coss(x) gCosineTable[(u16)(x) >> 4]
 
 #define tans(x) ({          \
     __auto_type _x = (x);     \

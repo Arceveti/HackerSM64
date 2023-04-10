@@ -25,41 +25,42 @@
 #include "rumble_init.h"
 #include "config.h"
 
-u8  sDelayInvincTimer;
-s16 sInvulnerable;
-u32 interact_coin          (struct MarioState *m, u32 interactType, struct Object *obj);
-u32 interact_water_ring    (struct MarioState *m, u32 interactType, struct Object *obj);
-u32 interact_star_or_key   (struct MarioState *m, u32 interactType, struct Object *obj);
-u32 interact_bbh_entrance  (struct MarioState *m, u32 interactType, struct Object *obj);
-u32 interact_warp          (struct MarioState *m, u32 interactType, struct Object *obj);
-u32 interact_warp_door     (struct MarioState *m, u32 interactType, struct Object *obj);
-u32 interact_door          (struct MarioState *m, u32 interactType, struct Object *obj);
-u32 interact_cannon_base   (struct MarioState *m, u32 interactType, struct Object *obj);
-u32 interact_igloo_barrier (struct MarioState *m, u32 interactType, struct Object *obj);
-u32 interact_tornado       (struct MarioState *m, u32 interactType, struct Object *obj);
-u32 interact_whirlpool     (struct MarioState *m, u32 interactType, struct Object *obj);
-u32 interact_strong_wind   (struct MarioState *m, u32 interactType, struct Object *obj);
-u32 interact_flame         (struct MarioState *m, u32 interactType, struct Object *obj);
-u32 interact_snufit_bullet (struct MarioState *m, u32 interactType, struct Object *obj);
-u32 interact_clam_or_bubba (struct MarioState *m, u32 interactType, struct Object *obj);
-u32 interact_bully         (struct MarioState *m, u32 interactType, struct Object *obj);
-u32 interact_shock         (struct MarioState *m, u32 interactType, struct Object *obj);
-u32 interact_mr_blizzard   (struct MarioState *m, u32 interactType, struct Object *obj);
-u32 interact_hit_from_below(struct MarioState *m, u32 interactType, struct Object *obj);
-u32 interact_bounce_top    (struct MarioState *m, u32 interactType, struct Object *obj);
-u32 interact_spiny_walking (struct MarioState *m, u32 interactType, struct Object *obj);
-u32 interact_damage        (struct MarioState *m, u32 interactType, struct Object *obj);
-u32 interact_breakable     (struct MarioState *m, u32 interactType, struct Object *obj);
-u32 interact_koopa_shell   (struct MarioState *m, u32 interactType, struct Object *obj);
-u32 interact_pole          (struct MarioState *m, u32 interactType, struct Object *obj);
-u32 interact_hoot          (struct MarioState *m, u32 interactType, struct Object *obj);
-u32 interact_cap           (struct MarioState *m, u32 interactType, struct Object *obj);
-u32 interact_grabbable     (struct MarioState *m, u32 interactType, struct Object *obj);
-u32 interact_text          (struct MarioState *m, u32 interactType, struct Object *obj);
+_Bool sDelayInvincTimer = FALSE;
+_Bool sInvulnerable = FALSE;
+
+u32 interact_coin          (struct MarioState* m, u32 interactType, struct Object* obj);
+u32 interact_water_ring    (struct MarioState* m, u32 interactType, struct Object* obj);
+u32 interact_star_or_key   (struct MarioState* m, u32 interactType, struct Object* obj);
+u32 interact_bbh_entrance  (struct MarioState* m, u32 interactType, struct Object* obj);
+u32 interact_warp          (struct MarioState* m, u32 interactType, struct Object* obj);
+u32 interact_warp_door     (struct MarioState* m, u32 interactType, struct Object* obj);
+u32 interact_door          (struct MarioState* m, u32 interactType, struct Object* obj);
+u32 interact_cannon_base   (struct MarioState* m, u32 interactType, struct Object* obj);
+u32 interact_igloo_barrier (struct MarioState* m, u32 interactType, struct Object* obj);
+u32 interact_tornado       (struct MarioState* m, u32 interactType, struct Object* obj);
+u32 interact_whirlpool     (struct MarioState* m, u32 interactType, struct Object* obj);
+u32 interact_strong_wind   (struct MarioState* m, u32 interactType, struct Object* obj);
+u32 interact_flame         (struct MarioState* m, u32 interactType, struct Object* obj);
+u32 interact_snufit_bullet (struct MarioState* m, u32 interactType, struct Object* obj);
+u32 interact_clam_or_bubba (struct MarioState* m, u32 interactType, struct Object* obj);
+u32 interact_bully         (struct MarioState* m, u32 interactType, struct Object* obj);
+u32 interact_shock         (struct MarioState* m, u32 interactType, struct Object* obj);
+u32 interact_mr_blizzard   (struct MarioState* m, u32 interactType, struct Object* obj);
+u32 interact_hit_from_below(struct MarioState* m, u32 interactType, struct Object* obj);
+u32 interact_bounce_top    (struct MarioState* m, u32 interactType, struct Object* obj);
+u32 interact_spiny_walking (struct MarioState* m, u32 interactType, struct Object* obj);
+u32 interact_damage        (struct MarioState* m, u32 interactType, struct Object* obj);
+u32 interact_breakable     (struct MarioState* m, u32 interactType, struct Object* obj);
+u32 interact_koopa_shell   (struct MarioState* m, u32 interactType, struct Object* obj);
+u32 interact_pole          (struct MarioState* m, u32 interactType, struct Object* obj);
+u32 interact_hoot          (struct MarioState* m, u32 interactType, struct Object* obj);
+u32 interact_cap           (struct MarioState* m, u32 interactType, struct Object* obj);
+u32 interact_grabbable     (struct MarioState* m, u32 interactType, struct Object* obj);
+u32 interact_text          (struct MarioState* m, u32 interactType, struct Object* obj);
 
 struct InteractionHandler {
     u32 interactType;
-    u32 (*handler)(struct MarioState *m, u32 interactType, struct Object *obj);
+    u32 (*handler)(struct MarioState* m, u32 interactType, struct Object* obj);
 };
 
 static struct InteractionHandler sInteractionHandlers[] = {
@@ -110,15 +111,15 @@ static u32 sBackwardKnockbackActions[][3] = {
     { ACT_BACKWARD_WATER_KB,       ACT_BACKWARD_WATER_KB,  ACT_BACKWARD_WATER_KB       }, // Water
 };
 
-static u8 sDisplayingDoorText = FALSE;
-static u8 sJustTeleported = FALSE;
-static u8 sPssSlideStarted = FALSE;
+static _Bool sDisplayingDoorText = FALSE;
+static _Bool sJustTeleported = FALSE;
+static _Bool sPssSlideStarted = FALSE;
 
 /**
  * Returns the type of cap Mario is wearing.
  */
-u32 get_mario_cap_flag(struct Object *capObject) {
-    const BehaviorScript *script = virtual_to_segmented(SEGMENT_BEHAVIOR_DATA, capObject->behavior);
+u32 get_mario_cap_flag(struct Object* capObject) {
+    const BehaviorScript* script = virtual_to_segmented(SEGMENT_BEHAVIOR_DATA, capObject->behavior);
 
     if (script == bhvNormalCap) {
         return MARIO_NORMAL_CAP;

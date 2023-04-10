@@ -18,10 +18,10 @@ struct EnvFxParticle {
 
 extern s8 gEnvFxMode;
 
-extern struct EnvFxParticle *gEnvFxBuffer;
+extern struct EnvFxParticle* gEnvFxBuffer;
 
-Gfx *envfx_update_particles(s32 mode, Vec3s marioPos, Vec3s camTo, Vec3s camFrom);
+Gfx* envfx_update_particles(s32 mode, Vec3s marioPos, Vec3s camTo, Vec3s camFrom);
 void rotate_triangle_vertices(Vec3s vertex1, Vec3s vertex2, Vec3s vertex3, s16 pitch, s16 yaw);
-void append_particle_vertex_buffer(Gfx *gfx, s32 index, Vec3s vertex1, Vec3s vertex2, Vec3s vertex3, Vtx *template);
+void append_particle_vertex_buffer(Gfx* gfx, s32 index, Vec3s vertex1, Vec3s vertex2, Vec3s vertex3, Vtx* template);
 
 #endif // ENVFX_SNOW_H

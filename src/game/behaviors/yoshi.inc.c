@@ -16,7 +16,8 @@ void bhv_yoshi_init(void) {
     o->oBuoyancy = 1.3f;
     o->oInteractionSubtype = INT_SUBTYPE_NPC;
 
-    if (sYoshiDead
+    if (
+        sYoshiDead
 #if defined(ENABLE_VANILLA_LEVEL_SPECIFIC_CHECKS) && !defined(UNLOCK_ALL)
      || (save_file_get_total_star_count(
             SAVE_NUM_TO_INDEX(gCurrSaveFileNum),

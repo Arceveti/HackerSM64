@@ -630,7 +630,7 @@ static void level_cmd_set_macro_objects(void) {
 #else
         // The game modifies the macro object data (for example marking coins as taken),
         // so it must be reset when the level reloads.
-        MacroObject *data = segmented_to_virtual(CMD_GET(void*, 4));
+        MacroObject* data = segmented_to_virtual(CMD_GET(void*, 4));
         s32 len = 0;
         while (data[len++] != MACRO_OBJECT_END()) {
             len += 4;

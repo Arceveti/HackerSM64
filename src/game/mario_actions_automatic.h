@@ -28,6 +28,6 @@ enum HangingSteps { // perform_hanging_step
     HANG_LEFT_CEIL
 };
 
-s32 mario_execute_automatic_action(struct MarioState *m);
+s32 mario_execute_automatic_action(struct MarioState* m);
 
 #endif // MARIO_ACTIONS_AUTOMATIC_H

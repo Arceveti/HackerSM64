@@ -172,7 +172,7 @@ void obj_compute_vel_from_move_pitch(f32 speed) {
 
 //! TODO: Move these two to math_util.c
 
-s32 clamp_s16(s16 *value, s16 minimum, s16 maximum) {
+s32 clamp_s16(s16* value, s16 minimum, s16 maximum) {
     if (*value <= minimum) {
         *value = minimum;
     } else if (*value >= maximum) {
@@ -184,7 +184,7 @@ s32 clamp_s16(s16 *value, s16 minimum, s16 maximum) {
     return TRUE;
 }
 
-s32 clamp_f32(f32 *value, f32 minimum, f32 maximum) {
+s32 clamp_f32(f32* value, f32 minimum, f32 maximum) {
     if (*value <= minimum) {
         *value = minimum;
     } else if (*value >= maximum) {
@@ -245,8 +245,7 @@ s32 obj_turn_pitch_toward_mario(f32 targetOffsetY, s16 turnAmount) {
 }
 
 //! TODO: Move this to math_util.c
-
-s32 approach_f32_ptr(f32 *px, f32 target, f32 delta) {
+s32 approach_f32_ptr(f32* px, f32 target, f32 delta) {
     if (*px > target) {
         delta = -delta;
     }
@@ -272,29 +271,28 @@ s32 obj_y_vel_approach(f32 target, f32 delta) {
 s32 obj_move_pitch_approach(s16 target, s16 delta) {
     o->oMoveAnglePitch = approach_s16_symmetric(o->oMoveAnglePitch, target, delta);
 
-    return ((s16) o->oMoveAnglePitch == target);
+    return ((s16)o->oMoveAnglePitch == target);
 }
 
 s32 obj_face_pitch_approach(s16 targetPitch, s16 deltaPitch) {
     o->oFaceAnglePitch = approach_s16_symmetric(o->oFaceAnglePitch, targetPitch, deltaPitch);
 
-    return ((s16) o->oFaceAnglePitch == targetPitch);
+    return ((s16)o->oFaceAnglePitch == targetPitch);
 }
 
 s32 obj_face_yaw_approach(s16 targetYaw, s16 deltaYaw) {
     o->oFaceAngleYaw = approach_s16_symmetric(o->oFaceAngleYaw, targetYaw, deltaYaw);
 
-    return ((s16) o->oFaceAngleYaw == targetYaw);
+    return ((s16)o->oFaceAngleYaw == targetYaw);
 }
 
 s32 obj_face_roll_approach(s16 targetRoll, s16 deltaRoll) {
     o->oFaceAngleRoll = approach_s16_symmetric(o->oFaceAngleRoll, targetRoll, deltaRoll);
 
-    return ((s16) o->oFaceAngleRoll == targetRoll);
+    return ((s16)o->oFaceAngleRoll == targetRoll);
 }
 
-s32 obj_smooth_turn(s16 *angleVel, s32 *angle, s16 targetAngle, f32 targetSpeedProportion,
-                           s16 accel, s16 minSpeed, s16 maxSpeed) {
+s32 obj_smooth_turn(s16* angleVel, s32* angle, s16 targetAngle, f32 targetSpeedProportion, s16 accel, s16 minSpeed, s16 maxSpeed) {
     s16 currentSpeed;
     s16 currentAngle = (s16)(*angle);
 
@@ -314,15 +312,15 @@ void obj_roll_to_match_yaw_turn(s16 targetYaw, s16 maxRoll, s16 rollSpeed) {
 }
 
 s32 random_linear_offset(s16 base, s16 range) {
-    return (s16) (base + (s16)(range * random_float()));
+    return (s16)(base + (s16)(range * random_float()));
 }
 
 s32 random_mod_offset(s16 base, s16 step, s16 mod) {
-    return (s16) (base + (step * (random_u16() % mod)));
+    return (s16)(base + (step * (random_u16() % mod)));
 }
 
 s32 obj_random_fixed_turn(s16 delta) {
-    return (s16) (o->oMoveAngleYaw + ((s16) random_sign() * delta));
+    return (s16)(o->oMoveAngleYaw + ((s16)random_sign() * delta));
 }
 
 /**
@@ -332,7 +330,7 @@ s32 obj_random_fixed_turn(s16 delta) {
  * shootFireScale during this time, return 1.
  * Return -1 once it's reached endScale.
  */
-s32 obj_grow_then_shrink(f32 *scaleVel, f32 shootFireScale, f32 endScale) {
+s32 obj_grow_then_shrink(f32* scaleVel, f32 shootFireScale, f32 endScale) {
     if (o->oTimer < 2) {
         // Grow
         o->header.gfx.scale[0] += *scaleVel;
@@ -356,14 +354,18 @@ s32 obj_grow_then_shrink(f32 *scaleVel, f32 shootFireScale, f32 endScale) {
     return OBJ_SCALE_STATUS_SCALING;
 }
 
-s32 oscillate_toward(s32 *value, f32 *vel, s32 target, f32 velCloseToZero, f32 accel, f32 slowdown) {
+s32 oscillate_toward(s32* value, f32* vel, s32 target, f32 velCloseToZero, f32 accel, f32 slowdown) {
     s32 startValue = *value;
-    *value += (s32) *vel;
+    *value += (s32)*vel;
 
-    if (*value == target
-        || ((*value - target) * (startValue - target) < 0
-            && *vel > -velCloseToZero
-            && *vel <  velCloseToZero)) {
+    if (
+        *value == target ||
+        (
+            (*value - target) * (startValue - target) < 0 &&
+            *vel > -velCloseToZero &&
+            *vel <  velCloseToZero
+        )
+    ) {
         *value = target;
         *vel = 0.0f;
         return TRUE;
@@ -381,7 +383,7 @@ s32 oscillate_toward(s32 *value, f32 *vel, s32 target, f32 velCloseToZero, f32 a
     return FALSE;
 }
 
-void obj_update_blinking(s32 *blinkTimer, s16 baseCycleLength, s16 cycleLengthRange, s16 blinkLength) {
+void obj_update_blinking(s32* blinkTimer, s16 baseCycleLength, s16 cycleLengthRange, s16 blinkLength) {
     if (*blinkTimer != 0) {
         (*blinkTimer)--;
     } else {
@@ -395,8 +397,8 @@ void obj_update_blinking(s32 *blinkTimer, s16 baseCycleLength, s16 cycleLengthRa
     }
 }
 
-s32 obj_resolve_object_collisions(s32 *targetYaw) {
-    struct Object *otherObject;
+s32 obj_resolve_object_collisions(s32* targetYaw) {
+    struct Object* otherObject;
     f32 dx, dz;
     s16 angle;
     f32 radius, otherRadius, relativeRadius;
@@ -436,7 +438,7 @@ s32 obj_resolve_object_collisions(s32 *targetYaw) {
     return FALSE;
 }
 
-s32 obj_bounce_off_walls_edges_objects(s32 *targetYaw) {
+s32 obj_bounce_off_walls_edges_objects(s32* targetYaw) {
     if (o->oMoveFlags & OBJ_MOVE_HIT_WALL) {
         *targetYaw = cur_obj_reflect_move_angle_off_wall();
     } else if (o->oMoveFlags & OBJ_MOVE_HIT_EDGE) {
@@ -532,7 +534,7 @@ s32 obj_die_if_above_lava_and_health_non_positive(void) {
     return TRUE;
 }
 
-s32 obj_handle_attacks(struct ObjectHitbox *hitbox, s32 attackedMarioAction, u8 *attackHandlers) {
+s32 obj_handle_attacks(struct ObjectHitbox* hitbox, s32 attackedMarioAction, u8* attackHandlers) {
     s32 attackType;
 
     obj_set_hitbox(o, hitbox);
@@ -654,7 +656,7 @@ s32 obj_update_standard_actions(f32 scale) {
     }
 }
 
-s32 obj_check_attacks(struct ObjectHitbox *hitbox, s32 attackedMarioAction) {
+s32 obj_check_attacks(struct ObjectHitbox* hitbox, s32 attackedMarioAction) {
     s32 attackType;
 
     obj_set_hitbox(o, hitbox);
@@ -772,9 +774,8 @@ void treat_far_home_as_mario(f32 threshold) {
 /**
  * Used by bowser, fly guy, piranha plant, and fire spitters.
  */
-void obj_spit_fire(s16 relativePosX, s16 relativePosY, s16 relativePosZ, f32 scale, ModelID32 model,
-                   f32 startSpeed, f32 endSpeed, s16 movePitch) {
-    struct Object *obj = spawn_object_relative_with_scale(
+void obj_spit_fire(s16 relativePosX, s16 relativePosY, s16 relativePosZ, f32 scale, ModelID32 model, f32 startSpeed, f32 endSpeed, s16 movePitch) {
+    struct Object* obj = spawn_object_relative_with_scale(
         MOVING_FLAME_BP_MOVE,
         relativePosX, relativePosY, relativePosZ,
         scale, o, model, bhvMovingFlame

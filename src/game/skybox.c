@@ -255,7 +255,7 @@ void* create_skybox_ortho_matrix(s8 player) {
  * Creates the skybox's display list, then draws the 3x3 grid of tiles.
  */
 Gfx* init_skybox_display_list(s8 player, s8 background, s8 colorIndex) {
-    void *skybox = alloc_display_list(
+    void* skybox = alloc_display_list(
         SIZEOF_GFX_CMD(SPDisplayList(0)) +
         SIZEOF_GFX_CMD(SPMatrix(0,0)) +
         SIZEOF_GFX_CMD(SPDisplayList(0)) +

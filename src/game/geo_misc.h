@@ -14,17 +14,17 @@ extern s8 gFlyingCarpetState;
 
 #ifndef GBI_FLOATS
 extern void make_vertex(
-    Vtx *vtx, s32 n, s16 x, s16 y, s16 z, s16 tx, s16 ty, Color r, Color g, Color b, Alpha a
+    Vtx* vtx, s32 n, s16 x, s16 y, s16 z, s16 tx, s16 ty, Color r, Color g, Color b, Alpha a
 );
 #else
 extern void make_vertex(
-    Vtx *vtx, s32 n, f32 x, f32 y, f32 z, s16 tx, s16 ty, Color r, Color g, Color b, Alpha a
+    Vtx* vtx, s32 n, f32 x, f32 y, f32 z, s16 tx, s16 ty, Color r, Color g, Color b, Alpha a
 );
 #endif
-extern Gfx *geo_exec_inside_castle_light(s32 callContext, struct GraphNode *node, UNUSED Mat4 mtx);
-extern Gfx *geo_exec_flying_carpet_timer_update(s32 callContext, struct GraphNode *node, UNUSED Mat4 mtx);
-extern Gfx *geo_exec_flying_carpet_create(s32 callContext, struct GraphNode *node, UNUSED Mat4 mtx);
-extern Gfx *geo_exec_cake_end_screen(s32 callContext, struct GraphNode *node, UNUSED Mat4 mtx);
+extern Gfx* geo_exec_inside_castle_light(s32 callContext, struct GraphNode* node, UNUSED Mat4 mtx);
+extern Gfx* geo_exec_flying_carpet_timer_update(s32 callContext, struct GraphNode* node, UNUSED Mat4 mtx);
+extern Gfx* geo_exec_flying_carpet_create(s32 callContext, struct GraphNode* node, UNUSED Mat4 mtx);
+extern Gfx* geo_exec_cake_end_screen(s32 callContext, struct GraphNode* node, UNUSED Mat4 mtx);
 
 #define gLoadBlockTexture(dl, width, height, format, image)                                                  \
 {                                                                                                            \

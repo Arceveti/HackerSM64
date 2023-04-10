@@ -60,18 +60,10 @@ s16 sPrevCheckMarioRoom = 0;
 /**
  * Tracks whether or not Yoshi has walked/jumped off the roof.
  */
-s8 sYoshiDead = FALSE;
+_Bool sYoshiDead = FALSE;
 
 extern void* ccm_seg7_trajectory_snowman;
 extern void* inside_castle_seg7_trajectory_mips;
-
-/**
- * Resets yoshi as spawned/despawned upon new file select.
- * Possibly a function with stubbed code.
- */
-void set_yoshi_as_not_dead(void) {
-    sYoshiDead = FALSE;
-}
 
 /**
  * An unused geo function. Bears strong similarity to geo_bits_bowser_coloring, and relates something
@@ -83,8 +75,8 @@ UNUSED Gfx* geo_obj_transparency_something(s32 callContext, struct GraphNode* no
     Gfx* gfx;
 
     if (callContext == GEO_CONTEXT_RENDER) {
-        struct Object *heldObject = (struct Object*)gCurGraphNodeObject;
-        struct Object *obj = (struct Object*)node;
+        struct Object* heldObject = (struct Object*)gCurGraphNodeObject;
+        struct Object* obj = (struct Object*)node;
 
         if (gCurGraphNodeHeldObject != NULL) {
             heldObject = gCurGraphNodeHeldObject->objNode;
@@ -403,16 +395,16 @@ s32 object_step(void) {
     }
 
     obj_update_pos_vel_xz();
-    if ((s32) o->oPosY == (s32) floorY) {
+    if ((s32)o->oPosY == (s32)floorY) {
         collisionFlags += OBJ_COL_FLAG_GROUNDED;
     }
 
-    if ((s32) o->oVelY == 0) {
+    if ((s32)o->oVelY == 0) {
         collisionFlags += OBJ_COL_FLAG_NO_Y_VEL;
     }
 
     // Generate a splash if in water.
-    obj_splash((s32) waterY, (s32) o->oPosY);
+    obj_splash((s32)waterY, (s32)o->oPosY);
     return collisionFlags;
 }
 
@@ -515,8 +507,8 @@ s32 obj_check_if_facing_toward_angle(u32 base, u32 goal, s16 range) {
     s16 dAngle = (u16)goal - (u16)base;
 
     return (
-        ((f32) sins(-range) < (f32) sins(dAngle)) &&
-        ((f32) sins(dAngle) < (f32) sins(range )) &&
+        ((f32)sins(-range) < (f32)sins(dAngle)) &&
+        ((f32)sins(dAngle) < (f32)sins(range )) &&
         (coss(dAngle) > 0)
     );
 }
@@ -593,10 +585,13 @@ s32 current_mario_room_check(RoomData room) {
  * Triggers dialog when Mario is facing an object and controls it while in the dialog.
  */
 s32 trigger_obj_dialog_when_facing(s32* inDialog, s16 dialogID, f32 dist, s32 actionArg) {
-    if ((is_point_within_radius_of_mario(o->oPosX, o->oPosY, o->oPosZ, (s32) dist)
-         && obj_check_if_facing_toward_angle(o->oFaceAngleYaw, gMarioObject->header.gfx.angle[1] + 0x8000, 0x1000)
-         && obj_check_if_facing_toward_angle(o->oMoveAngleYaw, o->oAngleToMario, 0x1000))
-        || (*inDialog)) {
+    if (
+        (
+            is_point_within_radius_of_mario(o->oPosX, o->oPosY, o->oPosZ, (s32)dist) &&
+            obj_check_if_facing_toward_angle(o->oFaceAngleYaw, gMarioObject->header.gfx.angle[1] + 0x8000, 0x1000) &&
+            obj_check_if_facing_toward_angle(o->oMoveAngleYaw, o->oAngleToMario, 0x1000)
+        ) || (*inDialog)
+    ) {
         *inDialog = TRUE;
 
         if (set_mario_npc_dialog(actionArg) == MARIO_DIALOG_STATUS_SPEAK) { // If Mario is speaking.
@@ -673,7 +668,7 @@ void spawn_orange_number(s8 behParam, s16 relX, s16 relY, s16 relZ) {
     if (behParam > ORANGE_NUMBER_9) return;
 #endif
 
-    struct Object *orangeNumber = spawn_object_relative(behParam, relX, relY, relZ, o, MODEL_NUMBER, bhvOrangeNumber);
+    struct Object* orangeNumber = spawn_object_relative(behParam, relX, relY, relZ, o, MODEL_NUMBER, bhvOrangeNumber);
     orangeNumber->oPosY += 25.0f;
 }
 

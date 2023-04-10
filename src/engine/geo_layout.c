@@ -223,7 +223,7 @@ void geo_layout_cmd_node_perspective(void) {
         gGeoLayoutCommand += (0x04 << CMD_SIZE_SHIFT);
     }
 
-    graphNode = init_graph_node_perspective(gGraphNodePool, NULL, (f32) fov, near, far, frustumFunc, 0);
+    graphNode = init_graph_node_perspective(gGraphNodePool, NULL, (f32)fov, near, far, frustumFunc, 0);
 
     register_scene_graph_node(&graphNode->fnNode.node);
 

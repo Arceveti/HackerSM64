@@ -161,11 +161,11 @@ enum EndToadAnimIndex {
 void print_displaying_credits_entry(void);
 void bhv_end_peach_loop(void);
 void bhv_end_toad_loop(void);
-Gfx *geo_switch_peach_eyes(s32 callContext, struct GraphNode *node, UNUSED s32 context);
+Gfx* geo_switch_peach_eyes(s32 callContext, struct GraphNode* node, UNUSED s32 context);
 s32 mario_ready_to_speak(void);
 s32 set_mario_npc_dialog(s32 actionArg);
-s32 mario_execute_cutscene_action(struct MarioState *m);
+s32 mario_execute_cutscene_action(struct MarioState* m);
 extern Vp sEndCutsceneVp;
-extern struct CreditsEntry *sDispCreditsEntry;
+extern struct CreditsEntry* sDispCreditsEntry;
 
 #endif // MARIO_ACTIONS_CUTSCENE_H

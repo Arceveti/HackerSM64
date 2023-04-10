@@ -142,7 +142,7 @@ void puppyprint_calculate_ram_usage(void) {
     ramsizeSegment[RAM_ZBUFFER     ] = (u32)&_zbufferSegmentBssEnd - (u32)&_zbufferSegmentBssStart;
     ramsizeSegment[RAM_GODDARD     ] = (u32)&_goddardSegmentEnd - (u32)&_goddardSegmentStart;
     ramsizeSegment[RAM_POOLS       ] = gPoolMem;
-    ramsizeSegment[RAM_COLLISION   ] = ((u32) gCurrStaticSurfacePoolEnd - (u32) gCurrStaticSurfacePool) + ((u32) gDynamicSurfacePoolEnd - (u32) gDynamicSurfacePool);
+    ramsizeSegment[RAM_COLLISION   ] = ((u32)gCurrStaticSurfacePoolEnd - (u32)gCurrStaticSurfacePool) + ((u32)gDynamicSurfacePoolEnd - (u32)gDynamicSurfacePool);
     ramsizeSegment[RAM_MISC        ] = gMiscMem;
     ramsizeSegment[RAM_AUDIO       ] = gAudioHeapSize;
 }
@@ -584,10 +584,10 @@ void puppyprint_level_select_menu(void) {
         if (posY < 0 || posY > 84) {
             continue;
         }
-        if ((u32) sLevelSelectOption == i) {
+        if ((u32)sLevelSelectOption == i) {
             sprintf(textBytes, "%s - %d", sLevelNames[i], (sLevelSelectOptionArea + 1));
             print_set_envcolour(0xFF, 0x40, 0x40, 0xFF);
-        } else if (((u32) gCurrLevelNum - 1) == i) {
+        } else if (((u32)gCurrLevelNum - 1) == i) {
             sprintf(textBytes, "%s", sLevelNames[i]);
             print_set_envcolour(0xFF, 0xFF, 0x40, 0xFF);
         } else {
@@ -1052,8 +1052,8 @@ void print_small_text(s32 x, s32 y, const char* str, s32 align, s32 amount, u8 f
     u8 lines = 0;
     u8 xlu = gCurrEnvCol[3];
     u8 shakeTablePos = 0;
-    struct PPTextFont **fntPtr = segmented_to_virtual(gPuppyPrintFontTable);
-    struct PPTextFont *fnt = segmented_to_virtual(fntPtr[font]);
+    struct PPTextFont** fntPtr = segmented_to_virtual(gPuppyPrintFontTable);
+    struct PPTextFont* fnt = segmented_to_virtual(fntPtr[font]);
 
     shakeToggle = 0;
     waveToggle = 0;
@@ -1119,7 +1119,7 @@ void print_small_text(s32 x, s32 y, const char* str, s32 align, s32 amount, u8 f
                 textPos[0] = -(wideX[lines] / 2);
             }
             textPos[1] += topLineHeight;
-            topLineHeight = (f32) fnt->txH * textSizeTotal;
+            topLineHeight = (f32)fnt->txH * textSizeTotal;
             continue;
         }
 
@@ -1202,8 +1202,8 @@ void print_small_text_light(s32 x, s32 y, const char* str, s32 align, s32 amount
     u8 lines = 0;
     u8 widthX = 0;
     u8 xlu = gCurrEnvCol[3];
-    struct PPTextFont **fntPtr = segmented_to_virtual(gPuppyPrintFontTable);
-    struct PPTextFont *fnt = segmented_to_virtual(fntPtr[font]);
+    struct PPTextFont** fntPtr = segmented_to_virtual(gPuppyPrintFontTable);
+    struct PPTextFont* fnt = segmented_to_virtual(fntPtr[font]);
 
     if (amount <= PRINT_ALL || amount > strLen) {
         textLength = strLen;
@@ -1359,7 +1359,7 @@ s32 text_iterate_command(const char* str, s32 i, s32 runCMD) {
 
             // Final color value determined by median of two colors + a point in the end-to-end width of the difference between the two colors.
             // Said point changes based on the sTimer value in the form of a sine wave, which helps to create the fading effect.
-            rgba[j] = ((col1 + col2) / 2) + (s32) (sTimer * ((col1 - col2) / 2));
+            rgba[j] = ((col1 + col2) / 2) + (s32)(sTimer * ((col1 - col2) / 2));
         }
 
         rainbowToggle = 0;
@@ -1475,7 +1475,7 @@ void print_small_text_buffered(s32 x, s32 y, const char* str, u8 align, s32 amou
         return; // No point in printing an empty string
     }
     // Compare the cursor position and the string length with null terminator, plus 12 (header size) and return if it overflows.
-    if (sPuppyprintTextBufferPos + HEADERSIZE + (u8) amount + 1 > sizeof(sPuppyprintTextBuffer)) {
+    if (sPuppyprintTextBufferPos + HEADERSIZE + (u8)amount + 1 > sizeof(sPuppyprintTextBuffer)) {
         return;
     }
 
@@ -1490,7 +1490,7 @@ void print_small_text_buffered(s32 x, s32 y, const char* str, u8 align, s32 amou
     header.blue  = gCurrEnvCol[2];
     header.alpha = gCurrEnvCol[3];
     header.alignment = align;
-    header.textBufferLength = (u8) amount;
+    header.textBufferLength = (u8)amount;
     header.font = font;
     header.isLightText = gIsLightText;
 
@@ -1564,7 +1564,7 @@ void render_multi_image(Texture *image, s32 x, s32 y, s32 width, s32 height, UNU
     while (TRUE) {
         f32 val = (f32)width / (f32)num;
 
-        if ((s32)val == val && (s32) val >= 1) {
+        if ((s32)val == val && (s32)val >= 1) {
             imW = num;
             break;
         }
@@ -1580,7 +1580,7 @@ void render_multi_image(Texture *image, s32 x, s32 y, s32 width, s32 height, UNU
     num = 2;
     // Find the width mask
     while (TRUE) {
-        if ((s32) num == imW) {
+        if ((s32)num == imW) {
             break;
         }
         num *= 2;
@@ -1593,7 +1593,7 @@ void render_multi_image(Texture *image, s32 x, s32 y, s32 width, s32 height, UNU
     num = 2;
     // Find the height mask
     while (TRUE) {
-        if ((s32) num == imH) {
+        if ((s32)num == imH) {
             break;
         }
         num *= 2;

@@ -333,7 +333,7 @@ static void calculate_unique_save_magic(void) {
     u16 checksum = 0;
 
     for (s32 i = 0; i < 20; i++) {
-        checksum += (u16) INTERNAL_ROM_NAME[i] << (i & 0x07);
+        checksum += (u16)INTERNAL_ROM_NAME[i] << (i & 0x07);
     }
 
     MENU_DATA_MAGIC += checksum;

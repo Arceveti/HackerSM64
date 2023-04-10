@@ -16,7 +16,7 @@ enum EnvFxMode {
     /*14*/ ENVFX_JETSTREAM_BUBBLES  // JRB, DDD (submarine area)
 };
 
-Gfx *geo_envfx_main(s32 callContext, struct GraphNode *node, Mat4 mtxf);
-Gfx *geo_skybox_main(s32 callContext, struct GraphNode *node, UNUSED Mat4 *mtx);
+Gfx* geo_envfx_main(s32 callContext, struct GraphNode* node, Mat4 mtxf);
+Gfx* geo_skybox_main(s32 callContext, struct GraphNode* node, UNUSED Mat4* mtx);
 
 #endif // LEVEL_GEO_H

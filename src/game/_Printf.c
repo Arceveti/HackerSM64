@@ -20,7 +20,7 @@
 #define _PAD(i, m, size, src, extracond)                                                               \
     if ((extracond) && (m) > 0) {                                                                      \
         for ((i) = (m); (i) > 0; (i) -= (size)) {                                                      \
-            if ((u32) (i) > 32) {                                                                      \
+            if ((u32)(i) > 32) {                                                                       \
                 (size) = 32;                                                                           \
             } else {                                                                                   \
                 (size) = (i);                                                                          \
@@ -155,9 +155,9 @@ static void _Putfld(printf_struct* printfArg, va_list* args, u8 type, u8* buff) 
             }
 
             if (printfArg->length == 'h') {
-                printfArg->value.s64 = (u16) printfArg->value.s64;
+                printfArg->value.s64 = (u16)printfArg->value.s64;
             } else if (printfArg->length == 0) {
-                printfArg->value.s64 = (u32) printfArg->value.s64;
+                printfArg->value.s64 = (u32)printfArg->value.s64;
             }
 
             if (printfArg->flags & FLAGS_HASH) {

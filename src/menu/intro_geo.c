@@ -34,18 +34,18 @@ static s32 sTmCopyrightAlpha;
 /**
  * Geo callback to render the "Super Mario 64" logo on the title screen
  */
-Gfx *geo_intro_super_mario_64_logo(s32 callContext, struct GraphNode *node, UNUSED void *context) {
-    struct GraphNode *graphNode = node;
-    Gfx *dl = NULL;
-    Gfx *dlIter = NULL;
+Gfx* geo_intro_super_mario_64_logo(s32 callContext, struct GraphNode* node, UNUSED void* context) {
+    struct GraphNode* graphNode = node;
+    Gfx* dl = NULL;
+    Gfx* dlIter = NULL;
 
     if (callContext != GEO_CONTEXT_RENDER) {
         sIntroFrameCounter = 0;
     } else if (callContext == GEO_CONTEXT_RENDER) {
-        f32 *scaleTable1 = segmented_to_virtual(intro_seg7_table_scale_1);
-        f32 *scaleTable2 = segmented_to_virtual(intro_seg7_table_scale_2);
+        f32* scaleTable1 = segmented_to_virtual(intro_seg7_table_scale_1);
+        f32* scaleTable2 = segmented_to_virtual(intro_seg7_table_scale_2);
         graphNode->drawingLayer = LAYER_OPAQUE;
-        Mtx *scaleMat = alloc_display_list(sizeof(*scaleMat));
+        Mtx* scaleMat = alloc_display_list(sizeof(*scaleMat));
         dl = alloc_display_list(
             SIZEOF_GFX_CMD(SPMatrix(0,0)) +
             SIZEOF_GFX_CMD(SPDisplayList(0)) +
@@ -84,10 +84,10 @@ Gfx *geo_intro_super_mario_64_logo(s32 callContext, struct GraphNode *node, UNUS
 /**
  * Geo callback to render TM and Copyright on the title screen
  */
-Gfx *geo_intro_tm_copyright(s32 callContext, struct GraphNode *node, UNUSED void *context) {
-    struct GraphNode *graphNode = node;
-    Gfx *dl = NULL;
-    Gfx *dlIter = NULL;
+Gfx* geo_intro_tm_copyright(s32 callContext, struct GraphNode* node, UNUSED void* context) {
+    struct GraphNode* graphNode = node;
+    Gfx* dl = NULL;
+    Gfx* dlIter = NULL;
 
     if (callContext != GEO_CONTEXT_RENDER) { // reset
         sTmCopyrightAlpha = 0;
@@ -124,7 +124,7 @@ Gfx *geo_intro_tm_copyright(s32 callContext, struct GraphNode *node, UNUSED void
 }
 
 // intro screen background display lists for each of four 80x20 textures
-static const Gfx *introBackgroundDlRows[] = {
+static const Gfx* introBackgroundDlRows[] = {
     title_screen_bg_dl_0A000130,
     title_screen_bg_dl_0A000148,
     title_screen_bg_dl_0A000160,
@@ -149,7 +149,7 @@ static const float yCoords[] = {
 };
 
 // table that points to either the "Super Mario 64" or "Game Over" tables
-static const Texture *const *textureTables[] = {
+static const Texture* const* textureTables[] = {
     mario_title_texture_table,
     game_over_texture_table
 };
@@ -160,9 +160,9 @@ static const Texture *const *textureTables[] = {
  * @param index            which tile to render (value from 0 to 11)
  * @param backgroundTable  array describing which image to use for each tile (0 denotes a "Super Mario 64" image, and 1 denotes a "Game Over" image)
  */
-static Gfx *intro_backdrop_one_image(s32 index, const s8 *backgroundTable) {
-    Mtx *mtx = alloc_display_list(sizeof(*mtx));
-    Gfx *dl = alloc_display_list(
+static Gfx* intro_backdrop_one_image(s32 index, const s8* backgroundTable) {
+    Mtx* mtx = alloc_display_list(sizeof(*mtx));
+    Gfx* dl = alloc_display_list(
         SIZEOF_GFX_CMD(SPMatrix(0,0)) +
         SIZEOF_GFX_CMD(SPDisplayList(0)) +
         (4 * (
@@ -172,8 +172,8 @@ static Gfx *intro_backdrop_one_image(s32 index, const s8 *backgroundTable) {
         SIZEOF_GFX_CMD(SPPopMatrix(0)) +
         SIZEOF_GFX_CMD(SPEndDisplayList())
     );
-    Gfx *dlIter = dl;
-    const Texture *const *vIntroBgTable = segmented_to_virtual(textureTables[backgroundTable[index]]);
+    Gfx* dlIter = dl;
+    const Texture* const* vIntroBgTable = segmented_to_virtual(textureTables[backgroundTable[index]]);
     s32 i;
 
     guTranslate(mtx, xCoords[index], yCoords[index], 0.0f);
@@ -186,6 +186,7 @@ static Gfx *intro_backdrop_one_image(s32 index, const s8 *backgroundTable) {
     }
     gSPPopMatrix(dlIter++, G_MTX_MODELVIEW);
     gSPEndDisplayList(dlIter);
+
     return dl;
 }
 
@@ -199,11 +200,11 @@ static const s8 introBackgroundIndexTable[] = {
 /**
  * Geo callback to render the intro background tiles
  */
-Gfx *geo_intro_regular_backdrop(s32 callContext, struct GraphNode *node, UNUSED void *context) {
-    struct GraphNode *graphNode = node;
-    const s8 *backgroundTable = introBackgroundIndexTable;
-    Gfx *dl = NULL;
-    Gfx *dlIter = NULL;
+Gfx* geo_intro_regular_backdrop(s32 callContext, struct GraphNode* node, UNUSED void* context) {
+    struct GraphNode* graphNode = node;
+    const s8* backgroundTable = introBackgroundIndexTable;
+    Gfx* dl = NULL;
+    Gfx* dlIter = NULL;
     s32 i;
 
     if (callContext == GEO_CONTEXT_RENDER) { // draw
@@ -246,10 +247,10 @@ static const s8 flipOrder[] = {
 /**
  * Geo callback to render the Game Over background tiles
  */
-Gfx *geo_intro_gameover_backdrop(s32 callContext, struct GraphNode *node, UNUSED void *context) {
-    struct GraphNode *graphNode = node;
-    Gfx *dl = NULL;
-    Gfx *dlIter = NULL;
+Gfx* geo_intro_gameover_backdrop(s32 callContext, struct GraphNode* node, UNUSED void* context) {
+    struct GraphNode* graphNode = node;
+    Gfx* dl = NULL;
+    Gfx* dlIter = NULL;
     s32 i, j;
 
     if (callContext != GEO_CONTEXT_RENDER) { // reset
@@ -325,7 +326,7 @@ s8 sFaceCounter = 0;
 #define FACE_EASTER_EGG_WIDTH  (40 * RESOLUTION_MULTIPLIER)
 #define FACE_EASTER_EGG_HEIGHT (40 * RESOLUTION_MULTIPLIER)
 
-void intro_gen_face_texrect(Gfx **dlIter) {
+void intro_gen_face_texrect(Gfx** dlIter) {
     s32 x, y;
 
     for (y = 0; y < 6; y++) {
@@ -346,10 +347,10 @@ void intro_gen_face_texrect(Gfx **dlIter) {
     }
 }
 
-Gfx *intro_draw_face(RGBA16 *image, s32 imageW, s32 imageH) {
-    Gfx *dlIter;
+Gfx* intro_draw_face(RGBA16* image, s32 imageW, s32 imageH) {
+    Gfx* dlIter;
 
-    Gfx *dl = alloc_display_list(
+    Gfx* dl = alloc_display_list(
         SIZEOF_GFX_CMD(SPDisplayList(0)        ) +
         SIZEOF_GFX_CMD(DPLoadTextureBlock(0,0,G_IM_SIZ_16b,0,0,0,0,0,0,0,0,0)) +
         (((6 * 8) - 8) * (
@@ -378,14 +379,14 @@ Gfx *intro_draw_face(RGBA16 *image, s32 imageW, s32 imageH) {
     return dl;
 }
 
-RGBA16 *intro_sample_framebuffer(s32 imageW, s32 imageH, s32 sampleW, s32 sampleH, s32 xOffset, s32 yOffset) {
+RGBA16* intro_sample_framebuffer(s32 imageW, s32 imageH, s32 sampleW, s32 sampleH, s32 xOffset, s32 yOffset) {
     s32 pixel;
     f32 size = (1.0f / (sampleW * sampleH));
     ColorRGBf color;
     s32 iy, ix, sy, sx;
     s32 idy, idx, sdy;
-    RGBA16 *fb = gFramebuffers[sRenderingFramebuffer];
-    RGBA16 *image = alloc_display_list((imageW * imageH) * sizeof(RGBA16));
+    RGBA16* fb = gFramebuffers[sRenderingFramebuffer];
+    RGBA16* image = alloc_display_list((imageW * imageH) * sizeof(RGBA16));
 
     if (image == NULL) {
         return NULL;
@@ -417,9 +418,9 @@ RGBA16 *intro_sample_framebuffer(s32 imageW, s32 imageH, s32 sampleW, s32 sample
     return image;
 }
 
-Gfx *geo_intro_face_easter_egg(s32 callContext, struct GraphNode *node, UNUSED void *context) {
-    struct GraphNodeGenerated *genNode = (struct GraphNodeGenerated *)node;
-    Gfx *dl = NULL;
+Gfx* geo_intro_face_easter_egg(s32 callContext, struct GraphNode* node, UNUSED void* context) {
+    struct GraphNodeGenerated* genNode = (struct GraphNodeGenerated*)node;
+    Gfx* dl = NULL;
 
     if (callContext != GEO_CONTEXT_RENDER) {
         bzero(sFaceVisible, sizeof(sFaceVisible));
@@ -439,7 +440,7 @@ Gfx *geo_intro_face_easter_egg(s32 callContext, struct GraphNode *node, UNUSED v
 
         // Draw while the first or last face is visible.
         if (sFaceVisible[0] == 1 || sFaceVisible[17] == 1) {
-            RGBA16 *image = intro_sample_framebuffer(FACE_EASTER_EGG_WIDTH, FACE_EASTER_EGG_HEIGHT, 2, 2, 120, 80);
+            RGBA16* image = intro_sample_framebuffer(FACE_EASTER_EGG_WIDTH, FACE_EASTER_EGG_HEIGHT, 2, 2, 120, 80);
             if (image != NULL) {
                 genNode->fnNode.node.drawingLayer = LAYER_OPAQUE;
                 dl = intro_draw_face(image, FACE_EASTER_EGG_WIDTH, FACE_EASTER_EGG_HEIGHT);
@@ -480,7 +481,7 @@ static const Gfx title_screen_bg_dl_rumble_pak_end[] = {
 };
 
 //! TODO: Use DEFINE_LANGUAGE_ARRAY after ASCII/multilang is merged.
-Texture *title_texture_rumble_pak_language_array[] = {
+Texture* title_texture_rumble_pak_language_array[] = {
     title_texture_rumble_pak_en,
  #if MULTILANG
   #ifdef ENABLE_FRENCH
@@ -498,10 +499,10 @@ Texture *title_texture_rumble_pak_language_array[] = {
  #endif // MULTILANG
 };
 
-Gfx *geo_intro_rumble_pak_graphic(s32 callContext, struct GraphNode *node, UNUSED void *context) {
-    struct GraphNodeGenerated *genNode = (struct GraphNodeGenerated *)node;
-    Gfx *dlIter;
-    Gfx *dl = NULL;
+Gfx* geo_intro_rumble_pak_graphic(s32 callContext, struct GraphNode* node, UNUSED void*context) {
+    struct GraphNodeGenerated* genNode = (struct GraphNodeGenerated*)node;
+    Gfx* dlIter;
+    Gfx* dl = NULL;
     s8 backgroundTileSix = 0;
 
     if (callContext != GEO_CONTEXT_RENDER) {

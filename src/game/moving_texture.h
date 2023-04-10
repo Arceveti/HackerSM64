@@ -30,7 +30,7 @@ struct MovtexQuadCollection {
     /// identifier for geo nodes to refer to this MovtexQuad collection
     s16 id;
     /// points to a short 'n' followed by an array of n MovtexQuad structs
-    Movtex *quadArraySegmented;
+    Movtex* quadArraySegmented;
 };
 
 extern f32 gPaintingMarioYEntry;

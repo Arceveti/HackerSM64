@@ -56,7 +56,7 @@ static s32 dim_shadow_with_distance(u8 solidity, f32 distFromFloor) {
     } else if (distFromFloor >= dist) {
         return 120;
     } else {
-        return (((120 - solidity) * distFromFloor) / dist) + (f32) solidity;
+        return (((120 - solidity) * distFromFloor) / dist) + (f32)solidity;
     }
 }
 
@@ -70,7 +70,7 @@ static s32 linearly_interpolate_positive(Alpha finalSolidity, s16 curr, s16 star
     } else if (end < curr) {
         return finalSolidity;
     } else {
-        return (f32) finalSolidity * (curr - start) / (end - start);
+        return (f32)finalSolidity * (curr - start) / (end - start);
     }
 }
 
@@ -84,7 +84,7 @@ static s32 linearly_interpolate_negative(Alpha initialSolidity, s16 curr, s16 st
     } else if (curr > end) {
         return 0;
     } else {
-        return ((f32) initialSolidity * (1.0f - (f32)(curr - start) / (end - start)));
+        return ((f32)initialSolidity * (1.0f - (f32)(curr - start) / (end - start)));
     }
 }
 
@@ -178,7 +178,7 @@ s32 correct_lava_shadow_height(f32 *floorHeight) {
 static Gfx* shadow_display_list(s8 shadowType, Alpha solidity, _Bool isDecal) {
     const ColorRGB shadowColor = { 0x00, 0x00, 0x00 };
 
-    Gfx *gfxHead = alloc_display_list(
+    Gfx* gfxHead = alloc_display_list(
         SIZEOF_GFX_CMD(SPDisplayList(0)) +
         SIZEOF_GFX_CMD(SPDisplayList(0)) +
         SIZEOF_GFX_CMD(DPSetPrimColor(0,0,0,0,0,0)) +
@@ -241,7 +241,7 @@ Gfx* create_shadow_below_xyz(Vec3f pos, Vec3f floorNormal, Vec3f scaleVec, s16 s
     }
 
     // The floor underneath the object.
-    struct Surface *floor = NULL;
+    struct Surface* floor = NULL;
 
     // -- Check for floors --
 

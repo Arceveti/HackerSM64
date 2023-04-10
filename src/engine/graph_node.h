@@ -71,7 +71,7 @@ enum GeoContext {
 // - for GEO_CONTEXT_CREATE it is the AllocOnlyPool from which the node was allocated
 // - for GEO_CONTEXT_RENDER or GEO_CONTEXT_HELD_OBJ it is the top of the float matrix stack with type Mat4
 // - for GEO_CONTEXT_AREA_* it is the root geo node
-typedef Gfx *(*GraphNodeFunc)(s32 callContext, struct GraphNode* node, void* context);
+typedef Gfx* (*GraphNodeFunc)(s32 callContext, struct GraphNode* node, void* context);
 
 /** An extension of a graph node that includes a function pointer.
  *  Many graph node types have an update function that gets called

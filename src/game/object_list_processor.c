@@ -189,7 +189,7 @@ struct ParticleProperties {
     u32 particleFlag;
     u32 activeParticleFlag;
     ModelID16 model;
-    const BehaviorScript *behavior;
+    const BehaviorScript* behavior;
 };
 
 /**

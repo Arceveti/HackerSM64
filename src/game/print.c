@@ -70,7 +70,7 @@ void format_integer(s32 n, s32 base, char* dest, s32* totalLength, u8 width, s8 
         while (TRUE) {
             powBase = int_pow(base, numDigits);
 
-            if (powBase > (u32) n) {
+            if (powBase > (u32)n) {
                 break;
             }
 
@@ -228,7 +228,7 @@ void print_text_fmt_int(s32 x, s32 y, const char* str, s32 n) {
 /**
  * Prints text in the colorful lettering at given X, Y coordinates.
  */
-void print_text(s32 x, s32 y, const char *str) {
+void print_text(s32 x, s32 y, const char* str) {
     char c = 0;
     s32 length = 0;
     s32 srcIndex = 0;
@@ -376,7 +376,7 @@ void render_text_labels(void) {
     Gfx* dlHead = gDisplayListHead;
 
     guOrtho(mtx, 0.0f, SCREEN_WIDTH, 0.0f, SCREEN_HEIGHT, -10.0f, 10.0f, 1.0f);
-    gSPPerspNormalize((Gfx *) (dlHead++), 0xFFFF);
+    gSPPerspNormalize((Gfx*)(dlHead++), 0xFFFF);
     gSPMatrix(dlHead++, VIRTUAL_TO_PHYSICAL(mtx), (G_MTX_PROJECTION | G_MTX_LOAD | G_MTX_NOPUSH));
     gSPDisplayList(dlHead++, dl_hud_img_begin);
 

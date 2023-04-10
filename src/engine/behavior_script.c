@@ -457,7 +457,7 @@ static s32 bhv_cmd_set_vptr(void) {
 // Usage: ANIMATE(animIndex)
 static s32 bhv_cmd_animate(void) {
     s32 animIndex = BHV_CMD_GET_2ND_U8(0);
-    struct Animation **animations = gCurrentObject->oAnimations;
+    struct Animation** animations = gCurrentObject->oAnimations;
 
     geo_obj_init_animation(&gCurrentObject->header.gfx, &animations[animIndex]);
 
@@ -660,7 +660,7 @@ static s32 bhv_cmd_parent_bit_clear(void) {
 // BHV_CMD_SPAWN_WATER_DROPLET: Spawns a water droplet with the given parameters.
 // Usage: SPAWN_WATER_DROPLET(dropletParams)
 static s32 bhv_cmd_spawn_water_droplet(void) {
-    struct WaterDropletParams *dropletParams = BHV_CMD_GET_VPTR(1);
+    struct WaterDropletParams* dropletParams = BHV_CMD_GET_VPTR(1);
 
     spawn_water_droplet(gCurrentObject, dropletParams);
 
