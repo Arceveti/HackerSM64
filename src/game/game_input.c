@@ -272,9 +272,12 @@ void read_controller_inputs_status_polling(void) {
 
             if (gContStatusPollingReadyForInput) {
                 // If a button is pressed on an unassigned controller, assign it the current player number.
-                if (!portInfo->playerNum
-                 && (button
-                  || (gContStatusPollingIsBootMode && detect_analog_stick_input(pad, 20))) // Only check analog sticks in boot mode.
+                if (
+                    !portInfo->playerNum &&
+                    (
+                        button ||
+                        (gContStatusPollingIsBootMode && detect_analog_stick_input(pad, 20)) // Only check analog sticks in boot mode.
+                    )
                 ) {
                     portInfo->playerNum = ++gNumPlayers;
                 }

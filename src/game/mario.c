@@ -1612,11 +1612,15 @@ u32 update_and_return_cap_flags(struct MarioState *m) {
     if (m->capTimer > 0) {
         action = m->action;
 
-        if ((m->capTimer <= 60)
-            || ((action != ACT_READING_AUTOMATIC_DIALOG)
-             && (action != ACT_READING_NPC_DIALOG)
-             && (action != ACT_READING_SIGN)
-             && (action != ACT_IN_CANNON))) {
+        if (
+            (m->capTimer <= 60) ||
+            (
+                (action != ACT_READING_AUTOMATIC_DIALOG) &&
+                (action != ACT_READING_NPC_DIALOG) &&
+                (action != ACT_READING_SIGN) &&
+                (action != ACT_IN_CANNON)
+            )
+        ) {
             m->capTimer--;
         }
 
@@ -1707,9 +1711,11 @@ UNUSED static void debug_update_mario_cap(u16 button, s32 flags, u16 capTimer, u
     // This checks for Z_TRIG instead of Z_DOWN flag
     // (which is also what other debug functions do),
     // so likely debug behavior rather than unused behavior.
-    if ((gPlayer1Controller->buttonDown & Z_TRIG)
-     && (gPlayer1Controller->buttonPressed & button)
-     && !(gMarioState->flags & flags)) {
+    if (
+        (gPlayer1Controller->buttonDown & Z_TRIG) &&
+        (gPlayer1Controller->buttonPressed & button) &&
+        !(gMarioState->flags & flags)
+    ) {
         gMarioState->flags |= (flags + MARIO_CAP_ON_HEAD);
 
         if (gMarioState->capTimer < capTimer) {
@@ -1748,13 +1754,15 @@ s32 execute_mario_action(struct MarioState *m) {
     if (m->action) {
 #ifdef DEBUG_FORCE_CRASH_ON_L
         if (gPlayer1Controller->buttonDown & L_TRIG) {
-            FORCE_CRASH;
+            FORCE_CRASH();
         }
 #endif
 #ifdef ENABLE_DEBUG_FREE_MOVE
-        if (m->action != ACT_DEBUG_FREE_MOVE
-         && (gPlayer1Controller->buttonDown & U_JPAD)
-         && !(gPlayer1Controller->buttonDown & (L_TRIG | Z_TRIG))) {
+        if (
+            m->action != ACT_DEBUG_FREE_MOVE &&
+            (gPlayer1Controller->buttonDown & U_JPAD) &&
+            !(gPlayer1Controller->buttonDown & (L_TRIG | Z_TRIG))
+        ) {
             set_camera_mode(m->area->camera, CAMERA_MODE_8_DIRECTIONS, 1);
             set_mario_action(m, ACT_DEBUG_FREE_MOVE, 0);
         }
