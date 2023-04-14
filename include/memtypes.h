@@ -1,6 +1,21 @@
 #pragma once
 
 
+//! TODO: organize and use all these:
+
+typedef union {
+    struct PACKED {
+        uintptr_t isVirtual :  1;
+        uintptr_t segment   :  7;
+        uintptr_t offset    : 24;
+    };
+    struct PACKED {
+        uintptr_t : 1;
+        uintptr_t asPhysical : 31;
+    };
+    uintptr_t asVirtural;
+} Address;
+
 typedef union {
     u8 b1;
 } Mem8;
