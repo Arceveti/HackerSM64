@@ -1,6 +1,55 @@
 #pragma once
 
 
+typedef union {
+    u8 b1;
+} Mem8;
+
+typedef union {
+    struct PACKED {
+        u8 b1;
+        u8 b2;
+    };
+    u16 h1;
+} Mem16;
+
+typedef union {
+    struct PACKED {
+        u8 b1;
+        u8 b2;
+        u8 b3;
+        u8 b4;
+    };
+    struct PACKED {
+        u16 h1;
+        u16 h2;
+    };
+    u32 w1;
+} Mem32;
+
+typedef union {
+    struct PACKED {
+        u8 b1;
+        u8 b2;
+        u8 b3;
+        u8 b4;
+        u8 b5;
+        u8 b6;
+        u8 b7;
+        u8 b8;
+    };
+    struct PACKED {
+        u16 h1;
+        u16 h2;
+        u16 h3;
+        u16 h4;
+    };
+    struct PACLED {
+        u32 w1;
+        u32 w2;
+    };
+    u64 d1;
+} Mem64;
 
 typedef union {
     struct PACKED {
