@@ -644,10 +644,12 @@ s32 perform_air_quarter_step(struct MarioState* m, Vec3f intendedPos, u32 stepAr
     // Check if Mario can grab a wall.
     //! When the wall is not completely vertical or there is a slight wall
     // misalignment, you can activate these conditions in unexpected situations
-    if (m->vel[1] <= 0.0f
-     && (stepArg & AIR_STEP_CHECK_LEDGE_GRAB)
-     && hasLowerWalls
-     && !hasUpperWalls) {
+    if (
+        m->vel[1] <= 0.0f &&
+        (stepArg & AIR_STEP_CHECK_LEDGE_GRAB) &&
+        hasLowerWalls &&
+        !hasUpperWalls
+    ) {
         // Check if any walls are grabbable.
         grabbedWall = check_ledge_grab(m, &lowerWall, intendedPos, nextPos, ledgePos, &ledgeFloor);
 
@@ -790,10 +792,12 @@ void apply_vertical_wind(struct MarioState* m) {
     if (m->action != ACT_GROUND_POUND) {
         f32 offsetY = m->pos[1] + 1500.0f;
 
-        if (m->floor != NULL
-         && m->floor->type == SURFACE_VERTICAL_WIND
-         && -3000.0f < offsetY
-         && offsetY < 2000.0f) {
+        if (
+            m->floor != NULL &&
+            m->floor->type == SURFACE_VERTICAL_WIND &&
+            -3000.0f < offsetY &&
+            offsetY < 2000.0f
+        ) {
             if (offsetY >= 0.0f) {
                 maxVelY = 10000.0f / (offsetY + 200.0f);
             } else {

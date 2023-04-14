@@ -292,8 +292,10 @@ void handle_sp_complete(void) {
         if (curSPTask->task.t.type == M_AUDTASK) {
             profiler_rsp_completed(PROFILER_RSP_AUDIO);
             // After audio tasks come gfx tasks.
-            if ((sCurrentDisplaySPTask != NULL)
-             && (sCurrentDisplaySPTask->state != SPTASK_STATE_FINISHED)) {
+            if (
+                (sCurrentDisplaySPTask != NULL) &&
+                (sCurrentDisplaySPTask->state != SPTASK_STATE_FINISHED)
+            ) {
                 if (sCurrentDisplaySPTask->state == SPTASK_STATE_INTERRUPTED) {
                     profiler_rsp_resumed();
                 } else {

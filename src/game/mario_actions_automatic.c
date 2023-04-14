@@ -382,9 +382,10 @@ s32 act_start_hanging(struct MarioState *m) {
     // immediately go into hanging if controller stick is pointed far enough in
     // any direction, and it has been at least a frame
     if (
-        (m->input & INPUT_NONZERO_ANALOG)
-        && m->intendedMag > 16.0f
-        && m->actionTimer > 1) {
+        (m->input & INPUT_NONZERO_ANALOG) &&
+        m->intendedMag > 16.0f &&
+        m->actionTimer > 1
+    ) {
         return set_mario_action(m, ACT_HANGING, 0);
     }
 
@@ -635,9 +636,10 @@ s32 act_ledge_climb_slow(struct MarioState *m) {
         return let_go_of_ledge(m);
     }
 
-    if (m->actionTimer >= 28
-        && (m->input
-            & (INPUT_NONZERO_ANALOG | INPUT_A_PRESSED | INPUT_OFF_FLOOR | INPUT_ABOVE_SLIDE))) {
+    if (
+        m->actionTimer >= 28 &&
+        (m->input & (INPUT_NONZERO_ANALOG | INPUT_A_PRESSED | INPUT_OFF_FLOOR | INPUT_ABOVE_SLIDE))
+    ) {
         climb_up_ledge(m);
         return check_common_action_exits(m);
     }

@@ -1751,7 +1751,7 @@ s32 execute_mario_action(struct MarioState* m) {
     vec3f_get_dist_and_lateral_dist_and_angle(m->prevPos, m->pos, &m->moveSpeed, &m->lateralSpeed, &m->movePitch, &m->moveYaw);
     vec3f_copy(m->prevPos, m->pos);
 
-    if (m->action) {
+    if (m->action != ACT_UNINITIALIZED) {
 #ifdef DEBUG_FORCE_CRASH_ON_L
         if (gPlayer1Controller->buttonDown & L_TRIG) {
             FORCE_CRASH();

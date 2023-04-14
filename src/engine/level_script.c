@@ -326,9 +326,11 @@ void unmap_tlbs(void) {
     s32 i;
     for (i = 0; i < NUM_TLB_SEGMENTS; i++) {
         if (gTlbSegments[i]) {
-            if (i != SEGMENT_GROUP0_GEO
-             && i != SEGMENT_COMMON1_GEO
-             && i != SEGMENT_BEHAVIOR_DATA) {
+            if (
+                i != SEGMENT_GROUP0_GEO  &&
+                i != SEGMENT_COMMON1_GEO &&
+                i != SEGMENT_BEHAVIOR_DATA
+            ) {
                 while (gTlbSegments[i] > 0) {
                     osUnmapTLB(gTlbEntries);
                     gTlbSegments[i]--;
@@ -463,8 +465,8 @@ static void level_cmd_init_mario(void) {
 
 static void level_cmd_place_object(void) {
     if (
-        sCurrAreaIndex != -1
-        && (CMD_GET(u8, 2) & BIT(ACT_NUM_TO_INDEX(gCurrActNum)))
+        sCurrAreaIndex != -1 &&
+        (CMD_GET(u8, 2) & BIT(ACT_NUM_TO_INDEX(gCurrActNum)))
     ) {
         ModelID16 model = CMD_GET(u32, 0x18);
         struct SpawnInfo* spawnInfo = alloc_only_pool_alloc(sLevelPool, sizeof(struct SpawnInfo));
@@ -575,9 +577,9 @@ static void level_cmd_create_whirlpool(void) {
     s32 index = CMD_GET(u8, 2);
 
     if (
-        sCurrAreaIndex != -1
-        && index < ARRAY_COUNT(gAreas[sCurrAreaIndex].whirlpools)
-        && (CMD_GET(u8, 3) & BIT(ACT_NUM_TO_INDEX(gCurrActNum)))
+        sCurrAreaIndex != -1 &&
+        index < ARRAY_COUNT(gAreas[sCurrAreaIndex].whirlpools) &&
+        (CMD_GET(u8, 3) & BIT(ACT_NUM_TO_INDEX(gCurrActNum)))
     ) {
         if ((whirlpool = gAreas[sCurrAreaIndex].whirlpools[index]) == NULL) {
             whirlpool = alloc_only_pool_alloc(sLevelPool, sizeof(struct Whirlpool));

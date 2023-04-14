@@ -864,9 +864,9 @@ void cur_obj_update(void) {
             o->activeFlags |= ACTIVE_FLAG_FAR_AWAY;
         }
     } else if (
-        obj->collisionData == NULL
-        &&  (objFlags & OBJ_FLAG_COMPUTE_DIST_TO_MARIO)
-        && !(objFlags & OBJ_FLAG_ACTIVE_FROM_AFAR)
+        obj->collisionData == NULL &&
+         (objFlags & OBJ_FLAG_COMPUTE_DIST_TO_MARIO) &&
+        !(objFlags & OBJ_FLAG_ACTIVE_FROM_AFAR)
     ) {
         // If the object has a render distance, check if it should be shown.
         if (distanceFromMario > obj->oDrawingDistance) {

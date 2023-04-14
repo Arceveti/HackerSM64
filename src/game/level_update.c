@@ -502,9 +502,11 @@ void check_instant_warp(void) {
 
     if (floor != NULL) {
         s32 index = floor->type - SURFACE_INSTANT_WARP_1B;
-        if (index >= INSTANT_WARP_INDEX_START
-         && index <  INSTANT_WARP_INDEX_STOP
-         && gCurrentArea->instantWarps != NULL) {
+        if (
+            index >= INSTANT_WARP_INDEX_START &&
+            index <  INSTANT_WARP_INDEX_STOP  &&
+            gCurrentArea->instantWarps != NULL
+        ) {
             struct InstantWarp* warp = &gCurrentArea->instantWarps[index];
 
             if (warp->id != 0) {
@@ -952,9 +954,11 @@ s32 play_mode_normal(void) {
         print_intro_text();
         if (gPlayer1Controller->buttonPressed & END_DEMO) {
             level_trigger_warp(gMarioState, (gCurrLevelNum == LEVEL_PSS) ? WARP_OP_DEMO_END : WARP_OP_DEMO_NEXT);
-        } else if (!gWarpTransition.isActive
-                && sDelayedWarpOp == WARP_OP_NONE
-                && (gPlayer1Controller->buttonPressed & START_BUTTON)) {
+        } else if (
+            !gWarpTransition.isActive &&
+            sDelayedWarpOp == WARP_OP_NONE &&
+            (gPlayer1Controller->buttonPressed & START_BUTTON)
+        ) {
             level_trigger_warp(gMarioState, WARP_OP_DEMO_NEXT);
         }
     }

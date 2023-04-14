@@ -200,7 +200,7 @@ static Gfx* shadow_display_list(s8 shadowType, Alpha solidity, _Bool isDecal) {
 
     return gfxHead;
 }
-// extern s32 gCrashPrintValue;
+
 f32 get_shadow_floor(f32 x, f32 y, f32 z, struct Surface** floor, struct Object* obj, _Bool isPlayer, _Bool* shifted) {
     struct MarioState* m = gMarioState;
     f32 floorHeight = FLOOR_LOWER_LIMIT_MISC;
@@ -216,7 +216,6 @@ f32 get_shadow_floor(f32 x, f32 y, f32 z, struct Surface** floor, struct Object*
         //! Some objects only get their oFloor from bhv_init_room, which skips dynamic floors.
         *floor      = obj->oFloor;
         floorHeight = obj->oFloorHeight;
-        // gCrashPrintValue = floorHeight;
     } else {
         // The object has no referenced floor, so find a new one.
         floorHeight = find_floor(x, y, z, floor);
@@ -225,6 +224,14 @@ f32 get_shadow_floor(f32 x, f32 y, f32 z, struct Surface** floor, struct Object*
     }
 
     return floorHeight;
+}
+
+static _Bool obj_is_flying_carpet(struct Object* obj) {
+    return (
+        obj != NULL &&
+        obj_has_behavior(obj, bhvPlatformOnTrack) &&
+        obj->oPlatformOnTrackType == PLATFORM_ON_TRACK_TYPE_CARPET
+    );
 }
 
 //! TODO: Split create_shadow_below_xyz into multiple functions/
@@ -268,7 +275,7 @@ Gfx* create_shadow_below_xyz(Vec3f pos, Vec3f floorNormal, Vec3f scaleVec, s16 s
     f32 waterLevel = find_water_level_and_floor(x, y, z, &waterFloor);
 
     // Whether the floor is an environment box rather than an actual surface.
-    s32 isEnvBox = FALSE;
+    _Bool isEnvBox = FALSE;
 
     // An offset to apply to the shadow's height at the end.
     f32 heightOffset = 0.0f;
@@ -304,12 +311,8 @@ Gfx* create_shadow_below_xyz(Vec3f pos, Vec3f floorNormal, Vec3f scaleVec, s16 s
             *isDecal = correct_lava_shadow_height(&floorHeight);
 #endif
         } else {
-            struct Object* floorObj = floor->object;
             // Check if the shadow is on the flying carpet.
-            if (floorObj != NULL &&
-                obj_has_behavior(floorObj, bhvPlatformOnTrack) &&
-                floorObj->oPlatformOnTrackType == PLATFORM_ON_TRACK_TYPE_CARPET
-            ) {
+            if (obj_is_flying_carpet(floor->object)) {
                 // Raise the shadow 5 units on the flying carpet to avoid clipping issues.
                 heightOffset += 5;
                 // The flying carpet is transparent.
@@ -319,7 +322,6 @@ Gfx* create_shadow_below_xyz(Vec3f pos, Vec3f floorNormal, Vec3f scaleVec, s16 s
     }
 
     // -- Floor normals --
-
     f32 nx, ny, nz;
     if (isEnvBox) {
         // Assume the floor is flat.
@@ -333,7 +335,7 @@ Gfx* create_shadow_below_xyz(Vec3f pos, Vec3f floorNormal, Vec3f scaleVec, s16 s
         nz = floor->normal.z;
 
         // No shadow if the y-normal is negative (downward facing surface).
-        if (ny <= 0.0f) {
+        if (!F32_IS_NONZERO(ny)) {
             return NULL;
         }
 
@@ -343,10 +345,13 @@ Gfx* create_shadow_below_xyz(Vec3f pos, Vec3f floorNormal, Vec3f scaleVec, s16 s
         }
     }
 
-    // Apply y offset.
-    floorHeight += heightOffset;
+    // Set the floor normals in the shadow struct.
+    vec3f_set(floorNormal, nx, ny, nz);
 
     // -- Height checks --
+    
+    // Apply y offset.
+    floorHeight += heightOffset;
 
     // No shadow if the floor is lower than expected possible,
     if (floorHeight < FLOOR_LOWER_LIMIT_MISC) {
@@ -375,9 +380,6 @@ Gfx* create_shadow_below_xyz(Vec3f pos, Vec3f floorNormal, Vec3f scaleVec, s16 s
 
     // Move the shadow position to the floor height.
     pos[1] = floorHeight;
-
-    // Set the floor normals in the shadow struct.
-    vec3f_set(floorNormal, nx, ny, nz);
 
     // Generate the shadow display list with type and solidity.
     return shadow_display_list(shadowType, solidity, *isDecal);
