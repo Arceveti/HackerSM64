@@ -389,7 +389,7 @@ void thread3_main(UNUSED void* arg) {
 #ifdef UNF
     debug_initialize();
 #else
-    crash_screen_init();
+    create_crash_screen_thread();
 #endif
 
 #ifdef DEBUG
