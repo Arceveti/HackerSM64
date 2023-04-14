@@ -62,8 +62,6 @@ void koopa_shell_spawn_sparkles(f32 a) {
 }
 
 void bhv_koopa_shell_loop(void) {
-    struct Surface *floor;
-
     obj_set_hitbox(o, &sKoopaShellHitbox);
     cur_obj_scale(1.0f);
 
@@ -84,12 +82,13 @@ void bhv_koopa_shell_loop(void) {
 
         case KOOPA_SHELL_ACT_MARIO_RIDING:
             obj_copy_pos(o, gMarioObject);
-            floor = cur_obj_update_floor_height_and_get_floor();
+            o->oFloor       = gMarioState->floor;
+            o->oFloorHeight = gMarioState->floorHeight;
 
             if (absf(find_water_level(o->oPosX, o->oPosY, o->oPosZ) - o->oPosY) < 10.0f) {
                 koopa_shell_spawn_water_drop();
             } else if (absf(o->oPosY - o->oFloorHeight) < 5.0f) {
-                if (floor != NULL && floor->type == SURFACE_BURNING) {
+                if (o->oFloor != NULL && o->oFloor->type == SURFACE_BURNING) {
                     bhv_koopa_shell_flame_spawn();
                 } else {
                     koopa_shell_spawn_sparkles(10.0f);
