@@ -348,7 +348,6 @@ void crash_screen_input_disasm(void) {
         gCrashScreenDirectionFlags.pressed.up &&
         ((gSelectedAddress - DISASM_STEP) >= VALID_RAM_START)
     ) {
-        FORCE_CRASH();
         // Scroll up.
         gSelectedAddress -= DISASM_STEP;
         gCrashScreenUpdateFramebuffer = TRUE;

@@ -44,8 +44,6 @@ struct CSThreadInfo {
     /*0x24C*/ OSThread* crashedThread; /*0x04*/
 }; /*0x250*/
 
-size_t s = sizeof(OSMesg);
-
 struct CrashScreenPage {
     /*0x00*/ void (*initFunc)(void);
     /*0x04*/ void (*drawFunc)(OSThread* thread);
