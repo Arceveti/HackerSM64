@@ -15,6 +15,20 @@
 #define TO_STRING(s)    #s
 #define TO_STRING2(s)   TO_STRING(s)
 
+#define STRLEN(s)           (sizeof(s) - 1)
+#define STR_LAST_CHAR(s)    (s)[STRLEN(s) - 1]
+
+#define INCBIN(type, name, path, align) \
+    __asm__( \
+        ".section \".rodata\", \"a\", @progbits\n" \
+        ".global "TO_STRING2(name)"\n" \
+        ".balign "TO_STRING2(align)"\n" \
+        TO_STRING2(name)":\n" \
+        ".incbin \""path"\"\n" \
+        ".previous\n" \
+    ); \
+    extern type name[];
+
 // Avoid compiler warnings for unused variables.
 #ifdef __GNUC__
 #define UNUSED __attribute__((unused))
