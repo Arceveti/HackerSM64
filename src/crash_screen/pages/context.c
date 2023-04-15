@@ -120,7 +120,7 @@ void crash_screen_print_float_reg(u32 x, u32 y, u32 regNum, f32* addr) {
         crash_screen_print((x + TEXT_WIDTH(4 + 1)), y, STR_HEX_WORD, val.asU32);
     } else {
         // "[±][exponent]"
-        crash_screen_print((x + TEXT_WIDTH(4)), y, "% .3e", val.asF32);
+        crash_screen_print((x + TEXT_WIDTH(4)), y, "% g", val.asF32);
     }
 }
 
@@ -157,9 +157,11 @@ void draw_crash_context(OSThread* thread) {
     u32 line = 1;
 
     // "THREAD:[thread id]"
-    crash_screen_print(TEXT_X(0), TEXT_Y(line), STR_COLOR_PREFIX"%s:%d", COLOR_RGBA32_CRASH_THREAD, "THREAD", thread->id);
+    size_t threadPrintSize = crash_screen_print(TEXT_X(0), TEXT_Y(line), STR_COLOR_PREFIX"%s:%d", COLOR_RGBA32_CRASH_THREAD, "THREAD", thread->id);
     // "([exception cause description])"
-    line += crash_screen_print(TEXT_X(10), TEXT_Y(line), STR_COLOR_PREFIX"(%s)", COLOR_RGBA32_CRASH_DESCRIPTION, sCauseDesc[cause]);
+    crash_screen_print(TEXT_X(threadPrintSize + 1), TEXT_Y(line), STR_COLOR_PREFIX"(%s)", COLOR_RGBA32_CRASH_DESCRIPTION, sCauseDesc[cause]);
+
+    line++;
 
     osWritebackDCacheAll();
 
