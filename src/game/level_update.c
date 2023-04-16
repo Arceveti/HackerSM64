@@ -141,13 +141,13 @@ s16 sDelayedWarpOp;
 s16 sDelayedWarpTimer;
 s16 sSourceWarpNodeId;
 s32 sDelayedWarpArg;
-s8 sTimerRunning;
-s8 gNeverEnteredCastle;
+_Bool sTimerRunning;
+_Bool gNeverEnteredCastle;
 // Prevent multiple 100 coin stars from spawning
-u8 g100CoinStarSpawned = FALSE;
+_Bool g100CoinStarSpawned = FALSE;
 
 struct MarioState* gMarioState = &gMarioStates[0];
-s8 sWarpCheckpointActive = FALSE;
+_Bool sWarpCheckpointActive = FALSE;
 
 u32 level_control_timer(s32 timerOp) {
     switch (timerOp) {
@@ -534,7 +534,7 @@ s32 music_unchanged_through_warp(s16 id) {
     s16 levelNum = (warpNode->node.destLevel & WARP_DEST_LEVEL_NUM_MASK);
 
     s16 destArea = warpNode->node.destArea;
-    s32 unchanged = TRUE;
+    _Bool unchanged = TRUE;
 
 #ifdef ENABLE_VANILLA_LEVEL_SPECIFIC_CHECKS
     if (
@@ -618,7 +618,7 @@ void initiate_warp(s16 destLevel, s16 destArea, s16 destWarpNode, s32 warpFlags)
 #endif
 }
 
-s8 gPaintingEjectSoundPlayed = FALSE;
+_Bool gPaintingEjectSoundPlayed = FALSE;
 
 /**
  * Check is Mario has entered a painting, and if so, initiate a warp.
@@ -672,7 +672,7 @@ void initiate_painting_warp(void) {
  * Return the time left until the delayed warp is initiated.
  */
 s32 level_trigger_warp(struct MarioState* m, s32 warpOp) {
-    s32 fadeMusic = TRUE;
+    _Bool fadeMusic = TRUE;
 
     if (sDelayedWarpOp == WARP_OP_NONE) {
         m->invincTimer = -1;
@@ -1129,7 +1129,7 @@ UNUSED static s32 play_mode_unused(void) {
 }
 
 s32 update_level(void) {
-    s32 changeLevel = FALSE;
+    _Bool changeLevel = FALSE;
 
     switch (sCurrPlayMode) {
         case PLAY_MODE_NORMAL:
@@ -1158,7 +1158,7 @@ s32 update_level(void) {
 }
 
 s32 init_level(void) {
-    s32 fadeFromColor = FALSE;
+    _Bool fadeFromColor = FALSE;
 #ifdef PUPPYPRINT_DEBUG
     OSTime first = osGetTime();
 #endif
