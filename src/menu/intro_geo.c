@@ -454,11 +454,10 @@ Gfx* geo_intro_face_easter_egg(s32 callContext, struct GraphNode* node, UNUSED v
 
 #ifdef ENABLE_RUMBLE
 //! TODO: Move rumble pak graphic textures here once build order is fixed.
-
-#define RUMBLE_X 220
-#define RUMBLE_Y 200
 #define RUMBLE_W 80
 #define RUMBLE_H 24
+#define RUMBLE_X (SCREEN_WIDTH - 100) // 220
+#define RUMBLE_Y (SCREEN_HEIGHT - 40) // 200
 
 static const Gfx title_screen_bg_dl_rumble_pak_begin[] = {
     gsDPPipeSync(),
@@ -471,7 +470,7 @@ static const Gfx title_screen_bg_dl_rumble_pak_begin[] = {
 };
 
 static const Gfx title_screen_bg_dl_rumble_pak_end[] = {
-    gsSPTextureRectangle((RUMBLE_X << 2), (RUMBLE_Y << 2), ((RUMBLE_X + RUMBLE_W - 1) << 2), ((RUMBLE_Y + RUMBLE_H - 1) << 2), G_TX_RENDERTILE, 0, 0, (4 << 10), (1 << 10)),
+    gsSPTextureRectangle((RUMBLE_X << 2), (RUMBLE_Y << 2), (((RUMBLE_X + RUMBLE_W) - 1) << 2), (((RUMBLE_Y + RUMBLE_H) - 1) << 2), G_TX_RENDERTILE, 0, 0, (4 << 10), (1 << 10)),
     gsDPPipeSync(),
     gsDPSetCycleType(G_CYC_1CYCLE),
     gsDPSetTexturePersp(G_TP_PERSP),

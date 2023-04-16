@@ -1194,19 +1194,22 @@ void print_save_file_star_count(s8 fileIndex, s16 x, s16 y) {
     }
 }
 
-#define SELECT_FILE_X 93
-#define SELECT_FILE_Y 35
+#define SELECT_FILE_X (93 * RESOLUTION_MULTIPLIER)
+#define SELECT_FILE_Y (35 * RESOLUTION_MULTIPLIER)
 
-#define SCORE_X       52
-#define COPY_X       117
-#define ERASE_X      177
+#define SCORE_X ( 52 * RESOLUTION_MULTIPLIER)
+#define COPY_X  (117 * RESOLUTION_MULTIPLIER)
+#define ERASE_X (177 * RESOLUTION_MULTIPLIER)
+#define SOUND_X (254 * RESOLUTION_MULTIPLIER)
 
-#define MAINMENU_SAVEFILE_X1   92
-#define MAINMENU_SAVEFILE_Y1   78
-#define MAINMENU_SAVEFILE_X2  209
-#define MAINMENU_SAVEFILE_Y2  118
+#define BUTTON_TEXT_Y (39 * RESOLUTION_MULTIPLIER)
 
-#define MAINMENU_MARIOTEXT_X1  MAINMENU_SAVEFILE_X1
+#define MAINMENU_SAVEFILE_X1  ( 92 * RESOLUTION_MULTIPLIER)
+#define MAINMENU_SAVEFILE_Y1  ( 78 * RESOLUTION_MULTIPLIER)
+#define MAINMENU_SAVEFILE_X2  (209 * RESOLUTION_MULTIPLIER)
+#define MAINMENU_SAVEFILE_Y2  (118 * RESOLUTION_MULTIPLIER)
+
+#define MAINMENU_MARIOTEXT_X1 (MAINMENU_SAVEFILE_X1 -  0)
 #define MAINMENU_MARIOTEXT_Y1 (MAINMENU_SAVEFILE_Y1 - 13) // 65
 #define MAINMENU_MARIOTEXT_X2 (MAINMENU_SAVEFILE_X2 -  2) // 207
 #define MAINMENU_MARIOTEXT_Y2 (MAINMENU_SAVEFILE_Y2 - 13) // 105
@@ -1245,10 +1248,10 @@ void print_main_menu_strings(void) {
     gSPDisplayList(gDisplayListHead++, dl_ia_text_begin);
     gDPSetEnvColor(gDisplayListHead++, 255, 255, 255, sTextBaseAlpha);
 
-    print_generic_string(SCORE_X, 39, textScore);
-    print_generic_string(COPY_X,  39, textCopy);
-    print_generic_string(ERASE_X, 39, textErase);
-    print_generic_string_centered(254, 39, textSoundModes[sSoundMode], 10.0f);
+    print_generic_string(SCORE_X, BUTTON_TEXT_Y, textScore);
+    print_generic_string(COPY_X,  BUTTON_TEXT_Y, textCopy);
+    print_generic_string(ERASE_X, BUTTON_TEXT_Y, textErase);
+    print_generic_string_centered(SOUND_X, BUTTON_TEXT_Y, textSoundModes[sSoundMode], 10.0f);
     gSPDisplayList(gDisplayListHead++, dl_ia_text_end);
 }
 
