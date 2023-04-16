@@ -282,8 +282,11 @@ void play_sound_and_spawn_particles(struct MarioState* m, u32 soundBits, u32 wav
         }
     }
 
-    if ((m->flags & MARIO_METAL_CAP) || soundBits == SOUND_ACTION_UNSTUCK_FROM_GROUND
-        || soundBits == SOUND_MARIO_PUNCH_HOO) {
+    if (
+        (m->flags & MARIO_METAL_CAP) ||
+        soundBits == SOUND_ACTION_UNSTUCK_FROM_GROUND ||
+        soundBits == SOUND_MARIO_PUNCH_HOO
+    ) {
         play_sound(soundBits, m->marioObj->header.gfx.cameraToObject);
     } else {
         play_sound(m->terrainSoundAddend + soundBits, m->marioObj->header.gfx.cameraToObject);
@@ -431,10 +434,12 @@ s32 mario_get_floor_class(struct MarioState* m) {
     }
 
     // Crawling allows Mario to not slide on certain steeper surfaces.
-    if (m->action == ACT_CRAWLING
-     && m->floor != NULL
-     && m->floor->normal.y > 0.5f
-     && floorClass == SURFACE_CLASS_DEFAULT) {
+    if (
+        m->action == ACT_CRAWLING &&
+        m->floor != NULL          &&
+        m->floor->normal.y > 0.5f &&
+        floorClass == SURFACE_CLASS_DEFAULT
+    ) {
         floorClass = SURFACE_CLASS_NOT_SLIPPERY;
     }
 
@@ -546,8 +551,10 @@ u32 mario_floor_is_slippery(struct MarioState* m) {
         return FALSE;
     }
 
-    if (((m->area->terrainType & TERRAIN_MASK) == TERRAIN_SLIDE && m->floor->normal.y < COS1)
-     || (m->floor->type == SURFACE_SUPER_SLIPPERY)) {
+    if (
+        ((m->area->terrainType & TERRAIN_MASK) == TERRAIN_SLIDE && m->floor->normal.y < COS1) ||
+        (m->floor->type == SURFACE_SUPER_SLIPPERY)
+    ) {
         return TRUE;
     }
 
@@ -570,8 +577,10 @@ s32 mario_floor_is_slope(struct MarioState* m) {
         return FALSE;
     }
 
-    if (((m->area->terrainType & TERRAIN_MASK) == TERRAIN_SLIDE
-        && m->floor->normal.y < COS1) || (m->floor->type == SURFACE_SUPER_SLIPPERY)) {
+    if (
+        ((m->area->terrainType & TERRAIN_MASK) == TERRAIN_SLIDE && m->floor->normal.y < COS1) ||
+        (m->floor->type == SURFACE_SUPER_SLIPPERY)
+    ) {
         return TRUE;
     }
 
@@ -1177,8 +1186,10 @@ s32 set_water_plunge_action(struct MarioState* m) {
  * These are the scaling values for the x and z axis for Mario
  * when he is close to unsquishing.
  */
-u8 sSquishScaleOverTime[16] = { 0x46, 0x32, 0x32, 0x3C, 0x46, 0x50, 0x50, 0x3C,
-                                0x28, 0x14, 0x14, 0x1E, 0x32, 0x3C, 0x3C, 0x28 };
+u8 sSquishScaleOverTime[16] = {
+    0x46, 0x32, 0x32, 0x3C, 0x46, 0x50, 0x50, 0x3C,
+    0x28, 0x14, 0x14, 0x1E, 0x32, 0x3C, 0x3C, 0x28,
+};
 
 /**
  * Applies the squish to Mario's model via scaling.
@@ -1289,7 +1300,7 @@ void update_mario_geometry_inputs(struct MarioState* m) {
 
     m->floorHeight = find_floor(m->pos[0], m->pos[1], m->pos[2], &m->floor);
 
-    s32 isOOB = FALSE;
+    _Bool isOOB = FALSE;
 
 #ifdef ALLOW_NULL_FLOORS
  #ifndef ALLOW_OUTSIDE_LEVEL_BOUNDS
@@ -1320,8 +1331,10 @@ void update_mario_geometry_inputs(struct MarioState* m) {
             m->input |= INPUT_ABOVE_SLIDE;
         }
 
-        if ((m->floor->flags & SURFACE_FLAG_DYNAMIC)
-            || (m->ceil && (m->ceil->flags & SURFACE_FLAG_DYNAMIC))) {
+        if (
+            (m->floor->flags & SURFACE_FLAG_DYNAMIC) ||
+            (m->ceil && (m->ceil->flags & SURFACE_FLAG_DYNAMIC))
+        ) {
             f32 ceilToFloorDist = m->ceilHeight - m->floorHeight;
 
             if ((0.0f <= ceilToFloorDist) && (ceilToFloorDist <= 150.0f)) {
@@ -1607,7 +1620,7 @@ static const u64 sCapFlickerFrames = 0b01000100010001000100010010010010010010010
  */
 u32 update_and_return_cap_flags(struct MarioState* m) {
     u32 flags = m->flags;
-    u32 action;
+    u32 action = ACT_UNINITIALIZED;
 
     if (m->capTimer > 0) {
         action = m->action;
@@ -1745,7 +1758,7 @@ void queue_rumble_particles(struct MarioState* m) {
  * Main function for executing Mario's behavior. Returns particleFlags.
  */
 s32 execute_mario_action(struct MarioState* m) {
-    s32 inLoop = TRUE;
+    _Bool inLoop = TRUE;
 
     // Updates once per frame:
     vec3f_get_dist_and_lateral_dist_and_angle(m->prevPos, m->pos, &m->moveSpeed, &m->lateralSpeed, &m->movePitch, &m->moveYaw);
@@ -1768,7 +1781,7 @@ s32 execute_mario_action(struct MarioState* m) {
         }
 #endif
 #ifdef ENABLE_CREDITS_BENCHMARK
-        static s32 startedBenchmark = FALSE;
+        static _Bool startedBenchmark = FALSE;
         if (!startedBenchmark) {
             set_mario_action(m, ACT_IDLE, 0);
             level_trigger_warp(m, WARP_OP_CREDITS_START);
@@ -1789,7 +1802,7 @@ s32 execute_mario_action(struct MarioState* m) {
 #endif
         mario_process_interactions(m);
 
-        s32 isOOB = FALSE;
+        _Bool isOOB = FALSE;
 #ifdef ALLOW_NULL_FLOORS
  #ifndef ALLOW_OUTSIDE_LEVEL_BOUNDS
         isOOB = is_outside_level_bounds(m->pos[0], m->pos[2]);
