@@ -77,9 +77,9 @@ struct GdControl { // gGdCtrl
 };
 
 // data
-extern s32 gGdMoveScene;
+extern _Bool gGdMoveScene;
 extern f32 D_801A8058;
-extern s32 gGdUseVtxNormal;
+extern _Bool gGdUseVtxNormal;
 
 // bss
 extern struct GdControl gGdCtrl;

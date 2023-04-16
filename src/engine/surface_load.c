@@ -291,8 +291,8 @@ static struct Surface* read_surface_data(TerrainData* vertexData, TerrainData** 
  * Returns whether a surface has exertion/moves Mario
  * based on the surface type.
  */
-static s32 surface_has_force(s32 surfaceType) {
-    s32 hasForce = FALSE;
+static _Bool surface_has_force(s32 surfaceType) {
+    _Bool hasForce = FALSE;
 
     switch (surfaceType) {
         case SURFACE_0004: // Unused
@@ -341,7 +341,7 @@ static void load_static_surfaces(TerrainData** data, TerrainData* vertexData, s3
     struct Surface* surface = NULL;
     RoomData room = 0;
 #ifndef ALL_SURFACES_HAVE_FORCE
-    s16 hasForce = surface_has_force(surfaceType);
+    _Bool hasForce = surface_has_force(surfaceType);
 #endif
     s32 flags = surf_has_no_cam_collision(surfaceType);
 
@@ -427,7 +427,7 @@ void alloc_surface_pools(void) {
  */
 u32 get_area_terrain_size(TerrainData* data) {
     TerrainData* startPos = data;
-    s32 end = FALSE;
+    _Bool end = FALSE;
     TerrainData terrainLoadType;
     s32 numVertices;
     s32 numRegions;

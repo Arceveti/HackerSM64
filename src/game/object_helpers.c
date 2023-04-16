@@ -1460,8 +1460,8 @@ void cur_obj_move_standard(s16 steepSlopeAngleDegrees) {
     f32 buoyancy = o->oBuoyancy;
     f32 dragStrength = o->oDragStrength;
     f32 steepSlopeNormalY;
-    s32 careAboutEdgesAndSteepSlopes = FALSE;
-    s32 negativeSpeed = FALSE;
+    _Bool careAboutEdgesAndSteepSlopes = FALSE;
+    _Bool negativeSpeed = FALSE;
 
     //! Because some objects allow these active flags to be set but don't
     //  avoid updating when they are, we end up with "partial" updates, where
@@ -1912,7 +1912,7 @@ void cur_obj_disable_rendering_in_room(void) {
 }
 
 s32 cur_obj_set_hitbox_and_die_if_attacked(struct ObjectHitbox* hitbox, s32 deathSound, s32 noLootCoins) {
-    s32 interacted = FALSE;
+    _Bool interacted = FALSE;
 
     obj_set_hitbox(o, hitbox);
 
@@ -2111,7 +2111,7 @@ s32 cur_obj_update_dialog(s32 actionArg, s32 dialogFlags, s32 dialogID, UNUSED s
 
 s32 cur_obj_update_dialog_with_cutscene(s32 actionArg, s32 dialogFlags, s32 cutsceneTable, s32 dialogID) {
     s32 dialogResponse = DIALOG_RESPONSE_NONE;
-    s32 doneTurning = TRUE;
+    _Bool doneTurning = TRUE;
 
     switch (o->oDialogState) {
 #ifdef BUGFIX_DIALOG_TIME_STOP
@@ -2240,10 +2240,10 @@ s32 obj_attack_collided_from_other_object(struct Object* obj) {
 }
 
 s32 cur_obj_was_attacked_or_ground_pounded(void) {
-    s32 attacked = FALSE;
+    _Bool attacked = FALSE;
 
-    if ((o->oInteractStatus & INT_STATUS_INTERACTED)
-     && (o->oInteractStatus & INT_STATUS_WAS_ATTACKED)) {
+    if ((o->oInteractStatus & INT_STATUS_INTERACTED) &&
+        (o->oInteractStatus & INT_STATUS_WAS_ATTACKED)) {
         attacked = TRUE;
     }
 
@@ -2285,7 +2285,7 @@ s32 cur_obj_check_grabbed_mario(void) {
     return FALSE;
 }
 
-s32 sPlayerGrabReleaseState = FALSE;
+_Bool sPlayerGrabReleaseState = FALSE;
 
 s32 player_performed_grab_escape_action(void) {
     if (gPlayer1Controller->stickMag < 30.0f) {

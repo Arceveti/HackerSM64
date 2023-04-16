@@ -1132,13 +1132,13 @@ void bowser_dead_bounce(void) {
  * Wait for Mario to get close while Bowser is defeated
  * Returns TRUE if he is close enough
  */
-s32 bowser_dead_wait_for_mario(void) {
-    s32 ret = FALSE;
+_Bool bowser_dead_wait_for_mario(void) {
     cur_obj_become_intangible();
-    if (cur_obj_init_animation_and_check_if_near_end(BOWSER_ANIM_LAY_DOWN) && o->oDistanceToMario < 700.0f
-        && abs_angle_diff(gMarioObject->oMoveAngleYaw, o->oAngleToMario) > 0x6000) {
-        ret = TRUE;
-    }
+    _Bool ret = (
+        cur_obj_init_animation_and_check_if_near_end(BOWSER_ANIM_LAY_DOWN) &&
+        o->oDistanceToMario < 700.0f &&
+        abs_angle_diff(gMarioObject->oMoveAngleYaw, o->oAngleToMario) > 0x6000
+    );
     cur_obj_extend_animation_if_at_end();
     o->oBowserTimer = 0;
     return ret;
@@ -1148,8 +1148,8 @@ s32 bowser_dead_wait_for_mario(void) {
  * Makes Bowser twirl up by changing his scale
  * Returns TRUE once done
  */
-s32 bowser_dead_twirl_up(void) {
-    s32 ret = FALSE;
+_Bool bowser_dead_twirl_up(void) {
+    _Bool ret = FALSE;
 
     // Set angle rotation once he has low X scale value
     if (o->header.gfx.scale[0] < 0.8f) {
@@ -1225,6 +1225,7 @@ s32 bowser_dead_default_stage_ending(void) {
         set_mario_npc_dialog(MARIO_DIALOG_STOP);
         return TRUE;
     }
+
     return FALSE;
 }
 
@@ -1261,6 +1262,7 @@ s32 bowser_dead_final_stage_ending(void) {
         bowser_dead_hide();
         return TRUE;
     }
+
     return FALSE;
 }
 
@@ -1367,7 +1369,7 @@ void bowser_act_tilt_lava_platform(void) {
         o->oAction = BOWSER_ACT_DEFAULT;
     } else {
         s32 i = 0;
-        s32 isNotTilting = TRUE;
+        _Bool isNotTilting = TRUE;
         // Active platform tilting if the timer is not 0
         while (sBowsertiltPlatformData[i].time != 0) {
             // Move if the time values is more than the timer

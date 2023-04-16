@@ -22,7 +22,7 @@
 #define MIN_SWIM_STRENGTH 160
 #define MIN_SWIM_SPEED 16.0f
 
-static s16 sWasAtSurface = FALSE;
+static _Bool sWasAtSurface = FALSE;
 static s16 sSwimStrength = MIN_SWIM_STRENGTH;
 static s16 sWaterCurrentSpeeds[] = { 28, 12, 8, 4 };
 
@@ -1552,7 +1552,7 @@ static s32 check_common_submerged_cancels(struct MarioState *m) {
 }
 
 s32 mario_execute_submerged_action(struct MarioState *m) {
-    s32 cancel = FALSE;
+    _Bool cancel = FALSE;
 
     if (check_common_submerged_cancels(m)) {
         return TRUE;

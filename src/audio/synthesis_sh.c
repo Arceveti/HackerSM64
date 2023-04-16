@@ -481,7 +481,7 @@ u64 *synthesis_process_note(s32 noteIndex, struct NoteSubEu *noteSubEu, struct N
             while (nAdpcmSamplesProcessed != samplesLenAdjusted) {
                 s32 samplesRemaining; // v1
                 s32 s0;
-                s32 skip = FALSE;
+                _Bool skip = FALSE;
 
                 noteFinished = FALSE;
                 restart = FALSE;

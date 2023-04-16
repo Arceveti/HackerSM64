@@ -118,18 +118,20 @@ static void boo_oscillate(s32 ignoreOpacity) {
     }
 }
 
-static s32 boo_vanish_or_appear(void) {
+static _Bool boo_vanish_or_appear(void) {
     s16 relativeAngleToMario   = abs_angle_diff(o->oAngleToMario, o->oMoveAngleYaw);
     s16 relativeMarioFaceAngle = abs_angle_diff(o->oMoveAngleYaw, gMarioObject->oFaceAngleYaw);
     // magic?
     s16 relativeAngleToMarioThreshhold   = 0x1568; // ~30.1 degrees
     s16 relativeMarioFaceAngleThreshhold = 0x6B58; // ~150.95 degrees
-    s32 doneAppearing = FALSE;
+    _Bool doneAppearing = FALSE;
 
     o->oVelY = 0.0f;
 
-    if (relativeAngleToMario > relativeAngleToMarioThreshhold
-        || relativeMarioFaceAngle < relativeMarioFaceAngleThreshhold) {
+    if (
+        relativeAngleToMario > relativeAngleToMarioThreshhold ||
+        relativeMarioFaceAngle < relativeMarioFaceAngleThreshhold
+    ) {
         if (o->oOpacity == 40) {
             o->oBooTargetOpacity = 255;
             cur_obj_play_sound_2(SOUND_OBJ_BOO_LAUGH_LONG);

@@ -217,7 +217,7 @@ void update_sliding_angle(struct MarioState *m, f32 accel, f32 lossFactor) {
 }
 
 s32 update_sliding(struct MarioState *m, f32 stopSpeed) {
-    s32 stopped = FALSE;
+    _Bool stopped = FALSE;
 
     s16 intendedDYaw = (m->intendedYaw - m->slideYaw);
     f32 forward  = coss(intendedDYaw);
@@ -336,7 +336,7 @@ void apply_slope_accel(struct MarioState *m) {
 }
 
 s32 apply_landing_accel(struct MarioState *m, f32 frictionFactor) {
-    s32 stopped = FALSE;
+    _Bool stopped = FALSE;
 
     apply_slope_accel(m);
 
@@ -395,7 +395,7 @@ void update_shell_speed(struct MarioState *m) {
 
 s32 apply_slope_decel(struct MarioState *m, f32 decelCoef) {
     f32 decel;
-    s32 stopped = FALSE;
+    _Bool stopped = FALSE;
 
     switch (mario_get_floor_class(m)) {
         case SURFACE_CLASS_VERY_SLIPPERY:
@@ -423,7 +423,7 @@ s32 apply_slope_decel(struct MarioState *m, f32 decelCoef) {
 }
 
 s32 update_decelerating_speed(struct MarioState *m) {
-    s32 stopped = FALSE;
+    _Bool stopped = FALSE;
 
     m->forwardVel = approach_f32(m->forwardVel, 0.0f, 1.0f, 1.0f);
 
@@ -537,7 +537,7 @@ s32 begin_braking_action(struct MarioState *m) {
 void anim_and_audio_for_walk(struct MarioState *m) {
     s32 animSpeed;
     struct Object *marioObj = m->marioObj;
-    s32 inLoop = TRUE;
+    _Bool inLoop = TRUE;
     s16 targetPitch = 0;
 
     f32 intendedSpeed = MAX(m->intendedMag, m->forwardVel);
@@ -627,7 +627,7 @@ void anim_and_audio_for_walk(struct MarioState *m) {
 
 void anim_and_audio_for_hold_walk(struct MarioState *m) {
     s32 animSpeed;
-    s32 inLoop = TRUE;
+    _Bool inLoop = TRUE;
 
     f32 intendedSpeed = MAX(m->intendedMag, m->forwardVel);
 
@@ -1974,7 +1974,7 @@ s32 check_common_moving_cancels(struct MarioState *m) {
 }
 
 s32 mario_execute_moving_action(struct MarioState *m) {
-    s32 cancel = FALSE;
+    _Bool cancel = FALSE;
 
     if (check_common_moving_cancels(m)) {
         return TRUE;

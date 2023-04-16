@@ -890,7 +890,7 @@ void puppycam_terrain_angle(void) {
     s32 ceil = 20000; // find_ceil(gPuppyCam.pos[0], gPuppyCam.pos[1] + 100, gPuppyCam.pos[2]);
     s32 farFromSurface;
     s16 floorPitch;
-    s32 gotTheOkay = FALSE;
+    _Bool gotTheOkay = FALSE;
 
     if ((gMarioState->action & ACT_FLAG_SWIMMING) || !(gPuppyCam.flags & PUPPYCAM_BEHAVIOUR_HEIGHT_HELPER)) {
         gPuppyCam.intendedTerrainPitch = 0;

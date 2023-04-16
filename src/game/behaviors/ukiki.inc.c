@@ -25,8 +25,8 @@ void handle_cap_ukiki_reset(void) {
  * Returns TRUE if Mario has his cap and ukiki is
  * the cap ukiki.
  */
-s32 is_cap_ukiki_and_mario_has_normal_cap_on_head(void) {
-    return (o->oBehParams2ndByte == UKIKI_BP_CAP && does_mario_have_normal_cap_on_head(gMarioState));
+_Bool is_cap_ukiki_and_mario_has_normal_cap_on_head(void) {
+    return ((o->oBehParams2ndByte == UKIKI_BP_CAP) && does_mario_have_normal_cap_on_head(gMarioState));
 }
 
 /**
@@ -215,7 +215,7 @@ void ukiki_act_turn_to_mario(void) {
  * Ukiki either runs away away from Mario or towards him if stealing Mario's cap.
  */
 void ukiki_act_run(void) {
-    s32 fleeMario = TRUE;
+    _Bool fleeMario = TRUE;
     s16 goalYaw = o->oAngleToMario + 0x8000;
 
     if (is_cap_ukiki_and_mario_has_normal_cap_on_head()) {
@@ -224,7 +224,7 @@ void ukiki_act_run(void) {
     }
 
     if (o->oTimer == 0) {
-        o->oUkikiChaseFleeRange = random_float() * 100.0f + 350.0f;
+        o->oUkikiChaseFleeRange = (random_float() * 100.0f) + 350.0f;
     }
 
     cur_obj_init_animation_with_sound(UKIKI_ANIM_RUN);
@@ -243,12 +243,10 @@ void ukiki_act_run(void) {
     }
 
     if (fleeMario && o->oDistanceToMario < 200.0f) {
-        if ((o->oMoveFlags & OBJ_MOVE_HIT_WALL)
-            && is_mario_moving_fast_or_in_air(10)) {
+        if ((o->oMoveFlags & OBJ_MOVE_HIT_WALL) && is_mario_moving_fast_or_in_air(10)) {
             o->oAction = UKIKI_ACT_JUMP;
             o->oMoveAngleYaw = o->oWallAngle;
-        } else if ((o->oMoveFlags & OBJ_MOVE_HIT_EDGE)
-                   && is_mario_moving_fast_or_in_air(10)) {
+        } else if ((o->oMoveFlags & OBJ_MOVE_HIT_EDGE) && is_mario_moving_fast_or_in_air(10)) {
             o->oAction = UKIKI_ACT_JUMP;
             o->oMoveAngleYaw += 0x8000;
         }

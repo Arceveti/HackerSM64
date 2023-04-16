@@ -141,12 +141,8 @@ void small_penguin_dive_with_mario(void) {
 }
 
 void small_penguin_act_walking_away_from_mario(void) {
-    s32 nearMother = FALSE;
+    _Bool nearMother = (o->oTimer == 0 && cur_obj_dist_to_nearest_object_with_behavior(bhvTuxiesMother) < 1000.0f);
 
-    if (o->oTimer == 0
-        && cur_obj_dist_to_nearest_object_with_behavior(bhvTuxiesMother) < 1000.0f) {
-        nearMother = TRUE;
-    }
     cur_obj_init_animation_with_sound(PENGUIN_ANIM_WALK);
     o->oForwardVel = (o->oSmallPenguinNextForwardVel + 3.0f);
     cur_obj_rotate_yaw_toward((o->oAngleToMario + 0x8000), (o->oSmallPenguinYawIncrement + 0x600));
@@ -195,7 +191,7 @@ void small_penguin_act_dive_sliding_stop(void) {
 }
 
 void small_penguin_act_walking(void) {
-    s32 nearMother = FALSE;
+    _Bool nearMother = FALSE;
 
     cur_obj_init_animation_with_sound(PENGUIN_ANIM_IDLE);
     if (o->oTimer == 0) {
@@ -294,8 +290,8 @@ Gfx *geo_switch_tuxie_mother_eyes(s32 callContext, struct GraphNode *node, UNUSE
         struct Object *obj = (struct Object *) gCurGraphNodeObject;
         struct GraphNodeSwitchCase *switchCase = (struct GraphNodeSwitchCase *) node;
 
-        s32 isMother = obj_has_behavior(obj, bhvTuxiesMother);
-        s32 babyDelivered = obj->oAction == MOTHER_PENGUIN_ACT_RECEIVED_BABY;
+        _Bool isMother = obj_has_behavior(obj, bhvTuxiesMother);
+        _Bool babyDelivered = (obj->oAction == MOTHER_PENGUIN_ACT_RECEIVED_BABY);
         switchCase->selectedCase = (!isMother || babyDelivered) ? PENGUIN_ANIM_STATE_EYES_OPEN : PENGUIN_ANIM_STATE_EYES_SAD;
 
         // timer logic for blinking. uses cases 0-2.

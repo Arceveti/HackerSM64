@@ -36,8 +36,8 @@ static char sLevelSelectStageNames[64][16] = {
 #undef DEFINE_LEVEL
 
 #ifdef KEEP_MARIO_HEAD
-static s16 sPlayMarioGreeting = TRUE;
-static s16 sPlayMarioGameOver = TRUE;
+static _Bool sPlayMarioGreeting = TRUE;
+static _Bool sPlayMarioGameOver = TRUE;
  #ifndef DISABLE_DEMO
 static u16 sDemoCountdown   = 0;
 static u16 gDemoInputListID = 0;

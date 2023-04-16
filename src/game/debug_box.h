@@ -37,8 +37,8 @@ enum VisualDebugViewCycles {
 };
 
 extern u8 gVisualDebugViewCycle;
-extern u8 gVisualHitboxView;
-extern u8 gVisualSurfaceView;
+extern _Bool gVisualHitboxView;
+extern _Bool gVisualSurfaceView;
 extern s16 gVisualSurfaceCount;
 
 extern void debug_box_input(void);
@@ -51,7 +51,7 @@ void debug_box_pos(Vec3f pMin, Vec3f pMax, s32 type);
 void debug_box_pos_rot(Vec3f pMin, Vec3f pMax, s16 yaw, s32 type);
 
 void render_debug_boxes(s32 type);
-extern void visual_surface_loop(s32 isDecal);
+extern void visual_surface_loop(_Bool isDecal);
 
 #endif
 

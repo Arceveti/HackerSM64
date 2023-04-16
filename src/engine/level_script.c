@@ -68,8 +68,8 @@ static s16 sScriptStatus;
 static s32 sRegister;
 static struct LevelCommand* sCurrentCmd;
 
-static s32 eval_script_op(s8 op, s32 arg) {
-    s32 result = FALSE;
+static _Bool eval_script_op(s8 op, s32 arg) {
+    _Bool result = FALSE;
 
     switch (op) {
         case OP_AND:  result =  (sRegister &  arg); break;
@@ -659,7 +659,7 @@ static void level_cmd_unload_area(void) {
 }
 
 #ifdef STARTUP_SPAWN_LEVEL
-static u8 sFirstWarp = TRUE;
+static _Bool sFirstWarp = TRUE;
 #endif
 
 static void level_cmd_set_mario_start_pos(void) {

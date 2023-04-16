@@ -102,8 +102,8 @@ Gfx dl_debug_cylinder_verts[] = {
     gsSPEndDisplayList(),
 };
 
-u8 gVisualHitboxView  = FALSE;
-u8 gVisualSurfaceView = FALSE;
+_Bool gVisualHitboxView  = FALSE;
+_Bool gVisualSurfaceView = FALSE;
 
 /**
  * Internal struct containing box info
@@ -360,7 +360,7 @@ u32 iterate_surface_count(s32 x, s32 z) {
     return nodes;
 }
 
-void visual_surface_loop(s32 isDecal) {
+void visual_surface_loop(_Bool isDecal) {
     if (
         !gSurfaceNodesAllocated ||
         !gSurfacesAllocated     ||

@@ -67,15 +67,14 @@ static struct GdBoundingBox sNullBoundingBox = {        // @ 801A8258
     0.0, 0.0, 0.0,
     0.0, 0.0, 0.0
 };
-static s32 sUseIntegerNames = FALSE;  // if TRUE, then all DynNames are specified as integers
+static _Bool sUseIntegerNames = FALSE;  // if TRUE, then all DynNames are specified as integers
 
 // bss
 static char sIntToStringBuf[DYNOBJ_NAME_SIZE]; ///< buffer for returning formated string from
                                                ///< `integer_name_to_string()`
 static struct DynObjInfo sNullDynObjInfo;      // @ 801B9F08
 static char sDynNameSuffix[DYNOBJ_NAME_SIZE];       // @ 801B9F20; small buf for printing dynid to?
-static s32
-    sUnnamedObjCount;      // @ 801B9F28; used to print empty string ids (not NULL char *) to sDynNameSuffix
+static s32 sUnnamedObjCount;      // @ 801B9F28; used to print empty string ids (not NULL char *) to sDynNameSuffix
 static s32 sLoadedDynObjs; // @ 801B9F2C; total loaded dynobjs
 static struct DynObjInfo *sDynListCurInfo; // @ 801B9F30; info for most recently added object
 static struct DynObjInfo *sParentObjInfo; ///< Information for `ObjNet` made by `d_add_net_with_subgroup()` or `ObjJoint` made by `d_attach_joint_to_net()`

@@ -1,7 +1,7 @@
 // whomp.inc.c
 
 void whomp_play_sfx_from_pound_animation(void) {
-    s32 playSound = FALSE;
+    _Bool playSound = FALSE;
 
     if (o->oForwardVel < 5.0f) {
         playSound = cur_obj_check_anim_frame(0);

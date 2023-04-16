@@ -65,13 +65,13 @@ extern OSMesgQueue gSIEventMesgQueue;
 
 extern struct VblankHandler* gVblankHandlers[NUM_VBLANK_HANDLERS];
 extern struct SPTask* gActiveSPTask;
-extern s8 sAudioEnabled;
+extern _Bool sAudioEnabled;
 extern u32 gNumVblanks;
 extern s8 gResetTimer;
 extern s8 gNmiResetBarsTimer;
-extern s8 gDebugLevelSelect;
+extern _Bool gDebugLevelSelect;
 #ifdef VANILLA_DEBUG
-extern s8 gShowDebugText;
+extern _Bool gShowDebugText;
 #endif
 
 void set_vblank_handler(s32 index, struct VblankHandler* handler, OSMesgQueue* queue, OSMesg* msg);

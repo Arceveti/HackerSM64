@@ -108,7 +108,7 @@ extern s16 sDelayedWarpOp;
 extern s16 sDelayedWarpTimer;
 extern s16 sSourceWarpNodeId;
 extern s32 sDelayedWarpArg;
-extern s8 sTimerRunning;
+extern _Bool sTimerRunning;
 
 struct HudDisplay {
     /*0x00*/ s16 lives;
@@ -119,13 +119,13 @@ struct HudDisplay {
     /*0x0A*/ s16 flags;
     /*0x0C*/ u16 timer;
 #ifdef BREATH_METER
-    /*0x0E*/  u16 breath;
+    /*0x0E*/ u16 breath;
 #endif
 }; /*0x10*/
 
 extern struct HudDisplay gHudDisplay;
-extern s8 gNeverEnteredCastle;
-extern u8 g100CoinStarSpawned;
+extern _Bool gNeverEnteredCastle;
+extern _Bool g100CoinStarSpawned;
 
 enum HUDDisplayFlag {
     HUD_DISPLAY_NONE                  = 0x0,

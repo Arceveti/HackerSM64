@@ -50,14 +50,14 @@ const char* sDebugEnemyStringInfo[] = {
 
 s32 sDebugInfoDPadMask = 0;
 s32 sDebugInfoDPadUpdID = 0;
-s8 sDebugLvSelectCheckFlag = FALSE;
+_Bool sDebugLvSelectCheckFlag = FALSE;
 
 #define DEBUG_PAGE_MIN DEBUG_PAGE_OBJECTINFO
 #define DEBUG_PAGE_MAX DEBUG_PAGE_ENEMYINFO
 
 s8 sDebugPage = DEBUG_PAGE_MIN;
-s8 sNoExtraDebug = FALSE;
-s8 sDebugStringArrPrinted = FALSE;
+_Bool sNoExtraDebug = FALSE;
+_Bool sDebugStringArrPrinted = FALSE;
 s8 sDebugSysCursor = 0;
 s8 sDebugInfoButtonSeqID = 0;
 s16 sDebugInfoButtonSeq[] = { U_CBUTTONS, L_CBUTTONS, D_CBUTTONS, R_CBUTTONS, -1 };

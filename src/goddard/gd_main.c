@@ -13,9 +13,9 @@
  */
 
 // data
-s32 gGdMoveScene = TRUE; // @ 801A8050
+_Bool gGdMoveScene = TRUE; // @ 801A8050
 f32 D_801A8058 = -600.0f;
-s32 gGdUseVtxNormal = TRUE; // @ 801A805C; instead of face normals
+_Bool gGdUseVtxNormal = TRUE; // @ 801A805C; instead of face normals
 
 // bss
 struct GdControl gGdCtrl;     // @ 801B9920; processed controller info

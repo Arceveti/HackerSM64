@@ -68,14 +68,14 @@ struct SPTask*        sCurrentAudioSPTask   = NULL;
 struct SPTask*        sCurrentDisplaySPTask = NULL;
 struct SPTask*        sNextAudioSPTask      = NULL;
 struct SPTask*        sNextDisplaySPTask    = NULL;
-s8  sAudioEnabled      = TRUE;
-u32 gNumVblanks        = 0;
-s8  gResetTimer        = 0;
-s8  gNmiResetBarsTimer = 0;
-s8  gDebugLevelSelect  = FALSE;
+_Bool sAudioEnabled      = TRUE;
+u32   gNumVblanks        = 0;
+s8    gResetTimer        = 0;
+s8    gNmiResetBarsTimer = 0;
+_Bool gDebugLevelSelect  = FALSE;
 
 #ifdef VANILLA_DEBUG
-s8 gShowDebugText = FALSE;
+_Bool gShowDebugText = FALSE;
 
 // unused
 UNUSED static u16 sDebugTextKeySequence[] = {

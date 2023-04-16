@@ -156,7 +156,7 @@ void seq_channel_layer_process_script(struct SequenceChannelLayer *layer) {
 #pragma inline routine(get_instrument)
 #endif
 
-    u8 sameSound = TRUE;
+    _Bool sameSound = TRUE;
     if (!(*layer).enabled) {
         return;
     }

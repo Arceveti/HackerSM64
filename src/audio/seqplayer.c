@@ -439,11 +439,7 @@ void seq_channel_layer_process_script(struct SequenceChannelLayer *layer) {
     struct Drum *drum;
     s32 temp_a0_5;
     u16 sp3A = 0;
- #ifdef VERSION_EU
-    s32 sameSound = TRUE;
- #else
-    u8 sameSound = TRUE;
- #endif
+    _Bool sameSound = TRUE;
     u8 cmd;
     UNUSED u8 cmdSemitone;
     f32 tuning;
@@ -1136,7 +1132,7 @@ s32 seq_channel_layer_process_script_part2(struct SequenceChannelLayer *layer) {
 }
 
 s32 seq_channel_layer_process_script_part4(struct SequenceChannelLayer *layer, s32 cmd1) {
-    s32 sameSound = TRUE;
+    _Bool sameSound = TRUE;
     struct SequenceChannel *seqChannel = layer->seqChannel;
     struct Portamento *portamento;
     struct AudioBankSound *sound;

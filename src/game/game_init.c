@@ -39,8 +39,8 @@ Gfx* gDisplayListHead;
 u8* gGfxPoolEnd;
 struct GfxPool* gGfxPool;
 
-u8 gIsConsole = TRUE; // Needs to be initialized before audio_reset_session is called
-u8 gCacheEmulated = TRUE;
+_Bool gIsConsole = TRUE; // Needs to be initialized before audio_reset_session is called
+_Bool gCacheEmulated = TRUE;
 u8 gBorderHeight;
 #ifdef VANILLA_STYLE_CUSTOM_DEBUG
 u8 gCustomDebugMode;

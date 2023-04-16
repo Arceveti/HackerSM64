@@ -123,10 +123,10 @@ void apply_platform_displacement(struct PlatformDisplacementInfo* displaceInfo, 
 }
 
 // Doesn't change in the code, set this to FALSE if you don't want inertia
-u8 gDoInertia = TRUE;
+_Bool gDoInertia = TRUE;
 
-static u8 sShouldApplyInertia = FALSE;
-static u8 sInertiaFirstFrame = FALSE;
+static _Bool sShouldApplyInertia = FALSE;
+static _Bool sInertiaFirstFrame = FALSE;
 
 /**
  * Apply inertia based on Mario's last platform.

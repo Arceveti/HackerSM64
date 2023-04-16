@@ -407,7 +407,7 @@ struct Object *mario_get_collided_object(struct MarioState *m, u32 interactType)
 }
 
 u32 mario_check_object_grab(struct MarioState *m) {
-    u32 result = FALSE;
+    _Bool result = FALSE;
     const BehaviorScript *script;
 
     if (m->input & INPUT_INTERACT_OBJ_GRABBABLE) {
@@ -766,14 +766,14 @@ u32 interact_star_or_key(struct MarioState *m, UNUSED u32 interactType, struct O
     u32 starGrabAction = ACT_STAR_DANCE_EXIT;
 #ifdef NON_STOP_STARS
  #ifdef KEYS_EXIT_LEVEL
-    u32 noExit = !obj_has_model(obj, MODEL_BOWSER_KEY);
+    _Bool noExit = !obj_has_model(obj, MODEL_BOWSER_KEY);
  #else
-    u32 noExit = TRUE;
+    _Bool noExit = TRUE;
  #endif
 #else // !NON_STOP_STARS
-    u32 noExit = ((obj->oInteractionSubtype & INT_SUBTYPE_NO_EXIT) != 0);
+    _Bool noExit = ((obj->oInteractionSubtype & INT_SUBTYPE_NO_EXIT) != 0);
 #endif // !NON_STOP_STARS
-    u32 grandStar = ((obj->oInteractionSubtype & INT_SUBTYPE_GRAND_STAR) != 0);
+    _Bool grandStar = ((obj->oInteractionSubtype & INT_SUBTYPE_GRAND_STAR) != 0);
 
     if (m->health >= 0x100) {
         mario_stop_riding_and_holding(m);
@@ -985,8 +985,8 @@ u32 get_door_save_file_flag(struct Object *door) {
     s16 requiredNumStars = (door->oBehParams >> 24);
 
     //! Hardcoded vanilla position check
-    s16 isCcmDoor = (door->oPosX < 0.0f);
-    s16 isPssDoor = (door->oPosY > 500.0f);
+    _Bool isCcmDoor = (door->oPosX < 0.0f);
+    _Bool isPssDoor = (door->oPosY > 500.0f);
 
     switch (requiredNumStars) {
         case  1: saveFileFlag = (isPssDoor ? SAVE_FLAG_UNLOCKED_PSS_DOOR : SAVE_FLAG_UNLOCKED_WF_DOOR ); break;
@@ -1760,7 +1760,7 @@ u32 check_npc_talk(struct MarioState *m, struct Object *obj) {
 }
 
 u32 interact_text(struct MarioState *m, UNUSED u32 interactType, struct Object *obj) {
-    u32 interact = FALSE;
+    _Bool interact = FALSE;
 
     if (obj->oInteractionSubtype & INT_SUBTYPE_SIGN) {
         interact = check_read_sign(m, obj);

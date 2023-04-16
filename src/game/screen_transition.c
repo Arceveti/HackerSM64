@@ -16,8 +16,8 @@
 u8 sTransitionColorFadeCount[4] = { 0 };
 u16 sTransitionTextureFadeCount[2] = { 0 };
 
-s32 set_and_reset_transition_fade_timer(s8 fadeTimer, u8 transTime) {
-    s32 reset = FALSE;
+_Bool set_and_reset_transition_fade_timer(s8 fadeTimer, u8 transTime) {
+    _Bool reset = FALSE;
 
     sTransitionColorFadeCount[fadeTimer]++;
 
@@ -26,6 +26,7 @@ s32 set_and_reset_transition_fade_timer(s8 fadeTimer, u8 transTime) {
         sTransitionTextureFadeCount[fadeTimer] = 0;
         reset = TRUE;
     }
+
     return reset;
 }
 
@@ -58,7 +59,7 @@ Vtx* vertex_transition_color(struct WarpTransitionData* transData, Alpha alpha) 
     return verts;
 }
 
-s32 dl_transition_color(s8 fadeTimer, u8 transTime, struct WarpTransitionData* transData, Alpha alpha) {
+_Bool dl_transition_color(s8 fadeTimer, u8 transTime, struct WarpTransitionData* transData, Alpha alpha) {
     Vtx* verts = vertex_transition_color(transData, alpha);
 
     if (verts != NULL) {
@@ -76,13 +77,13 @@ s32 dl_transition_color(s8 fadeTimer, u8 transTime, struct WarpTransitionData* t
     return set_and_reset_transition_fade_timer(fadeTimer, transTime);
 }
 
-s32 render_fade_transition_from_color(s8 fadeTimer, u8 transTime, struct WarpTransitionData* transData) {
+_Bool render_fade_transition_from_color(s8 fadeTimer, u8 transTime, struct WarpTransitionData* transData) {
     Alpha alpha = set_transition_color_fade_alpha(COLOR_TRANS_FADE_FROM_COLOR, fadeTimer, transTime);
 
     return dl_transition_color(fadeTimer, transTime, transData, alpha);
 }
 
-s32 render_fade_transition_into_color(s8 fadeTimer, u8 transTime, struct WarpTransitionData* transData) {
+_Bool render_fade_transition_into_color(s8 fadeTimer, u8 transTime, struct WarpTransitionData* transData) {
     Alpha alpha = set_transition_color_fade_alpha(COLOR_TRANS_FADE_INTO_COLOR, fadeTimer, transTime);
 
     return dl_transition_color(fadeTimer, transTime, transData, alpha);
@@ -170,7 +171,7 @@ Texture* sTextureTransitionID[] = {
     texture_transition_bowser_half,
 };
 
-s32 render_textured_transition(s8 fadeTimer, s8 transTime, struct WarpTransitionData* transData, s8 texID, s8 transTexType) {
+_Bool render_textured_transition(s8 fadeTimer, s8 transTime, struct WarpTransitionData* transData, s8 texID, s8 transTexType) {
     f32 texTransTime = calc_tex_transition_time(fadeTimer, transTime, transData);
     u16 texTransPos = convert_tex_transition_angle_to_pos(transData);
     s16 centerTransX = center_tex_transition_x(transData, texTransTime, texTransPos);
@@ -216,7 +217,7 @@ s32 render_textured_transition(s8 fadeTimer, s8 transTime, struct WarpTransition
     return set_and_reset_transition_fade_timer(fadeTimer, transTime);
 }
 
-s32 render_screen_transition(s8 fadeTimer, s8 transType, u8 transTime, struct WarpTransitionData* transData) {
+_Bool render_screen_transition(s8 fadeTimer, s8 transType, u8 transTime, struct WarpTransitionData* transData) {
     switch (transType) {
         case WARP_TRANSITION_FADE_FROM_COLOR:
             return render_fade_transition_from_color(fadeTimer, transTime, transData);

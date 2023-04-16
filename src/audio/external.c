@@ -60,7 +60,7 @@ s32 gAudioErrorFlags2 = 0;
 #else
 s32 gAudioErrorFlags = 0;
 #endif
-s32 sGameLoopTicked = FALSE;
+_Bool sGameLoopTicked = FALSE;
 
 // Dialog sounds
 // The US difference is the sound for DIALOG_037 ("I win! You lose! Ha ha ha ha!
@@ -325,7 +325,7 @@ u8 sMaxChannelsForSoundBank[SOUND_BANK_COUNT] = { 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 }
 
 f32 gGlobalSoundSource[3] = { 0.0f, 0.0f, 0.0f };
 u8 sSoundBankDisabled[16] = { 0 };
-u8 sHasStartedFadeOut = FALSE;
+_Bool sHasStartedFadeOut = FALSE;
 u16 sSoundBanksThatLowerBackgroundMusic = 0;
 u8 sBackgroundMusicMaxTargetVolume = TARGET_VOLUME_UNSET;
 u8 sCurrentSecondaryMusicSeqId = SEQ_SOUND_PLAYER;
@@ -695,7 +695,7 @@ void play_sound(s32 soundBits, f32 *pos) {
  * Called from threads: thread4_sound, thread5_game_loop (EU only)
  */
 static void process_sound_request(u32 bits, f32 *pos) {
-    s32 counter = FALSE;
+    _Bool counter = FALSE;
 
     s32 bank = ((bits & SOUNDARGS_MASK_BANK) >> SOUNDARGS_SHIFT_BANK);
 
@@ -2392,7 +2392,7 @@ void func_803210D4(u16 fadeDuration) {
 /**
  * Called from threads: thread5_game_loop
  */
-void play_course_clear(s32 isKey) {
+void play_course_clear(_Bool isKey) {
     if (isKey) {
         seq_player_play_sequence(SEQ_PLAYER_ENV, SEQ_EVENT_CUTSCENE_COLLECT_KEY, 0);
     } else {

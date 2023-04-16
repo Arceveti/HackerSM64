@@ -1476,7 +1476,7 @@ void anim_spline_init(Vec4s *keyFrames) {
 s32 anim_spline_poll(Vec3f result) {
     Vec4f weights;
     s32 i, j;
-    s32 hasEnded = FALSE;
+    _Bool hasEnded = FALSE;
 
     vec3_zero(result);
     spline_get_weights(weights, gSplineKeyframeFraction, gSplineState);

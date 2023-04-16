@@ -41,8 +41,8 @@
 #ifdef BETTER_REVERB
 // Do not touch these values manually, unless you want potential for problems.
 u8 gBetterReverbPreset = 0;
-u8 toggleBetterReverb = FALSE;
-u8 betterReverbLightweight = FALSE;
+_Bool toggleBetterReverb = FALSE;
+_Bool betterReverbLightweight = FALSE;
 u8 monoReverb;
 s8 betterReverbDownsampleRate;
 static u8 reverbMultsL[NUM_ALLPASS / 3] = {0};
@@ -1650,8 +1650,8 @@ void note_set_vel_pan_reverb(struct Note *note, f32 velocity, f32 pan, u8 reverb
         volLeft = gHeadsetPanVolume[panIndex];
         volRight = gHeadsetPanVolume[127 - panIndex];
     } else if (note->stereoHeadsetEffects && gSoundMode == SOUND_MODE_STEREO) {
-        u8 strongLeft  = FALSE;
-        u8 strongRight = FALSE;
+        _Bool strongLeft  = FALSE;
+        _Bool strongRight = FALSE;
         note->headsetPanLeft  = 0;
         note->headsetPanRight = 0;
         note->usesHeadsetPanEffects = FALSE;

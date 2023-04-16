@@ -1305,7 +1305,7 @@ static GeoProcessFunc GeoProcessJumpTable[] = {
  * be iterated over.
  */
 void geo_process_node_and_siblings(struct GraphNode* firstNode) {
-    s32 iterateChildren = TRUE;
+    _Bool iterateChildren = TRUE;
     struct GraphNode* curGraphNode = firstNode;
     struct GraphNode* parent = curGraphNode->parent;
 

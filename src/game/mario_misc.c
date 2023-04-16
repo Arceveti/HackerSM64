@@ -194,7 +194,7 @@ void bhv_toad_message_init(void) {
     );
 #endif
     s32 dialogId = GET_BPARAM1(o->oBehParams);
-    s32 enoughStars = TRUE;
+    _Bool enoughStars = TRUE;
 
     switch (dialogId) {
         case TOAD_STAR_1_DIALOG:

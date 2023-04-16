@@ -32,16 +32,16 @@ extern struct SaveBuffer gSaveBuffer;
 
 struct WarpCheckpoint gWarpCheckpoint;
 
-s8 gMainMenuDataModified;
-s8 gSaveFileModified;
+_Bool gMainMenuDataModified;
+_Bool gSaveFileModified;
 
 u8 gLastCompletedCourseNum = COURSE_NONE;
 u8 gLastCompletedStarNum = 0;
-s8 sUnusedGotGlobalCoinHiScore = FALSE;
-u8 gGotFileCoinHiScore = FALSE;
+_Bool sUnusedGotGlobalCoinHiScore = FALSE;
+_Bool gGotFileCoinHiScore = FALSE;
 u8 gCurrCourseStarFlags = 0;
 
-u8 gSpecialTripleJump = FALSE;
+_Bool gSpecialTripleJump = FALSE;
 
 #define STUB_LEVEL(_0, _1, courseenum, _3, _4, _5, _6, _7, _8) courseenum,
 #define DEFINE_LEVEL(_0, _1, courseenum, _3, _4, _5, _6, _7, _8, _9, _10) courseenum,
@@ -776,7 +776,7 @@ void check_if_should_set_warp_checkpoint(struct WarpNode* warpNode) {
  * returns TRUE if input WarpNode was updated, and FALSE if not.
  */
 s32 check_warp_checkpoint(struct WarpNode* warpNode) {
-    s16 warpCheckpointActive = FALSE;
+    _Bool warpCheckpointActive = FALSE;
     s16 currCourseNum = gLevelToCourseNumTable[(warpNode->destLevel & WARP_DEST_LEVEL_NUM_MASK) - 1];
 
     // gSavedCourseNum is only used in this function.

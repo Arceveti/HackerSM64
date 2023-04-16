@@ -100,8 +100,8 @@ static u32 D_801BAF28;                                 // RAM addr offset?
 static s16 sTriangleBuf[13][8];                          // [[s16; 8]; 13]? vert indices?
 static u8 *sMemBlockPoolBase; // @ 801BB00C
 static u32 sAllocMemory;      // @ 801BB010; malloc-ed bytes
-static s32 D_801BB018;
-static s32 D_801BB01C;
+static bool D_801BB018;
+static bool D_801BB01C;
 static void *sLoadedTextures[0x10];          // texture pointers
 static s32 sTextureDisplayLists[0x10];            // gd_dl indices
 static s16 sVtxCvrtTCBuf[2];            // @ 801BB0A0
@@ -2351,7 +2351,7 @@ void gd_shading(s32 model) {
 
 /* 251DAC -> 251E18 */
 s32 gd_getproperty(s32 prop, UNUSED void *arg1) {
-    s32 got = FALSE;
+    bool got = FALSE;
 
     switch (prop) {
         case 3:
@@ -3026,7 +3026,7 @@ UNUSED void *Unknown801A5AB8(s32 texnum) {
 }
 
 /* 2542B0 -> 254328 */
-UNUSED void Unknown801A5AE0(s32 arg0) {
+UNUSED void Unknown801A5AE0(bool arg0) {
     D_801BB018 = arg0;
     if (D_801BB01C != D_801BB018) {
         branch_cur_dl_to_num(sTextureDisplayLists[arg0]);

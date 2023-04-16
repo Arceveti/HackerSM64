@@ -301,7 +301,7 @@ static s32 perform_ground_quarter_step(struct MarioState* m, Vec3f nextPos) {
 
     f32 floorHeight = find_floor(nextPos[0], nextPos[1], nextPos[2], &floor);
 
-    s32 isOOB = FALSE;
+    _Bool isOOB = FALSE;
 #ifdef ALLOW_NULL_FLOORS
  #ifndef ALLOW_OUTSIDE_LEVEL_BOUNDS
     isOOB = (is_outside_level_bounds(nextPos[0], nextPos[2]));
@@ -563,7 +563,7 @@ s32 perform_air_quarter_step(struct MarioState* m, Vec3f intendedPos, u32 stepAr
 
     f32 waterLevel = find_water_level(nextPos[0], nextPos[1], nextPos[2]);
 
-    s32 isOOB = FALSE;
+    _Bool isOOB = FALSE;
 
 #ifdef ALLOW_NULL_FLOORS
  #ifndef ALLOW_OUTSIDE_LEVEL_BOUNDS

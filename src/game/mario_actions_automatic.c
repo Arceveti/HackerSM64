@@ -30,7 +30,7 @@ void add_tree_leaf_particles(struct MarioState *m) {
 }
 
 void play_climbing_sounds(struct MarioState *m, s32 direction) {
-    s32 isOnTree = obj_has_behavior(m->usedObj, bhvTree);
+    _Bool isOnTree = obj_has_behavior(m->usedObj, bhvTree);
 
     if (direction == CLIMBING_SOUND_ARG_CLIMB_UP) {
         if (is_anim_past_frame(m, 1)) {
@@ -873,7 +873,7 @@ s32 check_common_automatic_cancels(struct MarioState *m) {
 }
 
 s32 mario_execute_automatic_action(struct MarioState *m) {
-    s32 cancel = FALSE;
+    _Bool cancel = FALSE;
 
     if (check_common_automatic_cancels(m)) {
         return TRUE;

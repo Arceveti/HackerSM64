@@ -392,10 +392,10 @@ void *alloc_bank_or_seq(struct SoundMultiPool *loadedPool, s32 arg1, s32 size, s
     u32 nullID = -1;
     u8 *table = NULL;
 #ifdef VERSION_SH
-    u8 out = FALSE;
+    _Bool out = FALSE;
     s32 i;
 #else
-    u8 isSound = FALSE;
+    _Bool isSound = FALSE;
 #endif
 #if defined(VERSION_JP) || defined(VERSION_US)
     u32 bothDiscardable;
@@ -964,7 +964,7 @@ s32 audio_shut_down_and_reset_step(void) {
 }
 #endif // (VERSION_EU || VERSION_SH)
 
-u8 sAudioIsInitialized = FALSE;
+_Bool sAudioIsInitialized = FALSE;
 // Separate the reverb settings into their own func. Bit unstable currently, so still only runs at boot.
 #if defined(VERSION_EU) || defined(VERSION_SH)
 void init_reverb_eu(void) {

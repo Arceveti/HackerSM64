@@ -1875,10 +1875,13 @@ s32 update_default_camera(struct Camera *c) {
     s16 yawVel = 0;
     f32 scale;
     s32 avoidStatus = AVOID_STATUS_NONE;
-    s32 closeToMario = FALSE;
-    f32 ceilHeight = find_ceil(gLakituState.goalPos[0],
-                               gLakituState.goalPos[1],
-                               gLakituState.goalPos[2], &ceil);
+    _Bool closeToMario = FALSE;
+    f32 ceilHeight = find_ceil(
+        gLakituState.goalPos[0],
+        gLakituState.goalPos[1],
+        gLakituState.goalPos[2],
+        &ceil
+    );
     s16 yawDir;
 
     handle_c_button_movement(c);
@@ -2331,7 +2334,7 @@ void exit_c_up(struct Camera *c) {
     Vec3f checkFoc;
     Vec3f curPos;
     // Variables for searching for an open direction
-    s32 searching = FALSE;
+    _Bool searching = FALSE;
     /// The current sector of the circle that we are checking
     s32 sector;
     f32 ceilHeight;
@@ -2352,9 +2355,11 @@ void exit_c_up(struct Camera *c) {
 
         // Search for an open direction to zoom out in, if the camera is changing to close, free roam,
         // or spiral-stairs mode
-        if (sModeInfo.lastMode == CAMERA_MODE_SPIRAL_STAIRS
-         || sModeInfo.lastMode == CAMERA_MODE_CLOSE
-         || sModeInfo.lastMode == CAMERA_MODE_FREE_ROAM) {
+        if (
+            sModeInfo.lastMode == CAMERA_MODE_SPIRAL_STAIRS ||
+            sModeInfo.lastMode == CAMERA_MODE_CLOSE         ||
+            sModeInfo.lastMode == CAMERA_MODE_FREE_ROAM
+        ) {
             searching = TRUE;
             // Check the whole circle around Mario for an open direction to zoom out to
             for (sector = 0; sector < 16 && searching; sector++) {
@@ -3339,7 +3344,7 @@ void vec3f_to_object_pos(struct Object *obj, Vec3f src) {
  * the 4th CutsceneSplinePoint in the current segment away from spline[splineSegment] has an index of -1.
  */
 s32 move_point_along_spline(Vec3f pos, struct CutsceneSplinePoint spline[], s16 *splineSegment, f32 *progress) {
-    s32 finished = FALSE;
+    _Bool finished = FALSE;
     Vec3f controlPoints[4];
     s32 i = 0;
     f32 u = *progress;
@@ -3352,9 +3357,11 @@ s32 move_point_along_spline(Vec3f pos, struct CutsceneSplinePoint spline[], s16 
         segment = 0;
         u = 0;
     }
-    if (spline[segment + 0].index == -1
-     || spline[segment + 1].index == -1
-     || spline[segment + 2].index == -1) {
+    if (
+        spline[segment + 0].index == -1 ||
+        spline[segment + 1].index == -1 ||
+        spline[segment + 2].index == -1
+    ) {
         return TRUE;
     }
 
@@ -3870,7 +3877,7 @@ s32 is_surf_within_bounding_box(struct Surface *surf, f32 xMax, f32 yMax, f32 zM
     f32 dx, dy, dz;
     s32 i, j;
     // result
-    s32 smaller = FALSE;
+    _Bool smaller = FALSE;
 
     sx[0] = surf->vertex1[0];
     sx[1] = surf->vertex2[0];
@@ -3931,9 +3938,9 @@ s32 is_behind_surface(Vec3f pos, struct Surface *surf) {
  * Checks if the whole circular sector is behind the surface.
  */
 s32 is_range_behind_surface(Vec3f from, Vec3f to, struct Surface *surf, s16 range, s16 surfType) {
-    s32 behindSurface = TRUE;
-    s32 leftBehind = FALSE;
-    s32 rightBehind = FALSE;
+    _Bool behindSurface = TRUE;
+    _Bool leftBehind = FALSE;
+    _Bool rightBehind = FALSE;
     f32 checkDist;
     s16 checkPitch;
     s16 checkYaw;
@@ -3979,9 +3986,11 @@ s32 is_pos_in_bounds(Vec3f pos, Vec3f center, Vec3f bounds, s16 boundsYaw) {
 
     rotate_in_xz(rel, rel, boundsYaw);
 
-    return (-bounds[0] < rel[0] && rel[0] < bounds[0]
-         && -bounds[1] < rel[1] && rel[1] < bounds[1]
-         && -bounds[2] < rel[2] && rel[2] < bounds[2]);
+    return (
+        -bounds[0] < rel[0] && rel[0] < bounds[0] &&
+        -bounds[1] < rel[1] && rel[1] < bounds[1] &&
+        -bounds[2] < rel[2] && rel[2] < bounds[2]
+    );
 }
 
 s16 calculate_pitch(Vec3f from, Vec3f to) {
@@ -4881,7 +4890,7 @@ static UNUSED void stop_transitional_movement(void) {
  * @return TRUE if the base pos was updated
  */
 s32 set_camera_mode_fixed(struct Camera *c, s16 x, s16 y, s16 z) {
-    s32 basePosSet = FALSE;
+    _Bool basePosSet = FALSE;
     f32 posX = x;
     f32 posY = y;
     f32 posZ = z;
@@ -5886,7 +5895,7 @@ void camera_course_processing(struct Camera *c) {
     u32 b;
     // Camera trigger's bounding box
     Vec3f center, bounds;
-    u32 insideBounds = FALSE;
+    _Bool insideBounds = FALSE;
     u8 oldMode = c->mode;
 
     if (c->mode == CAMERA_MODE_C_UP) {

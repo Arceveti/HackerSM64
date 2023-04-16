@@ -148,7 +148,7 @@ s16 sClickPos[] = {-10000, -10000};
 s8 sSelectedFileIndex = -1;
 
 // Whether to fade out text or not.
-s8 sFadeOutText = FALSE;
+_Bool sFadeOutText = FALSE;
 
 // The message currently being displayed at the top of a menu.
 s8 sStatusMessageID = 0;
@@ -175,7 +175,7 @@ s8 sEraseYesNoHoverState = MENU_ERASE_HOVER_NONE;
 
 // Used for the copy menu, defines if the game as all 4 save slots with data.
 // if TRUE, it doesn't allow copying more files.
-s8 sAllFilesExist = FALSE;
+_Bool sAllFilesExist = FALSE;
 
 // Defines the value of the save slot selected in the menu.
 // Mario A: 1 | Mario B: 2 | Mario C: 3 | Mario D: 4

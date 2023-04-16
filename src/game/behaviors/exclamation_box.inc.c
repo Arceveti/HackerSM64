@@ -46,10 +46,12 @@ void exclamation_box_act_init(void) {
     if (o->oBehParams2ndByte < EXCLAMATION_BOX_BP_KOOPA_SHELL) {
         o->oAnimState = o->oBehParams2ndByte;
 #if defined(UNLOCK_ALL) || defined(EXCLAMATION_BOXES_ALWAYS_SOLID)
-        const u8 tangible = TRUE;
+        const _Bool tangible = TRUE;
 #else
-        const u8 tangible = ((save_file_get_flags() & sCapSaveFlags[o->oBehParams2ndByte])
-                          || (GET_BPARAM1(o->oBehParams) != EXCLAMATION_BOX_BP1_NEEDS_SWITCH));
+        const _Bool tangible = (
+            (save_file_get_flags() & sCapSaveFlags[o->oBehParams2ndByte]) ||
+            (GET_BPARAM1(o->oBehParams) != EXCLAMATION_BOX_BP1_NEEDS_SWITCH)
+        );
 #endif
         o->oAction = tangible ? EXCLAMATION_BOX_ACT_ACTIVE : EXCLAMATION_BOX_ACT_OUTLINE;
     } else {

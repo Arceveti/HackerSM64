@@ -49,7 +49,7 @@ static struct Surface* sObjFloor;
  * Set to false when an object close to the floor should not be oriented in reference
  * to it. Happens with boulder, falling pillar, and the rolling snowman body.
  */
-static s8 sOrientObjWithFloor = TRUE;
+static _Bool sOrientObjWithFloor = TRUE;
 
 /**
  * Keeps track of Mario's previous non-zero room.

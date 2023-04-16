@@ -92,10 +92,10 @@ STATIC_ASSERT((sizeof(struct SaveBuffer) <= EEPROM_SIZE), "ERROR: Save struct to
 
 extern u8 gLastCompletedCourseNum;
 extern u8 gLastCompletedStarNum;
-extern s8 sUnusedGotGlobalCoinHiScore;
-extern u8 gGotFileCoinHiScore;
+extern _Bool sUnusedGotGlobalCoinHiScore;
+extern _Bool gGotFileCoinHiScore;
 extern u8 gCurrCourseStarFlags;
-extern u8 gSpecialTripleJump;
+extern _Bool gSpecialTripleJump;
 extern s8 gLevelToCourseNumTable[];
 
 enum CourseFlags {
@@ -161,8 +161,8 @@ struct WarpCheckpoint {
 
 extern struct WarpCheckpoint gWarpCheckpoint;
 
-extern s8 gMainMenuDataModified;
-extern s8 gSaveFileModified;
+extern _Bool gMainMenuDataModified;
+extern _Bool gSaveFileModified;
 
 void save_file_do_save(s32 fileIndex);
 void save_file_erase(s32 fileIndex);

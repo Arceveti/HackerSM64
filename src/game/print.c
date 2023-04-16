@@ -44,13 +44,13 @@ s32 int_pow(s32 n, s32 exponent) {
  * Formats an integer n for print by fitting it to width, prefixing with a negative,
  * and converting the base.
  */
-void format_integer(s32 n, s32 base, char* dest, s32* totalLength, u8 width, s8 zeroPad) {
+void format_integer(s32 n, s32 base, char* dest, s32* totalLength, u8 width, bool zeroPad) {
     u32 powBase;
     s32 numDigits = 0;
     s32 i;
     s32 len = 0;
     s8 digit;
-    s8 negative = FALSE;
+    bool negative = FALSE;
     char pad;
 
     if (zeroPad) {
@@ -124,7 +124,7 @@ void format_integer(s32 n, s32 base, char* dest, s32* totalLength, u8 width, s8 
  * Additionally, this determines if a number should be zero-padded,
  * writing to 'zeroPad'.
  */
-void parse_width_field(const char* str, s32* srcIndex, u8* width, s8* zeroPad) {
+void parse_width_field(const char* str, s32* srcIndex, u8* width, bool* zeroPad) {
     s8 digits[12]; // unknown length
     s8 digitsLen = 0;
     s16 i;
@@ -174,7 +174,7 @@ void parse_width_field(const char* str, s32* srcIndex, u8* width, s8* zeroPad) {
  */
 void print_text_fmt_int(s32 x, s32 y, const char* str, s32 n) {
     char c = 0;
-    s8 zeroPad = FALSE;
+    bool zeroPad = FALSE;
     u8 width = 0;
     s32 base = 0;
     s32 len = 0;

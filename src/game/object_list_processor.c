@@ -302,7 +302,7 @@ s32 update_objects_starting_at(struct ObjectNode* objList, struct ObjectNode* fi
  */
 s32 update_objects_during_time_stop(struct ObjectNode* objList, struct ObjectNode* firstObj) {
     s32 count = 0;
-    s32 unfrozen;
+    bool unfrozen = FALSE;
 
     while (objList != firstObj) {
         gCurrentObject = (struct Object*)firstObj;

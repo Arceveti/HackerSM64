@@ -553,7 +553,7 @@ s32 gd_atoi(const char *str) {
     const char *origstr = str;
     s32 curval;
     s32 out = 0;
-    s32 isNegative = FALSE;
+    _Bool isNegative = FALSE;
 
     while (TRUE) {
         cur = *str++;

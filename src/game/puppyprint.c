@@ -53,9 +53,9 @@ a modern game engine's developer's console.
 #define TAB_WIDTH 16
 
 #ifdef ENABLE_CREDITS_BENCHMARK
-u8 fDebug = TRUE;
+_Bool fDebug = TRUE;
 #else
-u8 fDebug = FALSE;
+_Bool fDebug = FALSE;
 #endif
 u8 sPuppyprintTextBuffer[PUPPYPRINT_DEFERRED_BUFFER_SIZE];
 u32 sPuppyprintTextBufferPos; // Location in the buffer of puppyprint deferred text.
@@ -63,9 +63,9 @@ ColorRGBA gCurrEnvCol;
 
 #ifdef PUPPYPRINT_DEBUG
 
-s8 logViewer    = FALSE;
+_Bool logViewer    = FALSE;
 u8 sPPDebugPage = 0;
-u8 sDebugMenu   = FALSE;
+_Bool sDebugMenu   = FALSE;
 u8 sDebugOption = 0;
 s32 ramsizeSegment[NUM_TLB_SEGMENTS + 1] = { 0 };
 s32 mempool;
@@ -934,7 +934,7 @@ f32 textSizeTemp = 1.0f; // The value that's set when modifying text size mid dr
 u16 textTempScale = 1024; // A fixed point means of referring to scale.
 u8 textOffsets[2]; // Represents the dimensions of the text (12 x 8), and written to when size is modified.
 u8 topLineHeight; // Represents the peak line height of the current line. Prevents vertical overlapping.
-u8 gMonoSpace = FALSE; // Ignore kerning.
+_Bool gMonoSpace = FALSE; // Ignore kerning.
 
 s32 get_text_width(const char* str, s32 font) {
     s32 i       = 0;
@@ -1455,7 +1455,7 @@ struct PuppyprintDeferredBufferHeader {
     u8 isLightText;
 };
 
-static u8 gIsLightText = FALSE;
+static _Bool gIsLightText = FALSE;
 
 // This is where the deferred printing will be stored. When text is made, it will store text with a 12 byte header, then the rest will be the text data itself.
 // The first 4 bytes of the header will be the X and Y pos

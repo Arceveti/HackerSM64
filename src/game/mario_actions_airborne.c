@@ -2000,7 +2000,7 @@ s32 check_common_airborne_cancels(struct MarioState *m) {
 }
 
 s32 mario_execute_airborne_action(struct MarioState *m) {
-    u32 cancel = FALSE;
+    _Bool cancel = FALSE;
 
     if (check_common_airborne_cancels(m)) {
         return TRUE;

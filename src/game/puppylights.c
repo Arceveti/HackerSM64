@@ -41,7 +41,7 @@ shaped and rotated correctly, for accurate representation of their properties.
 #ifdef PUPPYLIGHTS
 
 Lights1 gLevelLight; // Existing ambient light in the area. Will be set by the level script, though can always be changed afterwards if desired.
-u8 levelAmbient = FALSE;
+_Bool levelAmbient = FALSE;
 Lights1* sLightBase; // The base value where lights are written to when worked with.
 Lights1 sDefaultLights = gdSPDefLights1(
     DEFAULT_LIGHT_AMB, DEFAULT_LIGHT_AMB, DEFAULT_LIGHT_AMB,
@@ -215,7 +215,7 @@ void puppylights_iterate(struct PuppyLight* light, Lights1* src, struct Object* 
 void puppylights_run(Lights1* src, struct Object* obj, s32 flags, RGBA32 baseColour) {
     s32 i;
     s32 numlights = 0;
-    s32 offsetPlaced = FALSE;
+    _Bool offsetPlaced = FALSE;
     s32 lightFlags = flags;
 
     if (gCurrLevelNum < LEVEL_BBH) {
@@ -288,7 +288,7 @@ void puppylights_object_emit(struct Object* obj) {
             return;
         }
         if (obj->oLightID == PUPPYLIGHTS_ID_NULL) {
-            s32 fadingExists = FALSE;
+            _Bool fadingExists = FALSE;
             if (absi(gNumLights - gDynLightStart) < MAX_LIGHTS_DYNAMIC) {
                 puppylights_deallocate_obj(obj);
                 return;

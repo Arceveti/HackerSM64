@@ -127,7 +127,7 @@ s8 gMovtexVtxColor = MOVTEX_VTX_COLOR_DEFAULT;
 f32 gPaintingMarioYEntry = 0.0f;
 
 /// Variable to ensure the initial Wet-Dry World water level is set only once
-s32 gWdwWaterLevelSet = FALSE;
+_Bool gWdwWaterLevelSet = FALSE;
 
 extern Texture ssl_quicksand[];
 extern Texture ssl_pyramid_sand[];

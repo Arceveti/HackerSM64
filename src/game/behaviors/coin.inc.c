@@ -182,8 +182,8 @@ void bhv_coin_formation_spawned_coin_loop(void) {
 
 void spawn_coin_in_formation(s32 index, s32 shape) {
     Vec3i pos = { 0, 0, 0 };
-    s32 spawnCoin = TRUE;
-    s32 snapToGround = TRUE;
+    _Bool spawnCoin = TRUE;
+    _Bool snapToGround = TRUE;
 
     switch (shape & COIN_FORMATION_BP_SHAPE_MASK) {
         case COIN_FORMATION_BP_SHAPE_HORIZONTAL_LINE:

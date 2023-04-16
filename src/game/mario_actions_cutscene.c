@@ -46,7 +46,7 @@ struct CreditsEntry *sDispCreditsEntry = NULL;
 
 // related to peach gfx?
 static s8 sPeachManualBlinkTime = 0;
-static s8 sPeachIsBlinking = FALSE;
+static _Bool sPeachIsBlinking = FALSE;
 static s8 sPeachBlinkTimes[7] = {
     2, 3, 2, 1, 2, 3, 2
 };
@@ -311,17 +311,16 @@ void cutscene_put_cap_on(struct MarioState *m) {
 s32 mario_ready_to_speak(void) {
     u32 action = gMarioState->action;
     u32 actionGroup = (action & ACT_GROUP_MASK);
-    s32 isReadyToSpeak = FALSE;
 
-    if ((action == ACT_WAITING_FOR_DIALOG
-        || actionGroup == ACT_GROUP_STATIONARY
-        || actionGroup == ACT_GROUP_MOVING)
-     && !(action & (ACT_FLAG_RIDING_SHELL | ACT_FLAG_INVULNERABLE))
-     && action != ACT_FIRST_PERSON) {
-        isReadyToSpeak = TRUE;
-    }
-
-    return isReadyToSpeak;
+    return (
+        (
+            action == ACT_WAITING_FOR_DIALOG    ||
+            actionGroup == ACT_GROUP_STATIONARY ||
+            actionGroup == ACT_GROUP_MOVING
+        ) &&
+        !(action & (ACT_FLAG_RIDING_SHELL | ACT_FLAG_INVULNERABLE)) &&
+        action != ACT_FIRST_PERSON
+    );
 }
 
 // (can) place Mario in dialog?
@@ -581,7 +580,7 @@ s32 act_debug_free_move(struct MarioState *m) {
     set_mario_wall(m, ((wallData.numWalls > 0) ? wallData.walls[0] : NULL));
     f32 floorHeight = find_floor(pos[0], pos[1], pos[2], &floor);
 
-    s32 isOOB = FALSE;
+    _Bool isOOB = FALSE;
 
 #ifdef ALLOW_NULL_FLOORS
  #ifndef ALLOW_OUTSIDE_LEVEL_BOUNDS
@@ -612,7 +611,7 @@ s32 act_debug_free_move(struct MarioState *m) {
     return FALSE;
 }
 
-void general_star_dance_handler(struct MarioState *m, s32 isInWater) {
+void general_star_dance_handler(struct MarioState *m, _Bool isInWater) {
     struct Object *celebStar = NULL;
 
     if (m->actionState == ACT_STATE_STAR_DANCE_CUTSCENE) {
@@ -1523,7 +1522,7 @@ s32 act_shocked(struct MarioState *m) {
 s32 act_squished(struct MarioState *m) {
     f32 squishAmount;
     s16 surfAngle;
-    s32 underSteepSurf = FALSE; // seems to be responsible for setting velocity?
+    _Bool underSteepSurf = FALSE; // seems to be responsible for setting velocity?
     f32 spaceUnderCeil = m->ceilHeight - m->floorHeight;
 
     if (spaceUnderCeil < 0) {

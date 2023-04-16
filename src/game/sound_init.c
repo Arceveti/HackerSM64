@@ -31,12 +31,12 @@ static struct VblankHandler sSoundVblankHandler;
 // Only written to, never read.
 static u8 sMusicVolume = 0;
 
-static u8 sBgMusicDisabled = FALSE;
+static _Bool sBgMusicDisabled = FALSE;
 static u16 sCurrentMusic = MUSIC_NONE;
 static u16 sCurrentShellMusic = MUSIC_NONE;
 static u16 sCurrentCapMusic = MUSIC_NONE;
 #ifdef ENABLE_VANILLA_LEVEL_SPECIFIC_CHECKS
-static u8 sPlayingInfiniteStairs = FALSE;
+static _Bool sPlayingInfiniteStairs = FALSE;
 #endif
 static s16 sSoundMenuModeToSoundMode[3] = {
     SOUND_MODE_STEREO,
@@ -283,7 +283,7 @@ void stop_shell_music(void) {
  */
 
 #ifdef PERSISTENT_CAP_MUSIC
-static s8 sDoResetMusic = FALSE;
+static _Bool sDoResetMusic = FALSE;
 extern void stop_cap_music(void);
 #endif
 

@@ -14,7 +14,7 @@
  * Move the arrow lift away from its original position.
  */
 static s32 arrow_lift_move_away(void) {
-    s8 doneMoving = FALSE;
+    _Bool doneMoving = FALSE;
 
     o->oMoveAngleYaw = o->oFaceAngleYaw - 0x4000;
     o->oVelY = 0;
@@ -38,8 +38,8 @@ static s32 arrow_lift_move_away(void) {
 /**
  * Move the arrow lift back to its original position.
  */
-static s8 arrow_lift_move_back(void) {
-    s8 doneMoving = FALSE;
+static _Bool arrow_lift_move_back(void) {
+    _Bool doneMoving = FALSE;
 
     o->oMoveAngleYaw = o->oFaceAngleYaw + 0x4000;
     o->oVelY = 0;
