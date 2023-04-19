@@ -127,6 +127,12 @@
 #define ALIGNED64
 #endif
 
+// Align to previous boundry.
+#ifndef ALIGNFLOOR
+#define ALIGNFLOOR(VAL_, ALIGNMENT_) ((VAL_) & ~(ALIGNMENT_ - 1))
+#endif
+
+// Align to next boundary.
 #ifndef ALIGN
 #define ALIGN(VAL_, ALIGNMENT_) (((VAL_) + ((ALIGNMENT_) - 1)) & ~((ALIGNMENT_) - 1))
 #endif
