@@ -1338,7 +1338,7 @@ null_return:
 void reclaim_notes(void) {
     struct Note *note;
     s32 i;
-    s32 cond;
+    _Bool cond;
 
     for (i = 0; i < gMaxSimultaneousNotes; i++) {
         note = &gNotes[i];

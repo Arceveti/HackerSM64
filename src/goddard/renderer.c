@@ -117,9 +117,9 @@ static s32 sTriangleBufCount;                  // number of triangles in sTriang
 static struct ObjView *sMSceneView;     // @ 801BB0C8; Mario scene view
 static s32 sVertexBufStartIndex;                  // Vtx start in GD Dl
 static struct ObjView *sCarSceneView;   // @ 801BB0D0
-static s32 sUpdateYoshiScene;           // @ 801BB0D4; update dl Vtx from ObjVertex?
-static s32 sUpdateMarioScene;           // @ 801BB0D8; update dl Vtx from ObjVertex?
-static s32 sUpdateCarScene; // @ 801BB0E0; guess, not really used
+static _Bool sUpdateYoshiScene;           // @ 801BB0D4; update dl Vtx from ObjVertex?
+static _Bool sUpdateMarioScene;           // @ 801BB0D8; update dl Vtx from ObjVertex?
+static _Bool sUpdateCarScene; // @ 801BB0E0; guess, not really used
 static struct GdVec3f sTextDrawPos;  // position to draw text? only set in one function, never used
 static Mtx sIdnMtx;           // @ 801BB100
 static Mat4f sInitIdnMat4;    // @ 801BB140
@@ -3080,10 +3080,10 @@ UNUSED void Unknown801A5D90(struct ObjGroup *arg0) {
     struct ObjLabel *mtLabel;  // 254
     struct ObjGroup *labelgrp; // 250
     struct ObjView *memview;   // 24c
-    s32 trackerNum;                 // memtracker id and/or i
+    s32 trackerNum;            // memtracker id and/or i
     s32 sp244;                 // label y position?
-    s32 sp240;                 // done checking all memtrakcers
-    s32 sp23C;                 // memtracker label made?
+    _Bool sp240;               // done checking all memtrakcers
+    _Bool sp23C;               // memtracker label made?
     char mtStatsFmt[0x100];    // 13c
     char groupId[0x100];       // 3c
     struct MemTracker *mt;     // 38

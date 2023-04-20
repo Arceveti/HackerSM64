@@ -129,10 +129,10 @@ enum WarpTransitions {
 };
 
 struct WarpTransition {
-    /*0x00*/ u8 isActive;       // Is the transition active. (either TRUE or FALSE)
-    /*0x01*/ u8 type;           // Determines the type of transition to use (circle, star, etc.)
-    /*0x02*/ u8 time;           // Amount of time to complete the transition (in frames)
-    /*0x03*/ u8 pauseRendering; // Should the game stop rendering. (either TRUE or FALSE)
+    /*0x00*/ _Bool isActive;       // Is the transition active. (either TRUE or FALSE)
+    /*0x01*/ u8 type;              // Determines the type of transition to use (circle, star, etc.)
+    /*0x02*/ u8 time;              // Amount of time to complete the transition (in frames)
+    /*0x03*/ _Bool pauseRendering; // Should the game stop rendering. (either TRUE or FALSE)
     /*0x04*/ struct WarpTransitionData data;
 };
 

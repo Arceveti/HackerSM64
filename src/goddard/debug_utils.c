@@ -31,7 +31,7 @@ static u32 sSecondarySeed = 0x58374895; // @ 801A82A8
 // bss
 u8 *gGdStreamBuffer;                                        // @ 801BA190
 static const char *sRoutineNames[64];                       // @ 801BA198
-static s32 sTimingActive;                                   // @ 801BA298
+static _Bool sTimingActive;                                 // @ 801BA298
 static struct GdTimer sTimers[GD_NUM_TIMERS];               // @ 801BA2A0
 static struct MemTracker sMemTrackers[GD_NUM_MEM_TRACKERS]; // @ 801BA720
 static struct MemTracker *sActiveMemTrackers[16];           // @ 801BA920

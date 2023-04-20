@@ -23,7 +23,7 @@ void bhv_tilting_inverted_pyramid_loop(void) {
 #endif
     Vec3f targetNormal;
     Mat4 *transform = &o->transform;
-    s32 marioOnPlatform = (gMarioObject->platform == o);
+    _Bool marioOnPlatform = (gMarioObject->platform == o);
 
     if (marioOnPlatform) {
 #ifndef PLATFORM_DISPLACEMENT_2

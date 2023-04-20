@@ -43,7 +43,7 @@ s32 analog_stick_held_back(struct MarioState* m);
 void mario_set_forward_vel(struct MarioState* m, f32 speed);
 s32 mario_get_floor_class(struct MarioState* m);
 u32 mario_get_terrain_sound_addend(struct MarioState* m);
-s32 mario_facing_downhill(struct MarioState* m, s32 turnYaw);
+s32 mario_facing_downhill(struct MarioState* m, _Bool turnYaw);
 u32 mario_floor_is_slippery(struct MarioState* m);
 s32 mario_floor_is_slope(struct MarioState* m);
 s32 mario_floor_is_steep(struct MarioState* m);

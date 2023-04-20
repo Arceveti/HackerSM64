@@ -1634,8 +1634,8 @@ void find_surface_on_ray_cell(s32 cellX, s32 cellZ, Vec3f orig, Vec3f normalized
     // Skip if OOB
     if ((cellX >= 0) && (cellX <= (NUM_CELLS - 1)) && (cellZ >= 0) && (cellZ <= (NUM_CELLS - 1))) {
         f32 ny = normalized_dir[1];
-        s32 rayUp   = (ny >  NEAR_ONE);
-        s32 rayDown = (ny < -NEAR_ONE);
+        _Bool rayUp   = (ny >  NEAR_ONE);
+        _Bool rayDown = (ny < -NEAR_ONE);
 
         for (s32 i = 0; i < NUM_SPATIAL_PARTITIONS; i++) {
             if ((rayDown && (i == SPATIAL_PARTITION_CEILS ))

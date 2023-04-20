@@ -524,7 +524,7 @@ u32 mario_get_terrain_sound_addend(struct MarioState* m) {
 /**
  * Determines if Mario is facing "downhill."
  */
-s32 mario_facing_downhill(struct MarioState* m, s32 turnYaw) {
+s32 mario_facing_downhill(struct MarioState* m, _Bool turnYaw) {
     // Forces Mario to do a belly slide rather than a butt slide when on a super slippery floor, no matter his angle, so that the player can't jump.
     if (m->floor && m->floor->type == SURFACE_SUPER_SLIPPERY)
         return FALSE;
@@ -1301,7 +1301,6 @@ void update_mario_geometry_inputs(struct MarioState* m) {
     m->floorHeight = find_floor(m->pos[0], m->pos[1], m->pos[2], &m->floor);
 
     _Bool isOOB = FALSE;
-
 #ifdef ALLOW_NULL_FLOORS
  #ifndef ALLOW_OUTSIDE_LEVEL_BOUNDS
     isOOB = is_outside_level_bounds(m->pos[0], m->pos[2]);

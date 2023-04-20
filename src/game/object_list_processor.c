@@ -150,14 +150,14 @@ TerrainData* gEnvironmentRegions;
 s32 gEnvironmentLevels[20];
 struct TransitionRoomData gDoorAdjacentRooms[MAX_NUM_TRANSITION_ROOMS];
 s16 gMarioCurrentRoom;
-s16 gTHIWaterDrained;
+_Bool gTHIWaterDrained;
 s16 gTTCSpeedSetting;
-s16 gMarioShotFromCannon;
-s16 gCCMEnteredSlide;
+_Bool gMarioShotFromCannon;
+_Bool gCCMEnteredSlide;
 s16 gNumRoomedObjectsInMarioRoom;
 s16 gNumRoomedObjectsNotInMarioRoom;
-s16 gWDWWaterLevelChanging;
-s16 gMarioOnMerryGoRound;
+_Bool gWDWWaterLevelChanging;
+_Bool gMarioOnMerryGoRound;
 
 /**
  * Nodes used to represent the doubly linked object lists.

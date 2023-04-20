@@ -129,14 +129,14 @@ struct TransitionRoomData {
 extern struct TransitionRoomData gDoorAdjacentRooms[MAX_NUM_TRANSITION_ROOMS];
 
 extern s16 gMarioCurrentRoom;
-extern s16 gTHIWaterDrained;
+extern _Bool gTHIWaterDrained;
 extern s16 gTTCSpeedSetting;
-extern s16 gMarioShotFromCannon;
-extern s16 gCCMEnteredSlide;
+extern _Bool gMarioShotFromCannon;
+extern _Bool gCCMEnteredSlide;
 extern s16 gNumRoomedObjectsInMarioRoom;
 extern s16 gNumRoomedObjectsNotInMarioRoom;
-extern s16 gWDWWaterLevelChanging;
-extern s16 gMarioOnMerryGoRound;
+extern _Bool gWDWWaterLevelChanging;
+extern _Bool gMarioOnMerryGoRound;
 
 
 void bhv_mario_update(void);

@@ -1265,9 +1265,12 @@ u32 interact_bully(struct MarioState *m, UNUSED u32 interactType, struct Object 
 }
 
 u32 interact_shock(struct MarioState *m, UNUSED u32 interactType, struct Object *obj) {
-    if (!sInvulnerable && !(m->flags & MARIO_VANISH_CAP)
-        && !(obj->oInteractionSubtype & INT_SUBTYPE_DELAY_INVINCIBILITY)) {
-        u32 actionArg = (m->action & (ACT_FLAG_AIR | ACT_FLAG_ON_POLE | ACT_FLAG_HANGING)) == 0;
+    if (
+        !sInvulnerable &&
+        !(m->flags & MARIO_VANISH_CAP) &&
+        !(obj->oInteractionSubtype & INT_SUBTYPE_DELAY_INVINCIBILITY)
+    ) {
+        u32 actionArg = ((m->action & (ACT_FLAG_AIR | ACT_FLAG_ON_POLE | ACT_FLAG_HANGING)) == 0);
 
         obj->oInteractStatus = INT_STATUS_INTERACTED | INT_STATUS_ATTACKED_MARIO;
         m->interactObj = obj;

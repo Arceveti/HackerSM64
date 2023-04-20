@@ -13,7 +13,7 @@ struct EnvFxParticle {
     /*0x10*/ s32 distFromCenter; // for whirpools, distance from center
     /*0x14*/ s32 bubbleY; // for Bubbles, yPos is always set to this
     /*0x18*/ s16 animFrame; // lava bubbles and flowers have frame animations
-    /*0x1A*/ s8 isAlive : 1;
+    /*0x1A*/ _Bool isAlive;
 };
 
 extern s8 gEnvFxMode;
