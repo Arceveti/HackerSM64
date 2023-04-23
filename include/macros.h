@@ -21,8 +21,8 @@
 #define INCBIN(type, name, path, align) \
     __asm__( \
         ".section \".rodata\", \"a\", @progbits\n" \
-        ".global "TO_STRING2(name)"\n" \
         ".balign "TO_STRING2(align)"\n" \
+        ".global "TO_STRING2(name)"\n" \
         TO_STRING2(name)":\n" \
         ".incbin \""path"\"\n" \
         ".previous\n" \
