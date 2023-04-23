@@ -1257,9 +1257,11 @@ s32 is_bowser_level(u32 level) {
 #ifndef ENABLE_VANILLA_LEVEL_SPECIFIC_CHECKS
     return FALSE;
 #endif
-    return (level == LEVEL_BOWSER_1
-         || level == LEVEL_BOWSER_2
-         || level == LEVEL_BOWSER_3);
+    return (
+        level == LEVEL_BOWSER_1 ||
+        level == LEVEL_BOWSER_2 ||
+        level == LEVEL_BOWSER_3
+    );
 }
 
 /**
