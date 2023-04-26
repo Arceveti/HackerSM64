@@ -19,7 +19,9 @@
 
 #define G_CC_TEXT PRIMITIVE, 0, TEXEL0, 0, 0, 0, 0, TEXEL0
 
+
 INCBIN(Texture, fast_font, "src/game/newfont2_swapped.bin", 16);
+
 
 // Sets of characters to skip (in order):
 #define SKIP1 "<=>"

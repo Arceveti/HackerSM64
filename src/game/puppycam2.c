@@ -888,7 +888,7 @@ void puppycam_terrain_angle(void) {
     f32 adjustSpeed;
     s32 floor2 = find_floor_height(gPuppyCam.pos[0], gPuppyCam.pos[1] + 100, gPuppyCam.pos[2]);
     s32 ceil = 20000; // find_ceil(gPuppyCam.pos[0], gPuppyCam.pos[1] + 100, gPuppyCam.pos[2]);
-    s32 farFromSurface;
+    _Bool farFromSurface;
     s16 floorPitch;
     _Bool gotTheOkay = FALSE;
 
@@ -974,9 +974,11 @@ static s32 puppycam_check_volume_bounds(struct sPuppyVolume *volume, s32 index) 
         debug_box_color(COLOR_RGBA32_DEBUG_PUPPYVOLUME);
         debug_box_rot(debugPos[0], debugPos[1], sPuppyVolumeStack[index]->rot, (DEBUG_SHAPE_CYLINDER | DEBUG_UCODE_DEFAULT));
 #endif
-        f32 distCheck = (dist < sqr(sPuppyVolumeStack[index]->radius[0]));
-
-        if (-sPuppyVolumeStack[index]->radius[1] < rel[1] && rel[1] < sPuppyVolumeStack[index]->radius[1] && distCheck) {
+        if (
+            (-sPuppyVolumeStack[index]->radius[1] < rel[1]) &&
+            (rel[1] <  sPuppyVolumeStack[index]->radius[1]) &&
+            (dist < sqr(sPuppyVolumeStack[index]->radius[0]))
+        ) {
             *volume = *sPuppyVolumeStack[index];
             return TRUE;
         }
