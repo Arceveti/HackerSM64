@@ -1355,7 +1355,7 @@ u32 ascii_to_credits_char(unsigned char c) {
     return GLOBAL_CHAR_SPACE;
 }
 
-void print_credits_str_ascii(s16 x, s16 y, const char *str) {
+void print_credits_str_ascii(s16 x, s16 y, const String str) {
     s32 pos = 0;
     unsigned char c = str[pos];
     unsigned char creditStr[100] = "";

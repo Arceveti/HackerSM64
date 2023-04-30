@@ -171,7 +171,7 @@ void set_menu_mode(s16 mode);
 void reset_cutscene_msg_fade(void);
 void dl_rgba16_begin_cutscene_msg_fade(void);
 void dl_rgba16_stop_cutscene_msg_fade(void);
-void print_credits_str_ascii(s16 x, s16 y, const char *str);
+void print_credits_str_ascii(s16 x, s16 y, const String str);
 void set_cutscene_message(s16 xOffset, s16 yOffset, s16 msgIndex, s16 msgDuration);
 void do_cutscene_handler(void);
 void render_hud_cannon_reticle(void);
