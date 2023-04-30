@@ -1602,7 +1602,7 @@ void find_surface_on_ray_list(struct SurfaceNode* list, Vec3f orig, Vec3f dir, f
     Vec3f chk_hit_pos;
     f32 top, bottom;
     PUPPYPRINT_GET_SNAPSHOT();
-    // Get upper and lower bounds of ray
+    // Get upper and lower bounds of ray.
     if (dir[1] >= 0.0f) {
         // Ray is upwards.
         top    = orig[1] + (dir[1] * dir_length);
@@ -1613,13 +1613,13 @@ void find_surface_on_ray_list(struct SurfaceNode* list, Vec3f orig, Vec3f dir, f
         bottom = orig[1] + (dir[1] * dir_length);
     }
 
-    // Iterate through every surface of the list
+    // Iterate through every surface of the list.
     for (; list != NULL; list = list->next) {
-        // Reject surface if out of vertical bounds
+        // Reject surface if out of vertical bounds.
         if ((list->surface->lowerY > top) || (list->surface->upperY < bottom)) {
             continue;
         }
-        // Check intersection between the ray and this surface
+        // Check intersection between the ray and this surface.
         hit = ray_surface_intersect(orig, dir, dir_length, list->surface, chk_hit_pos, &length);
         if (hit && (length <= *max_length)) {
             *hit_surface = list->surface;
@@ -1631,7 +1631,7 @@ void find_surface_on_ray_list(struct SurfaceNode* list, Vec3f orig, Vec3f dir, f
 }
 
 void find_surface_on_ray_cell(s32 cellX, s32 cellZ, Vec3f orig, Vec3f normalized_dir, f32 dir_length, struct Surface** hit_surface, Vec3f hit_pos, f32* max_length, s32 flags) {
-    // Skip if OOB
+    // Skip if OOB.
     if ((cellX >= 0) && (cellX <= (NUM_CELLS - 1)) && (cellZ >= 0) && (cellZ <= (NUM_CELLS - 1))) {
         f32 ny = normalized_dir[1];
         _Bool rayUp   = (ny >  NEAR_ONE);
@@ -1644,7 +1644,7 @@ void find_surface_on_ray_cell(s32 cellX, s32 cellZ, Vec3f orig, Vec3f normalized
             }
 
             if (flags & BIT(i)) {
-                // Iterate through each surface in this partition
+                // Iterate through each surface in this partition.
                 find_surface_on_ray_list( gStaticSurfacePartition[cellZ][cellX][i].next, orig, normalized_dir, dir_length, hit_surface, hit_pos, max_length);
                 find_surface_on_ray_list(gDynamicSurfacePartition[cellZ][cellX][i].next, orig, normalized_dir, dir_length, hit_surface, hit_pos, max_length);
             }
@@ -1659,7 +1659,7 @@ void find_surface_on_ray(Vec3f orig, Vec3f dir, struct Surface** hit_surface, Ve
     const f32 invcell = (1.0f / CELL_SIZE);
     PUPPYPRINT_ADD_COUNTER(gPuppyCallCounter.collision_raycast);
 
-    // Set that no surface has been hit
+    // Set that no surface has been hit.
     *hit_surface = NULL;
     vec3f_sum(hit_pos, orig, dir);
 
@@ -1669,7 +1669,7 @@ void find_surface_on_ray(Vec3f orig, Vec3f dir, struct Surface** hit_surface, Ve
     vec3f_copy(normalized_dir, dir);
     vec3f_normalize(normalized_dir);
 
-    // Get our cell coordinate
+    // Get our cell coordinate.
     f32 fCellX    = (orig[0] + LEVEL_BOUNDARY_MAX) * invcell;
     f32 fCellZ    = (orig[2] + LEVEL_BOUNDARY_MAX) * invcell;
     s32 cellX     = fCellX;
@@ -1677,13 +1677,13 @@ void find_surface_on_ray(Vec3f orig, Vec3f dir, struct Surface** hit_surface, Ve
     s32 cellPrevX = cellX;
     s32 cellPrevZ = cellZ;
 
-    // Don't do DDA if straight down
+    // Don't do DDA if straight down.
     if ((normalized_dir[1] >= NEAR_ONE) || (normalized_dir[1] <= -NEAR_ONE)) {
         find_surface_on_ray_cell(cellX, cellZ, orig, normalized_dir, dir_length, hit_surface, hit_pos, &max_length, flags);
         return;
     }
 
-    // Get cells we cross using DDA
+    // Get cells we cross using DDA.
     f32 absDir0 = absf(dir[0]);
     f32 absDir2 = absf(dir[2]);
     if (absDir0 >= absDir2) {
@@ -1698,7 +1698,7 @@ void find_surface_on_ray(Vec3f orig, Vec3f dir, struct Surface** hit_surface, Ve
     for (i = 0; i < step && *hit_surface == NULL; i++) {
         find_surface_on_ray_cell(cellX, cellZ, orig, normalized_dir, dir_length, hit_surface, hit_pos, &max_length, flags);
 
-        // Move cell coordinate
+        // Move cell coordinate.
         fCellX   += dx;
         fCellZ   += dz;
         cellPrevX = cellX;
@@ -1719,15 +1719,15 @@ void find_surface_on_ray_between_points(Vec3f pos1, Vec3f pos2, struct Surface**
     find_surface_on_ray(pos1, dir, hit_surface, hit_pos, flags);
 }
 
-// Converts a floating point matrix to a fixed point matrix
+// Converts a floating point matrix to a fixed point matrix.
 // Makes some assumptions about certain fields in the matrix, which will always be true for valid matrices.
 OPTIMIZE_OS ALIGNED32 void mtxf_to_mtx_fast(s16* dst, float* src) {
     PUPPYPRINT_ADD_COUNTER(gPuppyCallCounter.matrix);
     int i;
     float scale = construct_float((float)0x00010000 / WORLD_SCALE);
-    // Iterate over rows of values in the input matrix
+    // Iterate over rows of values in the input matrix.
     for (i = 0; i < 4; i++) {
-        // Read the three input in the current row (assume the fourth is zero)
+        // Read the three input in the current row (assume the fourth is zero).
         float a = src[(4 * i) + 0];
         float b = src[(4 * i) + 1];
         float c = src[(4 * i) + 2];
@@ -1747,18 +1747,18 @@ OPTIMIZE_OS ALIGNED32 void mtxf_to_mtx_fast(s16* dst, float* src) {
         // Those two bytes will get overwritten by the integer part of b.
         // This prevents needing to shift or mask the integer value of a.
         *(s32*)(&dst[(4 * i) +  0]) = a_int;
-        // Write the fractional part of a
+        // Write the fractional part of a.
         dst[(4 * i) + 16] = (s16)a_int;
 
         // Write the integer part of b using swl to avoid needing to shift.
-        swl(dst + (4 * i), b_int, 2);
+        swl((dst + (4 * i)), b_int, 2);
         // Write the fractional part of b.
-        dst[(4 * i) + 16 + 1] = (s16)b_int;
+        dst[((4 * i) + 16) + 1] = (s16)b_int;
 
         // Write the integer part of c and two zeroes for the 4th column.
         *(s32*)(&dst[(4 * i) + 2]) = c_high;
-        // Write the fractional part of c and two zeroes for the 4th column
-        *(s32*)(&dst[(4 * i) + 16 + 2]) = c_low;
+        // Write the fractional part of c and two zeroes for the 4th column.
+        *(s32*)(&dst[((4 * i) + 16) + 2]) = c_low;
     }
     // Write 1.0 to the bottom right entry in the output matrix
     // The low half was already set to zero in the loop, so we only need

@@ -564,47 +564,88 @@ ALWAYS_INLINE f32 remap(f32 f, f32 fromA, f32 toA, f32 fromB, f32 toB) {
 
 // Inline asm functions:
 
-/// Rounds towards infinity
-ALWAYS_INLINE s32 ceilf(f32 in) {
-    f32 tmp;
-    s32 out;
-    __asm__("ceil.w.s  %0,%1" : "=f" (tmp) : "f" (in ));
-    __asm__("mfc1      %0,%1" : "=r" (out) : "f" (tmp));
+/// Load upper immediate.
+ALWAYS_INLINE void lui(u32* dest, u32 val) {
+    __asm__("lui %0, %1" : "=r"(*dest) : "K"(val));
+}
+
+/// OR immediate.
+ALWAYS_INLINE void ori_self(u32* dest, u32 val) {
+    __asm__("ori %0, $0, %1" : "+r"(*dest) : "K"(val));
+}
+
+/// Multiply two floats without a nop.
+ALWAYS_INLINE float mul_without_nop(float a, float b) {
+    float ret;
+    __asm__("mul.s %0, %1, %2" : "=f"(ret) : "f"(a), "f"(b));
+    return ret;
+}
+
+/// Write a 32 bit value into the low order bytes of a register.
+ALWAYS_INLINE void swr(void* addr, int val, const int offset) {
+    __asm__("swr %1, %2(%0)" : : "g"(addr), "g"(val), "I"(offset));
+}
+
+/// Write a 32 bit value into the high order bytes of a register.
+ALWAYS_INLINE void swl(void* addr, int val, const int offset) {
+    __asm__("swl %1, %2(%0)" : : "g"(addr), "g"(val), "I"(offset));
+}
+
+/// Convert a float to an int.
+ALWAYS_INLINE int mfc1(float in) {
+    int out;
+    __asm__("mfc1 %0,%1" : "=r" (out) : "f" (in));
     return out;
+}
+
+/// Convert an int to a float.
+ALWAYS_INLINE float mtc1(int in) {
+    float out;
+    __asm__("mtc1 %1, %0" : "=f"(out) : "r"(in));
+    return out;
+}
+
+/// Rounds towards infinity
+ALWAYS_INLINE s32 ceilf(const f32 in) {
+    f32 tmp;
+    __asm__("ceil.w.s %0,%1" : "=f" (tmp) : "f" (in));
+    return mfc1(tmp);
 }
 /// Rounds towards negative infinity
-ALWAYS_INLINE s32 floorf(f32 in) {
+ALWAYS_INLINE s32 floorf(const f32 in) {
     f32 tmp;
-    s32 out;
-    __asm__("floor.w.s %0,%1" : "=f" (tmp) : "f" (in ));
-    __asm__("mfc1      %0,%1" : "=r" (out) : "f" (tmp));
-    return out;
+    __asm__("floor.w.s %0,%1" : "=f" (tmp) : "f" (in));
+    return mfc1(tmp);
 }
 /// Rounds towards the nearest integer
-ALWAYS_INLINE s32 roundf(f32 in) {
+ALWAYS_INLINE s32 roundf(const f32 in) {
     f32 tmp;
-    s32 out;
-    __asm__("round.w.s %0,%1" : "=f" (tmp) : "f" (in ));
-    __asm__("mfc1      %0,%1" : "=r" (out) : "f" (tmp));
-    return out;
+    __asm__("round.w.s %0,%1" : "=f" (tmp) : "f" (in));
+    return mfc1(tmp);
 }
 /// Backwards compatibility
 #define round_float(in) roundf(in)
 
 
 /// Absolute value of a float value
-ALWAYS_INLINE f32 absf(f32 in) {
+ALWAYS_INLINE f32 absf(const f32 in) {
     f32 out;
     __asm__("abs.s %0,%1" : "=f" (out) : "f" (in)); //? __builtin_fabsf(x)
     return out;
 }
+/// Absolute value of a double value
+ALWAYS_INLINE f64 absd(const f64 in) {
+    f64 out;
+    __asm__("abs.d %0,%1" : "=f" (out) : "f" (in));
+    return out;
+}
 /// Absolute value of an integer value
-ALWAYS_INLINE s32 absi(s32 in) {
+ALWAYS_INLINE s32 absi(const s32 in) {
     s32 t0 = (in >> 31);
     return ((in ^ t0) - t0);
 }
 /// Absolute value of a short value
-ALWAYS_INLINE s32 abss(s16 in) {
+ALWAYS_INLINE s32 abss(const s16 in) {
     s32 t0 = (in >> 31);
     return ((in ^ t0) - t0);
 }
@@ -617,7 +658,6 @@ ALWAYS_INLINE s32 abss(s16 in) {
 /// Especially fast for halfword floats, which get loaded with a `lui` + `mtc1`.
 ALWAYS_INLINE float construct_float(const float f) {
     u32 r;
-    float f_out;
     u32 i = *(u32*)(&f);
 
     if (!__builtin_constant_p(i)) {
@@ -628,57 +668,23 @@ ALWAYS_INLINE float construct_float(const float f) {
     u32 lower = (i & BITMASK(16));
 
     if ((i & BITMASK(16)) == 0) {
-        __asm__ ("lui %0, %1"
-                                : "=r"(r)
-                                : "K"(upper));
+        lui(&r, upper);
     } else if ((i & (BITMASK(16) << 16)) == 0) {
-        __asm__ ("ori %0, $0, %1"
-                                : "+r"(r)
-                                : "K"(lower));
+        ori_self(&r, lower);
     } else {
-        __asm__ ("lui %0, %1"
-                                : "=r"(r)
-                                : "K"(upper));
-        __asm__ ("ori %0, %0, %1"
-                                : "+r"(r)
-                                : "K"(lower));
+        lui(&r, upper);
+        ori_self(&r, lower);
     }
 
-    __asm__ ("mtc1 %1, %0"
-                         : "=f"(f_out)
-                         : "r"(r));
-    return f_out;
-}
-
-/// Multiply two floats without a nop.
-ALWAYS_INLINE float mul_without_nop(float a, float b) {
-    float ret;
-    __asm__ ("mul.s %0, %1, %2"
-                         : "=f"(ret)
-                         : "f"(a), "f"(b));
-    return ret;
-}
-
-/// Write a 32 bit value into the low order bytes of a register.
-ALWAYS_INLINE void swr(void* addr, s32 val, const int offset) {
-    __asm__ ("swr %1, %2(%0)"
-                        :
-                        : "g"(addr), "g"(val), "I"(offset));
-}
-
-/// Write a 32 bit value into the high order bytes of a register.
-ALWAYS_INLINE void swl(void* addr, s32 val, const int offset) {
-    __asm__ ("swl %1, %2(%0)"
-                        :
-                        : "g"(addr), "g"(val), "I"(offset));
+    return mtc1(r);
 }
 
 
 // On console, (x != 0) still returns true for denormalized floats,
 // which will count as a division by zero when divided and crash.
 // For console compatibility, use this check instead when avoiding a division by zero.
-#define F32_IS_NONZERO(x) ((*(int*)&(x)) & (BITMASK( 8) << 23))
-#define F64_IS_NONZERO(x) ((*(int*)&(x)) & (BITMASK(11) << 52))
+#define F32_IS_NONZERO(x) ((*(int*)(&(x))) & (BITMASK( 8) << 23))
+#define F64_IS_NONZERO(x) ((*(int*)(&(x))) & (BITMASK(11) << 52))
 // HackerSM64: Backwards compatibility
 #define FLT_IS_NONZERO(x) F32_IS_NONZERO(x)
 #define DBL_IS_NONZERO(x) F64_IS_NONZERO(x)
