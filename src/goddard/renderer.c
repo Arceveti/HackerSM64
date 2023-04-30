@@ -2787,16 +2787,13 @@ UNUSED void Unknown801A4F58(void) {
     s16 *cbufOn;  // a1
     u16 *zbuf;    // a2
     s16 colour;   // a3
-    s16 r;        // t0
-    s16 g;        // t1
-    s16 b;        // t2
-    s32 i;        // t3
+    s16 r, g, b;
 
     cbufOff = sScreenView->colourBufs[gGdFrameBufNum ^ 1];
     cbufOn = sScreenView->colourBufs[gGdFrameBufNum];
     zbuf = sScreenView->zbuf;
 
-    for (i = 0; i < SCREEN_SIZE; i++) { // L801A4FCC
+    for (u32 i = 0; i < SCREEN_SIZE; i++) { // L801A4FCC
         colour = cbufOff[i];
         if (colour) {
             r = (s16)((colour >> 11) & BITMASK(5)) - 1;

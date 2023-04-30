@@ -14,6 +14,6 @@ extern RGBA16 gFramebuffers[3][SCREEN_SIZE];
 #define gFramebuffer1 gFramebuffers[1]
 #define gFramebuffer2 gFramebuffers[2]
 
-#define FRAMEBUFFER_SIZE (SCREEN_SIZE * sizeof(RGBA16))
+#define FRAMEBUFFER_SIZE (size_t)(SCREEN_SIZE * sizeof(RGBA16))
 
 #endif // FRAMEBUFFERS_H
