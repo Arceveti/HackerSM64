@@ -84,7 +84,7 @@ static Vec4s sJumboStarKeyframes[27] = {
  * character is a null character (equal to 0), stop counting the length since
  * that's the end of the string.
  */
-s32 get_credits_str_width(char *str) {
+s32 get_credits_str_width(String str) {
     u32 c;
     s32 length = 0;
 
@@ -115,7 +115,7 @@ s32 get_credits_str_width(char *str) {
  */
 void print_displaying_credits_entry(void) {
     if (sDispCreditsEntry != NULL) {
-        String *currStrPtr = (String *) sDispCreditsEntry->string;
+        String *currStrPtr = (String*)sDispCreditsEntry->string;
         String titleStr = *currStrPtr++;
         s16 numLines = (*titleStr++ - '0');
 
@@ -127,29 +127,29 @@ void print_displaying_credits_entry(void) {
 
         switch (numLines) {
             case 4:
-                print_credits_str_ascii(CREDIT_TEXT_X_LEFT, strY + 24, *currStrPtr++);
+                print_credits_str_ascii(CREDIT_TEXT_X_LEFT, (strY + 24), *currStrPtr++);
                 numLines = 2;
                 lineHeight = 24;
                 break;
             case 5:
-                print_credits_str_ascii(CREDIT_TEXT_X_LEFT, strY + 16, *currStrPtr++);
+                print_credits_str_ascii(CREDIT_TEXT_X_LEFT, (strY + 16), *currStrPtr++);
                 numLines = 3;
                 break;
 #ifdef VERSION_EU
             case 6:
-                print_credits_str_ascii(CREDIT_TEXT_X_LEFT, strY + 32, *currStrPtr++);
+                print_credits_str_ascii(CREDIT_TEXT_X_LEFT, (strY + 32), *currStrPtr++);
                 numLines = 3;
                 break;
             case 7:
-                print_credits_str_ascii(CREDIT_TEXT_X_LEFT, strY + 16, *currStrPtr++);
-                print_credits_str_ascii(CREDIT_TEXT_X_LEFT, strY + 32, *currStrPtr++);
+                print_credits_str_ascii(CREDIT_TEXT_X_LEFT, (strY + 16), *currStrPtr++);
+                print_credits_str_ascii(CREDIT_TEXT_X_LEFT, (strY + 32), *currStrPtr++);
                 numLines = 3;
                 break;
 #endif
         }
 
         while (numLines-- > 0) {
-            print_credits_str_ascii(CREDIT_TEXT_X_RIGHT - get_credits_str_width(*currStrPtr), strY, *currStrPtr);
+            print_credits_str_ascii((CREDIT_TEXT_X_RIGHT - get_credits_str_width(*currStrPtr)), strY, *currStrPtr);
 
             strY += lineHeight;
 
