@@ -4,8 +4,8 @@
 
 #define BUFF_LEN 0x18
 
-static u8 D_80334960[] = "0123456789abcdef";
-static u8 D_80334974[] = "0123456789ABCDEF";
+static const u8 sHexLowercase[] = "0123456789abcdef";
+static const u8 sHexUppercase[] = "0123456789ABCDEF";
 
 void _Litob(printf_struct* args, u8 type) {
     u8 buff[BUFF_LEN];
@@ -15,11 +15,7 @@ void _Litob(printf_struct* args, u8 type) {
     u64 num;
     lldiv_t quotrem;
 
-    if (type == 'X') {
-        num_map = D_80334974;
-    } else {
-        num_map = D_80334960;
-    }
+    num_map = (type == 'X') ? sHexUppercase : sHexLowercase;
 
     base = (type == 'o') ? 8 : ((type != 'x' && type != 'X') ? 10 : 16);
     buff_ind = BUFF_LEN;
@@ -33,7 +29,7 @@ void _Litob(printf_struct* args, u8 type) {
         buff[--buff_ind] = num_map[num % base];
     }
 
-    args->value.s64 = num / base;
+    args->value.s64 = (num / base);
 
     while (args->value.s64 > 0 && buff_ind > 0) {
         quotrem = lldiv(args->value.s64, base);
@@ -41,16 +37,21 @@ void _Litob(printf_struct* args, u8 type) {
         buff[--buff_ind] = num_map[quotrem.rem];
     }
 
-    args->part2_len = BUFF_LEN - buff_ind;
+    args->part2_len = (BUFF_LEN - buff_ind);
 
-    memcpy(args->buff, buff + buff_ind, args->part2_len);
+    memcpy(args->buff, (buff + buff_ind), args->part2_len);
 
     if (args->part2_len < args->precision) {
-        args->num_leading_zeros = args->precision - args->part2_len;
+        args->num_leading_zeros = (args->precision - args->part2_len);
     }
 
-    if (args->precision < 0 && (args->flags & (FLAGS_ZERO | FLAGS_MINUS)) == FLAGS_ZERO) {
-        buff_ind = args->width - args->part1_len - args->num_leading_zeros - args->part2_len;
+    if ((args->precision < 0) && ((args->flags & (FLAGS_ZERO | FLAGS_MINUS)) == FLAGS_ZERO)) {
+        buff_ind = (
+            args->width             -
+            args->part1_len         -
+            args->num_leading_zeros -
+            args->part2_len
+        );
         if (buff_ind > 0) {
             args->num_leading_zeros += buff_ind;
         }

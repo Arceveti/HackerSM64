@@ -34,6 +34,6 @@ enum PrintfFlags {
 };
 
 s32 _Printf(char*(*prout)(char*, const char*, size_t), char* dst, const char* fmt, va_list args);
-void _Litob(printf_struct* args, u8 type);
-void _Ldtob(printf_struct* args, u8 type);
+void _Litob(printf_struct* args, unsigned char type);
+void _Ldtob(printf_struct* args, unsigned char type);
 #endif
