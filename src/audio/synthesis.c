@@ -1152,7 +1152,12 @@ u64 *synthesis_process_notes(s16 *aiBuf, s32 bufLen, u64 *cmd)
 
                         switch (flags) {
                             case A_INIT: // = 1
-                                sp130 = 0;
+                                /**
+                                 * !NOTE: Removing this seems to produce a more accurate waveform, however I have no idea why Nintendo decided to add this originally.
+                                 * I can only speculate (and hope) that this was just an oversight on their part and this has no reason to exist, given my testing.
+                                 * I'm leaving it commented out here just in case though.
+                                 */
+                                // sp130 = 0;
                                 s5 = (s0 * 2) + s5;
                                 break;
 
@@ -1386,12 +1391,17 @@ u64 *process_envelope(u64 *cmd, struct NoteSubEu *note, struct NoteSynthesisStat
     synthesisState->curVolLeft = targetLeft;
     synthesisState->curVolRight = targetRight;
 #else // !VERSION_EU
-
 u64 *process_envelope(u64 *cmd, struct Note *note, s32 nSamples, u16 inBuf, s32 headsetPanSettings, UNUSED u32 flags) {
     u16 sourceLeft, sourceRight;
     u16 targetLeft, targetRight;
-    sourceLeft        = note->curVolLeft;
-    sourceRight       = note->curVolRight;
+    if (note->initFullVelocity) {
+        note->initFullVelocity = FALSE;
+        sourceLeft  = note->targetVolLeft;
+        sourceRight = note->targetVolRight;
+    } else {
+        sourceLeft  = note->curVolLeft;
+        sourceRight = note->curVolRight;
+    }
     targetLeft        = note->targetVolLeft;
     targetRight       = note->targetVolRight;
     note->curVolLeft  = targetLeft;
@@ -1705,6 +1715,7 @@ void note_enable(struct Note *note) {
     note->stereoStrongRight = FALSE;
     note->stereoStrongLeft = FALSE;
     note->usesHeadsetPanEffects = FALSE;
+    note->initFullVelocity = FALSE;
     note->headsetPanLeft = 0;
     note->headsetPanRight = 0;
     note->prevHeadsetPanRight = 0;
