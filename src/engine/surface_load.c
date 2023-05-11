@@ -544,6 +544,8 @@ void load_area_terrain(s32 index, TerrainData* data, RoomData* surfaceRooms, Mac
 void clear_dynamic_surfaces(void) {
     PUPPYPRINT_GET_SNAPSHOT();
     if (!(gTimeStopState & TIME_STOP_ACTIVE)) {
+        clear_dynamic_surface_references();
+
         gSurfacesAllocated = gNumStaticSurfaces;
         gSurfaceNodesAllocated = gNumStaticSurfaceNodes;
         gDynamicSurfacePoolEnd = gDynamicSurfacePool;
