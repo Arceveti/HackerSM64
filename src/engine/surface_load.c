@@ -14,6 +14,7 @@
 #include "game/object_list_processor.h"
 #include "surface_load.h"
 #include "game/puppyprint.h"
+#include "game/debug.h"
 
 #include "config.h"
 
@@ -119,6 +120,7 @@ static void clear_static_surfaces(void) {
  */
 static void add_surface_to_cell(s32 dynamic, s32 cellX, s32 cellZ, struct Surface* surface) {
     struct SurfaceNode* list;
+    s32 priority;
     s32 sortDir = 1; // highest to lowest, then insertion order (water and floors)
     s32 listIndex;
 
@@ -134,6 +136,7 @@ static void add_surface_to_cell(s32 dynamic, s32 cellX, s32 cellZ, struct Surfac
         sortDir = 0; // insertion order
     }
 
+    s32 surfacePriority = surface->upperY * sortDir;
 
     struct SurfaceNode* newNode = alloc_surface_node(dynamic);
     newNode->surface = surface;
@@ -155,18 +158,14 @@ static void add_surface_to_cell(s32 dynamic, s32 cellX, s32 cellZ, struct Surfac
     }
 
     // Loop until we find the appropriate place for the surface in the list.
-    if (listIndex == SPATIAL_PARTITION_WATER) {
-        s32 surfacePriority = surface->upperY * sortDir;
-        s32 priority;
-        while (list->next != NULL) {
-            priority = list->next->surface->upperY * sortDir;
+    while (list->next != NULL) {
+        priority = list->next->surface->upperY * sortDir;
 
-            if (surfacePriority > priority) {
-                break;
-            }
-
-            list = list->next;
+        if (surfacePriority > priority) {
+            break;
         }
+
+        list = list->next;
     }
 
     newNode->next = list->next;
@@ -259,6 +258,7 @@ static struct Surface* read_surface_data(TerrainData* vertexData, TerrainData** 
 
     f32 mag = (sqr(n[0]) + sqr(n[1]) + sqr(n[2]));
     // This will never need to be run for custom levels because Fast64 does this step before exporting.
+    // assert(mag >= NEAR_ZERO, "Denorm tri was found.");
 #ifdef ENABLE_VANILLA_LEVEL_SPECIFIC_CHECKS
     if (mag < NEAR_ZERO) {
         return NULL;
@@ -689,20 +689,11 @@ void load_object_collision_model(void) {
     struct Object* obj = gCurrentObject;
 
     TerrainData* collisionData = obj->collisionData;
-    f32 marioDist = obj->oDistanceToMario;
 
-    // On an object's first frame, the distance is set to F32_MAX.
-    // If the distance hasn't been updated, update it now.
-    if (marioDist == F32_MAX) {
-        marioDist = dist_between_objects(obj, gMarioObject);
-    }
+    f32 sqrLateralDist;
+    vec3f_get_lateral_dist_squared(&o->oPosVec, &gMarioObject->oPosVec, &sqrLateralDist);
 
-#ifdef LOAD_OBJECT_COLLISION_NEAR_CAMERA
-    f32 camDist = vec3_mag(obj->header.gfx.cameraToObject);
-    if (marioDist > camDist && camDist > 0.0f) {
-        marioDist = camDist;
-    }
-#endif
+    f32 verticalMarioDiff = (gMarioObject->oPosY - o->oPosY);
 
 #ifdef AUTO_COLLISION_DISTANCE
     f32 colDist;
@@ -728,12 +719,18 @@ void load_object_collision_model(void) {
     if (drawDist < colDist) {
         drawDist = colDist;
     }
+    
+    _Bool inColRadius = (
+           (sqrLateralDist < sqr(colDist))
+        && (verticalMarioDiff > 0 || verticalMarioDiff > -colDist)
+        && (verticalMarioDiff < 0 || (verticalMarioDiff < (colDist + 2000.0f)))
+    );
 
     // Update if no Time Stop, in range, and in the current room.
     if (
-        !(gTimeStopState & TIME_STOP_ACTIVE) &&
-        (marioDist < colDist) &&
-        !(obj->activeFlags & ACTIVE_FLAG_IN_DIFFERENT_ROOM)
+        !(gTimeStopState & TIME_STOP_ACTIVE)
+     && inColRadius
+     && !(obj->activeFlags & ACTIVE_FLAG_IN_DIFFERENT_ROOM)
     ) {
         collisionData++;
         transform_object_vertices(&collisionData, sVertexData, obj);
@@ -742,6 +739,14 @@ void load_object_collision_model(void) {
         while (*collisionData != TERRAIN_LOAD_CONTINUE) {
             load_object_surfaces(&collisionData, sVertexData, obj, TRUE);
         }
+    }
+
+    f32 marioDist = obj->oDistanceToMario;
+
+    // On an object's first frame, the distance is set to F32_MAX.
+    // If the distance hasn't been updated, update it now.
+    if (marioDist == F32_MAX) {
+        marioDist = dist_between_objects(obj, gMarioObject);
     }
 
     obj->header.gfx.node.flags = COND_BIT(obj->header.gfx.node.flags, GRAPH_RENDER_ACTIVE, (marioDist < drawDist));

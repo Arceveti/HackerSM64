@@ -82,7 +82,7 @@ s32 gMinAiBufferLength;
 
 s16 gTempoInternalToExternal;
 s8 gAudioUpdatesPerFrame;
-s8 gSoundMode;
+s8 gSoundMode = SOUND_MODE_STEREO;
 
 extern u64 gAudioGlobalsStartMarker;
 extern u64 gAudioGlobalsEndMarker;
@@ -786,7 +786,6 @@ void audio_init() {
     gAudioFrameCount = 0;
     gAudioTaskIndex = 0;
     gCurrAiBufferIndex = 0;
-    gSoundMode = SOUND_MODE_STEREO;
     gAudioTask = NULL;
     gAudioTasks[0].task.t.data_size = 0;
     gAudioTasks[1].task.t.data_size = 0;

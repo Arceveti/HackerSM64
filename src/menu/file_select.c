@@ -93,9 +93,14 @@ static const struct MenuButton sEraseMenuButtonsList[] = {
 #endif
 
 static const struct MenuButton sSoundModeButtonsList[] = {
+#ifdef ENABLE_STEREO_HEADSET_EFFECTS
     { MENU_BUTTON_STEREO,            MODEL_MAIN_MENU_GENERIC_BUTTON,          533, SOUND_BUTTON_Y }, // Stereo option button
     { MENU_BUTTON_MONO,              MODEL_MAIN_MENU_GENERIC_BUTTON,            0, SOUND_BUTTON_Y }, // Mono option button
     { MENU_BUTTON_HEADSET,           MODEL_MAIN_MENU_GENERIC_BUTTON,         -533, SOUND_BUTTON_Y }, // Headset option button
+#else
+    { MENU_BUTTON_STEREO,            MODEL_MAIN_MENU_GENERIC_BUTTON,          533, SOUND_BUTTON_Y }, // Stereo option button
+    { MENU_BUTTON_MONO,              MODEL_MAIN_MENU_GENERIC_BUTTON,         -533, SOUND_BUTTON_Y }, // Mono option button
+#endif
 #if MULTILANG
     { MENU_BUTTON_LANGUAGE_ENGLISH,  MODEL_MAIN_MENU_GENERIC_BUTTON,          533,           -111 }, // English option button
     { MENU_BUTTON_LANGUAGE_FRENCH,   MODEL_MAIN_MENU_GENERIC_BUTTON,            0,           -111 }, // French option button
@@ -195,11 +200,18 @@ const unsigned char textCopyFileButton[] = { TEXT_COPY_FILE_BUTTON };
 
 const unsigned char textEraseFileButton[] = { TEXT_ERASE_FILE_BUTTON };
 
-const unsigned char textSoundModes[][8] = {
+#ifdef ENABLE_STEREO_HEADSET_EFFECTS
+unsigned char textSoundModes[][8] = {
     { TEXT_STEREO  },
     { TEXT_MONO    },
     { TEXT_HEADSET },
 };
+#else
+unsigned char textSoundModes[][8] = {
+    { TEXT_STEREO },
+    { TEXT_MONO   },
+};
+#endif
 
 #if MULTILANG
 unsigned char textLanguageSelect[][17] = {
@@ -791,9 +803,13 @@ void check_sound_mode_menu_clicked_buttons(struct Object *soundModeButton) {
             if (check_clicked_button(buttonX, buttonY, 22.0f)) {
                 // If sound mode button clicked, select it and define sound mode
                 // The check will always be true because of the group configured above (In JP & US)
-                if (buttonID == MENU_BUTTON_STEREO
+                if (
+                    buttonID == MENU_BUTTON_STEREO
                  || buttonID == MENU_BUTTON_MONO
-                 || buttonID == MENU_BUTTON_HEADSET) {
+#ifdef ENABLE_STEREO_HEADSET_EFFECTS
+                 || buttonID == MENU_BUTTON_HEADSET
+#endif
+                ) {
                     if (soundModeButton->oMenuButtonActionPhase == SOUND_MODE_PHASE_MAIN) {
                         play_sound(SOUND_MENU_CLICK_FILE_SELECT, gGlobalSoundSource);
                         queue_rumble_data(gPlayer1Controller, 5, 80, 0);
@@ -1032,7 +1048,9 @@ void bhv_menu_button_manager_loop(void) {
         // exiting the Options menu, as a result they added a return button
         case MENU_BUTTON_STEREO:
         case MENU_BUTTON_MONO:
+#ifdef ENABLE_STEREO_HEADSET_EFFECTS
         case MENU_BUTTON_HEADSET:
+#endif
             return_to_main_menu(MENU_BUTTON_OPTIONS, sMainMenuButtons[sSelectedButtonID]);
             break;
     }
@@ -1694,7 +1712,11 @@ void print_sound_mode_menu_strings(void) {
     gSPDisplayList(gDisplayListHead++, dl_ia_text_begin);
 
     // Print sound mode names
-    for (mode = 0, textX = 90; mode < 3; textX += 70, mode++) {
+#ifdef ENABLE_STEREO_HEADSET_EFFECTS
+    for (mode = 0, textX = 87; mode < ARRAY_COUNT(textSoundModes); textX += 74, mode++) {
+#else
+    for (mode = 0, textX = 111; mode < ARRAY_COUNT(textSoundModes); textX += 99, mode++) {
+#endif
         if (mode == sSoundMode) {
             gDPSetEnvColor(gDisplayListHead++, 255, 255, 255, sTextBaseAlpha);
         } else {

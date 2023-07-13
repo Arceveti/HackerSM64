@@ -618,15 +618,18 @@ ALWAYS_INLINE s32 floorf(const f32 in) {
     return mfc1(tmp);
 }
 /// Rounds towards the nearest integer
-ALWAYS_INLINE s32 roundf(const f32 in) {
-    f32 tmp;
-    __asm__("round.w.s %0,%1" : "=f" (tmp) : "f" (in));
-    return mfc1(tmp);
-}
+extern s32 roundf(f32);
+// ALWAYS_INLINE s32 roundf(const f32 in) {
+//     f32 tmp;
+//     __asm__("round.w.s %0,%1" : "=f" (tmp) : "f" (in));
+//     return mfc1(tmp);
+// }
+
 /// Backwards compatibility
 #define round_float(in) roundf(in)
 
 
+//! TODO: Is ABS macro better for these?:
 /// Absolute value of a float value
 ALWAYS_INLINE f32 absf(const f32 in) {
     f32 out;
@@ -847,7 +850,7 @@ void spline_get_weights(Vec4f result, f32 t, UNUSED s32 c);
 void anim_spline_init(Vec4s* keyFrames);
 s32  anim_spline_poll(Vec3f result);
 // Raycasting
-void find_surface_on_ray(Vec3f orig, Vec3f dir, struct Surface** hit_surface, Vec3f hit_pos, s32 flags);
-void find_surface_on_ray_between_points(Vec3f pos1, Vec3f pos2, struct Surface** hit_surface, Vec3f hit_pos, s32 flags);
+f32 find_surface_on_ray(Vec3f orig, Vec3f dir, struct Surface** hit_surface, Vec3f hit_pos, s32 flags);
+f32 find_surface_on_ray_between_points(Vec3f pos1, Vec3f pos2, struct Surface** hit_surface, Vec3f hit_pos, s32 flags);
 
 #endif // MATH_UTIL_H
