@@ -726,6 +726,19 @@ void load_object_collision_model(void) {
         && (verticalMarioDiff < 0 || (verticalMarioDiff < (colDist + 2000.0f)))
     );
 
+    f32 marioDist = obj->oDistanceToMario;
+
+    _Bool isInit = (marioDist == F32_MAX);
+
+#ifdef LOAD_OBJECT_COLLISION_NEAR_CAMERA
+    if (!inColRadius && !isInit) {
+        f32 camDist = vec3_mag(obj->header.gfx.cameraToObject);
+        if (marioDist > camDist && camDist > 0.0f) {
+            inColRadius = TRUE;
+        }
+    }
+#endif
+
     // Update if no Time Stop, in range, and in the current room.
     if (
         !(gTimeStopState & TIME_STOP_ACTIVE)
@@ -741,11 +754,9 @@ void load_object_collision_model(void) {
         }
     }
 
-    f32 marioDist = obj->oDistanceToMario;
-
     // On an object's first frame, the distance is set to F32_MAX.
     // If the distance hasn't been updated, update it now.
-    if (marioDist == F32_MAX) {
+    if (isInit) {
         marioDist = dist_between_objects(obj, gMarioObject);
     }
 
