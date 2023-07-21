@@ -521,6 +521,7 @@ Gfx* geo_intro_rumble_pak_graphic(s32 callContext, struct GraphNode* node, UNUSE
                 SIZEOF_GFX_CMD(SPDisplayList(0)) +
                 SIZEOF_GFX_CMD(SPEndDisplayList())
             );
+
             if (dl != NULL) {
                 dlIter = dl;
                 gSPDisplayList(dlIter++, &title_screen_bg_dl_rumble_pak_begin);

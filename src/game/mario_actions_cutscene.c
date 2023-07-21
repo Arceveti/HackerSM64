@@ -523,10 +523,11 @@ s32 act_debug_free_move(struct MarioState *m) {
     struct WallCollisionData wallData;
     struct Surface *floor, *ceil;
     Vec3f pos;
+    struct Controller* controller = m->controller;
 
-    f32 speed = (gPlayer1Controller->buttonDown & B_BUTTON) ? 4.0f : 1.0f;
+    f32 speed = (controller->buttonDown & B_BUTTON) ? 4.0f : 1.0f;
 
-    if (gPlayer1Controller->buttonDown & Z_TRIG) {
+    if (controller->buttonDown & Z_TRIG) {
         speed = 0.01f;
     }
 
@@ -537,13 +538,13 @@ s32 act_debug_free_move(struct MarioState *m) {
     set_mario_animation(m, MARIO_ANIM_A_POSE);
     vec3f_copy(pos, m->pos);
 
-    if (gPlayer1Controller->buttonDown & U_JPAD) {
+    if (controller->buttonDown & U_JPAD) {
         pos[1] += 16.0f * speed;
     }
-    if (gPlayer1Controller->buttonDown & D_JPAD) {
+    if (controller->buttonDown & D_JPAD) {
         pos[1] -= 16.0f * speed;
     }
-    if (gPlayer1Controller->buttonPressed & A_BUTTON) {
+    if (controller->buttonPressed & A_BUTTON) {
         vec3_zero(m->vel);
         m->forwardVel = 0.0f;
 
@@ -556,7 +557,7 @@ s32 act_debug_free_move(struct MarioState *m) {
         } else {
             // slight upwards boost to get you some hover time
             m->vel[1] = 20.0f;
-            gPlayer1Controller->buttonDown &= ~U_JPAD;
+            controller->buttonDown &= ~U_JPAD;
             return set_mario_action(m, ACT_FREEFALL, 0);
         }
     }

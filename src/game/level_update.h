@@ -480,6 +480,7 @@ enum WarpsTTM {
     WARP_TTM_4_MAIN_ENTRY     = 0x0A,
 };
 
+struct Controller* get_mario_controller(void);
 u32 level_control_timer(s32 timerOp);
 void fade_into_special_warp(u32 warpArg, u32 color);
 void load_level_init_text(u32 areaDialogIdx);

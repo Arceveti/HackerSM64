@@ -1772,8 +1772,8 @@ s32 execute_mario_action(struct MarioState* m) {
 #ifdef ENABLE_DEBUG_FREE_MOVE
         if (
             m->action != ACT_DEBUG_FREE_MOVE &&
-            (gPlayer1Controller->buttonDown & U_JPAD) &&
-            !(gPlayer1Controller->buttonDown & (L_TRIG | Z_TRIG))
+            (m->controller->buttonDown & U_JPAD) &&
+            !(m->controller->buttonDown & (L_TRIG | Z_TRIG))
         ) {
             set_camera_mode(m->area->camera, CAMERA_MODE_8_DIRECTIONS, 1);
             set_mario_action(m, ACT_DEBUG_FREE_MOVE, 0);
