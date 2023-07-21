@@ -401,7 +401,6 @@ static s32 get_exponent(s32 x) {
         };
         f32 f;
     } b = { .f = x };
-
     return (b.exponent - 127);
 }
 
