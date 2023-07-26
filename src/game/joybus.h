@@ -1,5 +1,4 @@
-#ifndef CONTROLLER_H
-#define CONTROLLER_H
+#pragma once
 
 #include <PR/os_internal.h>
 #include "types.h"
@@ -886,7 +885,7 @@ typedef struct PACKED {
     /*0x04*/ u16 statusPollButtons; // Input, only used when status polling to save the previous frame's inputs.
     /*0x06*/ _Bool plugged;         // Whether a controller is plugged in to this port.
     /*0x07*/ u8 playerNum;          // The player number. [0, 4]. 0 = not assigned to a player.
-    /*0x08*/ u8 gcRumble;           // Stored GCN Rumble byte.
+    /*0x08*/ u8 gcnRumble;          // Stored GCN Rumble byte.
 } OSPortInfo; /*0x09*/
 
 /////////////
@@ -901,4 +900,4 @@ extern u8         __osContLastCmd;      // The ID of the last command that was e
 // From HackerSM64:
 extern OSPortInfo gPortInfo[MAXCONTROLLERS];
 
-#endif /* CONTROLLER_H */
+void __osContGetInitDataEx(u8* pattern, OSContStatus* status);

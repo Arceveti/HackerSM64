@@ -1,11 +1,11 @@
-#ifndef GAME_INPUT_H
-#define GAME_INPUT_H
+#pragma once
 
 #include "types.h"
 #include <PR/os_internal.h>
 
 #include "types.h"
 #include "config.h"
+#include "rumble.h"
 
 // Controller Status Polling:
 
@@ -52,5 +52,3 @@ void start_controller_status_polling(_Bool isBootMode);
 void stop_controller_status_polling(OSContPadEx* pad);
 void handle_input(OSMesg* mesg);
 void init_controllers(void);
-
-#endif /* GAME_INPUT */

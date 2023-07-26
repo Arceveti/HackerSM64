@@ -15,8 +15,7 @@
 #include "sm64.h"
 #include "game_init.h"
 #include "sound_init.h"
-#include "game_input.h"
-#include "rumble_init.h"
+#include "input.h"
 #include "puppyprint.h"
 #include "profiling.h"
 
