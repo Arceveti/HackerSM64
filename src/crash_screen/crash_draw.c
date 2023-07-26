@@ -11,10 +11,6 @@
 #include "game/game_init.h"
 
 
-_Bool gCSDrawCrashScreen     = TRUE;
-_Bool gCSDrawSavedScreenshot = TRUE;
-
-
 // Crash screen font. Each row of the image fits in one u32 pointer.
 ALIGNED32 static const Texture gCSFont[CRASH_SCREEN_FONT_CHAR_HEIGHT * CRASH_SCREEN_FONT_NUM_ROWS * sizeof(CSFontRow)] = {
     #include "textures/crash_screen/crash_screen_font.custom.ia1.inc.c"
@@ -221,7 +217,7 @@ void crash_screen_draw_line(u32 x1, u32 y1, u32 x2, u32 y2, RGBA32 color) {
 
 void crash_screen_draw_glyph(u32 startX, u32 startY, uchar glyph, RGBA32 color) {
     if (glyph == CHAR_NULL) { // Null
-        color = COLOR_RGBA32_GRAY;
+        color = COLOR_RGBA32_CRASH_NULL_CHAR;
     }
     const Alpha alpha = RGBA32_A(color);
     if (alpha == 0x00) {
@@ -299,7 +295,7 @@ void crash_screen_draw_scroll_bar(u32 topY, u32 bottomY, u32 numVisibleEntries, 
     if (drawBg) {
         // Draw the background scroll bar
         const Alpha bgAlpha = (RGBA32_A(color) / 2);
-        crash_screen_draw_rect(x, topY, 1, scrollableHeight, ((color & ~0xFF) | bgAlpha));
+        crash_screen_draw_rect(x, topY, 1, scrollableHeight, RGBA32_SET_ALPHA(color, bgAlpha));
     }
 
     u32 bottomVisibleEntry = (topVisibleEntry + numVisibleEntries);
@@ -355,11 +351,12 @@ void print_crash_screen_header(void) {
 }
 
 void crash_screen_draw_main(void) {
-    crash_screen_reset_framebuffer(gCSDrawSavedScreenshot);
+    crash_screen_set_scissor_box(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
+    crash_screen_reset_framebuffer(gCSSettings[CS_OPT_DRAW_SCREENSHOT].val);
     crash_screen_reset_scissor_box();
 
-    if (gCSDrawCrashScreen) {
-        if (gCSDrawSavedScreenshot) {
+    if (gCSSettings[CS_OPT_DRAW_CRASH_SCREEN].val) {
+        if (gCSSettings[CS_OPT_DRAW_SCREENSHOT].val) {
             // Draw the transparent background.
             crash_screen_draw_dark_rect(
                 CRASH_SCREEN_X1, CRASH_SCREEN_Y1,

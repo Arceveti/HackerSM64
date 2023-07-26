@@ -94,10 +94,6 @@ typedef struct {
 extern CSScissorBox gCSScissorBox;
 
 
-extern _Bool gCSDrawCrashScreen;
-extern _Bool gCSDrawSavedScreenshot;
-
-
 void crash_screen_set_scissor_box(s32 x1, s32 y1, s32 x2, s32 y2);
 void crash_screen_reset_scissor_box(void);
 void crash_screen_draw_dark_rect(s32 startX, s32 startY, s32 w, s32 h, u32 darken);
@@ -111,5 +107,13 @@ void crash_screen_draw_scroll_bar(u32 topY, u32 bottomY, u32 numVisibleEntries, 
 void crash_screen_draw_main(void);
 
 ALWAYS_INLINE void crash_screen_draw_divider(u32 y) {
-    crash_screen_draw_rect(CRASH_SCREEN_X1, y, CRASH_SCREEN_W, 1, COLOR_RGBA32_LIGHT_GRAY);
+    crash_screen_draw_rect(CRASH_SCREEN_X1, y, CRASH_SCREEN_W, 1, COLOR_RGBA32_CRASH_DIVIDER);
+}
+
+ALWAYS_INLINE void crash_screen_draw_row_selection_box(s32 y) {
+    crash_screen_draw_rect(
+        (TEXT_X(0) - 1), (y - 2),
+        (CRASH_SCREEN_TEXT_W + 1), (TEXT_HEIGHT(1) + 1),
+        COLOR_RGBA32_CRASH_SELECT_HIGHLIGHT
+    );
 }

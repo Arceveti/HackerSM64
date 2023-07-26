@@ -110,7 +110,9 @@ extern const f32 gSineTable[];
     (_x > 0) ? _x : -_x;    \
 })
 
-#define CLAMP(x, low, high)  ({ \
+#define CLAMP(x, low, high)  (((x) > (high)) ? (high) : (((x) < (low)) ? (low) : (x)))
+
+#define CLAMP2(x, low, high)  ({ \
     __auto_type _x    = (x);    \
     __auto_type _low  = (low);  \
     __auto_type _high = (high); \

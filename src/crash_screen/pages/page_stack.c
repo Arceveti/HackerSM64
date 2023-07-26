@@ -2,21 +2,13 @@
 #include "types.h"
 #include "sm64.h"
 #include "crash_screen/crash_main.h"
-#include "stack_trace.h"
-#include "game/game_input.h"
+#include "page_stack.h"
+#include "game/input.h"
 #include "segment_symbols.h"
 
 
 ALIGNED16 static struct FunctionInStack sCSFunctionStackBuffer[STACK_TRACE_BUFFER_SIZE];
 static u32 sCSNumFoundFunctions = 0;
-
-#ifdef INCLUDE_DEBUG_MAP
-    #define SHOW_FUNC_NAMES_DEFAULT TRUE
-#else
-    #define SHOW_FUNC_NAMES_DEFAULT FALSE
-#endif
-
-static _Bool sStackTraceShowFunctionNames = SHOW_FUNC_NAMES_DEFAULT;
 
 static u32 sStackTraceSelectedIndex = 0;
 static u32 sStackTraceViewportIndex = 0;
@@ -33,11 +25,11 @@ const enum ControlTypes stackTraceContList[] = {
     CONT_DESC_LIST_END,
 };
 
-extern void __osCleanupThread(void);
-
 static void add_to_stack(struct FunctionInStack* func) {
     sCSFunctionStackBuffer[sCSNumFoundFunctions++] = *func;
 }
+
+extern void __osCleanupThread(void);
 
 void fill_function_stack_trace(void) {
     bzero(&sCSFunctionStackBuffer, sizeof(sCSFunctionStackBuffer));
@@ -88,8 +80,6 @@ void fill_function_stack_trace(void) {
 }
 
 void stack_trace_init(void) {
-    sStackTraceShowFunctionNames = SHOW_FUNC_NAMES_DEFAULT;
-
     sStackTraceSelectedIndex = 0;
     sStackTraceViewportIndex = 0;
 
@@ -113,11 +103,7 @@ void stack_trace_print_entries(u32 line, u32 numLines) {
         u32 y = TEXT_Y(line + i);
 
         if (currIndex == sStackTraceSelectedIndex) {
-            crash_screen_draw_rect(
-                (TEXT_X(0) - 1), (y - 2),
-                (CRASH_SCREEN_TEXT_W + 1), (TEXT_HEIGHT(1) + 1),
-                COLOR_RGBA32_CRASH_SELECT
-            );
+            crash_screen_draw_row_selection_box(y);
         }
 
         const size_t addrStrSize = STRLEN("00000000:");
@@ -128,35 +114,33 @@ void stack_trace_print_entries(u32 line, u32 numLines) {
             crash_screen_print(TEXT_X(0), y, STR_HEX_WORD":", function->stackAddr);
         }
 
-        const RGBA32 nameColor = ((currIndex == 0) ? COLOR_RGBA32_CRASH_FUNCTION_NAME : COLOR_RGBA32_CRASH_FUNCTION_NAME_2);
-
 #ifdef INCLUDE_DEBUG_MAP
         if (function->fname == NULL) {
-            // Print unknown function
+            // Print unknown function.
             // "[function address]"
             crash_screen_print(TEXT_X(addrStrSize), y,
                 (STR_COLOR_PREFIX STR_HEX_WORD),
                 COLOR_RGBA32_CRASH_UNKNOWN, function->curAddr
             );
         } else {
-            // Print known function
-            if (sStackTraceShowFunctionNames) {
+            // Print known function.
+            if (gCSSettings[CS_OPT_FUNCTION_NAMES].val) {
                 // "[function name]"
                 const size_t offsetStrSize = STRLEN("+0000");
                 crash_screen_print_symbol_name_impl(TEXT_X(addrStrSize), y,
                     (CRASH_SCREEN_NUM_CHARS_X - (addrStrSize + offsetStrSize)),
-                    nameColor, function->fname
+                    COLOR_RGBA32_CRASH_FUNCTION_NAME, function->fname
                 );
                 // "+[offset]"
                 crash_screen_print(TEXT_X(CRASH_SCREEN_NUM_CHARS_X - offsetStrSize), y,
                     (STR_COLOR_PREFIX"+"STR_HEX_HALFWORD),
-                    COLOR_RGBA32_CRASH_FUNCTION_NAME_2, (function->curAddr - function->faddr)
+                    COLOR_RGBA32_CRASH_OFFSET, (function->curAddr - function->faddr)
                 );
             } else {
                 // "[function address]"
                 crash_screen_print(TEXT_X(addrStrSize), y,
                     (STR_COLOR_PREFIX STR_HEX_WORD),
-                    nameColor, function->curAddr
+                    COLOR_RGBA32_CRASH_FUNCTION_NAME, function->curAddr
                 );
             }
         }
@@ -164,7 +148,7 @@ void stack_trace_print_entries(u32 line, u32 numLines) {
         // "[function address]"
         crash_screen_print(TEXT_X(addrStrSize), y,
             (STR_COLOR_PREFIX STR_HEX_WORD),
-            nameColor, function->curAddr
+            COLOR_RGBA32_CRASH_FUNCTION_NAME, function->curAddr
         );
 #endif
 
@@ -187,7 +171,7 @@ void stack_trace_draw(void) {
 
 #ifdef INCLUDE_DEBUG_MAP
     // "OFFSET:"
-    crash_screen_print(TEXT_X(CRASH_SCREEN_NUM_CHARS_X - STRLEN("OFFSET:")), TEXT_Y(line), STR_COLOR_PREFIX"OFFSET:", COLOR_RGBA32_CRASH_FUNCTION_NAME_2);
+    crash_screen_print(TEXT_X(CRASH_SCREEN_NUM_CHARS_X - STRLEN("OFFSET:")), TEXT_Y(line), STR_COLOR_PREFIX"OFFSET:", COLOR_RGBA32_CRASH_OFFSET);
 #endif
 
     line++;
@@ -197,13 +181,13 @@ void stack_trace_draw(void) {
     // Draw the top line after the entries so the selection rectangle is behind it.
     crash_screen_draw_divider(DIVIDER_Y(line));
 
-    // Scroll Bar
+    // Scroll Bar:
     if (sCSNumFoundFunctions > STACK_TRACE_NUM_ROWS) {
         crash_screen_draw_scroll_bar(
-            (DIVIDER_Y(line) + 1), DIVIDER_Y(CRASH_SCREEN_NUM_CHARS_Y), 
+            (DIVIDER_Y(line) + 1), DIVIDER_Y(CRASH_SCREEN_NUM_CHARS_Y),
             STACK_TRACE_NUM_ROWS, sCSNumFoundFunctions,
             sStackTraceViewportIndex,
-            COLOR_RGBA32_LIGHT_GRAY, TRUE
+            COLOR_RGBA32_CRASH_DIVIDER, TRUE
         );
 
         crash_screen_draw_divider(DIVIDER_Y(CRASH_SCREEN_NUM_CHARS_Y));
@@ -222,7 +206,7 @@ void stack_trace_input(void) {
 #ifdef INCLUDE_DEBUG_MAP
     if (buttonPressed & B_BUTTON) {
         // Toggle whether to display function names.
-        sStackTraceShowFunctionNames ^= TRUE;
+        gCSSettings[CS_OPT_FUNCTION_NAMES].val ^= TRUE;
     }
 #endif
 
