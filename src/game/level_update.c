@@ -987,38 +987,43 @@ s32 play_mode_normal(void) {
     check_instant_warp();
 
 #ifdef PUPPYPRINT_DEBUG
-#ifdef BETTER_REVERB
-    if (sPPDebugPage != PUPPYPRINT_PAGE_RAM && sPPDebugPage != PUPPYPRINT_PAGE_LEVEL_SELECT && sPPDebugPage != PUPPYPRINT_PAGE_BETTER_REVERB) {
-#else
-    if (sPPDebugPage != PUPPYPRINT_PAGE_RAM && sPPDebugPage != PUPPYPRINT_PAGE_LEVEL_SELECT) {
-#endif
+    if (
+        sPPDebugPage != PUPPYPRINT_PAGE_RAM &&
+        sPPDebugPage != PUPPYPRINT_PAGE_LEVEL_SELECT
+ #ifdef BETTER_REVERB
+        && sPPDebugPage != PUPPYPRINT_PAGE_BETTER_REVERB
+ #endif // BETTER_REVERB
+    ) {
         if (sTimerRunning && gHudDisplay.timer < 17999) {
             gHudDisplay.timer++;
         }
         area_update_objects();
     }
-#else
+#else // !PUPPYPRINT_DEBUG
     if (sTimerRunning && gHudDisplay.timer < 17999) {
         gHudDisplay.timer++;
     }
     area_update_objects();
-#endif
+#endif // !PUPPYPRINT_DEBUG
     update_hud_values();
 #ifdef PUPPYLIGHTS
     delete_lights();
-#endif
+#endif // PUPPYLIGHTS
     if (gCurrentArea != NULL) {
 #ifdef PUPPYPRINT_DEBUG
-#ifdef BETTER_REVERB
-    if (sPPDebugPage != PUPPYPRINT_PAGE_RAM && sPPDebugPage != PUPPYPRINT_PAGE_LEVEL_SELECT && sPPDebugPage != PUPPYPRINT_PAGE_BETTER_REVERB) {
-#else
-    if (sPPDebugPage != PUPPYPRINT_PAGE_RAM && sPPDebugPage != PUPPYPRINT_PAGE_LEVEL_SELECT) {
-#endif
+
+    if (
+        sPPDebugPage != PUPPYPRINT_PAGE_RAM &&
+        sPPDebugPage != PUPPYPRINT_PAGE_LEVEL_SELECT
+ #ifdef BETTER_REVERB
+        && sPPDebugPage != PUPPYPRINT_PAGE_BETTER_REVERB
+ #endif // BETTER_REVERB
+    ) {
             update_camera(gCurrentArea->camera);
         }
-#else
+#else // !PUPPYPRINT_DEBUG
         update_camera(gCurrentArea->camera);
-#endif
+#endif // !PUPPYPRINT_DEBUG
     }
 
     initiate_painting_warp();
