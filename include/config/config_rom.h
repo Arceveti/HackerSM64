@@ -29,7 +29,7 @@
  * NOTE: If this is 1, the first controller with input after boot will become player 1. Otherwise, player numbers are automatically assigned via port order.
  * NOTE: It is highly recommended to enable ENABLE_STATUS_REPOLLING_GUI if this is greater than 1.
  */
-#define MAX_NUM_PLAYERS 1
+#define MAX_NUM_PLAYERS 4
 
 /**
  * Enables a GUI that, while opem, allows plugging/unplugging controllers and changing the controller order.
@@ -43,7 +43,12 @@
 #define ENABLE_STATUS_REPOLLING_COMBO_IN_GAMEPLAY
 
 /**
- * Informs supported emulators to default to gamecube controller inputs.
+ * Highlights the currently pressed buttons on controllers in the status repolling GUI.
+ */
+#define CONTROLLERS_INPUT_DISPLAY
+
+/**
+ * Informs supported emulators to default to GameCube controller inputs.
  */
 // #define EMU_DEFAULT_TO_GCN
 
