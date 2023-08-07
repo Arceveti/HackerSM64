@@ -21,7 +21,7 @@ This is a fork of the ultrasm64 repo by CrashOveride which includes the followin
 - **Fazana**: PuppyLib, ucode swapping, audio load time optimizations (with Arctic), general hacker qol improvements, visual debug
 - **Reonu**: Starting the project/repo, widescreen, reonucam, various defines for hacker QoL
 - **JoshDuMan**: Decomp guy, general assistance
-- **Arceveti**: New crash screen, silhouette, various optimizations including shadows, breath meter, painting objects, star glow, z offset geo command, 4 controller support, alternate rumble graphics, controller assignment screen, controller icons, implementation of better wall collision, better hanging, naming most unknowns, various hacker QOL improvements, and various optimizations/fixes
+- **Arceveti**: New crash screen, silhouette, various optimizations including shadows, breath meter, painting objects, star glow, z offset geo command, 4 controller support, major input refactoring, controller reassignment, controller icons, alternate rumble graphics, implementation of better wall collision, better hanging, naming most unknowns, various hacker QOL improvements, and various optimizations/fixes
 - **axollyon**: Console testing, bugfixes, idea-guying, and had a hand in silhouettes
 - **Wiseguy**: World scale reimplementation, silhouette, graph node optimizations, instant input patch, cake screen fix, segmented code support, matrix stack fix, and various optimizations/fixes
 - **Kaze Emanuar**: Graph node & math util optimizations, automatic optimal collision distance, cell buffer fix

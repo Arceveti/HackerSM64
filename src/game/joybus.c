@@ -8,8 +8,6 @@
 #include "input.h"
 #include "rumble.h"
 
-OSPortInfo gPortInfo[MAXCONTROLLERS] = { 0 };
-
 void __osSiGetAccess(void);
 void __osSiRelAccess(void);
 
@@ -69,7 +67,7 @@ static void __osPackRead_impl(u8 cmdID);
  * @brief Implementation for PIF pack handlers.
  *
  * @param[in] mq    The SI event message queue.
- * @param[in] cmdID The command ID to run (see enum OSContCmds);
+ * @param[in] cmdID The command ID to run (see enum OSContCmds).
  * @returns Error status: -1 = busy, 0 = success.
  */
 s32 osStartRead_impl(OSMesgQueue* mq, u8 cmdID) {
@@ -104,77 +102,73 @@ s32 osStartRead_impl(OSMesgQueue* mq, u8 cmdID) {
     (dst) += sizeof(src);           \
 }
 
-#define WRITE_PIF_CMD_WITH_GCN_RUMBLE(dst, src) {               \
-    (*(typeof(src)*)(dst)) = (src);                             \
-    (*(typeof(src)*)(dst)).send.rumble = portInfo->gcnRumble;   \
-    (dst) += sizeof(src);                                       \
+#define WRITE_PIF_CMD_WITH_GCN_RUMBLE(dst, src, port) {                 \
+    (*(typeof(src)*)(dst)) = (src);                                     \
+    (*(typeof(src)*)(dst)).send.rumble = gRumbleInfos[port].motorState; \
+    (dst) += sizeof(src);                                               \
 }
 
 /**
  * @brief Writes PIF commands to poll controller inputs depending on the command.
  * Called by osContStartReadData and osStartRead_impl.
  *
- * @param[in] cmdID The command ID to run (see enum OSContCmds);
+ * @param[in] cmdID The command ID to run (see enum OSContCmds).
  */
 static void __osPackRead_impl(u8 cmdID) {
     u8* ptr = (u8*)__osContPifRam.ramarray;
-    OSPortInfo* portInfo = NULL;
-    int port;
 
     bzero(__osContPifRam.ramarray, sizeof(__osContPifRam.ramarray));
     __osContPifRam.pifstatus = PIF_STATUS_EXE;
 
-    for (port = 0; port < __osMaxControllers; port++) {
-        portInfo = &gPortInfo[port];
+    for (int port = 0; port < __osMaxControllers; port++) {
+        OSContPadEx* pad = &gControllerPads[port];
+        u16 type = gControllerStatuses[port].type;
 
         // Make sure this port has a controller plugged in, and if not status repolling, only poll assigned ports.
-        _Bool isEnabled = (portInfo->plugged && (gContStatusPolling || portInfo->playerNum));
-        _Bool isGCN = (portInfo->type & CONT_CONSOLE_GCN);
+        if ((type != CONT_NONE) && (gContStatusPolling || (pad->playerNum != 0))) {
+            _Bool isGCN = (type & CONT_CONSOLE_GCN);
 
-        switch (cmdID) {
-            case CONT_CMD_READ_BUTTON:
-            case CONT_CMD_GCN_SHORT_POLL:
-                if (isEnabled) {
+            switch (cmdID) {
+                case CONT_CMD_READ_BUTTON: // Instead of running these commands separately, run one or the other depending on the connected controller type for each port.
+                case CONT_CMD_GCN_SHORT_POLL:
                     if (isGCN) {
-                        WRITE_PIF_CMD_WITH_GCN_RUMBLE(ptr, sGCNWriteFormatShort);     
+                        WRITE_PIF_CMD_WITH_GCN_RUMBLE(ptr, sGCNWriteFormatShort, port);
                     } else {
                         WRITE_PIF_CMD(ptr, sN64WriteFormat);
                     }
-                } else {
-                    ptr++; // Empty channel/port, so leave a PIF_CMD_SKIP_CHNL (0x00) byte to tell the PIF to skip it.
-                }
-                break;
-            case CONT_CMD_GCN_READ_ORIGIN:
-                if (isEnabled && isGCN && gControllerPads[port].origins.updateOrigins) {
-                    gControllerPads[port].origins.updateOrigins = FALSE;
-                    WRITE_PIF_CMD(ptr, sGCNReadOriginFormat);
-                } else {
-                    ptr++; // Empty channel/port, so leave a PIF_CMD_SKIP_CHNL (0x00) byte to tell the PIF to skip it.
-                }
-                break;
-            case CONT_CMD_GCN_CALIBRATE:
-                if (isEnabled && isGCN && gControllerPads[port].origins.updateOrigins) {
-                    gControllerPads[port].origins.updateOrigins = FALSE;
-                    WRITE_PIF_CMD_WITH_GCN_RUMBLE(ptr, sGCNCalibrateFormat);
-                } else {
-                    ptr++; // Empty channel/port, so leave a PIF_CMD_SKIP_CHNL (0x00) byte to tell the PIF to skip it.
-                }
-                break;
-            case CONT_CMD_GCN_LONG_POLL:
-                if (isEnabled) {
+                    break;
+
+                case CONT_CMD_GCN_READ_ORIGIN:
+                    if (isGCN && !pad->origins.initialized) {
+                        WRITE_PIF_CMD(ptr, sGCNReadOriginFormat);
+                    } else {
+                        ptr++; // Not a GCN controller, or doesn't need origins updated, so leave a PIF_CMD_SKIP_CHNL (0x00) byte to tell the PIF to skip it.
+                    }
+                    break;
+
+                case CONT_CMD_GCN_CALIBRATE:
+                    if (isGCN && !pad->origins.initialized) {
+                        WRITE_PIF_CMD_WITH_GCN_RUMBLE(ptr, sGCNCalibrateFormat, port);
+                    } else {
+                        ptr++; // Not a GCN controller, or doesn't need origins updated, so leave a PIF_CMD_SKIP_CHNL (0x00) byte to tell the PIF to skip it.
+                    }
+                    break;
+
+                case CONT_CMD_GCN_LONG_POLL:
                     if (isGCN) {
-                        WRITE_PIF_CMD_WITH_GCN_RUMBLE(ptr, sGCNWriteFormatLong);
+                        WRITE_PIF_CMD_WITH_GCN_RUMBLE(ptr, sGCNWriteFormatLong, port);
                     } else {
                         WRITE_PIF_CMD(ptr, sN64WriteFormat);
                     }
-                } else {
-                    ptr++; // Empty channel/port, so leave a PIF_CMD_SKIP_CHNL (0x00) byte to tell the PIF to skip it.
-                }
-                break;
-            default:
-                osSyncPrintf("__osPackRead_impl error: Unknown input poll command: %.02X (port %d)\n", cmdID, port);
-                ptr++;
-                return;
+                    break;
+
+                default:
+                    osSyncPrintf("__osPackRead_impl error: Unimplemented input poll command: %.02X (port %d)\n", cmdID, port);
+                    *ptr = PIF_CMD_END;
+                    return;
+            }
+        } else {
+            ptr++; // Empty channel/port, so leave a PIF_CMD_SKIP_CHNL (0x00) byte to tell the PIF to skip it.
         }
     }
 
@@ -208,45 +202,50 @@ static void set_gcn_origins(OSContOrigins* origins, Analog_u8 stick, Analog_u8 c
  */
 static void __osContReadGCNInputData(OSContPadEx* pad, GCNButtons gcn, Analog_u8 stick, Analog_u8 c_stick, Analog_u8 trig) {
     OSContOrigins* origins = &pad->origins;
-    OSContButtons dest = { .raw = 0x0 };
-
-    // The first time the controller is connected, store the origins for the controller's analog sticks.
-    if (!origins->initialized) {
-        set_gcn_origins(origins, stick, c_stick, trig);
-    }
+    OSContButtons buttons = { .raw = 0x0000 };
+    Analog_u8 origins_stick   = ANALOG_U8_ZERO;
+    Analog_u8 origins_c_stick = ANALOG_U8_ZERO;
+    Analog_u8 origins_trig    = ANALOG_U8_ZERO;
 
     // If the GET_ORIGIN bit is set, that means the controller has new analog origins data and either CONT_CMD_GCN_READ_ORIGIN or CONT_CMD_GCN_CALIBRATE needs to be run to get the new data.
     // The first frame after boot will use the above origins until the proper command runs later in the frame.
     if (gcn.standard.GET_ORIGIN) {
-        origins->updateOrigins = TRUE;
+        origins->initialized = FALSE;
+    }
+
+    // If the USE_ORIGIN bit is set, use the provided origins. Otherwise assume the origins are all zero.
+    if (gcn.standard.USE_ORIGIN) {
+        origins_stick   = origins->stick;
+        origins_c_stick = origins->c_stick;
+        origins_trig    = origins->trig;
     }
 
     // Write the analog data.
-    //! TODO: gcn.standard.USE_ORIGIN behavior.
-    pad->stick   = ANALOG_S8_CENTER(stick,   origins->stick);
-    pad->c_stick = ANALOG_S8_CENTER(c_stick, origins->c_stick);
-    pad->trig    = ANALOG_U8_CENTER(trig,    origins->trig);
+    pad->stick   = ANALOG_S8_CENTER(stick,   origins_stick  );
+    pad->c_stick = ANALOG_S8_CENTER(c_stick, origins_c_stick);
+    pad->trig    = ANALOG_U8_CENTER(trig,    origins_trig   );
 
     // Map GCN button bits to N64 button bits.
-    dest.A       = gcn.standard.A;
-    dest.B       = gcn.standard.B;
-    dest.Z       = (gcn.standard.L || (trig.l > GCN_TRIGGER_THRESHOLD)); // Swap L and Z.
-    dest.START   = gcn.standard.START;
-    dest.D.UP    = gcn.standard.D.UP;
-    dest.D.DOWN  = gcn.standard.D.DOWN;
-    dest.D.LEFT  = gcn.standard.D.LEFT;
-    dest.D.RIGHT = gcn.standard.D.RIGHT;
-    dest.X       = gcn.standard.X; // This bit was previously set when L+R+START was pressed on a standard N64 controller to recalibrate the analog stick (which also unsets the START bit).
-    dest.Y       = gcn.standard.Y; // This bit was unused by the N64 controller.
-    dest.L       = gcn.standard.Z; // Swap L and Z.
-    dest.R       = gcn.standard.R;
-    dest.C.UP    = (pad->c_stick.y >  GCN_C_STICK_THRESHOLD);
-    dest.C.DOWN  = (pad->c_stick.y < -GCN_C_STICK_THRESHOLD);
-    dest.C.LEFT  = (pad->c_stick.x < -GCN_C_STICK_THRESHOLD);
-    dest.C.RIGHT = (pad->c_stick.x >  GCN_C_STICK_THRESHOLD);
+    buttons.A       = gcn.standard.A;
+    buttons.B       = gcn.standard.B;
+    buttons.Z       = (gcn.standard.L || (trig.l > GCN_TRIGGER_THRESHOLD)); // Swap L and Z.
+    buttons.START   = gcn.standard.START;
+    buttons.D.UP    = gcn.standard.D.UP;
+    buttons.D.DOWN  = gcn.standard.D.DOWN;
+    buttons.D.LEFT  = gcn.standard.D.LEFT;
+    buttons.D.RIGHT = gcn.standard.D.RIGHT;
+    buttons.X       = gcn.standard.X; // This bit was previously set when L+R+START was pressed on a standard N64 controller to recalibrate the analog stick (which also unsets the START bit).
+    buttons.Y       = gcn.standard.Y; // This bit was unused by the N64 controller.
+    buttons.L       = gcn.standard.Z; // Swap L and Z.
+    buttons.R       = gcn.standard.R;
+    buttons.C.UP    = (pad->c_stick.y >  GCN_C_STICK_THRESHOLD);
+    buttons.C.DOWN  = (pad->c_stick.y < -GCN_C_STICK_THRESHOLD);
+    buttons.C.LEFT  = (pad->c_stick.x < -GCN_C_STICK_THRESHOLD);
+    buttons.C.RIGHT = (pad->c_stick.x >  GCN_C_STICK_THRESHOLD);
 
     // Write the button data.
-    pad->button.raw                 = dest.raw;
+    pad->button.raw = buttons.raw;
+    pad->rawContButtons = gcn.raw;
 
     // Write the non-button data.
     pad->ex.gcn.standard.ERRSTAT    = gcn.standard.ERRSTAT;
@@ -270,13 +269,18 @@ void osContGetReadDataEx(OSContPadEx* pad) {
     GCNInputData gcnInput;
 
     while (*ptr != PIF_CMD_END) {
-        if (*ptr == PIF_CMD_SKIP_CHNL || *ptr == PIF_CMD_RESET_CHNL) {
+        if (
+            *ptr == PIF_CMD_SKIP_CHNL ||
+            *ptr == PIF_CMD_RESET_CHNL
+        ) {
             // Skip empty channels/ports.
             pad++;
             ptr++;
             continue;
         }
-        if (*ptr == PIF_CMD_NOP) {
+        if (
+            *ptr == PIF_CMD_NOP
+        ) {
             // Skip bytes that are PIF_CMD_NOP (0xFF).
             ptr++;
             continue;
@@ -300,6 +304,8 @@ void osContGetReadDataEx(OSContPadEx* pad) {
                 if (pad->errno == (CHNL_ERR_SUCCESS >> 4)) {
                     n64Input = (*(__OSContReadFormat*)ptr).recv.input;
 
+                    pad->rawContButtons = n64Input.buttons.raw;
+
                     pad->button.raw = (n64Input.buttons.raw & ~(CONT_RESET | CONT_UNUSED)); // These two bits are repurposed to X and Y on the virtual controller, so make sure the game doesn't read an X button press when resetting.
                     // Allow the game to read the start button press that happens when resetting the analog stick.
                     if (n64Input.buttons.standard.RESET) {
@@ -308,9 +314,10 @@ void osContGetReadDataEx(OSContPadEx* pad) {
                     // Move these two bits to the other struct.
                     pad->ex.n64.standard.RESET  = n64Input.buttons.standard.RESET;
                     pad->ex.n64.standard.unused = n64Input.buttons.standard.unused;
+                    // Standard N64 controller only has one analog stick.
                     pad->stick                  = n64Input.stick;
-                    pad->c_stick                = (Analog_s8){ 0x00, 0x00 };
-                    pad->trig                   = (Analog_u8){ 0x00, 0x00 };
+                    pad->c_stick                = ANALOG_S8_ZERO;
+                    pad->trig                   = ANALOG_U8_ZERO;
                 }
 
                 ptr += sizeof(__OSContReadFormat);
@@ -342,7 +349,7 @@ void osContGetReadDataEx(OSContPadEx* pad) {
                             break;
                         case GCN_MODE_4_202:
                             c_stick = gcnInput.m3.c_stick;
-                            trig    = (Analog_u8){ 0x00, 0x00 };
+                            trig    = ANALOG_U8_ZERO;
                             break;
                     }
 
@@ -392,7 +399,7 @@ void osContGetReadDataEx(OSContPadEx* pad) {
                 break;
 
             default:
-                osSyncPrintf("osContGetReadDataEx error: Unknown input poll command: %.02X\n", readformatptr->send.cmdID);
+                osSyncPrintf("osContGetReadDataEx error: Unimplemented input poll command: %.02X\n", readformatptr->send.cmdID);
                 return;
         }
 
@@ -404,66 +411,18 @@ void osContGetReadDataEx(OSContPadEx* pad) {
 // contquery.c //
 /////////////////
 
-void __osContGetInitDataEx(u8* pattern, OSContStatus* status);
+void __osContGetInitData(u8* pattern, OSContStatus* status);
 
 /**
  * @brief Read status query data written by osContStartQuery.
- * odified from vanilla libultra to return bitpattern, similar to osContInit.
+ * odified from vanilla libultra to return the bitpattern returned by __osContGetInitData, similar to osContInit.
  * Called by poll_controller_statuses.
  *
  * @param[out] bitpattern The first 4 bits correspond to which 4 ports have controllers plugged in (low-high).
  * @param[out] status     A pointer to the 4 controller statuses.
  */
 void osContGetQueryEx(u8* bitpattern, OSContStatus* status) {
-    __osContGetInitDataEx(bitpattern, status);
-}
-
-//////////////////
-// controller.c //
-//////////////////
-
-/**
- * @brief Reads PIF command result written by __osPackRequestData and converts it into OSContStatus data.
- * Linker script will resolve references to the original function with this one instead.
- * Modified from vanilla libultra to set gPortInfo type and plugged status.
- * Called by osContInit, osContGetQuery, osContGetQueryEx, and osContReset.
- *
- * @param[out] bitpattern The first 4 bits correspond to which 4 ports have controllers plugged in (low-high).
- * @param[out] status     A pointer to the 4 controller statuses.
- */
-void __osContGetInitDataEx(u8* pattern, OSContStatus* status) {
-    u8* ptr = (u8*)__osContPifRam.ramarray;
-    __OSContRequestFormatAligned requestHeader;
-    OSPortInfo* portInfo = NULL;
-    u8 bits = 0x0;
-    int port;
-
-    for (port = 0; port < __osMaxControllers; port++) {
-        requestHeader = *(__OSContRequestFormatAligned*)ptr;
-        status->error = CHNL_ERR(requestHeader.fmt.size);
-
-        if (status->error == (CHNL_ERR_SUCCESS >> 4)) {
-            portInfo = &gPortInfo[port];
-
-            // Byteswap the SI identifier. This is done in vanilla libultra.
-            status->type = ((requestHeader.fmt.recv.type.l << 8) | requestHeader.fmt.recv.type.h);
-
-            // Check the type of controller device connected to the port.
-            // Some mupen cores seem to send back a controller type of CONT_TYPE_NULL (0xFFFF) if the core doesn't initialize the input plugin quickly enough,
-            //   so check for that and set the input type to N64 controller if so.
-            portInfo->type = ((s16)status->type == (s16)CONT_TYPE_NULL) ? CONT_TYPE_NORMAL : status->type;
-
-            // Set this port's status.
-            status->status = requestHeader.fmt.recv.status.raw;
-            portInfo->plugged = TRUE;
-            bits |= (1 << port);
-        }
-
-        ptr += sizeof(requestHeader);
-        status++;
-    }
-
-    *pattern = bits;
+    __osContGetInitData(bitpattern, status);
 }
 
 /////////////
@@ -492,10 +451,11 @@ s32 __osMotorAccessEx(OSPfs* pfs, s32 motorState) {
         return PFS_ERR_INVALID;
     }
 
-    if (gPortInfo[channel].type & CONT_CONSOLE_GCN) { // GCN Controllers.
-        gPortInfo[channel].gcnRumble = motorState;
+    // Check whether the controller is a GCN controller.
+    if (gControllerStatuses[channel].type & CONT_CONSOLE_GCN) {
+        // GCN rumble is set in the input poll command by motorState in gRumbleInfos.
 
-        // Change the last command ID so that input poll command (which includes rumble) gets written again.
+        // Change the last command ID so that input poll command (which includes the rumble byte) gets written again next frame.
         __osContLastCmd = PIF_CMD_END;
     } else { // N64 Controllers.
         // N64 rumble pak can only use MOTOR_STOP or MOTOR_START.
@@ -599,7 +559,8 @@ s32 osMotorInitEx(OSMesgQueue* mq, OSPfs* pfs, int channel) {
     pfs->channel    = channel;
     pfs->activebank = ACCESSORY_ID_NULL;
 
-    if (!(gPortInfo[channel].type & CONT_CONSOLE_GCN)) {
+    // Make sure the controller is not a GCN controller.
+    if (!(gControllerStatuses[channel].type & CONT_CONSOLE_GCN)) {
         // Write probe value (ensure Transfer Pak is turned off).
         err = __osPfsSelectBank(pfs, ACCESSORY_ID_TRANSFER_OFF);
         if (err == PFS_ERR_NEW_PACK) {

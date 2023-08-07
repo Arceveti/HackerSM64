@@ -30,6 +30,7 @@
 #include "joybus.h"
 #include "profiling.h"
 #include "fasttext.h"
+#include "segment2.h"
 #ifdef S2DEX_TEXT_ENGINE
 #include "s2d_engine/init.h"
 #endif
@@ -380,25 +381,26 @@ void play_transition_after_delay(s16 transType, s16 time, Color red, Color green
     play_transition(transType, time, red, green, blue);
 }
 
-#ifdef ALLOW_STATUS_REPOLLING_COMBO
+#ifdef ENABLE_STATUS_REPOLLING_GUI
  #if (MAX_NUM_PLAYERS > 1)
-ALIGNED8 static const char* sN64ButtonNames[16] = {
-    "A",       // A_BUTTON
-    "B",       // B_BUTTON
-    "Z",       // Z_TRIG
-    "START",   // START_BUTTON
-    "D UP",    // U_JPAD
-    "D DOWN",  // D_JPAD
-    "D LEFT",  // L_JPAD
-    "D RIGHT", // R_JPAD
-    "X",       // X_BUTTON
-    "Y",       // Y_BUTTON
-    "L",       // L_TRIG
-    "R",       // R_TRIG
-    "C UP",    // U_CBUTTONS
-    "C DOWN",  // D_CBUTTONS
-    "C LEFT",  // L_CBUTTONS
-    "C RIGHT", // R_CBUTTONS
+// Button names, in print order.
+ALIGNED8 static const struct ButtonName sButtonNames[16] = {
+    { .mask = U_CBUTTONS,   .name = "C UP",    },
+    { .mask = D_CBUTTONS,   .name = "C DOWN",  },
+    { .mask = L_CBUTTONS,   .name = "C LEFT",  },
+    { .mask = R_CBUTTONS,   .name = "C RIGHT", },
+    { .mask = U_JPAD,       .name = "D UP",    },
+    { .mask = D_JPAD,       .name = "D DOWN",  },
+    { .mask = L_JPAD,       .name = "D LEFT",  },
+    { .mask = R_JPAD,       .name = "D RIGHT", },
+    { .mask = Z_TRIG,       .name = "Z",       },
+    { .mask = L_TRIG,       .name = "L",       },
+    { .mask = R_TRIG,       .name = "R",       },
+    { .mask = A_BUTTON,     .name = "A",       },
+    { .mask = B_BUTTON,     .name = "B",       },
+    { .mask = X_BUTTON,     .name = "X",       },
+    { .mask = Y_BUTTON,     .name = "Y",       },
+    { .mask = START_BUTTON, .name = "START",   },
 };
 
 /**
@@ -407,15 +409,19 @@ ALIGNED8 static const char* sN64ButtonNames[16] = {
 static size_t button_combo_to_string(char* strp, u16 buttons) {
     size_t count = 0;
 
-    for (int i = 0; i < ARRAY_COUNT(sN64ButtonNames); i++) {
-        if (buttons & ((1 << (ARRAY_COUNT(sN64ButtonNames) - 1)) >> i)) { // 0x8000 >> i
+    for (int i = 0; i < ARRAY_COUNT(sButtonNames); i++) {
+        const struct ButtonName* buttonName = &sButtonNames[i];
+
+        if (buttons & buttonName->mask) {
+            buttons &= ~buttonName->mask;
+
             if (count) {
                 strcat(strp, "+");
                 count += strlen("+");
             }
 
-            strcat(strp, sN64ButtonNames[i]);
-            count += strlen(sN64ButtonNames[i]);
+            strcat(strp, buttonName->name);
+            count += strlen(buttonName->name);
         }
     }
 
@@ -423,20 +429,38 @@ static size_t button_combo_to_string(char* strp, u16 buttons) {
 }
  #endif // (MAX_NUM_PLAYERS > 1)
 
+// Controller icons (see segment2.c).
 ALIGNED8 static const struct ControllerIcon sControllerIcons[] = {
-    { .type = CONT_NONE,                .texture = texture_controller_port         },
-    { .type = CONT_TYPE_NORMAL,         .texture = texture_controller_n64_normal   },
-    { .type = CONT_TYPE_MOUSE,          .texture = texture_controller_n64_mouse    },
-    { .type = CONT_TYPE_VOICE,          .texture = texture_controller_n64_voice    },
-    { .type = CONT_TYPE_KEYBOARD,       .texture = texture_controller_n64_keyboard },
-    { .type = CONT_TYPE_GBA,            .texture = texture_controller_gba          },
-    { .type = CONT_TYPE_GCN_NORMAL,     .texture = texture_controller_gcn_normal   },
-    { .type = CONT_TYPE_GCN_RECEIVER,   .texture = texture_controller_gcn_receiver },
-    { .type = CONT_TYPE_GCN_WAVEBIRD,   .texture = texture_controller_gcn_wavebird },
-    { .type = CONT_TYPE_GCN_WHEEL,      .texture = texture_controller_gcn_wheel    },
-    { .type = CONT_TYPE_GCN_KEYBOARD,   .texture = texture_controller_gcn_keyboard },
-    { .type = CONT_TYPE_GCN_DANCEPAD,   .texture = texture_controller_gcn_dancepad },
+    { .type = CONT_NONE,                .texture = texture_controller_port,         },
+    { .type = CONT_TYPE_NORMAL,         .texture = texture_controller_n64_normal,   },
+    { .type = CONT_TYPE_MOUSE,          .texture = texture_controller_n64_mouse,    },
+    { .type = CONT_TYPE_VOICE,          .texture = texture_controller_n64_voice,    },
+    { .type = CONT_TYPE_KEYBOARD,       .texture = texture_controller_n64_keyboard, },
+    { .type = CONT_TYPE_GBA,            .texture = texture_controller_gba,          },
+    { .type = CONT_TYPE_GCN_NORMAL,     .texture = texture_controller_gcn_normal,   },
+    { .type = CONT_TYPE_GCN_RECEIVER,   .texture = texture_controller_gcn_receiver, },
+    { .type = CONT_TYPE_GCN_WAVEBIRD,   .texture = texture_controller_gcn_wavebird, },
+    { .type = CONT_TYPE_GCN_WHEEL,      .texture = texture_controller_gcn_wheel,    },
+    { .type = CONT_TYPE_GCN_KEYBOARD,   .texture = texture_controller_gcn_keyboard, },
+    { .type = CONT_TYPE_GCN_DANCEPAD,   .texture = texture_controller_gcn_dancepad, },
+    { .type = (u16)-1,                  .texture = texture_controller_unknown,      },
 };
+
+// Loop through sControllerIcons to get the port's corresponding texture.
+__attribute__((noinline)) const struct ControllerIcon* get_controller_icon(int port) {
+    const struct ControllerIcon* icon = &sControllerIcons[0];
+    u16 type = gControllerStatuses[port].type;
+
+    while (icon->type != (u16)-1) {
+        if (icon->type == type) {
+            break;
+        }
+
+        icon++;
+    }
+
+    return icon;
+}
 
 static const Gfx dl_controller_icons_begin[] = {
     gsDPPipeSync(),
@@ -458,18 +482,23 @@ static const Gfx dl_controller_icons_end[] = {
     gsSPEndDisplayList(),
 };
 
+#define CONT_ICON_W 32
+#define CONT_ICON_H 32
+
 /**
  * @brief Displays controller info (eg. type and player number) while polling for controller statuses.
+ * TODO: Fix this not rendering during transitions.
  */
 void render_controllers_overlay(void) {
-    const s32 w = 32;
-    const s32 h = 32;
+    const s32 w = CONT_ICON_W;
+    const s32 h = CONT_ICON_H;
     s32 x = SCREEN_CENTER_X;
     const s32 y = (SCREEN_CENTER_Y - (h / 2));
-    const s32 texW = 32;
-    const s32 texH = 32;
-    Texture* texture_controller = texture_controller_unknown;
-    OSPortInfo* portInfo = NULL;
+    const s32 texW = CONT_ICON_W;
+    const s32 texH = CONT_ICON_H;
+    const s32 spacing = 2;
+    const s32 spacedW = (w + spacing);
+    const s32 iconStartX = (SCREEN_CENTER_X - (((spacedW * MAXCONTROLLERS) - spacing) / 2));
     char text_buffer[32] = "";
     int port;
 
@@ -492,19 +521,15 @@ void render_controllers_overlay(void) {
 
     // Draw the port icons:
     for (port = 0; port < MAXCONTROLLERS; port++) {
-        portInfo = &gPortInfo[port];
+        const struct ControllerIcon* icon = get_controller_icon(port);
 
-        // Loop through sControllerIcons to get the port's corresponding texture.
-        for (int i = 0; i < ARRAY_COUNT(sControllerIcons); i++) {
-            if (portInfo->type == sControllerIcons[i].type) {
-                texture_controller = sControllerIcons[i].texture;
-                break;
-            }
+        if (icon == NULL) {
+            continue;
         }
 
-        x = (SCREEN_CENTER_X - (w * (MAXCONTROLLERS / 2))) + (w * port);
+        x = (iconStartX + (spacedW * port));
         gDPLoadTextureTile(dlHead++,
-            texture_controller, G_IM_FMT_RGBA, G_IM_SIZ_16b,
+            icon->texture, G_IM_FMT_RGBA, G_IM_SIZ_16b,
             texW, texH, 0, 0,
             (texW - 1), (texH - 1), 0,
             (G_TX_NOMIRROR | G_TX_CLAMP),
@@ -535,7 +560,7 @@ void render_controllers_overlay(void) {
             char comboStr[32] = "";
             size_t count = button_combo_to_string(comboStr, TOGGLE_CONT_STATUS_POLLING_COMBO);
             sprintf(text_buffer, "OR %s TO EXIT", comboStr);
-            s32 xOffset = ((strlen("ORTOEXIT") + 1 + count) / 2) * 7; // Center the text based on char count.
+            s32 xOffset = (((strlen("OR%sTOEXIT") + count) / 2) * 7); // Center the text based on char count.
             drawSmallStringCol(&dlHead, (SCREEN_CENTER_X - xOffset), (SCREEN_CENTER_Y + 28), text_buffer, col, col, col);
  #endif // (MAX_NUM_PLAYERS > 1)
         } else {
@@ -543,13 +568,15 @@ void render_controllers_overlay(void) {
         }
     }
 
-    // Print the assigned port numbers.
+    // Print the assigned player numbers.
     for (port = 0; port < MAXCONTROLLERS; port++) {
-        portInfo = &gPortInfo[port];
+        u8 playerNum = gControllerPads[port].playerNum;
 
-        if (portInfo->plugged && portInfo->playerNum) {
-            sprintf(text_buffer, "P%d", portInfo->playerNum);
-            drawSmallString(&dlHead, ((SCREEN_CENTER_X - (w * (MAXCONTROLLERS / 2))) + (w * port) + 8), (SCREEN_CENTER_Y + 16), text_buffer);
+        // Print if a controller is plugged in and assigned to a player.
+        if ((gControllerStatuses[port].type != CONT_NONE) && (playerNum != 0)) {
+            sprintf(text_buffer, "P%d", playerNum);
+            s32 playerNumX = ((iconStartX + 9) + (spacedW * port));
+            drawSmallString(&dlHead, playerNumX, (SCREEN_CENTER_Y + (CONT_ICON_H / 2)), text_buffer);
         }
     }
 
@@ -560,7 +587,7 @@ void render_controllers_overlay(void) {
 
     gDisplayListHead = dlHead;
 }
-#endif // ALLOW_STATUS_REPOLLING_COMBO
+#endif // ENABLE_STATUS_REPOLLING_GUI
 
 void render_game(void) {
     PROFILER_GET_SNAPSHOT_TYPE(PROFILER_DELTA_COLLISION);
@@ -643,7 +670,7 @@ void render_game(void) {
     gViewportOverride = NULL;
     gViewportClip = NULL;
 
-#ifdef ALLOW_STATUS_REPOLLING_COMBO
+#ifdef ENABLE_STATUS_REPOLLING_GUI
     render_controllers_overlay();
 #endif
 
