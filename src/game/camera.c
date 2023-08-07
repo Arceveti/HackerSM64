@@ -5940,12 +5940,16 @@ void camera_course_processing(struct Camera *c) {
             // Check only the current area's triggers
             if (sCameraTriggers[level][b].area == area) {
                 // Copy the bounding box into center and bounds
-                vec3f_set(center, sCameraTriggers[level][b].centerX,
-                                  sCameraTriggers[level][b].centerY,
-                                  sCameraTriggers[level][b].centerZ);
-                vec3f_set(bounds, sCameraTriggers[level][b].boundsX,
-                                  sCameraTriggers[level][b].boundsY,
-                                  sCameraTriggers[level][b].boundsZ);
+                vec3f_set(center,
+                    sCameraTriggers[level][b].centerX,
+                    sCameraTriggers[level][b].centerY,
+                    sCameraTriggers[level][b].centerZ
+                );
+                vec3f_set(bounds,
+                    sCameraTriggers[level][b].boundsX,
+                    sCameraTriggers[level][b].boundsY,
+                    sCameraTriggers[level][b].boundsZ
+                );
 
                 // Check if Mario is inside the bounds
                 if (is_pos_in_bounds(sMarioCamState->pos, center, bounds,
@@ -5959,13 +5963,13 @@ void camera_course_processing(struct Camera *c) {
                 }
             }
 
-            if ((sCameraTriggers[level])[b].area == -1) {
-                // Default triggers are only active if Mario is not already inside another trigger
-                if (!insideBounds) {
-                    if (!(sStatusFlags & CAM_FLAG_BLOCK_AREA_PROCESSING)) {
-                        sCameraTriggers[level][b].event(c);
-                    }
-                }
+            // Default triggers are only active if Mario is not already inside another trigger
+            if (
+                (sCameraTriggers[level][b].area == -1) &&
+                !insideBounds &&
+                !(sStatusFlags & CAM_FLAG_BLOCK_AREA_PROCESSING)
+            ) {
+                sCameraTriggers[level][b].event(c);
             }
 
             b++;
