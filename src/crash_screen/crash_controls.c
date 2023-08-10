@@ -175,7 +175,7 @@ _Bool update_crash_screen_page(void) {
 
 // Global controls.
 void crash_screen_update_input(void) {
-    handle_input(&gActiveCSThreadInfo->mesg); //! TODO: Make controller switching not weird when the crash screen is open.
+    handle_input_simple(&gActiveCSThreadInfo->mesg);
 
     if (gPlayer1Controller->buttonPressed & START_BUTTON) {
         gCSDrawControls ^= TRUE;

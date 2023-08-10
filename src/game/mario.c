@@ -1770,7 +1770,7 @@ s32 execute_mario_action(struct MarioState* m) {
 #endif
 #ifdef ENABLE_DEBUG_FREE_MOVE
         if (
-            m->action != ACT_DEBUG_FREE_MOVE &&
+            (m->action != ACT_DEBUG_FREE_MOVE) &&
             (m->controller->buttonDown & U_JPAD) &&
             !(m->controller->buttonDown & (L_TRIG | Z_TRIG))
         ) {
