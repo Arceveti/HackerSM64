@@ -13,6 +13,7 @@
 #include "buffers/buffers.h"
 #include "segments.h"
 #include "crash_screen/crash_main.h"
+#include "crash_screen/insn_disasm.h"
 #include "game/main.h"
 #include "game/version.h"
 #include "game/vc_check.h"

@@ -1,10 +1,34 @@
 #include <ultra64.h>
+
 #include <string.h>
+
 #include "types.h"
 #include "sm64.h"
+
+#include "crash_screen/address_select.h"
+#include "crash_screen/crash_controls.h"
+#include "crash_screen/crash_draw.h"
 #include "crash_screen/crash_main.h"
+#include "crash_screen/crash_print.h"
+#include "crash_screen/crash_settings.h"
+#include "crash_screen/insn_disasm.h"
+#include "crash_screen/map_parser.h"
+#include "crash_screen/memory_read.h"
+
 #include "page_disasm.h"
-#include "game/input.h"
+
+
+const enum ControlTypes disasmContList[] = {
+    CONT_DESC_SWITCH_PAGE,
+    CONT_DESC_SHOW_CONTROLS,
+    CONT_DESC_CYCLE_DRAW,
+    CONT_DESC_CURSOR_VERTICAL,
+    CONT_DESC_JUMP_TO_ADDRESS,
+#ifdef INCLUDE_DEBUG_MAP
+    CONT_DESC_TOGGLE_FUNCTIONS,
+#endif
+    CONT_DESC_LIST_END,
+};
 
 
 static u32 sDisasmViewportIndex = 0x00000000;
@@ -90,7 +114,7 @@ _Bool disasm_fill_branch_buffer(const char* fname, Address funcAddr) {
         // Check if we have left the function.
         const struct MapSymbol* symbol = get_map_symbol(sBranchBufferCurrAddr, SYMBOL_SEARCH_FORWARD);
         if (symbol != NULL) {
-            if (symbol->type != 'T' && symbol->type != 't') {
+            if (!is_in_code_segment(symbol->addr)) {
                 return FALSE;
             }
             if (funcAddr != symbol->addr) {
@@ -331,18 +355,6 @@ void disasm_draw(void) {
 
     osWritebackDCacheAll();
 }
-
-const enum ControlTypes disasmContList[] = {
-    CONT_DESC_SWITCH_PAGE,
-    CONT_DESC_SHOW_CONTROLS,
-    CONT_DESC_CYCLE_DRAW,
-    CONT_DESC_CURSOR_VERTICAL,
-    CONT_DESC_JUMP_TO_ADDRESS,
-#ifdef INCLUDE_DEBUG_MAP
-    CONT_DESC_TOGGLE_FUNCTIONS,
-#endif
-    CONT_DESC_LIST_END,
-};
 
 void disasm_input(void) {
 #ifdef INCLUDE_DEBUG_MAP

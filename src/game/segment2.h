@@ -5,8 +5,8 @@
 #include <PR/gbi.h>
 
 extern Texture* puppyprint_font_lut[];
-extern u8* puppyprint_kerning_lut[][82];
-extern const struct PPTextFont* gPuppyPrintFontTable[];
+extern u8* puppyprint_kerning_lut[][95];
+extern struct PPTextFont* gPuppyPrintFontTable[];
 
 extern u8* seg2_course_name_table[];
 extern u8* seg2_act_name_table[];

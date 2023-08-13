@@ -1,14 +1,18 @@
 #include <ultra64.h>
+
 #include <string.h>
+
 #include "types.h"
 #include "sm64.h"
+
+#include "crash_screen/address_select.h"
+#include "crash_screen/crash_controls.h"
+#include "crash_screen/crash_draw.h"
 #include "crash_screen/crash_main.h"
+#include "crash_screen/crash_print.h"
+#include "crash_screen/map_parser.h"
+
 #include "page_map.h"
-#include "game/input.h"
-
-
-u32 sMapViewerSelectedIndex = 0;
-static u32 sMapViewerViewportIndex = 0;
 
 
 const enum ControlTypes mapViewerContList[] = {
@@ -19,6 +23,10 @@ const enum ControlTypes mapViewerContList[] = {
     CONT_DESC_JUMP_TO_ADDRESS,
     CONT_DESC_LIST_END,
 };
+
+
+u32 sMapViewerSelectedIndex = 0;
+static u32 sMapViewerViewportIndex = 0;
 
 
 void map_view_init(void) {

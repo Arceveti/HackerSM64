@@ -3,7 +3,17 @@
 #include <ultra64.h>
 
 #include "types.h"
-// #include "crash_main.h"
+
+#include "game/input.h"
+
+
+struct CSController {
+    /*0x00*/ s16 rawStickX;
+    /*0x02*/ s16 rawStickY;
+    /*0x04*/ u16 buttonDown;
+    /*0x06*/ u16 buttonPressed;
+    /*0x08*/ u16 buttonReleased;
+}; /*0x0A*/
 
 
 typedef union {
@@ -58,7 +68,6 @@ extern const struct ControlType gCSControlDescriptions[];
 extern const enum ControlTypes defaultContList[];
 
 
-void crash_screen_set_page(enum CrashScreenPages page);
 u32 clamp_view_to_selection(u32 scrollIndex, u32 selectIndex, const u32 numRows, const u32 step);
 void crash_screen_update_input(void);
 void draw_controls_box(void);

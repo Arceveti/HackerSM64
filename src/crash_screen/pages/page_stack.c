@@ -1,17 +1,20 @@
 #include <ultra64.h>
+
 #include "types.h"
 #include "sm64.h"
+
+#include "crash_screen/address_select.h"
+#include "crash_screen/crash_controls.h"
+#include "crash_screen/crash_draw.h"
 #include "crash_screen/crash_main.h"
+#include "crash_screen/crash_print.h"
+#include "crash_screen/crash_settings.h"
+#include "crash_screen/map_parser.h"
+
 #include "page_stack.h"
-#include "game/input.h"
+
 #include "segment_symbols.h"
 
-
-ALIGNED16 static struct FunctionInStack sCSFunctionStackBuffer[STACK_TRACE_BUFFER_SIZE];
-static u32 sCSNumFoundFunctions = 0;
-
-static u32 sStackTraceSelectedIndex = 0;
-static u32 sStackTraceViewportIndex = 0;
 
 const enum ControlTypes stackTraceContList[] = {
     CONT_DESC_SWITCH_PAGE,
@@ -24,6 +27,13 @@ const enum ControlTypes stackTraceContList[] = {
 #endif
     CONT_DESC_LIST_END,
 };
+
+
+ALIGNED16 static struct FunctionInStack sCSFunctionStackBuffer[STACK_TRACE_BUFFER_SIZE];
+static u32 sCSNumFoundFunctions = 0;
+
+static u32 sStackTraceSelectedIndex = 0;
+static u32 sStackTraceViewportIndex = 0;
 
 static void add_to_stack(struct FunctionInStack* func) {
     sCSFunctionStackBuffer[sCSNumFoundFunctions++] = *func;
@@ -39,7 +49,7 @@ void fill_function_stack_trace(void) {
     __OSThreadContext* tc = &gCrashedThread->context;
     const struct MapSymbol* symbol = get_map_symbol(tc->pc, SYMBOL_SEARCH_BACKWARD);
     struct FunctionInStack currInfo = {
-        .stackAddr = 0,
+        .stackAddr = tc->sp,
         .curAddr   = tc->pc,
         .faddr     = (symbol ? symbol->addr : tc->pc),
         .fname     = get_map_symbol_name(symbol),
@@ -108,11 +118,10 @@ void stack_trace_print_entries(u32 line, u32 numLines) {
 
         const size_t addrStrSize = STRLEN("00000000:");
         // "[stack address]:"
-        if (currIndex == 0) {
-            crash_screen_print(TEXT_X(0), y, STR_COLOR_PREFIX"CURRFUNC:", COLOR_RGBA32_CRASH_AT);
-        } else {
-            crash_screen_print(TEXT_X(0), y, STR_HEX_WORD":", function->stackAddr);
-        }
+        crash_screen_print(TEXT_X(0), y,
+            STR_COLOR_PREFIX STR_HEX_WORD":",
+            ((currIndex == 0) ? COLOR_RGBA32_CRASH_AT : COLOR_RGBA32_WHITE), function->stackAddr
+        );
 
 #ifdef INCLUDE_DEBUG_MAP
         if (function->fname == NULL) {
@@ -162,12 +171,7 @@ void stack_trace_print_entries(u32 line, u32 numLines) {
 // prints any function pointers it finds in the stack format:
 // SP address: function name
 void stack_trace_draw(void) {
-    __OSThreadContext* tc = &gCrashedThread->context;
-
     u32 line = 1;
-
-    // "FROM: [XXXXXXXX]"
-    crash_screen_print(TEXT_X(12), TEXT_Y(line), "FROM "STR_HEX_WORD, (Address)tc->sp);
 
 #ifdef INCLUDE_DEBUG_MAP
     // "OFFSET:"
@@ -210,18 +214,10 @@ void stack_trace_input(void) {
     }
 #endif
 
-    if (gCSDirectionFlags.pressed.up) {
-        // Scroll up.
-        if (sStackTraceSelectedIndex > 0) {
-            sStackTraceSelectedIndex--;
-        }
-    }
-    if (gCSDirectionFlags.pressed.down) {
-        // Scroll down.
-        if (sStackTraceSelectedIndex < (sCSNumFoundFunctions - 1)) {
-            sStackTraceSelectedIndex++;
-        }
-    }
+    s32 change = 0;
+    if (gCSDirectionFlags.pressed.up  ) change = -1; // Scroll up.
+    if (gCSDirectionFlags.pressed.down) change = +1; // Scroll down.
+    sStackTraceSelectedIndex = WRAP(((s32)sStackTraceSelectedIndex + change), 0, (s32)(sCSNumFoundFunctions - 1));
 
     sStackTraceViewportIndex = clamp_view_to_selection(sStackTraceViewportIndex, sStackTraceSelectedIndex, STACK_TRACE_NUM_ROWS, 1);
 }

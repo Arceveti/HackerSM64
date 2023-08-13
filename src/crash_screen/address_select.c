@@ -1,9 +1,17 @@
 #include <ultra64.h>
+
 #include "types.h"
 #include "sm64.h"
+
+#include "crash_controls.h"
+#include "crash_draw.h"
 #include "crash_main.h"
+#include "crash_pages.h"
+#include "crash_print.h"
+#include "memory_read.h"
+
 #include "address_select.h"
-#include "game/input.h"
+
 #include "pages/page_disasm.h"
 
 
@@ -69,12 +77,8 @@ extern u32 sMapViewerSelectedIndex;
 void crash_screen_select_address(void) {
     s8 change = 0;
 
-    if (gCSDirectionFlags.pressed.left) {
-        change = -1;
-    }
-    if (gCSDirectionFlags.pressed.right) {
-        change = +1;
-    }
+    if (gCSDirectionFlags.pressed.left ) change = -1;
+    if (gCSDirectionFlags.pressed.right) change = +1;
 
     sAddressSelectCharIndex = ((sAddressSelectCharIndex + change) % SIZEOF_HEX(Address));
 
@@ -83,12 +87,8 @@ void crash_screen_select_address(void) {
     s8 new = digit;
     change = 0;
 
-    if (gCSDirectionFlags.pressed.up) {
-        change = +1;
-    }
-    if (gCSDirectionFlags.pressed.down) {
-        change = -1;
-    }
+    if (gCSDirectionFlags.pressed.up  ) change = +1;
+    if (gCSDirectionFlags.pressed.down) change = -1;
 
     if (change != 0) {
         // Wrap to virtual ram address:
