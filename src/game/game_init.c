@@ -268,6 +268,13 @@ void make_viewport_clip_rect(Vp *viewport) {
     gDPSetScissor(gDisplayListHead++, G_SC_NON_INTERLACE, vpUlx, vpPly, vpLrx, vpLry);
 }
 
+#define SET_GFX_TASK_UCODE(_ucode) do { \
+    gGfxSPTask->task.t.ucode           = gsp##_ucode##TextStart; \
+    gGfxSPTask->task.t.ucode_data      = gsp##_ucode##DataStart; \
+    gGfxSPTask->task.t.ucode_size      = ((u8*)gsp##_ucode##TextEnd - (u8*)gsp##_ucode##TextStart); \
+    gGfxSPTask->task.t.ucode_data_size = ((u8*)gsp##_ucode##DataEnd - (u8*)gsp##_ucode##DataStart); \
+} while (0);
+
 /**
  * Initializes the Fast3D OSTask structure.
  * If you plan on using gSPLoadUcode, make sure to add OS_TASK_LOADABLE to the flags member.
@@ -286,45 +293,21 @@ void create_gfx_task_structure(void) {
     gGfxSPTask->task.t.flags = 0x0;
 #endif
 #ifdef L3DEX2_ALONE
-    gGfxSPTask->task.t.ucode           = gspL3DEX2_fifoTextStart;
-    gGfxSPTask->task.t.ucode_data      = gspL3DEX2_fifoDataStart;
-    gGfxSPTask->task.t.ucode_size      = ((u8*)gspL3DEX2_fifoTextEnd - (u8*)gspL3DEX2_fifoTextStart);
-    gGfxSPTask->task.t.ucode_data_size = ((u8*)gspL3DEX2_fifoDataEnd - (u8*)gspL3DEX2_fifoDataStart);
+    SET_GFX_TASK_UCODE(L3DEX2_fifo);
 #elif F3DZEX_GBI_2
-    gGfxSPTask->task.t.ucode           = gspF3DZEX2_PosLight_fifoTextStart;
-    gGfxSPTask->task.t.ucode_data      = gspF3DZEX2_PosLight_fifoDataStart;
-    gGfxSPTask->task.t.ucode_size      = ((u8*)gspF3DZEX2_PosLight_fifoTextEnd - (u8*)gspF3DZEX2_PosLight_fifoTextStart);
-    gGfxSPTask->task.t.ucode_data_size = ((u8*)gspF3DZEX2_PosLight_fifoDataEnd - (u8*)gspF3DZEX2_PosLight_fifoDataStart);
+    SET_GFX_TASK_UCODE(F3DZEX2_PosLight_fifo);
 #elif F3DZEX_NON_GBI_2
-    gGfxSPTask->task.t.ucode           = gspF3DZEX2_NoN_PosLight_fifoTextStart;
-    gGfxSPTask->task.t.ucode_data      = gspF3DZEX2_NoN_PosLight_fifoDataStart;
-    gGfxSPTask->task.t.ucode_size      = ((u8*)gspF3DZEX2_NoN_PosLight_fifoTextEnd - (u8*)gspF3DZEX2_NoN_PosLight_fifoTextStart);
-    gGfxSPTask->task.t.ucode_data_size = ((u8*)gspF3DZEX2_NoN_PosLight_fifoDataEnd - (u8*)gspF3DZEX2_NoN_PosLight_fifoDataStart);
+    SET_GFX_TASK_UCODE(F3DZEX2_NoN_PosLight_fifo);
 #elif F3DEX2PL_GBI
-    gGfxSPTask->task.t.ucode           = gspF3DEX2_PosLight_fifoTextStart;
-    gGfxSPTask->task.t.ucode_data      = gspF3DEX2_PosLight_fifoDataStart;
-    gGfxSPTask->task.t.ucode_size      = ((u8*)gspF3DEX2_PosLight_fifoTextEnd - (u8*)gspF3DEX2_PosLight_fifoTextStart);
-    gGfxSPTask->task.t.ucode_data_size = ((u8*)gspF3DEX2_PosLight_fifoDataEnd - (u8*)gspF3DEX2_PosLight_fifoDataStart);
+    SET_GFX_TASK_UCODE(F3DEX2_PosLight_fifo);
 #elif F3DEX_GBI_2
-    gGfxSPTask->task.t.ucode           = gspF3DEX2_fifoTextStart;
-    gGfxSPTask->task.t.ucode_data      = gspF3DEX2_fifoDataStart;
-    gGfxSPTask->task.t.ucode_size      = ((u8*)gspF3DEX2_fifoTextEnd - (u8*)gspF3DEX2_fifoTextStart);
-    gGfxSPTask->task.t.ucode_data_size = ((u8*)gspF3DEX2_fifoDataEnd - (u8*)gspF3DEX2_fifoDataStart);
+    SET_GFX_TASK_UCODE(F3DEX2_fifo);
 #elif F3DEX_GBI
-    gGfxSPTask->task.t.ucode           = gspF3DEX_fifoTextStart;
-    gGfxSPTask->task.t.ucode_data      = gspF3DEX_fifoDataStart;
-    gGfxSPTask->task.t.ucode_size      = ((u8*)gspF3DEX_fifoTextEnd - (u8*)gspF3DEX_fifoTextStart);
-    gGfxSPTask->task.t.ucode_data_size = ((u8*)gspF3DEX_fifoDataEnd - (u8*)gspF3DEX_fifoDataStart);
+    SET_GFX_TASK_UCODE(F3DEX_fifo);
 #elif SUPER3D_GBI
-    gGfxSPTask->task.t.ucode           = gspSuper3DTextStart;
-    gGfxSPTask->task.t.ucode_data      = gspSuper3DDataStart;
-    gGfxSPTask->task.t.ucode_size      = ((u8*)gspSuper3DTextEnd - (u8*)gspSuper3DTextStart);
-    gGfxSPTask->task.t.ucode_data_size = ((u8*)gspSuper3DDataEnd - (u8*)gspSuper3DDataStart);
+    SET_GFX_TASK_UCODE(Super3D);
 #else
-    gGfxSPTask->task.t.ucode           = gspFast3D_fifoTextStart;
-    gGfxSPTask->task.t.ucode_data      = gspFast3D_fifoDataStart;
-    gGfxSPTask->task.t.ucode_size      = ((u8*)gspFast3D_fifoTextEnd - (u8*)gspFast3D_fifoTextStart);
-    gGfxSPTask->task.t.ucode_data_size = ((u8*)gspFast3D_fifoDataEnd - (u8*)gspFast3D_fifoDataStart);
+    SET_GFX_TASK_UCODE(Fast3D_fifo);
 #endif
     gGfxSPTask->task.t.dram_stack = (u64*)gGfxSPTaskStack;
     gGfxSPTask->task.t.dram_stack_size = SP_DRAM_STACK_SIZE8;
