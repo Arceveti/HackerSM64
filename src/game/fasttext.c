@@ -63,9 +63,28 @@ static const u8 fast_text_font_kerning[] = {
     /*p*/ 6, /*q*/ 6, /*r*/ 6, /*s*/ 6, /*t*/ 6, /*u*/ 6, /*v*/ 6, /*w*/ 6, /*x*/ 6, /*y*/ 6, /*z*/ 6, /*{*/ 0, /*|*/ 0, /*}*/ 0, /*~*/ 7,
 };
 
+int fasttext_get_str_width(const char* string) {
+    int i = 0;
+    int width = 0;
+
+    while (string[i] != '\0') {
+        unsigned int cur_char = string[i];
+
+        if (
+            cur_char != '\n' &&
+            cur_char != '\t'
+        ) {
+            width += fast_text_font_kerning[cur_char - ' '];
+        }
+
+        i++;
+    }
+
+    return width;
+}
+
 void drawSmallString_impl(Gfx** dl, const int x, const int y, const char* string, const int r, const int g, const int b) {
     Gfx* dlHead = *dl;
-
     int xPos = x;
     int yPos = y;
 

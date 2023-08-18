@@ -11,21 +11,21 @@
 #include "vc_check.h"
 #include "vc_ultra.h"
 
-// Player Controllers.
+// Player Controllers (players).
 struct Controller gControllers[MAXCONTROLLERS];
-// Defined controller slots. Anything above MAX_NUM_PLAYERS will be unused.
+// Defined player slots. Anything above MAX_NUM_PLAYERS should not be used.
 struct Controller* const gPlayer1Controller = &gControllers[0];
 struct Controller* const gPlayer2Controller = &gControllers[1];
 struct Controller* const gPlayer3Controller = &gControllers[2];
 struct Controller* const gPlayer4Controller = &gControllers[3];
 
-// OS Controllers.
+// OS Controllers (ports).
 OSContStatus gControllerStatuses[MAXCONTROLLERS];
 OSContPadEx gControllerPads[MAXCONTROLLERS];
 
 u8    gNumPlayers                     = 0;                  // The number of controllers currently assigned to a player.
 u8    gMaxNumPlayers                  = MAX_NUM_PLAYERS;    // The maximum number of player controllers that can be read [0..MAXCONTROLLERS]. This is only different from MAX_NUM_PLAYERS in handle_input_simple().
-u8    gControllerBits                 = 0b0000;             // Which ports have a controller connected to them (low to high).
+u8    gControllerBits                 = 0b0000;             // Which ports have a controller connected to them (lowest bit == leftmost port).
 _Bool gContStatusPolling              = FALSE;              // Whether controller status polling is enabled.
 _Bool gContStatusPollingIsBootMode    = FALSE;              // Whether controller status polling was triggered on boot and should be invisible.
 _Bool gContStatusPollingReadyForInput = TRUE;               // Whether all inputs have been released after starting status repolling.
@@ -42,7 +42,7 @@ struct DemoInput* gCurrDemoInput = NULL;
 #ifndef DISABLE_DEMO
 u16 gDemoInputListID = 0;
 
-// Demo controller.
+// Virtual demo controller.
 OSContStatus gDemoStatusData = {
     .type = CONT_TYPE_NORMAL,
 };
@@ -63,7 +63,7 @@ struct Controller* const gDemoController = &gDemoControllers[0];
  * @param[in,out] controller The controller to operate on.
  */
 static void adjust_analog_stick(struct Controller* controller) {
-    const s16 deadzone = ((controller->statusData->type & CONT_CONSOLE_GCN) ? 12 : 8);
+    const s16 deadzone = ((controller->statusData->type & CONT_CONSOLE_GCN) ? ANALOG_DEADZONE_GCN : ANALOG_DEADZONE_N64);
     const s16 offset = (deadzone - 2);
     const f32 max_stick_mag = 64.0f;
 
@@ -249,7 +249,7 @@ void assign_controllers_by_player_num(void) {
 static void poll_controller_inputs(OSMesg* mesg) {
     block_until_rumble_pak_free();
 
-    osStartRead_impl(&gSIEventMesgQueue, CONT_CMD_READ_BUTTON);
+    osContStartReadDataEx(&gSIEventMesgQueue, CONT_CMD_READ_BUTTON);
     osRecvMesg(&gSIEventMesgQueue, mesg, OS_MESG_BLOCK);
     osContGetReadDataEx(gControllerPads);
 
@@ -264,7 +264,7 @@ static void poll_controller_inputs(OSMesg* mesg) {
 static void poll_controller_gcn_origins(OSMesg* mesg) {
     block_until_rumble_pak_free();
 
-    osStartRead_impl(&gSIEventMesgQueue, CONT_CMD_GCN_READ_ORIGIN);
+    osContStartReadDataEx(&gSIEventMesgQueue, CONT_CMD_GCN_READ_ORIGIN);
     osRecvMesg(&gSIEventMesgQueue, mesg, OS_MESG_BLOCK);
     osContGetReadDataEx(gControllerPads);
 
@@ -385,7 +385,7 @@ void read_controller_inputs_status_polling(void) {
                         button ||
                         (
                             gContStatusPollingIsBootMode &&
-                            detect_analog_stick_input(pad, 20)
+                            detect_analog_stick_input(pad, ANALOG_DEADZONE_STATUS_POLLING)
                         ) // Only check analog sticks in boot mode.
                     )
                 ) {
@@ -468,7 +468,7 @@ void read_controller_inputs_normal(void) {
 void check_repoll_gcn_origins(OSMesg* mesg) {
     for (int port = 0; port < __osMaxControllers; port++) {
         // If any plugged in GCN controller with readable input needs its origins updated, run the GCN read origins command.
-        //! TODO: This is the same check as done later when writing the packed command in __osPackRead_impl, but also done here because origins.initialized is 0 for non-GCN controllers and empty ports. Otherwise the read origins command would be run every frame if there are any ports without a GCN controller. Is it possible to combine these checks?
+        //! TODO: This is the same check as done later when writing the packed command in __osPackReadEx, but also done here because origins.initialized is 0 for non-GCN controllers and empty ports. Otherwise the read origins command would be run every frame if there are any ports without a GCN controller. Is it possible to combine these checks?
         if (
             (gControllerStatuses[port].type & CONT_CONSOLE_GCN) &&
             (gContStatusPolling || (gControllerPads[port].playerNum != 0)) &&

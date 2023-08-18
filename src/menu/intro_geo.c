@@ -454,30 +454,6 @@ Gfx* geo_intro_face_easter_egg(s32 callContext, struct GraphNode* node, UNUSED v
 
 #ifdef ENABLE_RUMBLE
 //! TODO: Move rumble pak graphic textures here once build order is fixed.
-#define RUMBLE_W 80
-#define RUMBLE_H 24
-#define RUMBLE_X (SCREEN_WIDTH - 100) // 220
-#define RUMBLE_Y (SCREEN_HEIGHT - 40) // 200
-
-static const Gfx title_screen_bg_dl_rumble_pak_begin[] = {
-    gsDPPipeSync(),
-    gsDPSetCycleType(G_CYC_COPY),
-    gsDPSetTexturePersp(G_TP_NONE),
-    gsDPSetTextureFilter(G_TF_POINT),
-    gsDPSetRenderMode(G_RM_NOOP, G_RM_NOOP2),
-    gsDPSetScissor(G_SC_NON_INTERLACE, 0, 0, (SCREEN_WIDTH - 1), (SCREEN_HEIGHT - 1)),
-    gsSPEndDisplayList(),
-};
-
-static const Gfx title_screen_bg_dl_rumble_pak_end[] = {
-    gsSPTextureRectangle((RUMBLE_X << 2), (RUMBLE_Y << 2), (((RUMBLE_X + RUMBLE_W) - 1) << 2), (((RUMBLE_Y + RUMBLE_H) - 1) << 2), G_TX_RENDERTILE, 0, 0, (4 << 10), (1 << 10)),
-    gsDPPipeSync(),
-    gsDPSetCycleType(G_CYC_1CYCLE),
-    gsDPSetTexturePersp(G_TP_PERSP),
-    gsDPSetTextureFilter(G_TF_BILERP),
-    gsDPSetRenderMode(G_RM_AA_ZB_OPA_SURF, G_RM_AA_ZB_OPA_SURF2),
-    gsSPEndDisplayList(),
-};
 
 //! TODO: Use DEFINE_LANGUAGE_ARRAY after ASCII/multilang is merged.
 Texture* title_texture_rumble_pak_language_array[] = {
@@ -517,29 +493,18 @@ Gfx* geo_intro_rumble_pak_graphic(s32 callContext, struct GraphNode* node, UNUSE
         if (backgroundTileSix == INTRO_BACKGROUND_SUPER_MARIO) {
             dl = alloc_display_list(
                 SIZEOF_GFX_CMD(SPDisplayList(0)) +
-                SIZEOF_GFX_CMD(DPLoadTextureTile(0,0,G_IM_SIZ_16b,0,0,0,0,0,0,0,0,0,0,0,0,0)) +
+                SIZEOF_GFX_TEXRECT_RGBA32 +
+                SIZEOF_GFX_TEXRECT_RGBA32 +
                 SIZEOF_GFX_CMD(SPDisplayList(0)) +
                 SIZEOF_GFX_CMD(SPEndDisplayList())
             );
 
             if (dl != NULL) {
                 dlIter = dl;
-                gSPDisplayList(dlIter++, &title_screen_bg_dl_rumble_pak_begin);
-                gDPLoadTextureTile(dlIter++,
-                    title_texture_rumble_pak_language_array[LANGUAGE_ENGLISH],
-                    G_IM_FMT_RGBA, G_IM_SIZ_16b,
-                    RUMBLE_W,
-                    RUMBLE_H,
-                    0, 0,
-                    (RUMBLE_W - 1),
-                    (RUMBLE_H - 1),
-                    0,
-                    (G_TX_NOMIRROR | G_TX_CLAMP),
-                    (G_TX_NOMIRROR | G_TX_CLAMP),
-                    G_TX_NOMASK, G_TX_NOMASK,
-                    G_TX_NOLOD,  G_TX_NOLOD
-                );
-                gSPDisplayList(dlIter++, &title_screen_bg_dl_rumble_pak_end);
+                gSPDisplayList(dlIter++, &dl_texrect_rgba32_begin);
+                texrect_rgba32(&dlIter, title_texture_rumble_pak_language_array[LANGUAGE_ENGLISH], RUMBLE_TEXT_W, RUMBLE_TEXT_H, RUMBLE_TEXT_X, RUMBLE_TEXT_Y, RUMBLE_TEXT_W, RUMBLE_TEXT_H);
+                texrect_rgba32(&dlIter, title_texture_rumble_pak_controller,                       RUMBLE_CONT_W, RUMBLE_CONT_H, RUMBLE_CONT_X, RUMBLE_CONT_Y, RUMBLE_CONT_W, RUMBLE_CONT_H);
+                gSPDisplayList(dlIter++, &dl_texrect_rgba32_end);
                 gSPEndDisplayList(dlIter);
             }
         } else {

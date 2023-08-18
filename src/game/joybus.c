@@ -61,7 +61,7 @@ static __OSContGCNLongPollFormat sGCNLongPollFormatLong = {
     .recv.raw           = { [0 ... (sizeof(sGCNLongPollFormatLong.recv.raw) - 1)] = PIF_CMD_NOP }, // 10 bytes of PIF_CMD_NOP (0xFF).
 };
 
-static void __osPackRead_impl(u8 cmd);
+static void __osPackReadEx(u8 cmd);
 
 /**
  * @brief Implementation for PIF pack handlers.
@@ -70,7 +70,7 @@ static void __osPackRead_impl(u8 cmd);
  * @param[in] cmd The command ID to run (see enum OSContCmds).
  * @return s32 Error status: -1 = busy, 0 = success.
  */
-s32 osStartRead_impl(OSMesgQueue* mq, u8 cmd) {
+s32 osContStartReadDataEx(OSMesgQueue* mq, u8 cmd) {
     s32 ret = 0;
 
     __osSiGetAccess();
@@ -78,7 +78,7 @@ s32 osStartRead_impl(OSMesgQueue* mq, u8 cmd) {
     // If this was called twice in a row, there is no need to write the command again.
     if (__osContLastCmd != cmd) {
         // Run the pack command.
-        __osPackRead_impl(cmd);
+        __osPackReadEx(cmd);
 
         // Write __osContPifRam to the PIF RAM.
         ret = __osSiRawStartDma(OS_WRITE, &__osContPifRam);
@@ -110,11 +110,11 @@ s32 osStartRead_impl(OSMesgQueue* mq, u8 cmd) {
 
 /**
  * @brief Writes PIF commands to poll controller inputs depending on the command.
- * Called by osContStartReadData and osStartRead_impl.
+ * Called by osContStartReadData and osContStartReadDataEx.
  *
  * @param[in] cmd The command ID to run (see enum OSContCmds).
  */
-static void __osPackRead_impl(u8 cmd) {
+static void __osPackReadEx(u8 cmd) {
     u8* ptr = (u8*)__osContPifRam.ramarray;
 
     bzero(__osContPifRam.ramarray, sizeof(__osContPifRam.ramarray));
@@ -147,7 +147,7 @@ static void __osPackRead_impl(u8 cmd) {
                     break;
 
                 case CONT_CMD_GCN_CALIBRATE:
-                    if (isGCN && !pad->origins.initialized) {
+                    if (isGCN) {
                         WRITE_PIF_CMD_WITH_GCN_RUMBLE(ptr, sGCNCalibrateFormat, port);
                     } else {
                         ptr++; // Not a GCN controller, or doesn't need origins updated, so leave a PIF_CMD_SKIP_CHNL (0x00) byte to tell the PIF to skip it.
@@ -163,7 +163,7 @@ static void __osPackRead_impl(u8 cmd) {
                     break;
 
                 default:
-                    osSyncPrintf("__osPackRead_impl error: Unimplemented input poll command: %.02X (port %d)\n", cmd, port);
+                    osSyncPrintf("__osPackReadEx error: Unimplemented input poll command: %.02X (port %d)\n", cmd, port);
                     *ptr = PIF_CMD_END;
                     return;
             }
@@ -251,7 +251,7 @@ static void __osContReadGCNInputData(OSContPadEx* pad, GCNButtons gcn, Analog_u8
 }
 
 /**
- * @brief Reads PIF command result written by __osPackRead_impl and converts it into OSContPadEx data.
+ * @brief Reads PIF command result written by __osPackReadEx and converts it into OSContPadEx data.
  * Modified from vanilla libultra to handle GameCube controllers, skip empty/unassigned ports,
  *   and trigger status polling if an active controller is unplugged.
  * Called by poll_controller_inputs.
@@ -310,9 +310,9 @@ void osContGetReadDataEx(OSContPadEx* pad) {
                         pad->button.START = TRUE;
                     }
                     // Standard N64 controller only has one analog stick.
-                    pad->stick                  = n64Input.stick;
-                    pad->c_stick                = ANALOG_S8_ZERO;
-                    pad->trig                   = ANALOG_U8_ZERO;
+                    pad->stick   = n64Input.stick;
+                    pad->c_stick = ANALOG_S8_ZERO;
+                    pad->trig    = ANALOG_U8_ZERO;
                 }
 
                 ptr += sizeof(__OSContReadFormat);
@@ -448,7 +448,7 @@ s32 __osMotorAccessEx(OSPfs* pfs, s32 motorState) {
 
     // Check whether the controller is a GCN controller.
     if (gControllerStatuses[channel].type & CONT_CONSOLE_GCN) {
-        // GCN rumble is set in the input poll command by motorState in gRumbleInfos.
+        // GCN rumble is set in the input poll command, using motorState in gRumbleInfos.
 
         // Change the last command ID so that input poll command (which includes the rumble byte) gets written again next frame.
         __osContLastCmd = PIF_CMD_END;

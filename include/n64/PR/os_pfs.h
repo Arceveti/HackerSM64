@@ -28,7 +28,7 @@
  *---------------------------------------------------------------------*/
 
 #ifndef _OS_PFS_H_
-#define	_OS_PFS_H_
+#define _OS_PFS_H_
 
 #ifdef _LANGUAGE_C_PLUS_PLUS
 extern "C" {
@@ -63,7 +63,7 @@ typedef struct {
     /*0x60*/ int inode_start_page;  /* page # */
     /*0x64*/ u8  banks;
     /*0x65*/ u8  activebank;
-} OSPfs; /*0x66*/
+} OSPfs; /*0x68*/
 
 typedef struct {
     /*0x00*/ u32  file_size; /* bytes */
@@ -71,7 +71,7 @@ typedef struct {
     /*0x08*/ u16  company_code;
     /*0x0A*/ char ext_name[4];
     /*0x0E*/ char game_name[16];
-} OSPfsState; /*0x1E*/
+} OSPfsState; /*0x20*/
 
 
 #endif /* defined(_LANGUAGE_C) || defined(_LANGUAGE_C_PLUS_PLUS) */
@@ -83,9 +83,9 @@ typedef struct {
  */
 
 /* File System size */
-#define	OS_PFS_VERSION      0x0200
-#define	OS_PFS_VERSION_HI   (OS_PFS_VERSION >> 8)   // 0x0002
-#define	OS_PFS_VERSION_LO   (OS_PFS_VERSION & 0xFF) // 0x0000
+#define OS_PFS_VERSION      0x0200
+#define OS_PFS_VERSION_HI   (OS_PFS_VERSION >> 8)   // 0x0002
+#define OS_PFS_VERSION_LO   (OS_PFS_VERSION & 0xFF) // 0x0000
 
 #define PFS_FILE_NAME_LEN   sizeof(((OSPfsState*)0)->game_name) // 16
 #define PFS_FILE_EXT_LEN    sizeof(((OSPfsState*)0)->ext_name ) //  4

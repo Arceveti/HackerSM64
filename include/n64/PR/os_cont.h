@@ -28,7 +28,7 @@
  *---------------------------------------------------------------------*/
 
 #ifndef _OS_CONT_H_
-#define	_OS_CONT_H_
+#define _OS_CONT_H_
 
 #ifdef _LANGUAGE_C_PLUS_PLUS
 extern "C" {
@@ -365,7 +365,7 @@ typedef union {
 typedef struct { //! TODO: Accessory type/detection.
     /*0x00*/ u16 type;                      /* Controller Type (SI identifier, byteswapped) */
     /*0x02*/ u8  status;                    /* Controller status */
-    /*0x03*/ u8	 error;                     /* Error */
+    /*0x03*/ u8  error;                     /* Error */
 } OSContStatus; /*0x04*/
 
 typedef struct {
@@ -373,7 +373,7 @@ typedef struct {
     /*0x02*/ s8  stick_x;                   /* -80 <= stick_x <=  80 */
     /*0x03*/ s8  stick_y;                   /* -80 <= stick_y <=  80 */
     /*0x04*/ u8  error;                     /* Error */
-} OSContPad; /*0x05*/
+} OSContPad; /*0x08*/
 
 typedef struct PACKED {
     /*0x00*/ u8 pad[1];
@@ -394,7 +394,7 @@ typedef struct {
     /*0x0C*/ Analog_u8 trig;                /*   0 <= trig    <= 255 */
     /*0x0E*/ OSContOrigins origins;         /* GCN analog origins */
     /*0x16*/ u8 playerNum;                  /* Player number (0 = not assigned) */
-    /*0x17*/ u8	errno;                      /* Error number */
+    /*0x17*/ u8 errno;                      /* Error number */
 } OSContPadEx; /*0x18*/
 
 typedef struct {
@@ -473,9 +473,9 @@ typedef struct {
 #define CONT_EEPROM             (0x8000)
 #define CONT_EEP16K             (0x4000)
 // N64:
-#define	CONT_TYPE_NORMAL        (0x0000 | CONT_CONSOLE_N64 | CONT_ABSOLUTE | CONT_JOYPORT) // 0x0005
-#define	CONT_TYPE_MOUSE         (0x0000 | CONT_CONSOLE_N64 | CONT_RELATIVE) // 0x0002
-#define	CONT_TYPE_VOICE         (0x0100 | CONT_CONSOLE_N64) // 0x0100
+#define CONT_TYPE_NORMAL        (0x0000 | CONT_CONSOLE_N64 | CONT_ABSOLUTE | CONT_JOYPORT) // 0x0005
+#define CONT_TYPE_MOUSE         (0x0000 | CONT_CONSOLE_N64 | CONT_RELATIVE) // 0x0002
+#define CONT_TYPE_VOICE         (0x0100 | CONT_CONSOLE_N64) // 0x0100
 #define CONT_TYPE_KEYBOARD      (0x0200 | CONT_CONSOLE_N64) // 0x0200
 #define CONT_TYPE_DANCEPAD      CONT_TYPE_NORMAL
 #define CONT_TYPE_DENSHA        CONT_TYPE_NORMAL
@@ -598,7 +598,7 @@ extern s32  osContInit(           OSMesgQueue* mq, u8* bitpattern, OSContStatus*
 extern s32  osContReset(          OSMesgQueue* mq,                 OSContStatus* status);
 extern s32  osContStartQuery(     OSMesgQueue* mq);
 extern s32  osContStartReadData(  OSMesgQueue* mq);
-extern s32  osStartRead_impl(     OSMesgQueue* mq, u8 cmd);
+extern s32  osContStartReadDataEx(OSMesgQueue* mq, u8 cmd);
 #ifndef _HW_VERSION_1
 extern s32  osContSetCh(u8 ch);
 #endif
