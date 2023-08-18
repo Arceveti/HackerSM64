@@ -28,6 +28,7 @@ enum CSDisasmBranchArrowModes {
     DISASM_ARROW_MODE_OVERSCAN,
 };
 
+//! TODO: shown flag + enabled flag + callback func(old, new)
 struct CSSettingsEntry {
     /*0x00*/ const char* name;
     /*0x20*/ const char* (*valNames)[];
@@ -43,7 +44,7 @@ enum CSSettings {
     CS_OPT_HEADER_GLOBAL,
     CS_OPT_DRAW_SCREENSHOT,
 #ifdef INCLUDE_DEBUG_MAP
-    CS_OPT_FUNCTION_NAMES,
+    CS_OPT_SYMBOL_NAMES,
 #endif
     // CONTROLS:
     CS_OPT_HEADER_CONTROLS,
@@ -58,9 +59,15 @@ enum CSSettings {
     CS_OPT_CONTEXT_FLOATS_FMT,
     // RAM VIEW:
     CS_OPT_HEADER_PAGE_MEMORY,
+#ifdef INCLUDE_DEBUG_MAP
+    CS_OPT_MEMORY_SHOW_SYMBOL,
+#endif
     CS_OPT_MEMORY_AS_ASCII,
     // DISASM:
     CS_OPT_HEADER_PAGE_DISASM,
+#ifdef INCLUDE_DEBUG_MAP
+    CS_OPT_DISASM_SHOW_SYMBOL,
+#endif
     CS_OPT_DISASM_BINARY,
     CS_OPT_DISASM_PSEUDOINSNS,
     CS_OPT_DISASM_IMM_FMT,

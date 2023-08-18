@@ -18,8 +18,12 @@
 PrintBuffer gCSPrintBuffer[CHAR_BUFFER_SIZE];
 PrintBuffer gCSScrollBuffer[CHAR_BUFFER_SIZE];
 
-_Bool gCSWordWrap = FALSE;
+// Input:
+_Bool  gCSWordWrap          = FALSE;
+u32    gCSWordWrapXLimit    = CRASH_SCREEN_TEXT_X2;
+RGBA32 gCSDefaultPrintColor = COLOR_RGBA32_WHITE;
 
+// Output:
 u32 gCSNumLinesPrinted = 0;
 
 
@@ -66,15 +70,26 @@ static _Bool read_str_to_bytes(Byte dest[], const char* buf, u32 index, size_t n
 static _Bool is_special_char(char glyph) {
     return (
         (glyph == CHAR_ESCAPE ) ||
+        (glyph == CHAR_TAB    ) ||
         (glyph == CHAR_NEWLINE) ||
         (glyph == CHAR_RETURN ) ||
         (glyph == CHAR_COLOR  )
     );
 }
 
+static _Bool is_space_char(char glyph) {
+    return (
+        (glyph == CHAR_NULL   ) ||
+        (glyph == CHAR_TAB    ) ||
+        (glyph == CHAR_NEWLINE) ||
+        (glyph == CHAR_RETURN ) ||
+        (glyph == CHAR_SPACE  )
+    );
+}
+
 static u32 format_print_buffer(const char* buf, size_t totalSize) {
     u32 bufferCount = 0;
-    ColorRGBA32 textColor = { .rgba32 = COLOR_RGBA32_WHITE };
+    ColorRGBA32 textColor = { .rgba32 = gCSDefaultPrintColor };
     _Bool escaped = FALSE;
 
     // Pass 1: control characters and formatting
@@ -111,7 +126,7 @@ static u32 format_print_buffer(const char* buf, size_t totalSize) {
                         break;
                     }
                     // Only set 'color' if 'read_str_to_bytes' is successful.
-                    ColorRGBA32 tempColor = { .rgba32 = COLOR_RGBA32_WHITE };
+                    ColorRGBA32 tempColor = { .rgba32 = gCSDefaultPrintColor };
                     if (!read_str_to_bytes(tempColor.raw.asU8, buf, (index + 1), sizeof(tempColor.raw.asU8))) {
                         print = TRUE;
                         break;
@@ -125,6 +140,7 @@ static u32 format_print_buffer(const char* buf, size_t totalSize) {
             }
         }
 
+        // Write the print data for this char.
         if (print) {
             data->red   = C32_TO_C16(textColor.red  );
             data->green = C32_TO_C16(textColor.green);
@@ -139,18 +155,13 @@ static u32 format_print_buffer(const char* buf, size_t totalSize) {
     return bufferCount;
 }
 
-static u32 get_next_word_length(PrintBuffer* buf, u32 index, size_t size) {
-    u32 count = 0;
+static size_t get_next_word_length(PrintBuffer* buf, u32 index, size_t bufferCount) {
+    size_t count = 0;
 
-    while (index < size) {
+    while (index < bufferCount) {
         char glyph = buf[index].glyph;
 
-        if (
-            (glyph == CHAR_NULL   ) ||
-            (glyph == CHAR_SPACE  ) ||
-            (glyph == CHAR_NEWLINE) ||
-            (glyph == CHAR_RETURN )
-        ) {
+        if (is_space_char(glyph)) {
             break;
         }
 
@@ -162,7 +173,7 @@ static u32 get_next_word_length(PrintBuffer* buf, u32 index, size_t size) {
 }
 
 static _Bool can_wrap(u32 x) {
-    return (gCSWordWrap && (x >= CRASH_SCREEN_TEXT_X2));
+    return (gCSWordWrap && (x >= gCSWordWrapXLimit));
 }
 
 static size_t print_from_buffer(size_t bufferCount, u32 x, u32 y) {
@@ -175,8 +186,18 @@ static size_t print_from_buffer(size_t bufferCount, u32 x, u32 y) {
         char glyph = data->glyph;
         _Bool print = FALSE;
         _Bool newline = FALSE;
+        _Bool space = FALSE;
+        _Bool tab = FALSE;
 
         switch (glyph) {
+            case CHAR_TAB:
+                if (data->isEscaped) {
+                    print = TRUE;
+                } else {
+                    space = TRUE;
+                    tab = TRUE;
+                }
+                break;
             case CHAR_NEWLINE:
             case CHAR_RETURN:
                 if (data->isEscaped) {
@@ -186,16 +207,21 @@ static size_t print_from_buffer(size_t bufferCount, u32 x, u32 y) {
                 }
                 break;
             case CHAR_SPACE:
-                if (can_wrap(x + TEXT_WIDTH(get_next_word_length(data, index, bufferCount)))) {
-                    newline = TRUE;
-                }
+                space = TRUE;
                 break;
             default:
                 print = TRUE;
                 break;
         }
 
-        if (print) {
+        if (space && index < (bufferCount - 1)) {
+            size_t nextWordLength = get_next_word_length(gCSPrintBuffer, (index + 1), bufferCount);
+
+            if (can_wrap(x + TEXT_WIDTH(nextWordLength))) {
+                newline = TRUE;
+                tab = FALSE;
+            }
+        } else if (print) {
             if (can_wrap(x)) {
                 newline = TRUE;
                 index--;
@@ -219,6 +245,10 @@ static size_t print_from_buffer(size_t bufferCount, u32 x, u32 y) {
                 break;
             }
             gCSNumLinesPrinted++;
+        } else if (tab) {
+            int tabCount = (((x - startX) + TAB_WIDTH) / TAB_WIDTH);
+            numChars += (tabCount * TAB_WIDTH) - x;
+            x = (tabCount * TAB_WIDTH) + startX;
         } else {
             x += TEXT_WIDTH(1);
             numChars++;
@@ -249,10 +279,6 @@ static void scroll_buffer(size_t bufferCount, size_t charLimit) {
     memcpy(&gCSPrintBuffer, &gCSScrollBuffer, (charLimit * sizeof(PrintBuffer)));
 }
 
-static char* write_to_buf(char* buffer, const char* data, size_t size) {
-    return ((char*)memcpy(buffer, data, size) + size);
-}
-
 size_t crash_screen_print_impl(u32 x, u32 y, size_t charLimit, const char* fmt, ...) {
     char buf[CHAR_BUFFER_SIZE] = "";
     bzero(&buf, sizeof(buf));
@@ -262,7 +288,7 @@ size_t crash_screen_print_impl(u32 x, u32 y, size_t charLimit, const char* fmt, 
     va_start(args, fmt);
 
     size_t totalSize = _Printf(write_to_buf, buf, fmt, args);
-    ASSERT((totalSize < CHAR_BUFFER_SIZE), "@FF0000FFCRASH SCREEN PRINT BUFFER EXCEEDED");
+    ASSERTF((totalSize < (CHAR_BUFFER_SIZE - 1)), STR_COLOR_PREFIX"CRASH SCREEN PRINT BUFFER EXCEEDED", COLOR_RGBA32_RED);
     size_t numChars = 0;
 
     if (totalSize > 0) {

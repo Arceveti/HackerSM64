@@ -13,8 +13,12 @@
 // Spaces between localized horizontal scrolling sections.
 #define TEXT_SCROLL_NUM_SPACES 2
 
+// Tab size.
+#define TAB_WIDTH   TEXT_WIDTH(4)
+
 // Char macros:
 #define CHAR_NULL                   '\0'
+#define CHAR_TAB                    '\t'
 #define CHAR_NEWLINE                '\n'
 #define CHAR_RETURN                 '\r'
 #define CHAR_SPACE                  ' '
@@ -65,15 +69,19 @@ typedef struct PACKED {
     /*0x03*/ char glyph;
 } PrintBuffer; /*0x04*/
 
-extern _Bool gCSWordWrap;
+// Input:
+extern _Bool  gCSWordWrap;
+extern u32    gCSWordWrapXLimit;
+extern RGBA32 gCSDefaultPrintColor;
 
+// Output:
 extern u32 gCSNumLinesPrinted;
 
-size_t crash_screen_print_impl(u32 x, u32 y, size_t charLimit, const char* fmt, ...);
+size_t crash_screen_print_impl(u32 x, u32 y, size_t charLimit, const char* fmt, ...) __attribute__((format(printf, 4, 5)));
 
-//! TODO: change these to ALWAYS_INLINE functions for proper syntax highlighting (is this possible with variable args?)
-#define crash_screen_print(x, y, ...)                   crash_screen_print_impl((x), (y),           0, __VA_ARGS__)
-#define crash_screen_print_scroll(x, y, charLimit, ...) crash_screen_print_impl((x), (y), (charLimit), __VA_ARGS__)
+//! TODO: Change these to ALWAYS_INLINE functions for proper syntax highlighting (is this possible with variable args?)
+#define crash_screen_print(x, y, fmt, ...)                   crash_screen_print_impl((x), (y),           0, (fmt), ##__VA_ARGS__)
+#define crash_screen_print_scroll(x, y, charLimit, fmt, ...) crash_screen_print_impl((x), (y), (charLimit), (fmt), ##__VA_ARGS__)
 
 void crash_screen_print_symbol_name_impl(u32 x, u32 y, u32 maxWidth, RGBA32 color, const char* fname);
 void crash_screen_print_symbol_name(u32 x, u32 y, u32 maxWidth, const struct MapSymbol* symbol);
