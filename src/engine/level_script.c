@@ -30,6 +30,7 @@
 #include "game/puppyprint.h"
 #include "game/puppylights.h"
 #include "game/paintings.h"
+#include "game/emutest.h"
 
 #include "config.h"
 
@@ -293,7 +294,7 @@ static void level_cmd_load_mario_head(void) {
 }
 
 static void level_cmd_load_yay0_texture(void) {
-    load_segment_decompress_heap(CMD_GET(s16, 2), CMD_GET(void*, 4), CMD_GET(void*, 8));
+    load_segment_decompress(CMD_GET(s16, 2), CMD_GET(void*, 4), CMD_GET(void*, 8));
     sCurrentCmd = CMD_NEXT;
 }
 
@@ -725,7 +726,7 @@ static void level_cmd_set_music(void) {
     if (sCurrAreaIndex != -1) {
         gAreas[sCurrAreaIndex].musicSettingsPreset = CMD_GET(s16, 2);
 #ifdef BETTER_REVERB
-        if (gIsConsole) {
+        if (gEmulator & EMU_CONSOLE) {
             gAreas[sCurrAreaIndex].betterReverbPreset = CMD_GET(u8, 4);
         } else {
             gAreas[sCurrAreaIndex].betterReverbPreset = CMD_GET(u8, 5);
@@ -739,7 +740,7 @@ static void level_cmd_set_music(void) {
 static void level_cmd_set_menu_music(void) {
 #ifdef BETTER_REVERB
     // Must come before set_background_music()
-    if (gIsConsole) {
+    if (gEmulator & EMU_CONSOLE) {
         gBetterReverbPresetValue = CMD_GET(u8, 4);
     } else {
         gBetterReverbPresetValue = CMD_GET(u8, 5);
@@ -879,7 +880,7 @@ static void level_cmd_puppylight_node(void) {
 static void level_cmd_set_echo(void) {
     if (sCurrAreaIndex >= 0 && sCurrAreaIndex < AREA_COUNT) {
         gAreaData[sCurrAreaIndex].useEchoOverride = TRUE;
-        if (gIsConsole)
+        if (gEmulator & EMU_CONSOLE)
             gAreaData[sCurrAreaIndex].echoOverride = CMD_GET(s8, 2);
         else
             gAreaData[sCurrAreaIndex].echoOverride = CMD_GET(s8, 3);

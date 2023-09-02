@@ -36,8 +36,6 @@ extern struct SPTask* gGfxSPTask;
 extern Gfx* gDisplayListHead;
 extern u8* gGfxPoolEnd;
 extern struct GfxPool* gGfxPool;
-extern _Bool gIsConsole;
-extern _Bool gCacheEmulated;
 extern u8 gBorderHeight;
 #ifdef VANILLA_STYLE_CUSTOM_DEBUG
 extern u8 gCustomDebugMode;

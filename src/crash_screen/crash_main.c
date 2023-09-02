@@ -25,7 +25,6 @@
 #include "game/main.h"
 #include "game/printf.h"
 #include "game/puppyprint.h"
-#include "game/vc_check.h"
 
 
 ALIGNED16 static struct CSThreadInfo sCSThreadInfos[NUM_CRASH_SCREEN_BUFFERS];
