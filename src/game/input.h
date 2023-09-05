@@ -10,10 +10,10 @@
 // Controller Status Polling:
 
 // This button combo should be standard, so don't change it unless you have a very good reason.
-#define TOGGLE_CONT_STATUS_POLLING_COMBO    (Z_TRIG | R_TRIG | A_BUTTON | START_BUTTON)
+#define TOGGLE_CONT_STATUS_POLLING_COMBO (Z_TRIG | R_TRIG | A_BUTTON | START_BUTTON)
 // How many extra frames to wait between controller status polls when status polling is on, in frames (0 = status poll every frame).
 // [0..], default is 15.
-#define CONT_STATUS_POLLING_TIME            15
+#define CONT_STATUS_POLLING_TIME 15
 
 // Deazones for the main analog stick:
 #define ANALOG_DEADZONE_N64  8
@@ -24,12 +24,12 @@
 #define ANALOG_DEADZONE_STATUS_POLLING 20
 
 
-struct DemoInput {
+typedef struct DemoInput {
     /*0x00*/ u8 timer; // Time until next input. If this value is 0, it means the demo is over
     /*0x01*/ s8 rawStickX;
     /*0x02*/ s8 rawStickY;
     /*0x03*/ u8 buttonMask;
-}; /*0x04*/
+} DemoInput; /*0x04*/
 
 
 // Player Controllers.
