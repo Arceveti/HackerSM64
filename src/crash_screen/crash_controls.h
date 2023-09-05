@@ -6,17 +6,27 @@
 
 #include "game/input.h"
 
+#include "crash_screen/crash_settings.h"
 
-struct CSController {
+
+enum CSSettingsGroup_controls {
+    CS_OPT_HEADER_CONTROLS,
+    CS_OPT_CONTROLS_CURSOR_WAIT_FRAMES,
+    CS_OPT_CONTROLS_ANALOG_DEADZONE,
+    CS_OPT_END_CONTROLS,
+};
+
+
+typedef struct CSController {
     /*0x00*/ s16 rawStickX;
     /*0x02*/ s16 rawStickY;
     /*0x04*/ u16 buttonDown;
     /*0x06*/ u16 buttonPressed;
     /*0x08*/ u16 buttonReleased;
-}; /*0x0A*/
+} CSController; /*0x0A*/
 
 
-typedef union {
+typedef union CrashScreenDirections {
     struct PACKED {
         u8 up    : 1;
         u8 down  : 1;
@@ -54,18 +64,19 @@ enum ControlTypes {
     NUM_CONT_DESC,
 };
 
-struct ControlType {
+typedef struct ControlType {
     /*0x00*/ const char* control;
     /*0x04*/ const char* description;
-}; /*0x08*/
+} ControlType; /*0x08*/
 
 
+extern struct CSSetting cs_settings_group_controls[];
+extern const enum ControlTypes defaultContList[];
 extern _Bool gCSSwitchedPage;
 extern _Bool gCSDrawControls;
 extern CrashScreenDirections gCSDirectionFlags;
-extern struct CSController* const gCSCompositeController;
-extern const struct ControlType gCSControlDescriptions[];
-extern const enum ControlTypes defaultContList[];
+extern CSController* const gCSCompositeController;
+extern const ControlType gCSControlDescriptions[];
 
 
 u32 clamp_view_to_selection(u32 scrollIndex, u32 selectIndex, const u32 numRows, const u32 step);

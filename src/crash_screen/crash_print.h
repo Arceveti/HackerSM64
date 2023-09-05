@@ -2,8 +2,8 @@
 
 #include <ultra64.h>
 
-#include <stdarg.h>
 #include "types.h"
+
 #include "map_parser.h"
 
 
@@ -14,7 +14,7 @@
 #define TEXT_SCROLL_NUM_SPACES 2
 
 // Tab size.
-#define TAB_WIDTH   TEXT_WIDTH(4)
+#define TAB_WIDTH TEXT_WIDTH(4)
 
 // Char macros:
 #define CHAR_NULL                   '\0'
@@ -60,13 +60,16 @@
 
 #define STR_COLOR_PREFIX    "@"STR_HEX_WORD //! TODO: use CHAR_COLOR here
 
-typedef struct PACKED {
-    /*0x00*/ RGBA16 red    : 5;
-    /*0x00*/ RGBA16 green  : 5;
-    /*0x01*/ RGBA16 blue   : 5;
-    /*0x01*/ u16 isEscaped : 1; // Repurpose the alpha bit of RGBA32 color as a boolean.
-    /*0x02*/ Alpha alpha;
-    /*0x03*/ char glyph;
+typedef union PrintBuffer {
+    struct PACKED {
+        /*0x00*/ RGBA16 red    : 5;
+        /*0x00*/ RGBA16 green  : 5;
+        /*0x01*/ RGBA16 blue   : 5;
+        /*0x01*/ u16 isEscaped : 1; // Repurpose the alpha bit of RGBA32 color as a boolean.
+        /*0x02*/ Alpha alpha;
+        /*0x03*/ char glyph;
+    }; /*0x04*/
+    u32 raw;
 } PrintBuffer; /*0x04*/
 
 // Input:
@@ -84,4 +87,4 @@ size_t crash_screen_print_impl(u32 x, u32 y, size_t charLimit, const char* fmt, 
 #define crash_screen_print_scroll(x, y, charLimit, fmt, ...) crash_screen_print_impl((x), (y), (charLimit), (fmt), ##__VA_ARGS__)
 
 void crash_screen_print_symbol_name_impl(u32 x, u32 y, u32 maxWidth, RGBA32 color, const char* fname);
-void crash_screen_print_symbol_name(u32 x, u32 y, u32 maxWidth, const struct MapSymbol* symbol);
+void crash_screen_print_symbol_name(u32 x, u32 y, u32 maxWidth, const MapSymbol* symbol);

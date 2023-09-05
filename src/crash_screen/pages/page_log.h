@@ -4,10 +4,15 @@
 
 #include "types.h"
 
+#include "crash_screen/crash_settings.h"
 
-extern const enum ControlTypes logContList[];
+
+enum CSSettingsGroup_page_log {
+    CS_OPT_HEADER_PAGE_LOG,
+    CS_OPT_LOG_INDEX_NUMBERS,
+    CS_OPT_END_LOG,
+};
 
 
-void log_init(void);
-void log_draw(void);
-void log_input(void);
+extern struct CSSetting cs_settings_group_page_log[];
+extern struct CSPage gCSPage_log;

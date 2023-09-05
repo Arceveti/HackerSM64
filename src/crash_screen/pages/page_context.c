@@ -6,12 +6,23 @@
 #include "crash_screen/crash_controls.h"
 #include "crash_screen/crash_draw.h"
 #include "crash_screen/crash_main.h"
+#include "crash_screen/crash_pages.h"
 #include "crash_screen/crash_print.h"
 #include "crash_screen/crash_settings.h"
 #include "crash_screen/map_parser.h"
 #include "crash_screen/memory_read.h"
 
 #include "page_context.h"
+
+
+struct CSSetting cs_settings_group_page_context[] = {
+    [CS_OPT_HEADER_PAGE_CONTEXT ] = { .type = CS_OPT_TYPE_HEADER,  .name = "CONTEXT",                        .valNames = &gValNames_bool,          .val = SECTION_EXPANDED_DEFAULT,  .defaultVal = SECTION_EXPANDED_DEFAULT,  .lowerBound = FALSE,                 .upperBound = TRUE,                       },
+#ifdef INCLUDE_DEBUG_MAP
+    [CS_OPT_CONTEXT_PARSE_REG   ] = { .type = CS_OPT_TYPE_SETTING, .name = "Parse register addr names",      .valNames = &gValNames_bool,          .val = FALSE,                     .defaultVal = FALSE,                     .lowerBound = FALSE,                 .upperBound = TRUE,                       },
+#endif
+    [CS_OPT_CONTEXT_FLOATS_FMT  ] = { .type = CS_OPT_TYPE_SETTING, .name = "Floats print format",            .valNames = &gValNames_print_num_fmt, .val = PRINT_NUM_FMT_DEC,         .defaultVal = PRINT_NUM_FMT_DEC,         .lowerBound = PRINT_NUM_FMT_HEX,     .upperBound = PRINT_NUM_FMT_SCI,          },
+    [CS_OPT_END_CONTEXT         ] = { .type = CS_OPT_TYPE_END },
+};
 
 
 const enum ControlTypes contextContList[] = {
@@ -73,7 +84,7 @@ void context_init(void) {
 
 // Print a fixed-point register.
 void crash_screen_print_reg(u32 x, u32 y, const char* name, Word val) {
-    const struct MapSymbol* symbol = NULL;
+    const MapSymbol* symbol = NULL;
 
     // "[register name]:"
     size_t charX = crash_screen_print(x, y,
@@ -82,7 +93,7 @@ void crash_screen_print_reg(u32 x, u32 y, const char* name, Word val) {
     );
 
 #ifdef INCLUDE_DEBUG_MAP
-    if (gCSSettings[CS_OPT_CONTEXT_PARSE_REG].val) {
+    if (get_setting_val(CS_OPT_GROUP_PAGE_CONTEXT, CS_OPT_CONTEXT_PARSE_REG)) {
         symbol = get_map_symbol(val, SYMBOL_SEARCH_BACKWARD);
     }
 #endif
@@ -172,7 +183,9 @@ void crash_screen_print_float_reg(u32 x, u32 y, u32 regNum, f32* data) {
         // "[prefix][XXXXXXXX]"
         crash_screen_print(x, y, "%c"STR_HEX_WORD, prefix, val.asU32);
     } else {
-        switch (gCSSettings[CS_OPT_CONTEXT_FLOATS_FMT].val) {
+        const enum CSPrintNumberFormats floatsFormat = get_setting_val(CS_OPT_GROUP_PAGE_CONTEXT, CS_OPT_CONTEXT_FLOATS_FMT);
+
+        switch (floatsFormat) {
             case PRINT_NUM_FMT_HEX:
                 // "[XXXXXXXX]"
                 crash_screen_print(x, y, " "STR_HEX_WORD, val.asU32);
@@ -234,7 +247,7 @@ void context_draw(void) {
     osWritebackDCacheAll();
 
 #ifdef INCLUDE_DEBUG_MAP
-    const struct MapSymbol* symbol = get_map_symbol(tc->pc, SYMBOL_SEARCH_BACKWARD);
+    const MapSymbol* symbol = get_map_symbol(tc->pc, SYMBOL_SEARCH_BACKWARD);
     // "CRASH IN:"
     size_t charX = crash_screen_print(TEXT_X(0), TEXT_Y(line),
         STR_COLOR_PREFIX"CRASH IN: ",
@@ -253,6 +266,20 @@ void context_draw(void) {
 void context_input(void) {
     if (gCSCompositeController->buttonPressed & B_BUTTON) {
         // Cycle floats print mode.
-        crash_screen_inc_setting(CS_OPT_CONTEXT_FLOATS_FMT, 1);
+        crash_screen_inc_setting(CS_OPT_GROUP_PAGE_CONTEXT, CS_OPT_CONTEXT_FLOATS_FMT, 1);
     }
 }
+
+struct CSPage gCSPage_context ={
+    .name         = "CONTEXT",
+    .initFunc     = context_init,
+    .drawFunc     = context_draw,
+    .inputFunc    = context_input,
+    .contList     = contextContList,
+    .settingsList = cs_settings_group_page_context,
+    .flags = {
+        .initialized = FALSE,
+        .crashed     = FALSE,
+        .printName   = FALSE,
+    },
+};

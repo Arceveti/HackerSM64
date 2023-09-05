@@ -9,13 +9,22 @@
 #include "crash_screen/crash_controls.h"
 #include "crash_screen/crash_draw.h"
 #include "crash_screen/crash_main.h"
+#include "crash_screen/crash_pages.h"
 #include "crash_screen/crash_print.h"
+#include "crash_screen/crash_settings.h"
 
 #include "page_log.h"
 
 #include "game/assert.h"
 #include "game/debug.h"
 #include "game/puppyprint.h"
+
+
+struct CSSetting cs_settings_group_page_log[] = {
+    [CS_OPT_HEADER_PAGE_LOG     ] = { .type = CS_OPT_TYPE_HEADER,  .name = "LOG",                            .valNames = &gValNames_bool,          .val = SECTION_EXPANDED_DEFAULT,  .defaultVal = SECTION_EXPANDED_DEFAULT,  .lowerBound = FALSE,                 .upperBound = TRUE,                       },
+    [CS_OPT_LOG_INDEX_NUMBERS   ] = { .type = CS_OPT_TYPE_SETTING, .name = "Show index numbers",             .valNames = &gValNames_bool,          .val = TRUE,                      .defaultVal = TRUE,                      .lowerBound = FALSE,                 .upperBound = TRUE,                       },
+    [CS_OPT_END_LOG             ] = { .type = CS_OPT_TYPE_END },
+};
 
 
 const enum ControlTypes logContList[] = {
@@ -25,6 +34,7 @@ const enum ControlTypes logContList[] = {
     CONT_DESC_SCROLL_LIST,
     CONT_DESC_LIST_END,
 };
+
 
 static u32 sLogSelectedIndex = 0;
 static u32 sLogViewportIndex = 0;
@@ -108,6 +118,8 @@ u32 print_assert_section(u32 line) {
 
 #ifdef PUPPYPRINT_DEBUG
 void draw_log_section(u32 line, u32 numLines) {
+    const _Bool showIndexNumbers = get_setting_val(CS_OPT_GROUP_PAGE_LOG, CS_OPT_LOG_INDEX_NUMBERS);
+
     // "PUPPYPRINT LOG:"
     crash_screen_print(TEXT_X(0), TEXT_Y(line), STR_COLOR_PREFIX"PUPPYPRINT LOG:", COLOR_RGBA32_CRASH_HEADER);
     line++;
@@ -127,7 +139,11 @@ void draw_log_section(u32 line, u32 numLines) {
             crash_screen_draw_row_selection_box(charY);
         }
 
-        crash_screen_print(TEXT_X(0), charY, "%i:\t%s", ((gConsoleLogLastIndex - 1) - printIndex), entry);
+        if (showIndexNumbers) {
+            crash_screen_print(TEXT_X(0), charY, "%i:\t%s", ((gConsoleLogLastIndex - 1) - printIndex), entry);
+        } else {
+            crash_screen_print(TEXT_X(0), charY, "%s", entry);
+        }
     }
 
     crash_screen_draw_divider(DIVIDER_Y(line));
@@ -187,3 +203,17 @@ void log_input(void) {
         sLogViewportIndex = clamp_view_to_selection(sLogViewportIndex, sLogSelectedIndex, sLogNumShownRows, 1);
     }
 }
+
+struct CSPage gCSPage_log = {
+    .name         = "LOG",
+    .initFunc     = log_init,
+    .drawFunc     = log_draw,
+    .inputFunc    = log_input,
+    .contList     = logContList,
+    .settingsList = cs_settings_group_page_log,
+    .flags = {
+        .initialized = FALSE,
+        .crashed     = FALSE,
+        .printName   = TRUE,
+    },
+};

@@ -3,6 +3,7 @@
 #include <ultra64.h>
 
 #include "types.h"
+
 #include "engine/colors.h"
 
 
@@ -96,14 +97,14 @@ enum CSDrawTriangleDirection {
 };
 
 
-typedef struct {
+typedef struct CSScissorBox {
     s32 x1;
     s32 y1;
     s32 x2;
     s32 y2;
 } CSScissorBox;
 
-extern CSScissorBox gCSScissorBox;
+extern struct CSScissorBox gCSScissorBox;
 
 
 void crash_screen_set_scissor_box(s32 x1, s32 y1, s32 x2, s32 y2);

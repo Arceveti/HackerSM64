@@ -7,11 +7,22 @@
 #include "crash_screen/crash_controls.h"
 #include "crash_screen/crash_draw.h"
 #include "crash_screen/crash_main.h"
+#include "crash_screen/crash_pages.h"
 #include "crash_screen/crash_print.h"
 #include "crash_screen/crash_settings.h"
 #include "crash_screen/memory_read.h"
 
 #include "page_memory.h"
+
+
+struct CSSetting cs_settings_group_page_memory[] = {
+    [CS_OPT_HEADER_PAGE_MEMORY  ] = { .type = CS_OPT_TYPE_HEADER,  .name = "RAM VIEW",                       .valNames = &gValNames_bool,          .val = SECTION_EXPANDED_DEFAULT,  .defaultVal = SECTION_EXPANDED_DEFAULT,  .lowerBound = FALSE,                 .upperBound = TRUE,                       },
+#ifdef INCLUDE_DEBUG_MAP
+    [CS_OPT_MEMORY_SHOW_SYMBOL  ] = { .type = CS_OPT_TYPE_SETTING, .name = "Show current symbol name",       .valNames = &gValNames_bool,          .val = TRUE,                      .defaultVal = TRUE,                      .lowerBound = FALSE,                 .upperBound = TRUE,                       },
+#endif
+    [CS_OPT_MEMORY_AS_ASCII     ] = { .type = CS_OPT_TYPE_SETTING, .name = "Show data as ascii",             .valNames = &gValNames_bool,          .val = FALSE,                     .defaultVal = FALSE,                     .lowerBound = FALSE,                 .upperBound = TRUE,                       },
+    [CS_OPT_END_MEMORY          ] = { .type = CS_OPT_TYPE_END },
+};
 
 
 const enum ControlTypes ramViewerContList[] = {
@@ -37,7 +48,7 @@ void ram_view_init(void) {
 
 static void print_byte(u32 x, u32 y, Byte byte, RGBA32 color) {
     // "[XX]"
-    if (gCSSettings[CS_OPT_MEMORY_AS_ASCII].val) {
+    if (get_setting_val(CS_OPT_GROUP_PAGE_MEMORY, CS_OPT_MEMORY_AS_ASCII)) {
         crash_screen_draw_glyph((x + TEXT_WIDTH(1)), y, byte, color);
     } else {
         // Faster than doing crash_screen_print:
@@ -47,6 +58,7 @@ static void print_byte(u32 x, u32 y, Byte byte, RGBA32 color) {
 }
 
 static void ram_viewer_print_data(u32 line, Address startAddr) {
+    const _Bool memoryAsASCII = get_setting_val(CS_OPT_GROUP_PAGE_MEMORY, CS_OPT_MEMORY_AS_ASCII);
     __OSThreadContext* tc = &gCrashedThread->context;
     u32 charX = (TEXT_X(SIZEOF_HEX(Address)) + 3);
     u32 charY = TEXT_Y(line);
@@ -69,7 +81,7 @@ static void ram_viewer_print_data(u32 line, Address startAddr) {
                 charX += 2;
             }
 
-            RGBA32 textColor = ((gCSSettings[CS_OPT_MEMORY_AS_ASCII].val || (x % 2)) ? COLOR_RGBA32_CRASH_MEMORY_DATA1 : COLOR_RGBA32_CRASH_MEMORY_DATA2);
+            RGBA32 textColor = ((memoryAsASCII || (x % 2)) ? COLOR_RGBA32_CRASH_MEMORY_DATA1 : COLOR_RGBA32_CRASH_MEMORY_DATA2);
             RGBA32 selectColor = COLOR_RGBA32_NONE;
 
             if (currAddr == gSelectedAddress) {
@@ -99,7 +111,8 @@ void ram_view_draw(void) {
     __OSThreadContext* tc = &gCrashedThread->context;
 
 #ifdef INCLUDE_DEBUG_MAP
-    sRamViewNumShownRows = (19 - gCSSettings[CS_OPT_MEMORY_SHOW_SYMBOL].val);
+    const _Bool showCurrentSymbol = get_setting_val(CS_OPT_GROUP_PAGE_MEMORY, CS_OPT_MEMORY_SHOW_SYMBOL);
+    sRamViewNumShownRows = (19 - showCurrentSymbol);
 #endif
 
     u32 line = 1;
@@ -116,8 +129,8 @@ void ram_view_draw(void) {
     line++;
 
 #ifdef INCLUDE_DEBUG_MAP
-    if (gCSSettings[CS_OPT_MEMORY_SHOW_SYMBOL].val) {
-        const struct MapSymbol* symbol = get_map_symbol(gSelectedAddress, SYMBOL_SEARCH_BACKWARD);
+    if (showCurrentSymbol) {
+        const MapSymbol* symbol = get_map_symbol(gSelectedAddress, SYMBOL_SEARCH_BACKWARD);
 
         if (symbol != NULL) {
             // "IN:[symbol]"
@@ -222,8 +235,22 @@ void ram_view_input(void) {
 
     if (buttonPressed & B_BUTTON) {
         // Toggle whether the memory is printed as hex values or as ASCII chars.
-        crash_screen_inc_setting(CS_OPT_MEMORY_AS_ASCII, TRUE);
+        crash_screen_inc_setting(CS_OPT_GROUP_PAGE_MEMORY, CS_OPT_MEMORY_AS_ASCII, TRUE);
     }
 
     sRamViewViewportIndex = clamp_view_to_selection(sRamViewViewportIndex, gSelectedAddress, sRamViewNumShownRows, RAM_VIEWER_STEP);
 }
+
+struct CSPage gCSPage_memory = {
+    .name         = "RAM VIEW",
+    .initFunc     = ram_view_init,
+    .drawFunc     = ram_view_draw,
+    .inputFunc    = ram_view_input,
+    .contList     = ramViewerContList,
+    .settingsList = cs_settings_group_page_memory,
+    .flags = {
+        .initialized = FALSE,
+        .crashed     = FALSE,
+        .printName   = TRUE,
+    },
+};

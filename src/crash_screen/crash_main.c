@@ -31,7 +31,7 @@ ALIGNED16 static struct CSThreadInfo sCSThreadInfos[NUM_CRASH_SCREEN_BUFFERS];
 static s32 sCSThreadIndex = 0;
 static _Bool sFirstCrash = TRUE;
 
-struct CSThreadInfo* gActiveCSThreadInfo = NULL;
+CSThreadInfo* gActiveCSThreadInfo = NULL;
 OSThread* gCrashedThread = NULL;
 
 Address gSetCrashAddress = 0x00000000; // Used by SET_CRASH_ADDR to set the crashed thread PC.
@@ -41,24 +41,25 @@ Address gSelectedAddress = 0x00000000; // Selected address for ram viewer and di
 static void crash_screen_reinitialize(void) {
     // If the crash screen has crashed, disable the page that crashed, unless it was an assert.
     if (!sFirstCrash && gCrashedThread->context.cause != EXC_SYSCALL) {
-        gCSPages[gCSPageID].flags.crashed = TRUE;
+        gCSPages[gCSPageID]->flags.crashed = TRUE;
     }
 
-    gCSPageID = FIRST_PAGE;
+    gCSPageID = CRASH_SCREEN_START_PAGE;
 
     gCSSwitchedPage        = FALSE;
     gCSDrawControls        = FALSE;
     gAddressSelectMenuOpen = FALSE;
 
-    crash_screen_reset_all_settings();
+    crash_screen_settings_apply_to_all(settings_func_reset);
+    crash_screen_settings_set_all_headers(FALSE);
 
     gSetCrashAddress = 0x00000000;
     gSelectedAddress = 0x00000000;
 
     gCSDirectionFlags.raw = 0;
 
-    for (int i = 0; i < ARRAY_COUNT(gCSPages); i++) {
-        gCSPages[i].flags.initialized = FALSE;
+    for (int pageID = 0; pageID < ARRAY_COUNT(gCSPages); pageID++) {
+        gCSPages[pageID]->flags.initialized = FALSE;
     }
 }
 
@@ -109,6 +110,9 @@ void play_crash_sound(struct CSThreadInfo* threadInfo, s32 sound) {
 #endif
 
 static void on_crash(struct CSThreadInfo* threadInfo) {
+    // Create another crash screen thread in case the current one crashes.
+    create_crash_screen_thread();
+
     // Set the active thread info pointer.
     gActiveCSThreadInfo = threadInfo;
 
@@ -158,20 +162,19 @@ void crash_screen_thread_entry(UNUSED void* arg) {
     osSetEventMesg(OS_EVENT_SP_BREAK,  &threadInfo->mesgQueue, (OSMesg)CRASH_SCREEN_MSG_SP_BREAK );
     osSetEventMesg(OS_EVENT_FAULT,     &threadInfo->mesgQueue, (OSMesg)CRASH_SCREEN_MSG_FAULT    );
 
+    // Wait for CPU break or fault.
     while (TRUE) {
-        // Wait for CPU break or fault.
         osRecvMesg(&threadInfo->mesgQueue, &threadInfo->mesg, OS_MESG_BLOCK);
         gCrashedThread = get_crashed_thread();
-        if (gCrashedThread == NULL) {
-            continue;
+        if (gCrashedThread != NULL) {
+            break;
         }
-
-        // -- A thread has crashed --
-        on_crash(threadInfo);
-        create_crash_screen_thread();
-        break;
     }
 
+    // -- A thread has crashed --
+    on_crash(threadInfo);
+
+    // Crash screen open.
     while (TRUE) {
         crash_screen_update_input();
         crash_screen_draw_main();

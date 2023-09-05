@@ -15,6 +15,7 @@
 #include "game/printf.h"
 
 
+static char sCSCharBuffer[CHAR_BUFFER_SIZE];
 PrintBuffer gCSPrintBuffer[CHAR_BUFFER_SIZE];
 PrintBuffer gCSScrollBuffer[CHAR_BUFFER_SIZE];
 
@@ -261,8 +262,9 @@ static size_t print_from_buffer(size_t bufferCount, u32 x, u32 y) {
 static void scroll_buffer(size_t bufferCount, size_t charLimit) {
     bzero(&gCSScrollBuffer, sizeof(gCSScrollBuffer));
 
-    size_t offset = (CYCLES_TO_FRAMES(osGetTime()) >> (5 - gCSSettings[CS_OPT_PRINT_SCROLL_SPEED].val));
-    size_t size = (bufferCount + TEXT_SCROLL_NUM_SPACES);
+    const SettingsType scrollSpeed = get_setting_val(CS_OPT_GROUP_GLOBAL, CS_OPT_GLOBAL_PRINT_SCROLL_SPEED);
+    const size_t offset = (CYCLES_TO_FRAMES(osGetTime()) >> (5 - scrollSpeed));
+    const size_t size = (bufferCount + TEXT_SCROLL_NUM_SPACES);
 
     PrintBuffer* bufChar = &gCSScrollBuffer[0];
 
@@ -280,24 +282,23 @@ static void scroll_buffer(size_t bufferCount, size_t charLimit) {
 }
 
 size_t crash_screen_print_impl(u32 x, u32 y, size_t charLimit, const char* fmt, ...) {
-    char buf[CHAR_BUFFER_SIZE] = "";
-    bzero(&buf, sizeof(buf));
+    bzero(&sCSCharBuffer, sizeof(sCSCharBuffer));
     gCSNumLinesPrinted = 0;
 
     va_list args;
     va_start(args, fmt);
 
-    size_t totalSize = _Printf(write_to_buf, buf, fmt, args);
+    size_t totalSize = _Printf(write_to_buf, sCSCharBuffer, fmt, args);
     ASSERTF((totalSize < (CHAR_BUFFER_SIZE - 1)), STR_COLOR_PREFIX"CRASH SCREEN PRINT BUFFER EXCEEDED", COLOR_RGBA32_RED);
     size_t numChars = 0;
 
     if (totalSize > 0) {
         bzero(&gCSPrintBuffer, sizeof(gCSPrintBuffer));
 
-        size_t bufferCount = format_print_buffer(buf, totalSize);
+        size_t bufferCount = format_print_buffer(sCSCharBuffer, totalSize);
 
         if (0 < charLimit && charLimit < bufferCount) {
-            if (gCSSettings[CS_OPT_PRINT_SCROLL_SPEED].val > 0) {
+            if (get_setting_val(CS_OPT_GROUP_GLOBAL, CS_OPT_GLOBAL_PRINT_SCROLL_SPEED) > 0) {
                 scroll_buffer(bufferCount, charLimit);
             }
 
@@ -325,7 +326,7 @@ void crash_screen_print_symbol_name_impl(u32 x, u32 y, u32 maxWidth, RGBA32 colo
     }
 }
 
-void crash_screen_print_symbol_name(u32 x, u32 y, u32 maxWidth, const struct MapSymbol* symbol) {
+void crash_screen_print_symbol_name(u32 x, u32 y, u32 maxWidth, const MapSymbol* symbol) {
     crash_screen_print_symbol_name_impl(x, y, maxWidth,
         ((symbol != NULL && is_in_code_segment(symbol->addr)) ? COLOR_RGBA32_CRASH_FUNCTION_NAME : COLOR_RGBA32_CRASH_VARIABLE),
         get_map_symbol_name(symbol)

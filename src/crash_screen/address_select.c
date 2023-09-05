@@ -6,8 +6,9 @@
 #include "crash_controls.h"
 #include "crash_draw.h"
 #include "crash_main.h"
-#include "crash_pages.h"
 #include "crash_print.h"
+#include "crash_settings.h"
+#include "crash_pages.h"
 #include "memory_read.h"
 
 #include "address_select.h"
@@ -63,7 +64,7 @@ void draw_address_select(void) {
 
 #ifdef INCLUDE_DEBUG_MAP
     if (isValid) {
-        const struct MapSymbol* symbol = get_map_symbol(addr, SYMBOL_SEARCH_BACKWARD);
+        const MapSymbol* symbol = get_map_symbol(addr, SYMBOL_SEARCH_BACKWARD);
         if (symbol != NULL) {
             // "[mapped data name]"
             crash_screen_print_symbol_name(JUMP_MENU_X1, (JUMP_MENU_Y1 + TEXT_HEIGHT(4)), JUMP_MENU_CHARS_X, symbol);
