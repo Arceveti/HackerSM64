@@ -204,10 +204,10 @@ void clear_framebuffer(RGBA16FILL color) {
  * Resets the viewport, readying it for the final image.
  */
 void clear_viewport(Vp* viewport, RGBA16FILL color) {
-    s16 vpUlx = (viewport->vp.vtrans[0] - viewport->vp.vscale[0]) / 4 + 1;
-    s16 vpUly = (viewport->vp.vtrans[1] - viewport->vp.vscale[1]) / 4 + 1;
-    s16 vpLrx = (viewport->vp.vtrans[0] + viewport->vp.vscale[0]) / 4 - 2;
-    s16 vpLry = (viewport->vp.vtrans[1] + viewport->vp.vscale[1]) / 4 - 2;
+    s16 vpUlx = (((viewport->vp.vtrans[0] - viewport->vp.vscale[0]) / 4) + 1);
+    s16 vpUly = (((viewport->vp.vtrans[1] - viewport->vp.vscale[1]) / 4) + 1);
+    s16 vpLrx = (((viewport->vp.vtrans[0] + viewport->vp.vscale[0]) / 4) - 2);
+    s16 vpLry = (((viewport->vp.vtrans[1] + viewport->vp.vscale[1]) / 4) - 2);
 
 #ifdef WIDESCREEN
     vpUlx = GFX_DIMENSIONS_RECT_FROM_LEFT_EDGE(vpUlx);
