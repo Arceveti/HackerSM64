@@ -23,12 +23,6 @@ enum SoundMenuFlags {
     SOUND_MENU_FLAG_EXTRA           = BIT(8), // 0x100
 };
 
-enum SoundMenuMode {
-    SOUND_MENU_MODE_STEREO,
-    SOUND_MENU_MODE_MONO,
-    SOUND_MENU_MODE_HEADSET
-};
-
 void reset_volume(void);
 void raise_background_noise(s32 op);
 void lower_background_noise(s32 op);

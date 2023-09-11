@@ -45,7 +45,7 @@ static const struct MenuButton sMainMenuButtonsList[] = {
     { MENU_BUTTON_SCORE,             MODEL_MAIN_MENU_GREEN_SCORE_BUTTON,    -6400, -3500 }, // Score menu button
     { MENU_BUTTON_COPY,              MODEL_MAIN_MENU_BLUE_COPY_BUTTON,      -2134, -3500 }, // Copy menu button
     { MENU_BUTTON_ERASE,             MODEL_MAIN_MENU_RED_ERASE_BUTTON,       2134, -3500 }, // Erase menu button
-    { MENU_BUTTON_OPTIONS,           MODEL_MAIN_MENU_PURPLE_SOUND_BUTTON,    6400, -3500 }, // Sound mode menu button (Option Mode in EU)
+    { MENU_BUTTON_SOUND_MODE,        MODEL_MAIN_MENU_PURPLE_SOUND_BUTTON,    6400, -3500 }, // Sound mode menu button (Option Mode in EU)
     { -1,                            MODEL_NONE,                                0,     0 },
 };
 static const struct MenuButton sScoreMenuButtonsList[] = {
@@ -123,7 +123,7 @@ extern void *languageTable[][3];
 
 // Amount of main menu buttons defined in the code called by spawn_object_rel_with_rot.
 // See file_select.h for the names in MenuButtonTypes.
-struct Object *sMainMenuButtons[MENU_BUTTON_OPTIONS_MAX];
+struct Object *sMainMenuButtons[MENU_BUTTON_OPTION_MAX];
 
 // Used to defined yes/no fade colors after a file is selected in the erase menu.
 // sYesNoColor[0]: YES | sYesNoColor[1]: NO
@@ -167,11 +167,10 @@ u8 sTextFadeAlpha = 0;
 // and when you click yes/no in the erase confirmation prompt.
 s16 sMainMenuTimer = 0;
 
-// Sound mode menu buttonID, has different values compared to gSoundMode in audio.
-// 0: gSoundMode = 0 (Stereo) | 1: gSoundMode = 3 (Mono) | 2: gSoundMode = 1 (Headset)
+// Sound mode menu buttonID
 s8 sSoundMode = 0;
 
-// Active language for EU arrays, values defined similar to sSoundMode
+// Active language for EU arrays
 // 0: English | 1: French | 2: German
 
 // Tracks which button will be pressed in the erase confirmation prompt (yes/no).
@@ -785,7 +784,7 @@ void render_sound_mode_menu_buttons(struct Object *soundModeButton) {
     spawn_menu_buttons(sSoundModeButtonsList, soundModeButton, MENU_LAYER_SUBMENU);
 
     // Zoom in current selection
-    sMainMenuButtons[MENU_BUTTON_OPTIONS_MIN + sSoundMode]->oMenuButtonState = MENU_BUTTON_STATE_ZOOM_IN;
+    sMainMenuButtons[MENU_BUTTON_SOUND_OPTION_MIN + sSoundMode]->oMenuButtonState = MENU_BUTTON_STATE_ZOOM_IN;
 }
 
 /**
@@ -795,20 +794,14 @@ void check_sound_mode_menu_clicked_buttons(struct Object *soundModeButton) {
     if (soundModeButton->oMenuButtonState == MENU_BUTTON_STATE_FULLSCREEN) {
         s32 buttonID;
         // Configure sound mode menu button group
-        for (buttonID = MENU_BUTTON_OPTIONS_MIN; buttonID < MENU_BUTTON_OPTIONS_MAX; buttonID++) {
+        for (buttonID = MENU_BUTTON_SOUND_OPTION_MIN; buttonID < MENU_BUTTON_SOUND_OPTION_MAX; buttonID++) {
             s16 buttonX = sMainMenuButtons[buttonID]->oPosX;
             s16 buttonY = sMainMenuButtons[buttonID]->oPosY;
 
             if (check_clicked_button(buttonX, buttonY, 22.0f)) {
                 // If sound mode button clicked, select it and define sound mode
                 // The check will always be true because of the group configured above (In JP & US)
-                if (
-                    buttonID == MENU_BUTTON_STEREO
-                 || buttonID == MENU_BUTTON_MONO
-#ifdef ENABLE_STEREO_HEADSET_EFFECTS
-                 || buttonID == MENU_BUTTON_HEADSET
-#endif
-                ) {
+                if (buttonID >= MENU_BUTTON_SOUND_OPTION_MIN && buttonID < MENU_BUTTON_SOUND_OPTION_MAX) {
                     if (soundModeButton->oMenuButtonActionPhase == SOUND_MODE_PHASE_MAIN) {
                         play_sound(SOUND_MENU_CLICK_FILE_SELECT, gGlobalSoundSource);
                         queue_rumble_data(gPlayer1Controller, 5, 80, 0);
@@ -819,7 +812,7 @@ void check_sound_mode_menu_clicked_buttons(struct Object *soundModeButton) {
                         // because they don't have a case in bhv_menu_button_manager_loop
                         sSelectedButtonID = buttonID;
 #endif
-                        sSoundMode = buttonID - MENU_BUTTON_OPTIONS_MIN;
+                        sSoundMode = buttonID - MENU_BUTTON_SOUND_OPTION_MIN;
                         save_file_set_sound_mode(sSoundMode);
                     }
                 }
@@ -874,10 +867,10 @@ void delete_menu_button_objects(s16 minID, s16 maxID) {
  */
 void hide_submenu_buttons(s16 prevMenuButtonID) {
     switch (prevMenuButtonID) {
-        case MENU_BUTTON_SCORE:   delete_menu_button_objects(MENU_BUTTON_SCORE_MIN,   MENU_BUTTON_SCORE_MAX  ); break;
-        case MENU_BUTTON_COPY:    delete_menu_button_objects(MENU_BUTTON_COPY_MIN,    MENU_BUTTON_COPY_MAX   ); break;
-        case MENU_BUTTON_ERASE:   delete_menu_button_objects(MENU_BUTTON_ERASE_MIN,   MENU_BUTTON_ERASE_MAX  ); break;
-        case MENU_BUTTON_OPTIONS: delete_menu_button_objects(MENU_BUTTON_OPTIONS_MIN, MENU_BUTTON_OPTIONS_MAX); break;
+        case MENU_BUTTON_SCORE:      delete_menu_button_objects(MENU_BUTTON_SCORE_MIN,  MENU_BUTTON_SCORE_MAX ); break;
+        case MENU_BUTTON_COPY:       delete_menu_button_objects(MENU_BUTTON_COPY_MIN,   MENU_BUTTON_COPY_MAX  ); break;
+        case MENU_BUTTON_ERASE:      delete_menu_button_objects(MENU_BUTTON_ERASE_MIN,  MENU_BUTTON_ERASE_MAX ); break;
+        case MENU_BUTTON_SOUND_MODE: delete_menu_button_objects(MENU_BUTTON_OPTION_MIN, MENU_BUTTON_OPTION_MAX); break;
     }
 }
 
@@ -942,10 +935,10 @@ void bhv_menu_button_manager_init(void) {
 void check_main_menu_clicked_buttons(void) {
     // Sound mode menu is handled separately because the button ID for it
     // is not grouped with the IDs of the other submenus.
-    if (check_clicked_button(sMainMenuButtons[MENU_BUTTON_OPTIONS]->oPosX,
-                             sMainMenuButtons[MENU_BUTTON_OPTIONS]->oPosY, 200.0f)) {
-        sMainMenuButtons[MENU_BUTTON_OPTIONS]->oMenuButtonState = MENU_BUTTON_STATE_GROWING;
-        sSelectedButtonID = MENU_BUTTON_OPTIONS;
+    if (check_clicked_button(sMainMenuButtons[MENU_BUTTON_SOUND_MODE]->oPosX,
+                             sMainMenuButtons[MENU_BUTTON_SOUND_MODE]->oPosY, 200.0f)) {
+        sMainMenuButtons[MENU_BUTTON_SOUND_MODE]->oMenuButtonState = MENU_BUTTON_STATE_GROWING;
+        sSelectedButtonID = MENU_BUTTON_SOUND_MODE;
     } else {
         // Main Menu buttons
         s8 buttonID;
@@ -980,10 +973,10 @@ void check_main_menu_clicked_buttons(void) {
             queue_rumble_data(gPlayer1Controller, 5, 80, 0);
             render_sub_menu_buttons(sSelectedButtonID);
             break;
-        case MENU_BUTTON_OPTIONS:
+        case MENU_BUTTON_SOUND_MODE:
             play_sound(SOUND_MENU_CAMERA_ZOOM_IN, gGlobalSoundSource);
             queue_rumble_data(gPlayer1Controller, 5, 80, 0);
-            render_sound_mode_menu_buttons(sMainMenuButtons[MENU_BUTTON_OPTIONS]);
+            render_sound_mode_menu_buttons(sMainMenuButtons[MENU_BUTTON_SOUND_MODE]);
             break;
     }
 }
@@ -1038,10 +1031,10 @@ void bhv_menu_button_manager_loop(void) {
         case MENU_BUTTON_ERASE_CHECK_SCORE: load_menu_from_submenu(MENU_BUTTON_ERASE, MENU_BUTTON_SCORE, sMainMenuButtons[sSelectedButtonID]); break;
         case MENU_BUTTON_ERASE_COPY_FILE:   load_menu_from_submenu(MENU_BUTTON_ERASE, MENU_BUTTON_COPY,  sMainMenuButtons[sSelectedButtonID]); break;
 
-        case MENU_BUTTON_OPTIONS: check_sound_mode_menu_clicked_buttons(sMainMenuButtons[sSelectedButtonID]); break;
+        case MENU_BUTTON_SOUND_MODE: check_sound_mode_menu_clicked_buttons(sMainMenuButtons[sSelectedButtonID]); break;
 
 #if MULTILANG
-        case MENU_BUTTON_LANGUAGE_RETURN: return_to_main_menu(MENU_BUTTON_OPTIONS, sMainMenuButtons[sSelectedButtonID]); break;
+        case MENU_BUTTON_LANGUAGE_RETURN: return_to_main_menu(MENU_BUTTON_SOUND_MODE, sMainMenuButtons[sSelectedButtonID]); break;
 #endif
         // STEREO, MONO and HEADSET buttons are undefined so they can be selected without
         // exiting the Options menu, as a result they added a return button
@@ -1050,7 +1043,7 @@ void bhv_menu_button_manager_loop(void) {
 #ifdef ENABLE_STEREO_HEADSET_EFFECTS
         case MENU_BUTTON_HEADSET:
 #endif
-            return_to_main_menu(MENU_BUTTON_OPTIONS, sMainMenuButtons[sSelectedButtonID]);
+            return_to_main_menu(MENU_BUTTON_SOUND_MODE, sMainMenuButtons[sSelectedButtonID]);
             break;
     }
 
@@ -1906,7 +1899,7 @@ void print_file_select_strings(void) {
         case MENU_BUTTON_SCORE_FILE_B: print_save_file_scores(SAVE_FILE_B); break;
         case MENU_BUTTON_SCORE_FILE_C: print_save_file_scores(SAVE_FILE_C); break;
         case MENU_BUTTON_SCORE_FILE_D: print_save_file_scores(SAVE_FILE_D); break;
-        case MENU_BUTTON_OPTIONS:   print_sound_mode_menu_strings();        break;
+        case MENU_BUTTON_SOUND_MODE:   print_sound_mode_menu_strings();        break;
     }
     // If all 4 save file exists, define true to sAllFilesExist to prevent more copies in copy menu
     sAllFilesExist = (save_file_exists(SAVE_FILE_A)
@@ -1975,3 +1968,5 @@ s32 lvl_update_obj_and_load_file_selected(UNUSED s32 arg, UNUSED s32 unused) {
     area_update_objects();
     return sSelectedFileNum;
 }
+
+STATIC_ASSERT(SOUND_MODE_COUNT == MENU_BUTTON_SOUND_OPTION_MAX - MENU_BUTTON_SOUND_OPTION_MIN, "Mismatch between number of sound modes in audio code and file select!");

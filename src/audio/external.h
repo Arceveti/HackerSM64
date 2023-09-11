@@ -15,9 +15,11 @@
 
 enum SoundModes {
     SOUND_MODE_STEREO,
-    SOUND_MODE_HEADSET,
-    SOUND_MODE_UNUSED,
     SOUND_MODE_MONO,
+#ifdef ENABLE_STEREO_HEADSET_EFFECTS
+    SOUND_MODE_HEADSET,
+#endif
+    SOUND_MODE_COUNT,
 };
 
 enum SequencePlayers {
