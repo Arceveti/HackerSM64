@@ -25,7 +25,7 @@ const char* sValNames_branch_arrow[] = {
 #ifdef INCLUDE_DEBUG_MAP
     [DISASM_ARROW_MODE_FUNCTION ] = "FUNCTION",
 #endif
-    [DISASM_ARROW_MODE_OVERSCAN ] = "OVERSCAN", //! TODO: Implement this in page_disasm.c.
+    [DISASM_ARROW_MODE_OVERSCAN ] = "OVERSCAN", //! TODO: Implement this mode.
 };
 
 #ifdef INCLUDE_DEBUG_MAP
@@ -48,7 +48,7 @@ struct CSSetting cs_settings_group_page_disasm[] = {
 };
 
 
-const enum ControlTypes disasmContList[] = {
+const enum ControlTypes cs_cont_list_disasm[] = {
     CONT_DESC_SWITCH_PAGE,
     CONT_DESC_SHOW_CONTROLS,
     CONT_DESC_CYCLE_DRAW,
@@ -98,8 +98,8 @@ void disasm_init(void) {
     sDisasmViewportIndex = gSelectedAddress;
 
 #ifdef INCLUDE_DEBUG_MAP
-    gFillBranchBuffer            = FALSE;
-    sContinueFillBranchBuffer    = FALSE;
+    gFillBranchBuffer         = FALSE;
+    sContinueFillBranchBuffer = FALSE;
     reset_branch_buffer((Address)NULL);
 #endif
 }
@@ -224,7 +224,7 @@ void draw_branch_arrow(s32 startLine, s32 endLine, s32 dist, RGBA32 color, u32 p
             );
         }
 
-        s32 height = abss(arrowEndHeight - arrowStartHeight);
+        s32 height = absi(arrowEndHeight - arrowStartHeight);
 
         // Middle of arrow.
         cs_draw_rect((sDisasmBranchStartX + dist), MIN(arrowStartHeight, arrowEndHeight), 1, height, color);
@@ -250,9 +250,8 @@ void disasm_draw_branch_arrows(u32 printLine) {
 #endif
 
 static void print_as_insn(const u32 charX, const u32 charY, const Address addr, const Word data) {
-    InsnData insn = { .raw = data };
     const char* destFname = NULL;
-    const char* insnAsStr = cs_insn_to_string(addr, insn, &destFname);
+    const char* insnAsStr = cs_insn_to_string(addr, (InsnData)data, &destFname);
 
     // "[instruction name] [params]"
     cs_print(charX, charY, "%s", insnAsStr);
@@ -268,7 +267,7 @@ static void print_as_insn(const u32 charX, const u32 charY, const Address addr, 
 #endif
 }
 
-static void print_as_binary(const u32 charX, const u32 charY, const Word data) { //! TODO: make this a custom formatting specifier?, maybe \%b?
+static void print_as_binary(const u32 charX, const u32 charY, const Word data, RGBA32 color) { //! TODO: make this a custom formatting specifier?, maybe \%b?
     u32 bitCharX = charX;
 
     for (u32 c = 0; c < SIZEOF_BITS(Word); c++) {
@@ -276,7 +275,7 @@ static void print_as_binary(const u32 charX, const u32 charY, const Word data) {
             bitCharX += TEXT_WIDTH(1);
         }
 
-        cs_draw_glyph(bitCharX, charY, (((data >> (SIZEOF_BITS(Word) - c)) & 0b1) ? '1' : '0'), COLOR_RGBA32_WHITE);
+        cs_draw_glyph(bitCharX, charY, (((data >> (SIZEOF_BITS(Word) - c)) & 0b1) ? '1' : '0'), color);
 
         bitCharX += TEXT_WIDTH(1);
     }
@@ -299,7 +298,8 @@ static void disasm_draw_asm_entries(u32 line, u32 numLines, Address selectedAddr
             cs_draw_rect((charX - 1), (charY - 2), (CRASH_SCREEN_TEXT_W + 1), (TEXT_HEIGHT(1) + 1), COLOR_RGBA32_CRASH_PC_HIGHLIGHT);
             // "<-- CRASH"
             cs_print((CRASH_SCREEN_TEXT_X2 - TEXT_WIDTH(STRLEN("<-- CRASH"))), charY, STR_COLOR_PREFIX"<-- CRASH", COLOR_RGBA32_CRASH_AT);
-        } else if (addr == selectedAddr) {
+        }
+        if (addr == selectedAddr) {
             // Draw a gray selection rectangle.
             cs_draw_row_selection_box(charY);
         }
@@ -321,7 +321,7 @@ static void disasm_draw_asm_entries(u32 line, u32 numLines, Address selectedAddr
         } else { // Outside of code segments:
             if (unkAsBinary) {
                 // "bbbbbbbb bbbbbbbb bbbbbbbb bbbbbbbb"
-                print_as_binary(charX, charY, data);
+                print_as_binary(charX, charY, data, COLOR_RGBA32_WHITE);
             } else {
                 // "[XXXXXXXX]"
                 cs_print(charX, charY, STR_HEX_WORD, data);
@@ -485,12 +485,13 @@ void disasm_input(void) {
 #endif
 }
 
+
 struct CSPage gCSPage_disasm = {
     .name         = "DISASM",
     .initFunc     = disasm_init,
     .drawFunc     = disasm_draw,
     .inputFunc    = disasm_input,
-    .contList     = disasmContList,
+    .contList     = cs_cont_list_disasm,
     .settingsList = cs_settings_group_page_disasm,
     .flags = {
         .initialized = FALSE,
