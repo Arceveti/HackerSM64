@@ -18,13 +18,6 @@
 //! TODO: Should this be ((cond) ? ((dst) | (flag)) : ((dst) & ~(flag)))
 #define COND_BIT(dst, flag, cond) (((dst) & ~(flag)) | ((flag) >> (!(cond) * ~0ULL)))
 
-typedef union {
-    struct PACKED {
-        /*0x00*/ u8 h; // HI byte.
-        /*0x01*/ u8 l; // LO byte.
-    }; /*0x02*/
-    u16 hl;
-} HiLo16; /*0x02*/
 
 typedef union {
     struct PACKED {
