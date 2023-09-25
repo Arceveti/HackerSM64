@@ -42,7 +42,7 @@
  * Values above 4 should not be necessary.
  * Vanilla: 1
  */
-#define WORLD_SCALE (LEVEL_BOUNDARY_MAX / 8192.0f)
+#define WORLD_SCALE 1 // (LEVEL_BOUNDARY_MAX / 8192.0f)
 
 /**
  * The size of one collision cell.

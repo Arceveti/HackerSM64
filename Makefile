@@ -306,23 +306,23 @@ ifeq ($(filter clean distclean print-%,$(MAKECMDGOALS)),)
   # Make sure assets exist
   NOEXTRACT ?= 0
   ifeq ($(NOEXTRACT),0)
-    DUMMY != $(PYTHON) extract_assets.py $(VERSION) >&2 || echo FAIL
+    DUMMY != $(PYTHON) extract_assets.py us >&2 || echo FAIL
     ifeq ($(DUMMY),FAIL)
       $(error Failed to extract assets from US ROM)
     endif
-    ifneq (,$(wildcard baserom.jp.z64))
+    ifneq (,$(shell python3 tools/detect_baseroms.py jp))
       DUMMY != $(PYTHON) extract_assets.py jp >&2 || echo FAIL
       ifeq ($(DUMMY),FAIL)
         $(error Failed to extract assets from JP ROM)
       endif
     endif
-    ifneq (,$(wildcard baserom.eu.z64))
+    ifneq (,$(shell python3 tools/detect_baseroms.py eu))
       DUMMY != $(PYTHON) extract_assets.py eu >&2 || echo FAIL
       ifeq ($(DUMMY),FAIL)
         $(error Failed to extract assets from EU ROM)
       endif
     endif
-    ifneq (,$(wildcard baserom.sh.z64))
+    ifneq (,$(shell python3 tools/detect_baseroms.py sh))
       DUMMY != $(PYTHON) extract_assets.py sh >&2 || echo FAIL
       ifeq ($(DUMMY),FAIL)
         $(error Failed to extract assets from SH ROM)
@@ -369,6 +369,7 @@ include Makefile.split
 # Source code files
 LEVEL_C_FILES     := $(wildcard levels/*/leveldata.c) $(wildcard levels/*/script.c) $(wildcard levels/*/geo.c)
 C_FILES           := $(foreach dir,$(SRC_DIRS),$(wildcard $(dir)/*.c)) $(LEVEL_C_FILES)
+CPP_FILES         := $(foreach dir,$(SRC_DIRS),$(wildcard $(dir)/*.cpp))
 LIBZ_C_FILES      := $(foreach dir,$(LIBZ_SRC_DIRS),$(wildcard $(dir)/*.c))
 GODDARD_C_FILES   := $(foreach dir,$(GODDARD_SRC_DIRS),$(wildcard $(dir)/*.c))
 S_FILES           := $(foreach dir,$(SRC_DIRS),$(wildcard $(dir)/*.s))
@@ -390,6 +391,7 @@ SOUND_SEQUENCE_FILES := \
 
 # Object files
 O_FILES := $(foreach file,$(C_FILES),$(BUILD_DIR)/$(file:.c=.o)) \
+           $(foreach file,$(CPP_FILES),$(BUILD_DIR)/$(file:.cpp=.o)) \
            $(foreach file,$(S_FILES),$(BUILD_DIR)/$(file:.s=.o)) \
            $(foreach file,$(GENERATED_C_FILES),$(file:.c=.o)) \
            lib/PR/hvqm/hvqm2sp1.o lib/PR/hvqm/hvqm2sp2.o
@@ -407,6 +409,8 @@ DEP_FILES := $(O_FILES:.o=.d) $(LIBZ_O_FILES:.o=.d) $(GODDARD_O_FILES:.o=.d) $(B
 # detect prefix for MIPS toolchain
 ifneq      ($(call find-command,mips64-elf-ld),)
   CROSS := mips64-elf-
+else ifneq ($(call find-command,mips-n64-ld),)
+  CROSS := mips-n64-
 else ifneq ($(call find-command,mips64-ld),)
   CROSS := mips64-
 else ifneq ($(call find-command,mips-linux-gnu-ld),)
@@ -425,13 +429,15 @@ LINK_LIBRARIES = $(foreach i,$(LIBRARIES),-l$(i))
 
 export LD_LIBRARY_PATH=./tools
 
-AS      := $(CROSS)as
-ifeq      ($(COMPILER),gcc)
-  CC    := $(CROSS)gcc
-  $(BUILD_DIR)/actors/%.o: OPT_FLAGS := -Ofast -mlong-calls
-  $(BUILD_DIR)/levels/%.o: OPT_FLAGS := -Ofast -mlong-calls
+AS        := $(CROSS)as
+ifeq ($(COMPILER),gcc)
+  CC      := $(CROSS)gcc
+  CXX     := $(CROSS)g++
+  $(BUILD_DIR)/actors/%.o:           OPT_FLAGS := -Ofast -mlong-calls
+  $(BUILD_DIR)/levels/%.o:           OPT_FLAGS := -Ofast -mlong-calls
 else ifeq ($(COMPILER),clang)
-  CC    := clang
+  CC      := clang
+  CXX     := clang++
 endif
 # Prefer gcc's cpp if installed on the system
 ifneq (,$(call find-command,cpp-10))
@@ -447,6 +453,13 @@ endif
 AR      := $(CROSS)ar
 OBJDUMP := $(CROSS)objdump
 OBJCOPY := $(CROSS)objcopy
+
+ifeq ($(LD), tools/mips64-elf-ld)
+  ifeq ($(shell ls -la tools/mips64-elf-ld | awk '{print $1}' | grep x),)
+    $(warning [ERROR]: A required file in this repository is no longer executable.)
+    $(error *    Please run: 'chmod +x tools/mips64-elf-ld', then run `make` again)
+  endif
+endif
 
 ifeq ($(TARGET_N64),1)
   TARGET_CFLAGS := -nostdinc -DTARGET_N64 -D_LANGUAGE_C
@@ -588,7 +601,7 @@ unf: $(ROM) $(LOADER)
 libultra: $(BUILD_DIR)/libultra.a
 
 patch: $(ROM)
-	$(FLIPS) --create --bps ./baserom.$(VERSION).z64 $(ROM) $(BUILD_DIR)/$(TARGET_STRING).bps
+	$(FLIPS) --create --bps $(shell python3 tools/detect_baseroms.py $(VERSION)) $(ROM) $(BUILD_DIR)/$(TARGET_STRING).bps
 
 # Extra object file dependencies
 $(BUILD_DIR)/asm/ipl3.o:              $(IPL3_RAW_FILES)
@@ -806,7 +819,7 @@ $(BUILD_DIR)/include/level_headers.h: levels/level_headers.h.in
 # Generate version_data.h
 $(BUILD_DIR)/src/game/version_data.h: tools/make_version.sh
 	@$(PRINT) "$(GREEN)Generating: $(BLUE)$@ $(NO_COL)\n"
-	$(V)tools/make_version.sh $(CROSS) > $@
+	$(V)sh tools/make_version.sh $(CROSS) > $@
 
 #==============================================================================#
 # Compilation Recipes                                                          #
@@ -815,12 +828,15 @@ $(BUILD_DIR)/src/game/version_data.h: tools/make_version.sh
 # Compile C code
 ifeq ($(FIXLIGHTS),1)
 # This must not be run multiple times at once, so we run it ahead of time rather than in a rule
-DUMMY != $(FIXLIGHTS_PY) actors
-DUMMY != $(FIXLIGHTS_PY) levels
+DUMMY != $(PYTHON) $(FIXLIGHTS_PY) actors
+DUMMY != $(PYTHON) $(FIXLIGHTS_PY) levels
 endif
 $(BUILD_DIR)/%.o: %.c
 	$(call print,Compiling:,$<,$@)
 	$(V)$(CC) -c $(CFLAGS) -MMD -MF $(BUILD_DIR)/$*.d  -o $@ $<
+$(BUILD_DIR)/%.o: %.cpp
+	$(call print,Compiling (C++):,$<,$@)
+	$(V)$(CXX) -c $(CFLAGS) -std=c++17 -Wno-register -MMD -MF $(BUILD_DIR)/$*.d  -o $@ $<
 $(BUILD_DIR)/%.o: $(BUILD_DIR)/%.c
 	$(call print,Compiling:,$<,$@)
 	$(V)$(CC) -c $(CFLAGS) -MMD -MF $(BUILD_DIR)/$*.d  -o $@ $<
