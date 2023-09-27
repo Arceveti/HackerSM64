@@ -44,7 +44,7 @@ void colorRGB_add_hue(ColorRGB color, Color hueAdd, Color s);
 extern const Gfx dl_texrect_rgba16_begin[];
 extern const Gfx dl_texrect_rgba16_end[];
 
-#define SIZEOF_GFX_TEXRECT_RGBA32 ( \
+#define SIZEOF_GFX_TEXRECT_RGBA16 ( \
     SIZEOF_GFX_CMD(DPLoadTextureTile(0,0,G_IM_SIZ_16b,0,0,0,0,0,0,0,0,0,0,0,0,0)) + \
     SIZEOF_GFX_CMD(SPTextureRectangle(0,0,0,0,0,0,0,0,0)) \
 )

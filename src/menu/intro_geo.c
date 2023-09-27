@@ -493,8 +493,8 @@ Gfx* geo_intro_rumble_pak_graphic(s32 callContext, struct GraphNode* node, UNUSE
         if (backgroundTileSix == INTRO_BACKGROUND_SUPER_MARIO) {
             dl = alloc_display_list(
                 SIZEOF_GFX_CMD(SPDisplayList(0)) +
-                SIZEOF_GFX_TEXRECT_RGBA32 +
-                SIZEOF_GFX_TEXRECT_RGBA32 +
+                SIZEOF_GFX_TEXRECT_RGBA16 +
+                SIZEOF_GFX_TEXRECT_RGBA16 +
                 SIZEOF_GFX_CMD(SPDisplayList(0)) +
                 SIZEOF_GFX_CMD(SPEndDisplayList())
             );
