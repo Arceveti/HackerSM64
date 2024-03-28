@@ -38,23 +38,6 @@ enum ThreadID {
     THREAD_1002_CRASH_SCREEN_2,         // Same as THREAD_1001_CRASH_SCREEN_1. If this crashes, cycles back to THREAD_1000_CRASH_SCREEN_0.
 };
 
-struct RumbleData {
-    u8  comm;
-    u8  level;
-    s16 time;
-    s16 decay;
-};
-
-struct RumbleSettings {
-    s16 event;
-    s16 level;
-    s16 timer;
-    s16 count;
-    s16 start;
-    s16 slip;
-    s16 vibrate;
-    s16 decay;
-};
 
 extern OSViMode VI;
 
@@ -66,19 +49,10 @@ extern OSThread gMainThread;
 extern OSThread gGameLoopThread;
 extern OSThread gSoundThread;
 extern OSThread hvqmThread;
-#if ENABLE_RUMBLE
-extern OSThread gRumblePakThread;
-
-extern OSPfs gRumblePakPfs;
-#endif
 
 extern OSMesgQueue gPIMesgQueue;
 extern OSMesgQueue gIntrMesgQueue;
 extern OSMesgQueue gSPTaskMesgQueue;
-#if ENABLE_RUMBLE
-extern OSMesgQueue gRumblePakSchedulerMesgQueue;
-extern OSMesgQueue gRumbleThreadVIMesgQueue;
-#endif
 extern OSMesg gDmaMesgBuf[1];
 extern OSMesg gPIMesgBuf[32];
 extern OSMesg gSIEventMesgBuf[1];
@@ -88,13 +62,6 @@ extern OSIoMesg gDmaIoMesg;
 extern OSMesg gMainReceivedMesg;
 extern OSMesgQueue gDmaMesgQueue;
 extern OSMesgQueue gSIEventMesgQueue;
-#if ENABLE_RUMBLE
-extern OSMesg gRumblePakSchedulerMesgBuf[1];
-extern OSMesg gRumbleThreadVIMesgBuf[1];
-
-extern struct RumbleData gRumbleDataQueue[3];
-extern struct RumbleSettings gCurrRumbleSettings;
-#endif
 
 extern struct VblankHandler *gVblankHandler1;
 extern struct VblankHandler *gVblankHandler2;

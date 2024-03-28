@@ -75,6 +75,30 @@ typedef union {
     f64 asF64;
 } IEEE754_f64; /*0x08*/
 
+typedef union {
+    struct {
+        /*0x00*/ u8 hi; // HI byte.
+        /*0x01*/ u8 lo; // LO byte.
+    }; /*0x02*/
+    u16 raw;
+} HiLo16; /*0x02*/
+
+typedef union {
+    struct {
+        /*0x00*/ u16 hi; // HI byte.
+        /*0x01*/ u16 lo; // LO byte.
+    }; /*0x02*/
+    u32 raw;
+} HiLo32; /*0x02*/
+
+typedef union {
+    struct {
+        /*0x00*/ u32 hi; // HI byte.
+        /*0x01*/ u32 lo; // LO byte.
+    }; /*0x02*/
+    u64 raw;
+} HiLo64; /*0x02*/
+
 struct Config {
     f32 audioFrequency;
 #ifdef WIDE
