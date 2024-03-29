@@ -1,6 +1,8 @@
 #ifndef MACROS_H
 #define MACROS_H
 
+#include <ultra64.h>
+
 #include "platform_info.h"
 
 #ifndef __sgi

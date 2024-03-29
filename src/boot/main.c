@@ -2,6 +2,7 @@
 #include <PR/os_internal_reg.h>
 #include <PR/os_system.h>
 #include <PR/os_vi.h>
+#include <PR/os.h>
 #include <stdio.h>
 
 #include "sm64.h"

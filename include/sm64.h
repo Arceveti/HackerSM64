@@ -3,6 +3,8 @@
 
 // Global header for Super Mario 64
 
+#include <ultra64.h>
+
 #include "types.h"
 #include "config.h"
 #include "object_fields.h"
