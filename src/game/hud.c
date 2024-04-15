@@ -278,13 +278,19 @@ void handle_power_meter_actions(s16 numHealthWedges) {
 #endif
 }
 
+extern _Bool gSuitAcquired;
+
 /**
  * Renders the power meter that shows when Mario is in underwater
  * or has taken damage and has less than 8 health segments.
  * And calls a power meter animation function depending of the value defined.
  */
 void render_hud_power_meter(void) {
+    if (!gSuitAcquired) {
+        return;
+    }
     s16 shownHealthWedges = gHudDisplay.wedges;
+    if (FALSE) {
     if (sPowerMeterHUD.animation != POWER_METER_HIDING) handle_power_meter_actions(shownHealthWedges);
     if (sPowerMeterHUD.animation == POWER_METER_HIDDEN) return;
     switch (sPowerMeterHUD.animation) {
@@ -292,6 +298,7 @@ void render_hud_power_meter(void) {
         case POWER_METER_DEEMPHASIZING: animate_power_meter_deemphasizing(); break;
         case POWER_METER_HIDING:        animate_power_meter_hiding();        break;
         default:                                                             break;
+    }
     }
     render_dl_power_meter(shownHealthWedges);
     sPowerMeterVisibleTimer++;
@@ -409,39 +416,42 @@ void render_hud_mario_lives(void) {
     print_text_fmt_int(GFX_DIMENSIONS_RECT_FROM_LEFT_EDGE(54), HUD_TOP_Y, "%d", gHudDisplay.lives);
 }
 
-#ifdef VANILLA_STYLE_CUSTOM_DEBUG
-void render_debug_mode(void) {
-    print_text(180, 40, "DEBUG MODE");
-    print_text_fmt_int(5, 20, "Z %d", gMarioState->pos[2]);
-    print_text_fmt_int(5, 40, "Y %d", gMarioState->pos[1]);
-    print_text_fmt_int(5, 60, "X %d", gMarioState->pos[0]);
-    print_text_fmt_int(10, 100, "SPD %d", (s32) gMarioState->forwardVel);
-    print_text_fmt_int(10, 120, "ANG 0*%04x", (u16) gMarioState->faceAngle[1]);
-    print_fps(10,80);
-}
-#endif
+// #ifdef VANILLA_STYLE_CUSTOM_DEBUG
+// void render_debug_mode(void) {
+//     print_text(180, 40, "DEBUG MODE");
+//     print_text_fmt_int(5, 20, "Z %d", gMarioState->pos[2]);
+//     print_text_fmt_int(5, 40, "Y %d", gMarioState->pos[1]);
+//     print_text_fmt_int(5, 60, "X %d", gMarioState->pos[0]);
+//     print_text_fmt_int(10, 100, "SPD %d", (s32) gMarioState->forwardVel);
+//     print_text_fmt_int(10, 120, "ANG 0*%04x", (u16) gMarioState->faceAngle[1]);
+//     print_fps(10,80);
+// }
+// #endif
 
 /**
  * Renders the amount of coins collected.
  */
 void render_hud_coins(void) {
+    if (!gSuitAcquired) {
+        return;
+    }
     print_text(HUD_COINS_X, HUD_TOP_Y, "$"); // 'Coin' glyph
     print_text((HUD_COINS_X + 16), HUD_TOP_Y, "*"); // 'X' glyph
     print_text_fmt_int((HUD_COINS_X + 30), HUD_TOP_Y, "%d", gHudDisplay.coins);
 }
 
-/**
- * Renders the amount of stars collected.
- * Disables "X" glyph when Mario has 100 stars or more.
- */
-void render_hud_stars(void) {
-    if (gHudFlash == HUD_FLASH_STARS && gGlobalTimer & 0x8) return;
-    s8 showX = (gHudDisplay.stars < 100);
-    print_text(GFX_DIMENSIONS_RECT_FROM_RIGHT_EDGE(HUD_STARS_X), HUD_TOP_Y, "^"); // 'Star' glyph
-    if (showX) print_text((GFX_DIMENSIONS_RECT_FROM_RIGHT_EDGE(HUD_STARS_X) + 16), HUD_TOP_Y, "*"); // 'X' glyph
-    print_text_fmt_int((showX * 14) + GFX_DIMENSIONS_RECT_FROM_RIGHT_EDGE(HUD_STARS_X - 16),
-                       HUD_TOP_Y, "%d", gHudDisplay.stars);
-}
+// /**
+//  * Renders the amount of stars collected.
+//  * Disables "X" glyph when Mario has 100 stars or more.
+//  */
+// void render_hud_stars(void) {
+//     if (gHudFlash == HUD_FLASH_STARS && gGlobalTimer & 0x8) return;
+//     s8 showX = (gHudDisplay.stars < 100);
+//     print_text(GFX_DIMENSIONS_RECT_FROM_RIGHT_EDGE(HUD_STARS_X), HUD_TOP_Y, "^"); // 'Star' glyph
+//     if (showX) print_text((GFX_DIMENSIONS_RECT_FROM_RIGHT_EDGE(HUD_STARS_X) + 16), HUD_TOP_Y, "*"); // 'X' glyph
+//     print_text_fmt_int((showX * 14) + GFX_DIMENSIONS_RECT_FROM_RIGHT_EDGE(HUD_STARS_X - 16),
+//                        HUD_TOP_Y, "%d", gHudDisplay.stars);
+// }
 
 /**
  * Unused function that renders the amount of keys collected.
@@ -571,34 +581,34 @@ void render_hud(void) {
             render_hud_cannon_reticle();
         }
 
-#ifdef ENABLE_LIVES
-        if (hudDisplayFlags & HUD_DISPLAY_FLAG_LIVES) {
-            render_hud_mario_lives();
-        }
-#endif
+// #ifdef ENABLE_LIVES
+//         if (hudDisplayFlags & HUD_DISPLAY_FLAG_LIVES) {
+//             render_hud_mario_lives();
+//         }
+// #endif
 
-        if (hudDisplayFlags & HUD_DISPLAY_FLAG_COIN_COUNT) {
+        // if (hudDisplayFlags & HUD_DISPLAY_FLAG_COIN_COUNT) {
             render_hud_coins();
-        }
+        // }
 
-        if (hudDisplayFlags & HUD_DISPLAY_FLAG_STAR_COUNT) {
-            render_hud_stars();
-        }
+        // if (hudDisplayFlags & HUD_DISPLAY_FLAG_STAR_COUNT) {
+        //     render_hud_stars();
+        // }
 
-        if (hudDisplayFlags & HUD_DISPLAY_FLAG_KEYS) {
-            render_hud_keys();
-        }
+        // if (hudDisplayFlags & HUD_DISPLAY_FLAG_KEYS) {
+        //     render_hud_keys();
+        // }
 
-#ifdef BREATH_METER
-        if (hudDisplayFlags & HUD_DISPLAY_FLAG_BREATH_METER) render_hud_breath_meter();
-#endif
+// #ifdef BREATH_METER
+//         if (hudDisplayFlags & HUD_DISPLAY_FLAG_BREATH_METER) render_hud_breath_meter();
+// #endif
 
         if (hudDisplayFlags & HUD_DISPLAY_FLAG_CAMERA_AND_POWER) {
             render_hud_power_meter();
 #ifdef PUPPYCAM
             if (!gPuppyCam.enabled) {
 #endif
-            render_hud_camera_status();
+            // render_hud_camera_status();
 #ifdef PUPPYCAM
             }
 #endif

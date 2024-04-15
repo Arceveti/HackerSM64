@@ -58,6 +58,8 @@ enum GeoLayoutCommands {
     /*0x1E*/ GEO_CMD_NOP_1E,
     /*0x1F*/ GEO_CMD_NOP_1F,
     /*0x20*/ GEO_CMD_NODE_CULLING_RADIUS,
+    GEO_CMD_NODE_Z_OFFSET,
+    GEO_CMD_NODE_BGMODEL,
 
     GEO_CMD_COUNT,
 };
@@ -349,6 +351,27 @@ enum GeoLayoutCommands {
     CMD_PTR(displayList)
 #define GEO_BILLBOARD() \
     GEO_BILLBOARD_WITH_PARAMS(0, 0, 0, 0)
+
+
+/**
+ * GEO_CMD_NODE_Z_OFFSET: Create a z offset scene graph node.
+ *   0x01: unused
+ *   0x02: s16 zOffset
+ */
+#define GEO_Z_OFFSET(zOffset) \
+    CMD_BBH(GEO_CMD_NODE_Z_OFFSET, 0x00, zOffset)
+
+
+
+#define GEO_BGMODEL_WITH_PARAMS(layer, tx, ty, tz) \
+    CMD_BBH(GEO_CMD_NODE_BGMODEL, layer, tx), \
+    CMD_HH(ty, tz)
+#define GEO_BGMODEL_WITH_PARAMS_AND_DL(layer, tx, ty, tz, displayList) \
+    CMD_BBH(GEO_CMD_NODE_BGMODEL, (layer | 0x80), tx), \
+    CMD_HH(ty, tz), \
+    CMD_PTR(displayList)
+#define GEO_BGMODEL() \
+    GEO_BGMODEL_WITH_PARAMS(0, 0, 0, 0)
 
 /**
  * 0x15: Create plain display list scene graph node

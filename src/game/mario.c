@@ -1698,7 +1698,7 @@ void queue_rumble_particles(struct MarioState *m) {
     }
 }
 #endif
-
+extern void set_onscreen_dlg(int id);
 /**
  * Main function for executing Mario's behavior. Returns particleFlags.
  */
@@ -1711,11 +1711,12 @@ s32 execute_mario_action(UNUSED struct Object *obj) {
     vec3f_copy(gMarioState->prevPos, gMarioState->pos);
 
     if (gMarioState->action) {
-#ifdef DEBUG_FORCE_CRASH_ON_L
+// #ifdef DEBUG_FORCE_CRASH_ON_L
         if (gPlayer1Controller->buttonDown & L_TRIG) {
-            FORCE_CRASH();
+            // FORCE_CRASH();
+            set_onscreen_dlg(1);
         }
-#endif
+// #endif
 #ifdef ENABLE_DEBUG_FREE_MOVE
         if (
             (gMarioState->controller->buttonDown & U_JPAD) &&
@@ -1804,9 +1805,18 @@ s32 execute_mario_action(UNUSED struct Object *obj) {
 /**************************************************
  *                  INITIALIZATION                *
  **************************************************/
-
+extern _Bool nonStopSliding;
+extern _Bool canSlideUphill;
 void init_mario(void) {
     DEBUG_ASSERT((gMarioObject != NULL), ASSERT_PREFIX_LEVEL"Mario spawn object is missing!");
+    if (gCurrLevelNum == LEVEL_WF) {
+        canSlideUphill = TRUE;
+    }
+
+    if (gCurrLevelNum == LEVEL_JRB) {
+        gRainbowSlide = TRUE;
+        nonStopSliding = TRUE;
+    }
 
     gMarioState->actionTimer = 0;
     gMarioState->framesSinceA = 0xFF;

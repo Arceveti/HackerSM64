@@ -160,7 +160,7 @@ static const Gfx dl_debug_box_begin[] = {
 
 static const Gfx dl_visual_surface[] = {
     gsDPPipeSync(),
-    gsDPSetRenderMode(G_RM_ZB_XLU_DECAL, G_RM_NOOP2),
+    gsDPSetRenderMode(G_RM_ZB_XLU_SURF, G_RM_NOOP2),
     gsSPClearGeometryMode(G_LIGHTING),
     gsSPSetGeometryMode(G_ZBUFFER),
     gsSPTexture(0, 0, 0, G_TX_RENDERTILE, G_OFF),

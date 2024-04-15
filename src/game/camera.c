@@ -30,7 +30,7 @@
 #include "profiling.h"
 
 #define CBUTTON_MASK (U_CBUTTONS | D_CBUTTONS | L_CBUTTONS | R_CBUTTONS)
-
+extern struct Surface gWaterSurfacePseudoFloor;
 /**
  * @file camera.c
  * Implements the camera system, including C-button input, camera modes, camera triggers, and cutscenes.
@@ -631,7 +631,10 @@ void unused_set_camera_pitch_shake_env(s16 shake) {
  *      posOff and focOff are sometimes the same address, which just ignores the pos calculation
  */
 void calc_y_to_curr_floor(f32 *posOff, f32 posMul, f32 posBound, f32 *focOff, f32 focMul, f32 focBound) {
-    f32 floorHeight = sMarioGeometry.currFloorHeight;
+    // if () {
+        
+    // }
+    f32 floorHeight = gRainbowSlide ? sMarioCamState->pos[1] : sMarioGeometry.currFloorHeight;
     f32 waterHeight;
 
     if (!(sMarioCamState->action & ACT_FLAG_METAL_WATER)) {
@@ -711,7 +714,7 @@ void set_camera_height(struct Camera *c, f32 goalHeight) {
 
         approach_camera_height(c, goalHeight, 5.f);
     } else {
-        camFloorHeight = find_floor(c->pos[0], c->pos[1] + 100.f, c->pos[2], &surface) + baseOff;
+        camFloorHeight = gRainbowSlide ? (sMarioCamState->pos[1] + baseOff) : find_floor(c->pos[0], c->pos[1] + 100.f, c->pos[2], &surface) + baseOff;
         marioFloorHeight = baseOff + sMarioGeometry.currFloorHeight;
 
         if (camFloorHeight < marioFloorHeight) {
@@ -759,7 +762,7 @@ s16 look_down_slopes(s16 camYaw) {
     f32 xOff = sMarioCamState->pos[0] + sins(camYaw) * 40.f;
     f32 zOff = sMarioCamState->pos[2] + coss(camYaw) * 40.f;
 
-    f32 floorDY = find_floor(xOff, sMarioCamState->pos[1], zOff, &floor) - sMarioCamState->pos[1];
+    f32 floorDY = gRainbowSlide ? 0.0f : (find_floor(xOff, sMarioCamState->pos[1], zOff, &floor) - sMarioCamState->pos[1]);
 
     if (floor != NULL) {
         if (floor->type != SURFACE_WALL_MISC && floorDY > 0) {
@@ -1817,7 +1820,7 @@ s32 mode_behind_mario(struct Camera *c) {
 
     // Keep the camera above the water surface if swimming
     if (c->mode == WATER_SURFACE_CAMERA_MODE) {
-        floorHeight = find_floor(c->pos[0], c->pos[1], c->pos[2], &floor);
+        floorHeight = gRainbowSlide ? sMarioCamState->pos[1] : find_floor(c->pos[0], c->pos[1], c->pos[2], &floor);
         newPos[1] = marioState->waterLevel + 120;
         if (newPos[1] < (floorHeight += 120.f)) {
             newPos[1] = floorHeight;
@@ -2142,10 +2145,16 @@ s16 update_default_camera(struct Camera *c) {
 
     marioFloorHeight = 125.f + sMarioGeometry.currFloorHeight;
     marioFloor = sMarioGeometry.currFloor;
-    camFloorHeight = find_floor(cPos[0], cPos[1] + 50.f, cPos[2], &cFloor) + 125.f;
+    
+    if (gRainbowSlide && gMarioState->floor == &gWaterSurfacePseudoFloor) {
+        camFloorHeight = gMarioState->pos[1] + 125.f;
+    } else {
+        camFloorHeight = find_floor(cPos[0], cPos[1] + 50.f, cPos[2], &cFloor) + 125.f;
+    }
     for (scale = 0.1f; scale < 1.f; scale += 0.2f) {
         scale_along_line(tempPos, cPos, sMarioCamState->pos, scale);
-        tempFloorHeight = find_floor(tempPos[0], tempPos[1], tempPos[2], &tempFloor) + 125.f;
+        
+        tempFloorHeight = gRainbowSlide ? tempPos[1] + 125.f : find_floor(tempPos[0], tempPos[1], tempPos[2], &tempFloor) + 125.f;
         if (tempFloor != NULL && tempFloorHeight > marioFloorHeight) {
             marioFloorHeight = tempFloorHeight;
             marioFloor = tempFloor;
@@ -2849,7 +2858,7 @@ void update_lakitu(struct Camera *c) {
 
         if (c->mode != CAMERA_MODE_C_UP && c->cutscene == CUTSCENE_NONE) {
             gCollisionFlags |= COLLISION_FLAG_CAMERA;
-            distToFloor = find_floor(gLakituState.pos[0],
+            distToFloor = gRainbowSlide ? gMarioState->pos[1] : find_floor(gLakituState.pos[0],
                                      gLakituState.pos[1] + 20.0f,
                                      gLakituState.pos[2], &floor);
             if (distToFloor != FLOOR_LOWER_LIMIT) {
@@ -3318,7 +3327,7 @@ void init_camera(struct Camera *c) {
     // Set the camera pos to marioOffset (relative to Mario), added to Mario's position
     offset_rotated(c->pos, sMarioCamState->pos, marioOffset, sMarioCamState->faceAngle);
     if (c->mode != CAMERA_MODE_BEHIND_MARIO) {
-        c->pos[1] = find_floor(sMarioCamState->pos[0], sMarioCamState->pos[1] + 100.f,
+        c->pos[1] = gRainbowSlide ? sMarioCamState->pos[1] +125.f : find_floor(sMarioCamState->pos[0], sMarioCamState->pos[1] + 100.f,
                                sMarioCamState->pos[2], &floor) + 125.f;
     }
     vec3f_copy(c->focus, sMarioCamState->pos);
@@ -5157,7 +5166,7 @@ s16 next_lakitu_state(Vec3f newPos, Vec3f newFoc, Vec3f curPos, Vec3f curFoc,
         vec3f_copy(newPos, nextPos);
 
         if (gCamera->cutscene != 0 || !(gCameraMovementFlags & CAM_MOVE_C_UP_MODE)) {
-            floorHeight = find_floor(newPos[0], newPos[1], newPos[2], &floor);
+            floorHeight = gRainbowSlide ? sMarioCamState->pos[1] : find_floor(newPos[0], newPos[1], newPos[2], &floor);
             if (floorHeight != FLOOR_LOWER_LIMIT) {
                 if ((floorHeight += 125.f) > newPos[1]) {
                     newPos[1] = floorHeight;
@@ -5915,9 +5924,7 @@ struct CameraTrigger sCamRR[] = {
  * to free_roam when Mario is not walking up the tower.
  */
 struct CameraTrigger sCamBOB[] = {
-    {  1, cam_bob_tower, 2468, 2720, -4608, 3263, 1696, 3072, 0 },
-    { -1, cam_bob_default_free_roam, 0, 0, 0, 0, 0, 0, 0 },
-    NULL_TRIGGER
+	NULL_TRIGGER
 };
 
 /**
@@ -6066,6 +6073,15 @@ struct CameraTrigger sCamBBH[] = {
  *
  * Each table is terminated with NULL_TRIGGER
  */
+struct CameraTrigger sCamCastleGrounds[] = {
+	NULL_TRIGGER
+};
+struct CameraTrigger sCamWF[] = {
+	NULL_TRIGGER
+};
+struct CameraTrigger sCamJRB[] = {
+	NULL_TRIGGER
+};
 struct CameraTrigger *sCameraTriggers[LEVEL_COUNT + 1] = {
     NULL,
     #include "levels/level_defines.h"
@@ -6377,7 +6393,7 @@ void resolve_geometry_collisions(Vec3f pos) {
     struct Surface *surf;
 
     f32_find_wall_collision(&pos[0], &pos[1], &pos[2], 0.f, 100.f);
-    f32 floorY = find_floor(pos[0], pos[1] + 50.f, pos[2], &surf);
+    f32 floorY = gRainbowSlide ? gMarioState->pos[1] : find_floor(pos[0], pos[1] + 50.f, pos[2], &surf);
     f32 ceilY = find_ceil(pos[0], pos[1] - 50.f, pos[2], &surf);
 
     if ((FLOOR_LOWER_LIMIT != floorY) && (CELL_HEIGHT_LIMIT == ceilY)) {
@@ -6527,9 +6543,13 @@ void find_mario_floor_and_ceil(struct PlayerGeometry *pg) {
     }
 
     gCollisionFlags &= ~COLLISION_FLAG_CAMERA;
+    if (gRainbowSlide && gMarioState->floor == &gWaterSurfacePseudoFloor) {
+        pg->currFloorHeight = sMarioCamState->pos[1];
+    } else {
     pg->currFloorHeight = find_floor(sMarioCamState->pos[0],
                                      sMarioCamState->pos[1] + 10.f,
                                      sMarioCamState->pos[2], &pg->currFloor);
+    }
     pg->currCeilHeight = find_ceil(sMarioCamState->pos[0],
                                    sMarioCamState->pos[1] - 10.f,
                                    sMarioCamState->pos[2], &pg->currCeil);
@@ -10401,26 +10421,26 @@ u8 sDanceCutsceneIndexTable[][4] = {
  * and if the result is non-zero, the camera will zoom out.
  */
 u8 sZoomOutAreaMasks[] = {
-    ZOOMOUT_AREA_MASK(0,0,0,0, 0,0,0,0), // Unused         | Unused
-    ZOOMOUT_AREA_MASK(0,0,0,0, 0,0,0,0), // Unused         | Unused
-    ZOOMOUT_AREA_MASK(0,0,0,0, 1,0,0,0), // BBH            | CCM
-    ZOOMOUT_AREA_MASK(0,0,0,0, 0,0,0,0), // CASTLE_INSIDE  | HMC
-    ZOOMOUT_AREA_MASK(1,0,0,0, 1,0,0,0), // SSL            | BOB
-    ZOOMOUT_AREA_MASK(1,0,0,0, 1,0,0,0), // SL             | WDW
-    ZOOMOUT_AREA_MASK(0,0,0,0, 1,1,0,0), // JRB            | THI
-    ZOOMOUT_AREA_MASK(0,0,0,0, 1,0,0,0), // TTC            | RR
-    ZOOMOUT_AREA_MASK(1,0,0,0, 1,0,0,0), // CASTLE_GROUNDS | BITDW
-    ZOOMOUT_AREA_MASK(0,0,0,0, 1,0,0,0), // VCUTM          | BITFS
-    ZOOMOUT_AREA_MASK(0,0,0,0, 1,0,0,0), // SA             | BITS
-    ZOOMOUT_AREA_MASK(1,0,0,0, 0,0,0,0), // LLL            | DDD
-    ZOOMOUT_AREA_MASK(1,0,0,0, 0,0,0,0), // WF             | ENDING
-    ZOOMOUT_AREA_MASK(0,0,0,0, 0,0,0,0), // COURTYARD      | PSS
-    ZOOMOUT_AREA_MASK(0,0,0,0, 1,0,0,0), // COTMC          | TOTWC
-    ZOOMOUT_AREA_MASK(1,0,0,0, 1,0,0,0), // BOWSER_1       | WMOTR
-    ZOOMOUT_AREA_MASK(0,0,0,0, 1,0,0,0), // Unused         | BOWSER_2
-    ZOOMOUT_AREA_MASK(1,0,0,0, 0,0,0,0), // BOWSER_3       | Unused
-    ZOOMOUT_AREA_MASK(1,0,0,0, 0,0,0,0), // TTM            | Unused
-    ZOOMOUT_AREA_MASK(0,0,0,0, 0,0,0,0), // Unused         | Unused
+	ZOOMOUT_AREA_MASK(0, 0, 0, 0, 0, 0, 0, 0), // Unused         | Unused
+	ZOOMOUT_AREA_MASK(0, 0, 0, 0, 0, 0, 0, 0), // Unused         | Unused
+	ZOOMOUT_AREA_MASK(0, 0, 0, 0, 1, 0, 0, 0), // BBH            | CCM
+	ZOOMOUT_AREA_MASK(0, 0, 0, 0, 0, 0, 0, 0), // CASTLE_INSIDE  | HMC
+	ZOOMOUT_AREA_MASK(1, 0, 0, 0, 0, 0, 0, 0), // SSL            | BOB
+	ZOOMOUT_AREA_MASK(1, 0, 0, 0, 1, 0, 0, 0), // SL             | WDW
+	ZOOMOUT_AREA_MASK(1, 0, 0, 0, 1, 1, 0, 0), // JRB            | THI
+	ZOOMOUT_AREA_MASK(0, 0, 0, 0, 1, 0, 0, 0), // TTC            | RR
+	ZOOMOUT_AREA_MASK(1, 0, 0, 0, 1, 0, 0, 0), // CASTLE_GROUNDS | BITDW
+	ZOOMOUT_AREA_MASK(0, 0, 0, 0, 1, 0, 0, 0), // VCUTM          | BITFS
+	ZOOMOUT_AREA_MASK(0, 0, 0, 0, 1, 0, 0, 0), // SA             | BITS
+	ZOOMOUT_AREA_MASK(1, 0, 0, 0, 0, 0, 0, 0), // LLL            | DDD
+	ZOOMOUT_AREA_MASK(1, 0, 0, 0, 0, 0, 0, 0), // WF             | ENDING
+	ZOOMOUT_AREA_MASK(0, 0, 0, 0, 0, 0, 0, 0), // COURTYARD      | PSS
+	ZOOMOUT_AREA_MASK(0, 0, 0, 0, 1, 0, 0, 0), // COTMC          | TOTWC
+	ZOOMOUT_AREA_MASK(1, 0, 0, 0, 1, 0, 0, 0), // BOWSER_1       | WMOTR
+	ZOOMOUT_AREA_MASK(0, 0, 0, 0, 1, 0, 0, 0), // Unused         | BOWSER_2
+	ZOOMOUT_AREA_MASK(1, 0, 0, 0, 0, 0, 0, 0), // BOWSER_3       | Unused
+	ZOOMOUT_AREA_MASK(1, 0, 0, 0, 0, 0, 0, 0), // TTM            | Unused
+	ZOOMOUT_AREA_MASK(0, 0, 0, 0, 0, 0, 0, 0), // Unused         | Unused
 };
 
 STATIC_ASSERT(ARRAY_COUNT(sZoomOutAreaMasks) - 1 == LEVEL_MAX / 2, "Make sure you edit sZoomOutAreaMasks when adding / removing courses.");

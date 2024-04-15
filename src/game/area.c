@@ -25,7 +25,8 @@
 #include "puppyprint.h"
 #include "debug_box.h"
 #include "engine/colors.h"
-#include "profiling.h"
+// #include "controller_select_menu.h"
+#include "fasttext.h"
 #ifdef S2DEX_TEXT_ENGINE
 #include "s2d_engine/init.h"
 #endif
@@ -83,18 +84,12 @@ u8 sSpawnTypeFromWarpBhv[] = {
     MARIO_SPAWN_AIRBORNE_STAR_COLLECT, MARIO_SPAWN_AIRBORNE_DEATH,       MARIO_SPAWN_LAUNCH_STAR_COLLECT,   MARIO_SPAWN_LAUNCH_DEATH,
 };
 
-Vp gViewport = { {
-    { 640, 480, 511, 0 },
-    { 640, 480, 511, 0 },
-} };
-
-#if MULTILANG
-const char *gNoControllerMsg[] = {
-    "NO CONTROLLER",
-    "MANETTE DEBRANCHEE",
-    "CONTROLLER FEHLT",
+Vp gViewport = {
+    .vp = {
+        .vscale = { (SCREEN_WIDTH * 2), (SCREEN_HEIGHT * 2), (G_MAXZ / 2), 0 },
+        .vtrans = { (SCREEN_WIDTH * 2), (SCREEN_HEIGHT * 2), (G_MAXZ / 2), 0 },
+    }
 };
-#endif
 
 void override_viewport_and_clip(Vp *vpOverride, Vp *vpClip, Color red, Color green, Color blue) {
     RGBA16 color = ((red >> 3) << IDX_RGBA16_R) | ((green >> 3) << IDX_RGBA16_G) | ((blue >> 3) << IDX_RGBA16_B) | MSK_RGBA16_A;
@@ -114,24 +109,13 @@ void set_warp_transition_rgb(Color red, Color green, Color blue) {
 }
 
 void print_intro_text(void) {
-#if MULTILANG
-    s32 language = eu_get_language();
-#endif
     if ((gGlobalTimer & 31) < 20) {
-        if (gControllerBits == 0) {
-#if MULTILANG
-            print_text_centered(SCREEN_CENTER_X, 20, gNoControllerMsg[language]);
-#else
-            print_text_centered(SCREEN_CENTER_X, 20, "NO CONTROLLER");
-#endif
-        } else {
 #ifdef VERSION_EU
-            print_text(20, 20, "START");
+        print_text(20, 20, "START");
 #else
-            print_text_centered(60, 38, "PRESS");
-            print_text_centered(60, 20, "START");
+        print_text_centered(60, 38, "PRESS");
+        print_text_centered(60, 20, "START");
 #endif
-        }
     }
 }
 
@@ -413,6 +397,274 @@ void play_transition_after_delay(s16 transType, s16 time, u8 red, u8 green, u8 b
     play_transition(transType, time, red, green, blue);
 }
 
+#include <string.h>
+
+#define FPS_COUNT 30
+#define FRAMES_TO_NESC(f)   (((OSTime)(f) * 1000000000LL) / FPS_COUNT)
+#define FRAMES_TO_UESC(f)   (((OSTime)(f) * 1000000LL) / FPS_COUNT)
+#define FRAMES_TO_CYCLES(f) (((OSTime)(f) * OS_CPU_COUNTER) / FPS_COUNT)
+#define NSEC_TO_FRAMES(n)   (((OSTime)(n) * FPS_COUNT) / 1000000000LL)
+#define USEC_TO_FRAMES(n)   (((OSTime)(n) * FPS_COUNT) / 1000000LL)
+#define CYCLES_TO_FRAMES(c) (((OSTime)(c) * FPS_COUNT) / OS_CPU_COUNTER)
+
+_Bool gSuitAcquired = FALSE;
+
+#include "suit_dialogue.h"
+
+// enum OnScreenDialogue
+SuitDialogue sOnScreenDialogues[] = {
+    [DLG_NONE] = { .txt = "", },
+    // Summit
+    [DLG_BOOTING] = {.txt = "BOOTING UP S-L1D3...", .speed = 0.1f, },
+    [DLG_SCANNING] = {.txt = "SCANNING AREA...", .speed = 0.25f, },
+    [DLG_HELLO_FRIEND] = { .txt = "HELLO FRIEND, I AM SIGMA-L1D3.", .speed = 0.5f, },
+    [DLG_HELLO_2] = {.txt = "YOU CAN CALL ME S-L1DE FOR SHORT"},
+    [DLG_LAST_BOOT] = { .txt = "IT HAS BEEN xxxx CYCLES SINCE LAST BOOT." },
+    // [DLG_WELCOME] = { .txt = "", },
+    [DLG_LIGHTS_1] = { .txt = "LOOK AT THOSE PRETTY LIGHTS IN THE DISTANCE!" },
+    [DLG_HOME_1] = { .txt = "I WILL HELP YOU GO HOME", },
+    // Mountain
+    [DLG_START_RIGHT] = { .txt = "TURN TO THE RIGHT.", .r = 0xFF, .g = 0xFF, .b = 0x01, },
+    [DLG_READY_LEFT] = { .txt = "GET READY TO GO LEFT...", .r = 0xFF, .g = 0xFF, .b = 0x01,  },
+    [DLG_GO_LEFT] = { .txt = "TURN LEFT!", .r = 0xFF, .g = 0xFF, .b = 0x01,  },
+    [DLG_READY_RIGHT] = {.txt = "GET READY TO GO RIGHT...", .r = 0xFF, .g = 0xFF, .b = 0x01, },
+    [DLG_GO_RIGHT] = { .txt = "TURN RIGHT!", .r = 0xFF, .g = 0xFF, .b = 0x01,  },
+    [DLG_READY_JUMP] = { .txt = "GET READY TO JUMP", .r = 0xFF, .g = 0xFF, .b = 0x01, },
+    [DLG_GO_JUMP] = { .txt = "JUMP!", .r = 0xFF, .g = 0xFF, .b = 0x01,  },
+    [DLG_JUMP_ICICLES] = {.txt = "JUMP, BUT DON'T HIT THE ICICLES!", .r = 0xFF, .g = 0xFF, .b = 0x01, .speed = 2.0f, },
+    [DLG_JUMP_THEN_LEFT] = { .txt = "JUMP, THEN GO LEFT!", .r = 0xFF, .g = 0xFF, .b = 0x01, },
+    [DLG_JUMP_THEN_RIGHT] = { .txt = "JUMP, THEN GO RIGHT!", .r = 0xFF, .g = 0xFF, .b = 0x01, },
+    [DLG_KEEP_LEFT] = {.txt = "KEEP LEFT!", .timeout = 600, .r = 0xFF, .g = 0xFF, .b = 0x01, },
+    [DLG_KEEP_RIGHT] = {.txt = "KEEP RIGHT!", .timeout = 600, .r = 0xFF, .g = 0xFF, .b = 0x01, },
+    [DLG_LEFT_NO_RIGHT] = {.txt = "LEFT!  NO, WAIT, RIGHT!", .r = 0xFF, .g = 0xFF, .b = 0x01, },
+    [DLG_RIGHT_NO_LEFT] = {.txt = "RIGHT!  NO, WAIT, LEFT!", .r = 0xFF, .g = 0xFF, .b = 0x01, },
+    [DLG_LEFT_AGAIN] = {.txt = "LEFT AGAIN!", .r = 0xFF, .g = 0xFF, .b = 0x01, },
+    [DLG_RIGHT_AGAIN] = {.txt = "RIGHT AGAIN!", .r = 0xFF, .g = 0xFF, .b = 0x01, },
+    [DLG_INTO_THE_CAVE] = {.txt = "INTO THAT CAVE!", .r = 0xFF, .g = 0xFF, .b = 0x01, },
+    [DLG_JUMP_LEFT] = {.txt = "JUMP TO THE LEFT!", .r = 0xFF, .g = 0xFF, .b = 0x01, },
+    [DLG_JUMP_RIGHT] = {.txt = "JUMP TO THE RIGHT!", .r = 0xFF, .g = 0xFF, .b = 0x01, },
+    [DLG_WRONG_WAY] = {.txt = "WRONG WAY!", .r = 0xFF, .g = 0x01, .b = 0x01, .timeout = 1800, },
+    [DLG_GOOD] = {.txt = "GOOD!", .r = 0x01, .g = 0xFF, .b = 0x01, },
+    [DLG_DONT_FALL] = {.txt = "DON'T FALL!"},
+    [DLG_WATCH_OUT] = {.txt = "WATCH OUT!", .r = 0xFF, .g = 0xFF, .b = 0x01, },
+    // Lava
+    [DLG_WELCOME_HOME] = { .txt = "WELCOME TO MY HOME!", },
+    [DLG_HOTTER] = {.txt = "TEMP xxxx DEGREES HOTTER THAN PREV RECORD"},
+    [DLG_SHIELD] = {.txt = "ACTIVATING HEAT SHIELD..."},
+    [DLG_UPHILL] = {.txt = "THE HEAT REDUCES FRICTION, YOU CAN SLIDE UPHILL"},
+    // Boss
+    [DLG_OFFSCREEN] = {.txt = "A LOT JUST HAPPENED OFFSCREEN (RAN OUT OF TIME)"},
+    [DLG_OFFSCREEN_2] = {.txt = "WE'RE IN SPACE NOW, DON'T WORRY ABOUT IT."},
+    [DLG_BLACK_HOLE] = {.txt = "FLY AROUND THE BLACK HOLE TO FINISH THE HACK"},
+    // Space
+    [DLG_GOODBYE_FRIEND] = { .txt = "GOODBYE FRIEND.", .speed = 0.75f },
+    [DLG_LIGHTS_2] = { .txt = "LOOK AT ALL THOSE PRETTY LIGHTS" },
+    [DLG_HOME_2] = { .txt = "I WILL HELP YOU GO HOME" },
+    [DLG_YOUR_HOME] = {.txt = "YOUR HOME."},
+    [DLG_RAINBOW_ROAD] = {.txt = "ACTIVATING RAINBOW ROAD..."},
+};
+
+
+const SuitDialogue defaultDLGinfo = {
+    .txt = "",
+    .speed = 1.0f,
+    .timeout = 120,
+    .r = 0xFF,
+    .g = 0xFF,
+    .b = 0xFF,
+};
+
+char currOnScreenDlgBuffer[48] = "";
+int prevOnScreenDlgID = 0;
+int currOnScreenDlgID = 0;
+
+_Bool currOnScreenDlgDonePrinting = FALSE;
+OSTime currOnScreenDlgStartTime = 0;
+u32 currOnScreenDlgPrevFrameNumCharsShown = 0;
+u32 timeSinceFinished = 0;
+
+// u32 initDLG_1[] = {
+//     DLG_BOOTING, DLG_HELLO_FRIEND, DLG_HELLO_2, DLG_LAST_BOOT, //DLG_HOME_1,
+// };
+// u32 initDLG_2[] = {
+//     DLG_WELCOME_HOME, DLG_HOTTER, DLG_SHIELD, DLG_UPHILL,
+// };
+// u32 initDLG_3[] = {
+//     DLG_OFFSCREEN, DLG_OFFSCREEN_2, DLG_BLACK_HOLE,
+// };
+
+
+u32 gInitialTextIndex = 0;
+// // _Bool gDoingInitialDialogues = gInitialTextIndex;
+
+// u32 get_initial_DLG(void) {
+//     return DLG_BLACK_HOLE;
+//     gInitialTextIndex++;
+//     size_t size = 0;
+//     int dlgID = DLG_NONE;
+//     u32* list = NULL;
+//     switch (gCurrLevelNum) {
+//         case LEVEL_BOB:
+//             size = ARRAY_COUNT(initDLG_1);
+//             list = initDLG_1;
+//             break;
+//         case LEVEL_WF:
+//             size = ARRAY_COUNT(initDLG_2);
+//             list = initDLG_2;
+//             break;
+//         case LEVEL_JRB:
+//             size = ARRAY_COUNT(initDLG_3);
+//             list = initDLG_2;
+//             break;
+//         default:
+//             gInitialTextIndex = 0xFFFF;
+//             return DLG_NONE;
+//     }
+
+//     if (gInitialTextIndex < size) {
+//         dlgID = list[gInitialTextIndex];
+//     }
+
+//     if (dlgID != currOnScreenDlgID) {
+//         return dlgID;
+//     }
+
+//     return DLG_NONE;
+// }
+
+
+void set_default_DLG_info(SuitDialogue* dlg) {
+    if (dlg->txt == NULL) {
+        dlg->txt = defaultDLGinfo.txt;
+    }
+    if (dlg->speed == 0.0f) {
+        dlg->speed = defaultDLGinfo.speed;
+    }
+    if (dlg->timeout == 0) {
+        dlg->timeout = defaultDLGinfo.timeout;
+    }
+    if (dlg->r == 0x00) dlg->r = defaultDLGinfo.r;
+    if (dlg->g == 0x00) dlg->g = defaultDLGinfo.g;
+    if (dlg->b == 0x00) dlg->b = defaultDLGinfo.b;
+}
+
+void clear_onscreen_dlg_buf(void) {
+    bzero(currOnScreenDlgBuffer, sizeof(currOnScreenDlgBuffer));
+}
+
+void onscreen_dlg_changed(void) {
+    clear_onscreen_dlg_buf();
+    currOnScreenDlgDonePrinting = FALSE;
+    currOnScreenDlgPrevFrameNumCharsShown = 0;
+    currOnScreenDlgStartTime = osGetTime();
+    set_default_DLG_info(&sOnScreenDialogues[currOnScreenDlgID]);
+}
+
+void set_onscreen_dlg(int id) {
+    prevOnScreenDlgID = currOnScreenDlgID;
+    currOnScreenDlgID = id;
+    if (id == currOnScreenDlgID) {
+        return;
+    }
+    onscreen_dlg_changed();
+}
+
+void print_onscreen_dlg(void) {
+    if (currOnScreenDlgID != prevOnScreenDlgID) {
+        onscreen_dlg_changed();
+    }
+    OSTime time = osGetTime();
+    clear_onscreen_dlg_buf();
+    u32 id = currOnScreenDlgID;
+    SuitDialogue* dlg = &sOnScreenDialogues[id];
+    OSTime timeSinceStart = (time - currOnScreenDlgStartTime);
+    
+    u32 numCharsToPrint = CYCLES_TO_FRAMES(timeSinceStart) * dlg->speed;
+    const char* src = dlg->txt;
+    size_t srcSize = strlen(src);
+
+    s32 sound = SOUND_OBJ_BOBOMB_BUDDY_TALK;
+    // s32 sound = SOUND_OBJ_BULLY_WALK_LARGE;
+    stop_sound(sound, gGlobalSoundSource);
+    if (
+        src[numCharsToPrint - 1] != ' ' &&
+        src[numCharsToPrint - 1] != '\n' &&
+        src[numCharsToPrint - 1] != '\0' &&
+        !currOnScreenDlgDonePrinting &&
+        (numCharsToPrint != currOnScreenDlgPrevFrameNumCharsShown)
+    ) {
+        play_sound(sound, gGlobalSoundSource);
+    }
+    // if (currOnScreenDlgDonePrinting) {
+    //     stop_sound(sound, gGlobalSoundSource);
+    // }
+    if (numCharsToPrint > srcSize) {
+        currOnScreenDlgDonePrinting = TRUE;
+        numCharsToPrint = srcSize;
+    }
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wimplicit-function-declaration"
+    strncpy(currOnScreenDlgBuffer, src, numCharsToPrint);
+#pragma GCC diagnostic pop
+    currOnScreenDlgPrevFrameNumCharsShown = numCharsToPrint;
+    if (currOnScreenDlgDonePrinting) {
+        timeSinceFinished++;
+    }
+    if (timeSinceFinished >= dlg->timeout) {
+        timeSinceFinished = 0;
+        // set_onscreen_dlg((gInitialTextIndex != 0xFFFF) ? get_initial_DLG() : DLG_NONE);
+        set_onscreen_dlg(DLG_NONE);
+    }
+}
+#include "segment2.h"
+
+void render_suit_overlay(void) {
+    // if (!gSuitAcquired) {
+    //     return;
+    // }
+
+    Gfx* dlHead = gDisplayListHead;
+
+    // Allow drawing outside the screen borders.
+    gDPSetScissor(dlHead++, G_SC_NON_INTERLACE, 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
+
+    gSPDisplayList(dlHead++, dl_texrect_rgba16_begin);
+    if (currOnScreenDlgPrevFrameNumCharsShown > 0) {
+        texrect_rgba16(&dlHead, texture_robot, 32, 32, 32, 32, 32, 32);
+    }
+    gSPDisplayList(dlHead++, dl_texrect_rgba16_end);
+    gSPDisplayList(dlHead++, dl_fasttext_begin);
+    print_onscreen_dlg();
+    SuitDialogue* dlg = &sOnScreenDialogues[currOnScreenDlgID];
+    const char* txt = dlg->txt;
+    for (size_t i = 0; i < strlen(txt); i++) {
+        // if (txt[i] == '*') {
+        //     if (currOnScreenDlgBuffer[i] != '\0') {
+        //         currOnScreenDlgBuffer[i] = 0x20 + (unsigned char)(random_float() * (0x7E - 0x20));//'0' + (unsigned char)(random_float() * 10.0f);
+        //     }
+        // }
+        
+        if (txt[i] == 'x') {
+            if (currOnScreenDlgBuffer[i] != '\0') {
+                currOnScreenDlgBuffer[i] = (random_u16() & 0x1) ? 'X' : '9';
+            }
+        }
+    }
+    // Color col = 255;
+    
+    drawSmallStringCol(&dlHead,
+        64+8, 32,//(20 + random_f32_around_zero(sOnScreenDialogues[currOnScreenDlgID].speed)),
+        currOnScreenDlgBuffer,
+        dlg->r, dlg->g, dlg->b
+    );
+    gSPDisplayList(dlHead++, dl_fasttext_end);
+
+    // Disallow drawing outside the screen borders.
+    gDPSetScissor(dlHead++, G_SC_NON_INTERLACE, gBorderWidth, gBorderHeight, (SCREEN_WIDTH - gBorderWidth), (SCREEN_HEIGHT - gBorderHeight));
+
+    gDisplayListHead = dlHead;
+}
+
 void render_game(void) {
     PROFILER_GET_SNAPSHOT_TYPE(PROFILER_DELTA_COLLISION);
     if (gCurrentArea != NULL && !gWarpTransition.pauseRendering) {
@@ -425,7 +677,7 @@ void render_game(void) {
 
         gSPViewport(gDisplayListHead++, VIRTUAL_TO_PHYSICAL(&gViewport));
 
-        gDPSetScissor(gDisplayListHead++, G_SC_NON_INTERLACE, 0, gBorderHeight, SCREEN_WIDTH,
+        gDPSetScissor(gDisplayListHead++, G_SC_NON_INTERLACE, gBorderWidth, gBorderHeight, SCREEN_WIDTH - gBorderWidth,
                       SCREEN_HEIGHT - gBorderHeight);
         render_hud();
 
@@ -436,7 +688,7 @@ void render_game(void) {
 #endif
         do_cutscene_handler();
         print_displaying_credits_entry();
-        gDPSetScissor(gDisplayListHead++, G_SC_NON_INTERLACE, 0, gBorderHeight, SCREEN_WIDTH,
+        gDPSetScissor(gDisplayListHead++, G_SC_NON_INTERLACE, gBorderWidth, gBorderHeight, SCREEN_WIDTH - gBorderWidth,
                       SCREEN_HEIGHT - gBorderHeight);
         gMenuOptSelectIndex = render_menus_and_dialogs();
 
@@ -446,10 +698,10 @@ void render_game(void) {
 
         if (gViewportClip != NULL) {
             make_viewport_clip_rect(gViewportClip);
-        } else
-            gDPSetScissor(gDisplayListHead++, G_SC_NON_INTERLACE, 0, gBorderHeight, SCREEN_WIDTH,
+        } else {
+            gDPSetScissor(gDisplayListHead++, G_SC_NON_INTERLACE, gBorderWidth, gBorderHeight, SCREEN_WIDTH - gBorderWidth,
                           SCREEN_HEIGHT - gBorderHeight);
-
+        }
         if (gWarpTransition.isActive) {
             if (gWarpTransDelay == 0) {
                 gWarpTransition.isActive = !render_screen_transition(gWarpTransition.type, gWarpTransition.time,
@@ -487,6 +739,8 @@ void render_game(void) {
 
     gViewportOverride = NULL;
     gViewportClip     = NULL;
+
+    render_suit_overlay();
 
     profiler_update(PROFILER_TIME_GFX, profiler_get_delta(PROFILER_DELTA_COLLISION) - first);
     profiler_print_times();

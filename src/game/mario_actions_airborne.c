@@ -51,10 +51,11 @@ s32 lava_boost_on_wall(struct MarioState *m) {
     }
 
     if (!(m->flags & MARIO_METAL_CAP)) {
-        m->hurtCounter += (m->flags & MARIO_CAP_ON_HEAD) ? 12 : 18;
+        // m->hurtCounter += (m->flags & MARIO_CAP_ON_HEAD) ? 12 : 18;
+        m->health = 0xFF;
     }
 
-    play_sound(SOUND_MARIO_ON_FIRE, m->marioObj->header.gfx.cameraToObject);
+    // play_sound(SOUND_MARIO_ON_FIRE, m->marioObj->header.gfx.cameraToObject);
     update_mario_sound_and_camera(m);
     return drop_and_set_mario_action(m, ACT_LAVA_BOOST, 1);
 }
@@ -1405,6 +1406,7 @@ s32 act_butt_slide_air(struct MarioState *m) {
             break;
 
         case AIR_STEP_HIT_WALL:
+        case AIR_STEP_HIT_LAVA_WALL:
             if (m->vel[1] > 0.0f) {
                 m->vel[1] = 0.0f;
             }
@@ -1412,9 +1414,9 @@ s32 act_butt_slide_air(struct MarioState *m) {
             set_mario_action(m, ACT_BACKWARD_AIR_KB, 0);
             break;
 
-        case AIR_STEP_HIT_LAVA_WALL:
-            lava_boost_on_wall(m);
-            break;
+        // case AIR_STEP_HIT_LAVA_WALL:
+        //     lava_boost_on_wall(m);
+        //     break;
     }
 
     set_mario_animation(m, MARIO_ANIM_SLIDE);
@@ -1444,6 +1446,7 @@ s32 act_hold_butt_slide_air(struct MarioState *m) {
             break;
 
         case AIR_STEP_HIT_WALL:
+        case AIR_STEP_HIT_LAVA_WALL:
             if (m->vel[1] > 0.0f) {
                 m->vel[1] = 0.0f;
             }
@@ -1453,9 +1456,9 @@ s32 act_hold_butt_slide_air(struct MarioState *m) {
             set_mario_action(m, ACT_BACKWARD_AIR_KB, 0);
             break;
 
-        case AIR_STEP_HIT_LAVA_WALL:
-            lava_boost_on_wall(m);
-            break;
+        // case AIR_STEP_HIT_LAVA_WALL:
+        //     lava_boost_on_wall(m);
+        //     break;
     }
 
     set_mario_animation(m, MARIO_ANIM_SLIDING_ON_BOTTOM_WITH_LIGHT_OBJ);
@@ -1481,12 +1484,13 @@ s32 act_lava_boost(struct MarioState *m) {
     switch (perform_air_step(m, 0)) {
         case AIR_STEP_LANDED:
             if (m->floor->type == SURFACE_BURNING) {
-                m->actionState = ACT_STATE_LAVA_BOOST_HIT_LAVA;
+                // m->actionState = ACT_STATE_LAVA_BOOST_HIT_LAVA;
                 if (!(m->flags & MARIO_METAL_CAP)) {
-                    m->hurtCounter += (m->flags & MARIO_CAP_ON_HEAD) ? 12 : 18;
+                    // m->hurtCounter += (m->flags & MARIO_CAP_ON_HEAD) ? 12 : 18;
+                    m->health = 0xFF;
                 }
                 m->vel[1] = 84.0f;
-                play_sound(SOUND_MARIO_ON_FIRE, m->marioObj->header.gfx.cameraToObject);
+                // play_sound(SOUND_MARIO_ON_FIRE, m->marioObj->header.gfx.cameraToObject);
 #if ENABLE_RUMBLE
                 queue_rumble_data(5, 80);
 #endif
@@ -1512,7 +1516,7 @@ s32 act_lava_boost(struct MarioState *m) {
     }
 
     set_mario_animation(m, MARIO_ANIM_FIRE_LAVA_BURN);
-    if ((m->area->terrainType & TERRAIN_MASK) != TERRAIN_SNOW && !(m->flags & MARIO_METAL_CAP)
+    if ((m->area->terrainType & TERRAIN_MASK) != TERRAIN_SNOW && !(m->flags & MARIO_METAL_CAP) && gCurrLevelNum != LEVEL_BOB
         && m->vel[1] > 0.0f) {
         m->particleFlags |= PARTICLE_FIRE;
         if (m->actionState == ACT_STATE_LAVA_BOOST_HIT_LAVA) {

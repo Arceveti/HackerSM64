@@ -279,7 +279,86 @@ void mtxf_lookat(Mat4 mtx, Vec3f from, Vec3f to, s16 roll) {
  * 'scale' is the scale of the object.
  * 'angle' rotates the object while still facing the camera.
  */
-void mtxf_billboard(Mat4 dest, Mat4 mtx, Vec3f position, Vec3f scale, s16 angle) {
+void mtxf_billboard(Mat4 dest, Mat4 mtx, Mat4 src, Vec3f position, Vec3f scale, s16 angle) {
+    PUPPYPRINT_ADD_COUNTER(gPuppyCallCounter.matrix);
+    // s16 xrot;
+    // s16 yrot;
+    // f32 cx, cy, cz;
+    // dest[3][0] = (mtx[0][0] * position[0]) + (mtx[1][0] * position[1]) + (mtx[2][0] * position[2]) + mtx[3][0];
+    // dest[3][1] = (mtx[0][1] * position[0]) + (mtx[1][1] * position[1]) + (mtx[2][1] * position[2]) + mtx[3][1];
+    // dest[3][2] = (mtx[0][2] * position[0]) + (mtx[1][2] * position[1]) + (mtx[2][2] * position[2]) + mtx[3][2];
+    // dest[3][3] = 1;
+    // xrot = -atan2s(dest[3][2], dest[3][0]);
+    // yrot = atan2s(dest[3][2], dest[3][1]);
+    // cx = coss(xrot);
+    // cy = coss(yrot);
+    // cz = coss(angle);
+    // dest[2][0] = sins(xrot);
+    // dest[0][2] = -dest[2][0];
+    // dest[1][2] = sins(yrot);
+    // dest[2][1] = -dest[1][2];
+    // dest[0][1] = sins(angle);
+    // dest[1][0] = -dest[0][1];
+    // dest[0][0] = -cx *  cz;
+    // dest[1][1] = -cy *  cz;
+    // dest[2][2] = -cx * -cy;
+    // dest[0][3] = 0;
+    // dest[1][3] = 0;
+    // dest[2][3] = 0;
+    s32 i;
+    f32 sx = scale[0];
+    f32 sy = scale[1];
+    f32 sz = scale[2];
+    // Mat4* cameraMat = &src;
+    // // Rotate to face opposite camera:
+    // Vec3s angleToCamera = {0x0, 0x0, 0x0};
+    // f32 dist = 0.0f;
+    // vec3_get_dist_and_angle(position, (*cameraMat)[3], &dist, &angleToCamera[0], &angleToCamera[1]);
+    // mtxf_rotate_zxy_and_translate(dest, position, angleToCamera);
+    for (i = 0; i < 3; i++) {
+        for (int j = 0; j < 3; j++) {
+            dest[i][j] = src[j][i];
+        }
+        dest[i][3] = 0.0f;
+    }
+    // Camera Roll
+    if (angle != 0x0) {
+        float m00 = dest[0][0];
+        float m01 = dest[0][1];
+        float m02 = dest[0][2];
+        float m10 = dest[1][0];
+        float m11 = dest[1][1];
+        float m12 = dest[1][2];
+        float cosa = coss(angle);
+        float sina = sins(angle);
+        dest[0][0] = ( cosa * m00) + (sina * m10); 
+        dest[0][1] = ( cosa * m01) + (sina * m11); 
+        dest[0][2] = ( cosa * m02) + (sina * m12);
+        dest[1][0] = (-sina * m00) + (cosa * m10);
+        dest[1][1] = (-sina * m01) + (cosa * m11);
+        dest[1][2] = (-sina * m02) + (cosa * m12);
+    }
+    // Scale
+    for (i = 0; i < 3; i++) {
+        dest[0][i] *= sx;
+        dest[1][i] *= sy;
+        dest[2][i] *= sz;
+    }
+
+    // Translation = input translation + position
+    vec3f_copy(dest[3], position);
+    vec3f_add(dest[3], mtx[3]);
+    dest[3][3] = 1.0f;
+}
+
+/**
+ * Set 'dest' to a transformation matrix that turns an object to face the camera.
+ * 'mtx' is the look-at matrix from the camera.
+ * 'position' is the position of the object in the world.
+ * 'scale' is the scale of the object.
+ * 'angle' rotates the object while still facing the camera.
+ */
+void mtxf_bgmodel(Mat4 dest, Mat4 mtx, UNUSED Vec3f position, Vec3f scale, UNUSED s16 angle) {
     PUPPYPRINT_ADD_COUNTER(gPuppyCallCounter.matrix);
     s32 i;
     f32 sx = scale[0];
@@ -292,22 +371,22 @@ void mtxf_billboard(Mat4 dest, Mat4 mtx, Vec3f position, Vec3f scale, s16 angle)
         }
         dest[i][3] = 0.0f;
     }
-    if (angle != 0x0) {
-        float m00 = dest[0][0];
-        float m01 = dest[0][1];
-        float m02 = dest[0][2];
-        float m10 = dest[1][0];
-        float m11 = dest[1][1];
-        float m12 = dest[1][2];
-        float cosa = coss(angle);
-        float sina = sins(angle);
-        dest[0][0] = cosa * m00 + sina * m10; 
-        dest[0][1] = cosa * m01 + sina * m11; 
-        dest[0][2] = cosa * m02 + sina * m12;
-        dest[1][0] = -sina * m00 + cosa * m10;
-        dest[1][1] = -sina * m01 + cosa * m11;
-        dest[1][2] = -sina * m02 + cosa * m12;
-    }
+    // if (angle != 0x0) {
+    //     float m00 = dest[0][0];
+    //     float m01 = dest[0][1];
+    //     float m02 = dest[0][2];
+    //     float m10 = dest[1][0];
+    //     float m11 = dest[1][1];
+    //     float m12 = dest[1][2];
+    //     float cosa = coss(angle);
+    //     float sina = sins(angle);
+    //     dest[0][0] = cosa * m00 + sina * m10; 
+    //     dest[0][1] = cosa * m01 + sina * m11; 
+    //     dest[0][2] = cosa * m02 + sina * m12;
+    //     dest[1][0] = -sina * m00 + cosa * m10;
+    //     dest[1][1] = -sina * m01 + cosa * m11;
+    //     dest[1][2] = -sina * m02 + cosa * m12;
+    // }
     for (i = 0; i < 3; i++) {
         dest[0][i] *= sx;
         dest[1][i] *= sy;
@@ -315,7 +394,8 @@ void mtxf_billboard(Mat4 dest, Mat4 mtx, Vec3f position, Vec3f scale, s16 angle)
     }
 
     // Translation = input translation + position
-    vec3f_copy(dest[3], position);
+    // vec3f_copy(dest[3], position);
+    vec3f_copy(dest[3], (*cameraMat)[3]);
     vec3f_add(dest[3], mtx[3]);
     dest[3][3] = 1.0f;
 }

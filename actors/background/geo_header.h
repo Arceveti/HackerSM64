@@ -1,0 +1,15 @@
+extern const GeoLayout background_lava_geo[];
+extern u8 background_FIRE_bs_sceneTex_003C00_rgba16_ci8[];
+extern u8 background_FIRE_bs_sceneTex_003C00_rgba16_pal_rgba16[];
+extern u8 background_FIRE_bs_room_1Tex_0053D8_rgba16_ci8[];
+extern u8 background_FIRE_bs_room_1Tex_0053D8_rgba16_pal_rgba16[];
+extern Vtx background_Background__Lava_mesh_layer_0_vtx_cull[8];
+extern Vtx background_Background__Lava_mesh_layer_0_vtx_0[102];
+extern Gfx background_Background__Lava_mesh_layer_0_tri_0[];
+extern Vtx background_Background__Lava_mesh_layer_0_vtx_1[102];
+extern Gfx background_Background__Lava_mesh_layer_0_tri_1[];
+extern Gfx mat_background_f3dlite_material_005[];
+extern Gfx mat_revert_background_f3dlite_material_005[];
+extern Gfx mat_background_f3dlite_material_006[];
+extern Gfx mat_revert_background_f3dlite_material_006[];
+extern Gfx background_Background__Lava_mesh_layer_0[];

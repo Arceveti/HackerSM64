@@ -1,3 +1,4 @@
+#include "texscroll.h"
 #include <ultra64.h>
 
 #include "sm64.h"
@@ -31,7 +32,7 @@
 #include "puppycam2.h"
 #include "puppyprint.h"
 #include "level_commands.h"
-
+#include "suit_dialogue.h"
 #include "config.h"
 
 // TODO: Make these ifdefs better
@@ -280,6 +281,22 @@ void set_mario_initial_cap_powerup(struct MarioState *m) {
 }
 
 void set_mario_initial_action(struct MarioState *m, u32 spawnType, u32 actionArg) {
+    
+
+    switch (gCurrLevelNum) {
+        case LEVEL_BOB:
+            set_onscreen_dlg(DLG_BOOTING);
+            break;
+        case LEVEL_WF:
+            set_onscreen_dlg(DLG_UPHILL);
+            break;
+        case LEVEL_JRB:
+            set_onscreen_dlg(DLG_BLACK_HOLE);
+            break;
+        default:
+            set_onscreen_dlg(DLG_NONE);
+            break;
+    }
     switch (spawnType) {
         case MARIO_SPAWN_DOOR_WARP:
             set_mario_action(m, ACT_WARP_DOOR_SPAWN, actionArg);
@@ -347,7 +364,25 @@ void set_mario_initial_action(struct MarioState *m, u32 spawnType, u32 actionArg
     set_mario_initial_cap_powerup(m);
 }
 
+#include "suit_dialogue.h"
+
+extern u32 gInitialTextIndex;
+extern _Bool nonStopSliding;
+extern _Bool currOnScreenDlgDonePrinting;
+
+// u32 initDLG_1[] = {
+//     DLG_BOOTING, DLG_HELLO_FRIEND, DLG_HELLO_2, DLG_LAST_BOOT, //DLG_HOME_1,
+// };
+// u32 initDLG_2[] = {
+//     DLG_WELCOME_HOME, DLG_HOTTER, DLG_SHIELD, DLG_UPHILL,
+// };
+// u32 initDLG_3[] = {
+//     DLG_OFFSCREEN, DLG_OFFSCREEN_2, DLG_BLACK_HOLE,
+// };
 void init_mario_after_warp(void) {
+    set_onscreen_dlg(DLG_NONE);
+    gMarioState->health = 0x880;
+    gInitialTextIndex = 0;
     struct ObjectWarpNode *spawnNode = area_get_warp_node(sWarpDest.nodeId);
     u32 marioSpawnType = get_mario_spawn_type(spawnNode->object);
 
@@ -1048,6 +1083,8 @@ s32 play_mode_normal(void) {
     return FALSE;
 }
 
+// initiate_warp(LEVEL_ENDING, 1, WARP_NODE_DEFAULT, )
+
 s32 play_mode_paused(void) {
     if (gMenuOptSelectIndex == MENU_OPT_NONE) {
         set_menu_mode(MENU_MODE_RENDER_PAUSE_SCREEN);
@@ -1173,7 +1210,7 @@ s32 update_level(void) {
 
     switch (sCurrPlayMode) {
         case PLAY_MODE_NORMAL:
-            changeLevel = play_mode_normal();
+            changeLevel = play_mode_normal(); scroll_textures();
             break;
         case PLAY_MODE_PAUSED:
             changeLevel = play_mode_paused();
@@ -1351,7 +1388,11 @@ s32 lvl_set_current_level(UNUSED s16 initOrUpdate, s32 levelNum) {
     sWarpCheckpointActive = FALSE;
     gCurrLevelNum = levelNum;
     gCurrCourseNum = gLevelToCourseNumTable[levelNum - 1];
-
+	if (gCurrLevelNum == LEVEL_JRB) return 0;
+	if (gCurrLevelNum == LEVEL_WF) return 0;
+	if (gCurrLevelNum == LEVEL_BOB) return 0;
+	if (gCurrLevelNum == LEVEL_CASTLE_GROUNDS) return 0;
+	
     if (gCurrDemoInput != NULL || gCurrCreditsEntry != NULL || gCurrCourseNum == COURSE_NONE) {
         return FALSE;
     }

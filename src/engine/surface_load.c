@@ -235,7 +235,7 @@ static void add_surface(struct Surface *surface, s32 dynamic) {
         }
     }
 }
-
+extern _Bool is_valid_ram_addr(uintptr_t addr);
 /**
  * Initializes a Surface struct using the given vertex data
  * @param vertexData The raw data containing vertex positions
@@ -355,7 +355,7 @@ static void load_static_surfaces(TerrainData **data, TerrainData *vertexData, s3
         }
 
         surface = read_surface_data(vertexData, data, FALSE);
-        if (surface != NULL) {
+        if (surface != NULL || surface->type == SURFACE_NULL) {
             surface->room = room;
             surface->type = surfaceType;
             surface->flags = flags;
@@ -577,6 +577,7 @@ void clear_dynamic_surfaces(void) {
  */
 void transform_object_vertices(TerrainData **data, TerrainData *vertexData) {
     Mat4 *objectTransform = &o->transform;
+    DEBUG_ASSERT((objectTransform != NULL), "Object has no collision data.");
 
     register s32 numVertices = *(*data)++;
 
@@ -627,7 +628,7 @@ void load_object_surfaces(TerrainData **data, TerrainData *vertexData, u32 dynam
     for (i = 0; i < numSurfaces; i++) {
         struct Surface *surface = read_surface_data(vertexData, data, dynamic);
 
-        if (surface != NULL) {
+        if (surface != NULL || surface->type == SURFACE_NULL) {
             surface->object = o;
             surface->type = surfaceType;
 

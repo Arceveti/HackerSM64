@@ -22,7 +22,7 @@
 /**
  * Allows for retries on collecting the remaining blue coins from a blue coin switch.
  */
-// #define BLUE_COIN_SWITCH_RETRY
+#define BLUE_COIN_SWITCH_RETRY
 
 /**
  * Allow previewing blue coin locations from a blue coin switch when Mario is standing on the blue coin switch.
@@ -36,7 +36,7 @@
 /**
  * Tiny Goombas (from THI) always drop their coin.
  */
-// #define TINY_GOOMBA_ALWAYS_DROPS_COIN
+#define TINY_GOOMBA_ALWAYS_DROPS_COIN
 
 /**
  * Floombas! These fellas sport custom behaviors (bhvFloomba, bhvFloombaTripletSpawner) and of course the iconic Floomba texture.
@@ -56,7 +56,7 @@
 /**
  * Causes leaf particles to occasionally fall from trees which contain Hoot.
  */
-// #define HOOT_TREE_PARTICLES
+#define HOOT_TREE_PARTICLES
 
 /**************
  * -- MR I --
@@ -65,7 +65,7 @@
 /**
  * Enables Mr I to shoot his particle in any direction.
  */
-// #define MR_I_PITCH_SHOOTING
+#define MR_I_PITCH_SHOOTING
 
 /********************
  * -- WATER RING --

@@ -2,7 +2,15 @@
 #define BEHAVIOR_DATA_H
 
 #include "types.h"
+#include "suit_dialogue.h"
 
+extern const BehaviorScript bhvShield[];
+extern const BehaviorScript bhvRobot[];
+extern const BehaviorScript bhvScan[];
+extern const BehaviorScript bhvDLG[];
+extern const BehaviorScript bhvBackground[];
+extern const BehaviorScript bhvRainbowPath[];
+extern const BehaviorScript bhvBlackHole[];
 extern const BehaviorScript bhvStarDoor[];
 extern const BehaviorScript bhvMrI[];
 extern const BehaviorScript bhvMrIIris[];

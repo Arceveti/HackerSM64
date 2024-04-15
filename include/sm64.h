@@ -697,6 +697,8 @@ enum MarioActionFlags {
 #define ACT_UNUSED_1BE                 0x000001BE // (0x1BE)
 #define ACT_UNUSED_1BF                 0x000001BF // (0x1BF)
 
+extern _Bool gRainbowSlide;
+
 // group 0x1C0: custom actions
 // 0x1C0 - 0x1FF
 

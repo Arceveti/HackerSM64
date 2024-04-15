@@ -368,18 +368,21 @@ void thread3_main(UNUSED void *arg) {
     osSyncPrintf("Linker  : %s\n", __linker__);
 #endif
 
-    if (!(gEmulator & EMU_CONSOLE)) {
-        gBorderHeight = BORDER_HEIGHT_EMULATOR;
-#ifdef RCVI_HACK
-        VI.comRegs.vSync = 525*20;   
-        change_vi(&VI, SCREEN_WIDTH, SCREEN_HEIGHT);
-        osViSetMode(&VI);
-        osViSetSpecialFeatures(OS_VI_DITHER_FILTER_ON);
-        osViSetSpecialFeatures(OS_VI_GAMMA_OFF);
-#endif
-    } else {
-        gBorderHeight = BORDER_HEIGHT_CONSOLE;
-    }
+
+//     if (!(gEmulator & EMU_CONSOLE)) {
+//         gBorderHeight = BORDER_HEIGHT_EMULATOR;
+// #ifdef RCVI_HACK
+//         VI.comRegs.vSync = 525*20;   
+//         change_vi(&VI, SCREEN_WIDTH, SCREEN_HEIGHT);
+//         osViSetMode(&VI);
+//         osViSetSpecialFeatures(OS_VI_DITHER_FILTER_ON);
+//         osViSetSpecialFeatures(OS_VI_GAMMA_OFF);
+// #endif
+//     } else {
+//         gBorderHeight = BORDER_HEIGHT_CONSOLE;
+//     }
+    gBorderWidth = 10;
+    gBorderHeight = 10;
 #ifdef DEBUG
     gIdleThreadStack[0] = 0;
     gIdleThreadStack[THREAD1_STACK - 1] = 0;

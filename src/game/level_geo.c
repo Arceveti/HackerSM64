@@ -75,3 +75,25 @@ Gfx *geo_skybox_main(s32 callContext, struct GraphNode *node, UNUSED Mat4 *mtx) 
 
     return gfx;
 }
+
+/**
+ * Geo function that generates a displaylist for the skybox. Can be assigned
+ * as the function of a GraphNodeBackground.
+ */
+Gfx *geo_background_main(s32 callContext, struct GraphNode *node, UNUSED Mat4 *mtx) {
+    Gfx *gfx = NULL;
+    struct GraphNodeBackground *backgroundNode = (struct GraphNodeBackground *) node;
+
+    if (callContext == GEO_CONTEXT_AREA_LOAD) {
+        backgroundNode->unused = 0;
+#ifndef L3DEX2_ALONE
+    } else if (callContext == GEO_CONTEXT_RENDER) {
+        struct GraphNodeCamera *camNode = (struct GraphNodeCamera *) gCurGraphNodeRoot->views[0];
+        struct GraphNodePerspective *camFrustum =
+            (struct GraphNodePerspective *) camNode->fnNode.node.parent;
+        gfx = create_skybox_facing_camera(0, backgroundNode->background, camFrustum->fov, gLakituState.pos, gLakituState.focus);
+#endif
+    }
+
+    return gfx;
+}

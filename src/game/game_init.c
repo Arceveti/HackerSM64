@@ -46,6 +46,7 @@ struct Controller gControllers[MAXCONTROLLERS];
 OSContStatus gControllerStatuses[MAXCONTROLLERS];
 OSContPadEx gControllerPads[MAXCONTROLLERS];
 u8 gControllerBits = 0b0000;
+u8 gBorderWidth;
 u8 gBorderHeight;
 #ifdef VANILLA_STYLE_CUSTOM_DEBUG
 u8 gCustomDebugMode;
@@ -169,7 +170,7 @@ void init_z_buffer(s32 resetZB) {
     gDPSetFillColor(tempGfxHead++,
                     GPACK_ZDZ(G_MAXFBZ, 0) << 16 | GPACK_ZDZ(G_MAXFBZ, 0));
 
-    gDPFillRectangle(tempGfxHead++, 0, gBorderHeight, SCREEN_WIDTH - 1,
+    gDPFillRectangle(tempGfxHead++, gBorderWidth, gBorderHeight, SCREEN_WIDTH - 1 - gBorderWidth,
                      SCREEN_HEIGHT - 1 - gBorderHeight);
 
     gDisplayListHead = tempGfxHead;
@@ -186,7 +187,7 @@ void select_framebuffer(void) {
     gDPSetCycleType(tempGfxHead++, G_CYC_1CYCLE);
     gDPSetColorImage(tempGfxHead++, G_IM_FMT_RGBA, G_IM_SIZ_16b, SCREEN_WIDTH,
                      gPhysicalFramebuffers[sRenderingFramebuffer]);
-    gDPSetScissor(tempGfxHead++, G_SC_NON_INTERLACE, 0, gBorderHeight, SCREEN_WIDTH,
+    gDPSetScissor(tempGfxHead++, G_SC_NON_INTERLACE, gBorderWidth, gBorderHeight, SCREEN_WIDTH - gBorderWidth,
                   SCREEN_HEIGHT - gBorderHeight);
 
     gDisplayListHead = tempGfxHead;
@@ -206,8 +207,8 @@ void clear_framebuffer(s32 color) {
 
     gDPSetFillColor(tempGfxHead++, color);
     gDPFillRectangle(tempGfxHead++,
-                     GFX_DIMENSIONS_RECT_FROM_LEFT_EDGE(0), gBorderHeight,
-                     GFX_DIMENSIONS_RECT_FROM_RIGHT_EDGE(0) - 1, SCREEN_HEIGHT - gBorderHeight - 1);
+                     gBorderWidth, gBorderHeight,
+                     GFX_DIMENSIONS_RECT_FROM_RIGHT_EDGE(gBorderWidth) - 1, SCREEN_HEIGHT - gBorderHeight - 1);
 
     gDPPipeSync(tempGfxHead++);
 
@@ -266,6 +267,14 @@ void draw_screen_borders(void) {
                         GFX_DIMENSIONS_RECT_FROM_RIGHT_EDGE(0) - 1, gBorderHeight - 1);
         gDPFillRectangle(tempGfxHead++,
                         GFX_DIMENSIONS_RECT_FROM_LEFT_EDGE(0), SCREEN_HEIGHT - gBorderHeight,
+                        GFX_DIMENSIONS_RECT_FROM_RIGHT_EDGE(0) - 1, SCREEN_HEIGHT - 1);
+    }
+
+    if (gBorderWidth) {
+        gDPFillRectangle(tempGfxHead++, GFX_DIMENSIONS_RECT_FROM_LEFT_EDGE(0), 0,
+                        gBorderWidth - 1, gBorderHeight - 1);
+        gDPFillRectangle(tempGfxHead++,
+                        GFX_DIMENSIONS_RECT_FROM_RIGHT_EDGE(gBorderWidth) - 1, SCREEN_HEIGHT - gBorderHeight,
                         GFX_DIMENSIONS_RECT_FROM_RIGHT_EDGE(0) - 1, SCREEN_HEIGHT - 1);
     }
 

@@ -14,6 +14,7 @@
 #include "memory.h"
 #include "behavior_data.h"
 #include "rumble_init.h"
+#include "object_list_processor.h"
 
 #include "config.h"
 
@@ -143,13 +144,20 @@ s32 set_triple_jump_action(struct MarioState *m, UNUSED u32 action, UNUSED u32 a
     return FALSE;
 }
 
+_Bool canSlideUphill = FALSE; // Powerup
+_Bool canPauseSliding = FALSE; // Powerup?
+    _Bool slidingIsPaused = FALSE;
+_Bool nonStopSliding = TRUE; // Activate in boss room and in space
+_Bool gRainbowSlide = FALSE;
+
+
 void update_sliding_angle(struct MarioState *m, f32 accel, f32 lossFactor) {
     s32 newFacingDYaw;
     s16 facingDYaw;
 
     struct Surface *floor = m->floor;
-    s16 slopeAngle = atan2s(floor->normal.z, floor->normal.x);
-    f32 steepness = sqrtf(floor->normal.x * floor->normal.x + floor->normal.z * floor->normal.z);
+    s16 slopeAngle = canSlideUphill ? m->faceAngle[1] : atan2s(floor->normal.z, floor->normal.x);
+    f32 steepness = sqrtf(sqr(floor->normal.x) + sqr(floor->normal.z));
 
     m->slideVelX += accel * steepness * sins(slopeAngle);
     m->slideVelZ += accel * steepness * coss(slopeAngle);
@@ -162,20 +170,24 @@ void update_sliding_angle(struct MarioState *m, f32 accel, f32 lossFactor) {
     facingDYaw = m->faceAngle[1] - m->slideYaw;
     newFacingDYaw = facingDYaw;
 
-    if (newFacingDYaw > 0 && newFacingDYaw <= 0x4000) {
-        if ((newFacingDYaw -= 0x200) < 0) {
+    if (newFacingDYaw > 0x0000 && newFacingDYaw <= 0x4000) {
+        newFacingDYaw -= 0x200;
+        if (newFacingDYaw < 0) {
             newFacingDYaw = 0;
         }
-    } else if (newFacingDYaw >= -0x4000 && newFacingDYaw < 0) {
-        if ((newFacingDYaw += 0x200) > 0) {
+    } else if (newFacingDYaw >= -0x4000 && newFacingDYaw < 0x0000) {
+        newFacingDYaw += 0x200;
+        if (newFacingDYaw > 0) {
             newFacingDYaw = 0;
         }
     } else if (newFacingDYaw > 0x4000 && newFacingDYaw < 0x8000) {
-        if ((newFacingDYaw += 0x200) > 0x8000) {
+        newFacingDYaw += 0x200;
+        if (newFacingDYaw > 0x8000) {
             newFacingDYaw = 0x8000;
         }
     } else if (newFacingDYaw > -0x8000 && newFacingDYaw < -0x4000) {
-        if ((newFacingDYaw -= 0x200) < -0x8000) {
+        newFacingDYaw -= 0x200;
+        if (newFacingDYaw < -0x8000) {
             newFacingDYaw = -0x8000;
         }
     }
@@ -200,55 +212,64 @@ void update_sliding_angle(struct MarioState *m, f32 accel, f32 lossFactor) {
         m->forwardVel *= -1.0f;
     }
 }
-
+extern f32 gBlackHoleDistortion;
 s32 update_sliding(struct MarioState *m, f32 stopSpeed) {
-    f32 lossFactor;
-    f32 accel;
-    f32 oldSpeed;
-    f32 newSpeed;
-
     s32 stopped = FALSE;
 
-    s16 intendedDYaw = m->intendedYaw - m->slideYaw;
+    // s16 intendedDYaw = (m->intendedYaw - m->slideYaw);
+    s16 intendedDYaw = gRainbowSlide ? (approach_angle(m->faceAngle[1], m->intendedYaw, (gBlackHoleDistortion == 1.0f ? 0x400 : 0x800)) - m->slideYaw) : (m->intendedYaw - m->slideYaw);
     f32 forward = coss(intendedDYaw);
     f32 sideward = sins(intendedDYaw);
 
     //! 10k glitch
     if (forward < 0.0f && m->forwardVel >= 0.0f) {
-        forward *= 0.5f + 0.5f * m->forwardVel / 100.0f;
+        forward *= 0.5f + (0.5f * m->forwardVel / 100.0f);
     }
+
+    if (m->forwardVel < 10.0f) {
+        m->forwardVel = 10.0f;
+    }
+
+    f32 mag = (m->intendedMag / 32.0f);
+
+    f32 accel;
+    f32 lossFactor = (mag * forward * 0.02f);
 
     switch (mario_get_floor_class(m)) {
         case SURFACE_CLASS_VERY_SLIPPERY:
             accel = 10.0f;
-            lossFactor = m->intendedMag / 32.0f * forward * 0.02f + 0.98f;
+            lossFactor += 0.98f;
             break;
 
         case SURFACE_CLASS_SLIPPERY:
             accel = 8.0f;
-            lossFactor = m->intendedMag / 32.0f * forward * 0.02f + 0.96f;
+            lossFactor += 0.96f;
             break;
 
         default:
             accel = 7.0f;
-            lossFactor = m->intendedMag / 32.0f * forward * 0.02f + 0.92f;
+            lossFactor += 0.92f;
             break;
 
         case SURFACE_CLASS_NOT_SLIPPERY:
             accel = 5.0f;
-            lossFactor = m->intendedMag / 32.0f * forward * 0.02f + 0.92f;
+            lossFactor += 0.92f;
             break;
     }
 
-    oldSpeed = sqrtf(m->slideVelX * m->slideVelX + m->slideVelZ * m->slideVelZ);
+    if (nonStopSliding) lossFactor = 1.0f;
 
-    //! This is attempting to use trig derivatives to rotate Mario's speed.
-    // It is slightly off/asymmetric since it uses the new X speed, but the old
-    // Z speed.
-    m->slideVelX += m->slideVelZ * (m->intendedMag / 32.0f) * sideward * 0.05f;
-    m->slideVelZ -= m->slideVelX * (m->intendedMag / 32.0f) * sideward * 0.05f;
+    f32 oldSpeed = sqrtf(sqr(m->slideVelX) + sqr(m->slideVelZ));
 
-    newSpeed = sqrtf(m->slideVelX * m->slideVelX + m->slideVelZ * m->slideVelZ);
+    // This uses trig derivatives to rotate Mario's speed.
+    f32 modifier = (mag * sideward * 0.05f);
+    f32 slideVelXModifier = (m->slideVelZ * modifier);
+    f32 slideVelZModifier = (m->slideVelX * modifier);
+
+    m->slideVelX += slideVelXModifier;
+    m->slideVelZ -= slideVelZModifier;
+
+    f32 newSpeed = sqrtf(sqr(m->slideVelX) + sqr(m->slideVelZ));
 
     if (oldSpeed > 0.0f && newSpeed > 0.0f) {
         m->slideVelX = m->slideVelX * oldSpeed / newSpeed;
@@ -257,7 +278,7 @@ s32 update_sliding(struct MarioState *m, f32 stopSpeed) {
 
     update_sliding_angle(m, accel, lossFactor);
 
-    if (!mario_floor_is_slope(m) && m->forwardVel * m->forwardVel < stopSpeed * stopSpeed) {
+    if (!mario_floor_is_slope(m) && sqr(m->forwardVel) < sqr(stopSpeed)) {
         mario_set_forward_vel(m, 0.0f);
         stopped = TRUE;
     }
@@ -274,7 +295,7 @@ void apply_slope_accel(struct MarioState *m) {
     s16 floorDYaw = abs_angle_diff(m->floorYaw, m->faceAngle[1]);
 
     if (mario_floor_is_slope(m)) {
-        s16 slopeClass = 0;
+        s16 slopeClass = SURFACE_CLASS_DEFAULT;
 
         if (m->action != ACT_SOFT_BACKWARD_GROUND_KB && m->action != ACT_SOFT_FORWARD_GROUND_KB) {
             slopeClass = mario_get_floor_class(m);
@@ -1347,8 +1368,25 @@ s32 act_burning_ground(struct MarioState *m) {
 void tilt_body_butt_slide(struct MarioState *m) {
     s16 intendedDYaw = m->intendedYaw - m->faceAngle[1];
     f32 mag = DEGREES(30) * m->intendedMag / 32.0f;
-    m->marioBodyState->torsoAngle[0] = (s32)(mag * coss(intendedDYaw));
-    m->marioBodyState->torsoAngle[2] = (s32)(-(mag * sins(intendedDYaw)));
+    m->marioBodyState->torsoAngle[0] = approach_angle(m->marioBodyState->torsoAngle[0], (s32)(mag * coss(intendedDYaw)), 0x200);
+    m->marioBodyState->torsoAngle[2] = approach_angle(m->marioBodyState->torsoAngle[2], (s32)(-(mag * sins(intendedDYaw))), 0x200);
+}
+
+s16 gRainbowSlidePathPitch = 0x0;
+s16 gRainbowSlidePathRoll = 0x0;
+
+f32 gRainbowSlideVertical = 0.0f;
+
+void make_rainbow_slide(struct MarioState* m) {
+    // rainbowSlide
+    if (gPrevFrameObjectCount < (OBJECT_POOL_CAPACITY - 1)) {
+        struct Object* rainbow = spawn_object(m->marioObj, MODEL_RAINBOW_PATH, bhvRainbowPath);
+        rainbow->oPosX += 2 * m->vel[0];
+        rainbow->oPosY -= 9.0f * gRainbowSlideVertical;//90.0f * (m->controller->stickY / 64.0f);
+        rainbow->oPosZ += 2 * m->vel[2];
+        rainbow->oFaceAnglePitch = gRainbowSlidePathPitch = approach_angle(gRainbowSlidePathPitch, -m->movePitch, 0x800);
+        rainbow->oFaceAngleRoll = gRainbowSlidePathRoll = approach_angle(gRainbowSlidePathRoll, m->marioBodyState->torsoAngle[2], 0x800);
+    }
 }
 
 void common_slide_action(struct MarioState *m, u32 endAction, u32 airAction, s32 animation) {
@@ -1360,8 +1398,21 @@ void common_slide_action(struct MarioState *m, u32 endAction, u32 airAction, s32
 
     adjust_sound_for_speed(m);
 
+    _Bool madeRainbow = FALSE;
+
     switch (perform_ground_step(m)) {
         case GROUND_STEP_LEFT_GROUND:
+            // if (madeRainbow) break;
+            if (gRainbowSlide) {
+                // struct Object* rainbow = spawn_object(m->marioObj, MODEL_RAINBOW_PATH, bhvRainbowPath);
+                make_rainbow_slide(m);
+                madeRainbow = TRUE;
+                set_mario_animation(m, animation);
+                align_with_floor(m);
+                m->particleFlags |= PARTICLE_DUST;
+                break;
+            }
+            
             set_mario_action(m, airAction, 0);
             if (m->forwardVel < -50.0f || 50.0f < m->forwardVel) {
                 play_sound(SOUND_MARIO_HOOHOO, m->marioObj->header.gfx.cameraToObject);
@@ -1397,11 +1448,21 @@ void common_slide_action(struct MarioState *m, u32 endAction, u32 airAction, s32
             align_with_floor(m);
             break;
     }
+
+    if (gRainbowSlide && !madeRainbow) {
+        struct Surface* floor = NULL;
+        f32 floorHeight = find_floor(m->pos[0], m->pos[1], m->pos[2], &floor);
+        if (floor != NULL && m->pos[1] > (floorHeight + 100.0f)) {
+            // struct Object* rainbow = spawn_object(m->marioObj, MODEL_RAINBOW_PATH, bhvRainbowPath);
+            make_rainbow_slide(m);
+        }
+    }
 }
 
 s32 common_slide_action_with_jump(struct MarioState *m, u32 stopAction, u32 jumpAction, u32 airAction,
                                   s32 animation) {
 #ifdef SLOPE_BUFFER
+    if (!gRainbowSlide) {
     if (m->input & INPUT_A_PRESSED) {
         m->actionState = 1;
     } else if (!(m->input & INPUT_A_DOWN)) {
@@ -1413,6 +1474,7 @@ s32 common_slide_action_with_jump(struct MarioState *m, u32 stopAction, u32 jump
         }
     } else {
         m->actionTimer++;
+    }
     }
 #else
     if (m->actionTimer == 5) {
@@ -1433,8 +1495,17 @@ s32 common_slide_action_with_jump(struct MarioState *m, u32 stopAction, u32 jump
 }
 
 s32 act_butt_slide(struct MarioState *m) {
-    s32 cancel = common_slide_action_with_jump(m, ACT_BUTT_SLIDE_STOP, ACT_JUMP, ACT_BUTT_SLIDE_AIR,
-                                               MARIO_ANIM_SLIDE);
+    s32 cancel = FALSE;
+    
+    if (canPauseSliding && (m->input & INPUT_Z_DOWN)) {
+        // m->faceAngle[1] = m->intendedYaw - approach_s32((s16)(m->intendedYaw - m->faceAngle[1]), 0, 0x800, 0x800);
+        m->faceAngle[1] = approach_angle(m->faceAngle[1], m->intendedYaw, 0x400);
+        m->marioObj->header.gfx.angle[1] = m->faceAngle[1];
+        // slidingIsPaused = TRUE;
+    } else {
+        cancel = common_slide_action_with_jump(m, ACT_BUTT_SLIDE_STOP, ACT_JUMP, ACT_BUTT_SLIDE_AIR, MARIO_ANIM_SLIDE);
+    }
+    
     tilt_body_butt_slide(m);
     return cancel;
 }
@@ -1451,9 +1522,9 @@ s32 act_hold_butt_slide(struct MarioState *m) {
 }
 
 s32 act_crouch_slide(struct MarioState *m) {
-    if (m->input & INPUT_ABOVE_SLIDE) {
+    // if (m->input & INPUT_ABOVE_SLIDE) {
         return set_mario_action(m, ACT_BUTT_SLIDE, 0);
-    }
+    // }
 
     if (m->actionTimer < 30) {
         m->actionTimer++;
@@ -1516,16 +1587,19 @@ s32 act_slide_kick_slide(struct MarioState *m) {
 }
 
 s32 stomach_slide_action(struct MarioState *m, u32 stopAction, u32 airAction, s32 animation) {
-    if (m->actionTimer == 5) {
-        if (!(m->input & INPUT_ABOVE_SLIDE) && (m->input & (INPUT_A_PRESSED | INPUT_B_PRESSED))) {
+    if (m->input & (INPUT_A_PRESSED)) {
+
+    // }
+    // if (m->actionTimer == 5) {
+    //     if (!(m->input & INPUT_ABOVE_SLIDE) && (m->input & (INPUT_A_PRESSED | INPUT_B_PRESSED))) {
 #if ENABLE_RUMBLE
             queue_rumble_data(5, 80);
 #endif
             return drop_and_set_mario_action(
                 m, m->forwardVel >= 0.0f ? ACT_FORWARD_ROLLOUT : ACT_BACKWARD_ROLLOUT, 0);
-        }
-    } else {
-        m->actionTimer++;
+    //     }
+    // } else {
+    //     m->actionTimer++;
     }
 
     if (update_sliding(m, 4.0f)) {
@@ -1537,6 +1611,7 @@ s32 stomach_slide_action(struct MarioState *m, u32 stopAction, u32 airAction, s3
 }
 
 s32 act_stomach_slide(struct MarioState *m) {
+    return set_mario_action(m, ACT_BUTT_SLIDE, 0);
     return stomach_slide_action(m, ACT_STOMACH_SLIDE_STOP, ACT_FREEFALL, MARIO_ANIM_SLIDE_DIVE);
 }
 
@@ -1549,6 +1624,7 @@ s32 act_hold_stomach_slide(struct MarioState *m) {
 }
 
 s32 act_dive_slide(struct MarioState *m) {
+    return set_mario_action(m, ACT_BUTT_SLIDE, 0);
     if (!(m->input & INPUT_ABOVE_SLIDE) && (m->input & (INPUT_A_PRESSED | INPUT_B_PRESSED))) {
 #if ENABLE_RUMBLE
         queue_rumble_data(5, 80);

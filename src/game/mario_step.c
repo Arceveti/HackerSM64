@@ -272,7 +272,7 @@ s32 stationary_ground_step(struct MarioState *m) {
 
     return stepResult;
 }
-
+extern f32 gRainbowSlideVertical;
 static s32 perform_ground_quarter_step(struct MarioState *m, Vec3f nextPos) {
     struct WallCollisionData lowerWall, upperWall;
     struct Surface *ceil, *floor;
@@ -304,9 +304,26 @@ static s32 perform_ground_quarter_step(struct MarioState *m, Vec3f nextPos) {
             return GROUND_STEP_HIT_WALL_STOP_QSTEPS;
         }
 
+        if (gRainbowSlide && (m->action & ACT_FLAG_BUTT_OR_STOMACH_SLIDE)) {
+            // rainbowslide
+            gRainbowSlideVertical = approach_f32_symmetric(gRainbowSlideVertical, (10.0f * (m->controller->stickY / 64.0f)), 0.1f);
+            nextPos[1] -= gRainbowSlideVertical;
+            if (nextPos[1] < 0.0f) {
+                nextPos[1] = 0.0f;
+            }
+            floorHeight = nextPos[1];
+            // m->vel[1] += 
+            floor = &gWaterSurfacePseudoFloor;
+            floor->originOffset = -floorHeight;
+            vec3f_copy(m->pos, nextPos);
+            set_mario_floor(m, floor, floorHeight);
+            return GROUND_STEP_NONE;
+        } else {
+
         vec3f_copy(m->pos, nextPos);
         set_mario_floor(m, floor, floorHeight);
         return GROUND_STEP_LEFT_GROUND;
+        }
     }
 
     if (floorHeight + 160.0f >= ceilHeight) {
@@ -432,7 +449,7 @@ s32 bonk_or_hit_lava_wall(struct MarioState *m, struct WallCollisionData *wallDa
 
     for (i = 0; i < wallData->numWalls; i++) {
         if (wallData->walls[i] != NULL) {
-            if (wallData->walls[i]->type == SURFACE_BURNING) {
+            if (wallData->walls[i]->type == SURFACE_BURNING && m->vel[1] <= 0.0f) {
                 set_mario_wall(m, wallData->walls[i]);
                 return AIR_STEP_HIT_LAVA_WALL;
             }

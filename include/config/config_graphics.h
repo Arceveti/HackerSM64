@@ -7,7 +7,7 @@
 /**
  * The size of the master display list (gDisplayListHead). 6400 is vanilla.
  */
-#define GFX_POOL_SIZE 10000
+#define GFX_POOL_SIZE 0x4000
 
 /**
  * Causes the global light direction to be in world space,
@@ -15,7 +15,7 @@
  * By modifying `globalLightDirection`, you can choose the direction that points TOWARDS the light,
  * but keep in mind that this direction should be normalized to roughly ~127 if changed.
  */
-// #define WORLDSPACE_LIGHTING
+#define WORLDSPACE_LIGHTING
 
 /**
  * Show a watermark on the title screen that reads "Made with HackerSM64", instead of the copyright message.
@@ -50,7 +50,7 @@
  * Enables Puppyprint, a display library for text and large images.
  * Automatically enabled when PUPPYPRINT_DEBUG is enabled.
  */
-// #define PUPPYPRINT
+#define PUPPYPRINT
 
 /**
  * Disables AA (Improves console performance but causes visible seams between unconnected geometry).
@@ -65,7 +65,7 @@
 /**
  * Similar to the above, but 30 FPS (Textures by InTheBeef, cleaned up by Arceveti).
  */
-// #define IA8_30FPS_COINS
+#define IA8_30FPS_COINS
 
 /**
  * Use .rej microcode for certain objects (experimental - only should be used when F3DEX_GBI_2 is defined).
@@ -108,7 +108,7 @@
  * Uses the star object's model in the star dance cutscene.
  * This has a side effect of making the star dance star also transparent when Mario collects a transparent star.
  */
-// #define STAR_DANCE_USES_STARS_MODEL
+#define STAR_DANCE_USES_STARS_MODEL
 
 /**
  * Disables all object shadows. You'll probably only want this either as a last resort for performance or if you're making a super stylized hack.
@@ -144,7 +144,7 @@
  * Eases the textured screen transitions to make them look smoother. 
  * Extends the full radius for mario, bowser and the star transitions.
  */
-// #define POLISHED_TRANSITIONS
+#define POLISHED_TRANSITIONS
 
 /**
  * Uses frustratio of 2 instead of 1.

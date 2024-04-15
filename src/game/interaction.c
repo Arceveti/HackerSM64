@@ -1859,7 +1859,7 @@ void mario_process_interactions(struct MarioState *m) {
 }
 
 void check_death_barrier(struct MarioState *m) {
-    if (m->pos[1] < m->floorHeight + 2048.0f) {
+    if (gCurrLevelNum == LEVEL_BOB || m->pos[1] < m->floorHeight + 16.0f) {
         if (level_trigger_warp(m, WARP_OP_WARP_FLOOR) == 20 && !(m->flags & MARIO_FALL_SOUND_PLAYED)) {
             play_sound(SOUND_MARIO_WAAAOOOW, m->marioObj->header.gfx.cameraToObject);
         }
@@ -1869,7 +1869,8 @@ void check_death_barrier(struct MarioState *m) {
 void check_lava_boost(struct MarioState *m) {
     if (!(m->action & ACT_FLAG_RIDING_SHELL) && m->pos[1] < m->floorHeight + 10.0f) {
         if (!(m->flags & MARIO_METAL_CAP)) {
-            m->hurtCounter += (m->flags & MARIO_CAP_ON_HEAD) ? 12 : 18;
+            // m->hurtCounter += (m->flags & MARIO_CAP_ON_HEAD) ? 12 : 18;
+            m->health = 0xFF;
         }
 
         update_mario_sound_and_camera(m);
@@ -1896,7 +1897,7 @@ void pss_end_slide(struct MarioState *m) {
         sPssSlideStarted = FALSE;
     }
 }
-
+u32 gDeathTimer = 0;
 void mario_handle_special_floors(struct MarioState *m) {
     if ((m->action & ACT_GROUP_MASK) == ACT_GROUP_CUTSCENE) {
         return;
@@ -1908,7 +1909,9 @@ void mario_handle_special_floors(struct MarioState *m) {
         switch (floorType) {
             case SURFACE_DEATH_PLANE:
             case SURFACE_VERTICAL_WIND:
-                check_death_barrier(m);
+                if (gCurrLevelNum != LEVEL_BOB || gDeathTimer++ > 15) {
+                    check_death_barrier(m);
+                }
                 break;
 
             case SURFACE_WARP:
@@ -1921,6 +1924,9 @@ void mario_handle_special_floors(struct MarioState *m) {
 
             case SURFACE_TIMER_END:
                 pss_end_slide(m);
+                break;
+            default:
+                gDeathTimer = 0;
                 break;
         }
 

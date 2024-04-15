@@ -27,3 +27,10 @@
 #include "metal_box/geo.inc.c"
 #include "exclamation_box_outline/geo.inc.c"
 #include "koopa_shell/geo.inc.c"
+
+#include "black_hole/geo.inc.c"
+
+#include "background/geo.inc.c"
+#include "rainbow_path/geo.inc.c"
+#include "shield/geo.inc.c"
+#include "scan/geo.inc.c"

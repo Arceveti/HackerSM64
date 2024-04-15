@@ -195,4 +195,18 @@ extern const GeoLayout test_platform_geo[];
 extern const Gfx unknown_seg8_dl_08026260[];
 extern const Collision unknown_seg8_collision_080262F8[];
 
+#include "black_hole/geo_header.h"
+
+#include "black_hole/collision_header.h"
+
+#include "background/geo_header.h"
+
+#include "rainbow_path/geo_header.h"
+
+#include "rainbow_path/collision_header.h"
+
+#include "shield/geo_header.h"
+
+#include "scan/geo_header.h"
+
 #endif

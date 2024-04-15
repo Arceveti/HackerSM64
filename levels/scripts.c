@@ -196,7 +196,11 @@ const LevelScript script_func_global_1[] = {
     LOAD_MODEL_FROM_GEO(MODEL_HEART,                   heart_geo),
     LOAD_MODEL_FROM_GEO(MODEL_FLYGUY,                  flyguy_geo),
     LOAD_MODEL_FROM_GEO(MODEL_CHUCKYA,                 chuckya_geo),
-    LOAD_MODEL_FROM_GEO(MODEL_TRAJECTORY_MARKER_BALL,      bowling_ball_track_geo),
+    LOAD_MODEL_FROM_GEO(MODEL_TRAJECTORY_MARKER_BALL,  bowling_ball_track_geo),
+    LOAD_MODEL_FROM_GEO(MODEL_BLACK_HOLE,              black_hole_geo),
+    LOAD_MODEL_FROM_GEO(MODEL_RAINBOW_PATH,            rainbow_path_geo),
+    LOAD_MODEL_FROM_GEO(MODEL_BACKGROUND_LAVA,         background_lava_geo),
+    LOAD_MODEL_FROM_GEO(MODEL_SHIELD,                  shield_geo),
     RETURN(),
 };
 

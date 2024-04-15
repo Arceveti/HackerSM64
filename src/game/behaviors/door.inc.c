@@ -136,3 +136,96 @@ void bhv_door_rendering_loop(void) {
 
     COND_BIT(o->oDoorIsRendering, o->header.gfx.node.flags, GRAPH_RENDER_ACTIVE);
 }
+
+
+
+void bhv_shield_init(void) {
+
+}
+void bhv_shield_loop(void) {
+    struct MarioState* m = &gMarioStates[0];
+    vec3_copy_y_off(&o->oPosVec, m->pos, 80.0f);
+    o->oFaceAnglePitch += 0x800 * random_float();
+    o->oFaceAngleYaw   += 0x800 * random_float();
+    o->oFaceAngleRoll  += 0x800 * random_float();
+    // o->oFaceAngleYaw = (s16)random_u16();
+}
+
+void bhv_robot_init(void) {
+
+}
+void bhv_robot_loop(void) {
+
+}
+void bhv_scan_init(void) {
+
+}
+void bhv_scan_loop(void) {
+    o->oFaceAngleYaw += 0x200;
+}
+void bhv_dlg_trigger_init(void) {
+
+}
+#include "suit_dialogue.h"
+extern u32 gInitialTextIndex;
+void bhv_dlg_trigger_loop(void) {
+    if (gMarioStates[0].health <= 0xFF) {
+        return;
+    }
+    u8 size = BPARAM1;
+    u8 dlgId = BPARAM2;
+    if (o->oDistanceToMario < 100.0f * (f32)size) {
+        gInitialTextIndex = 0xFFFF;
+        set_onscreen_dlg(dlgId);
+    }
+}
+
+void bhv_background_init(void) {
+
+}
+// extern struct Camera* gCamera;
+void bhv_background_loop(void) {
+    // o->oPosX = gLakituState.pos[0];
+    // o->oPosY = gLakituState.pos[1];
+    // o->oPosZ = gLakituState.pos[2];
+}
+
+void bhv_rainbow_path_init(void) {
+
+}
+extern s16 gRainbowSlidePathPitch;
+extern s16 gRainbowSlidePathRoll;
+void bhv_rainbow_path_loop(void) {
+    // obj_
+    if (o->oTimer > 60) {
+        mark_obj_for_deletion(o);
+    }
+    
+    // o->oFaceAnglePitch = approach_angle(o->oFaceAnglePitch, -gMarioState->movePitch, 0x100);
+    // o->oFaceAngleRoll = approach_angle(o->oFaceAngleRoll, gMarioState->marioBodyState->torsoAngle[2], 0x100);
+}
+extern f32 gBlackHoleDistortion;
+
+u32 enteredBlackHoleAmount = 0;
+void bhv_black_hole_loop(void) {
+    o->oFaceAngleYaw = random_u16();
+    if (o->oDistanceToMario < 8192.0f) {
+        enteredBlackHoleAmount++;
+        struct MarioState* m = &gMarioStates[0];
+        if (m->action != ACT_DEBUG_FREE_MOVE) {
+            // f32 modifier = (o->oDistanceToMario / 8192.0f);
+            gBlackHoleDistortion = (o->oDistanceToMario / 8192.0f);
+            s16 marioAngleToObj = mario_obj_angle_to_object(m, o);
+            // f32 speed = 32.0f * (1.0f - modifier);
+            // m->pos[0] += speed * sins(marioAngleToObj);
+            // m->pos[2] += speed * coss(marioAngleToObj);
+            m->faceAngle[1] = approach_angle(m->faceAngle[1], marioAngleToObj, 0x200);
+        } else {
+            gBlackHoleDistortion = 1.0f;
+        }
+    } else {
+        if (enteredBlackHoleAmount >= 300) { 
+            level_trigger_warp(gMarioState, WARP_OP_CREDITS_END);
+        }
+    }
+}

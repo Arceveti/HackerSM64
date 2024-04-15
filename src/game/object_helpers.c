@@ -1613,7 +1613,7 @@ void chain_segment_init(struct ChainSegment *segment) {
 }
 
 f32 random_f32_around_zero(f32 diameter) {
-    return random_float() * diameter - diameter / 2;
+    return ((random_float() * diameter) - (diameter / 2));
 }
 
 void obj_scale_random(struct Object *obj, f32 rangeLength, f32 minScale) {

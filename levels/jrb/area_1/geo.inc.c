@@ -1,0 +1,38 @@
+#include "src/game/envfx_snow.h"
+
+const GeoLayout jrb_area_1_geo[] = {
+	GEO_NODE_START(),
+	GEO_OPEN_NODE(),
+		GEO_TRANSLATE_NODE_WITH_DL(LAYER_ALPHA, -28, -10100, 37, jrb_dl_Level_3_Death_Plane_mesh_layer_4),
+		// GEO_TRANSLATE_NODE_WITH_DL(LAYER_FORCE, -28, -100, 37, jrb_dl_Space__Background_mesh_layer_0),
+		GEO_ASM(0, background_translate),
+		GEO_TRANSLATE_NODE(LAYER_OPAQUE, -28, -100, 37),
+		GEO_TRANSLATE_NODE_WITH_DL(LAYER_TRANSPARENT, -28, 700, -21563, jrb_dl_Starting_Slope_mesh_layer_5),
+	GEO_CLOSE_NODE(),
+	GEO_RETURN(),
+};
+const GeoLayout jrb_area_1[] = {
+	GEO_NODE_SCREEN_AREA(10, 160, 120, 150, 110),
+	GEO_OPEN_NODE(),
+		GEO_ZBUFFER(0),
+		GEO_OPEN_NODE(),
+			GEO_NODE_ORTHO(100.0000),
+			GEO_OPEN_NODE(),
+				GEO_BACKGROUND_COLOR(0x0001),
+			GEO_CLOSE_NODE(),
+		GEO_CLOSE_NODE(),
+		GEO_ZBUFFER(1),
+		GEO_OPEN_NODE(),
+			GEO_CAMERA_FRUSTUM_WITH_FUNC(45.0000, 200, 60000, geo_camera_fov),
+			GEO_OPEN_NODE(),
+				GEO_CAMERA(CAMERA_MODE_SLIDE_HOOT, 0, 0, 0, 0, -100, 0, geo_camera_main),
+				GEO_OPEN_NODE(),
+					GEO_BRANCH(1, jrb_area_1_geo),
+					GEO_RENDER_OBJ(),
+					GEO_ASM(ENVFX_MODE_NONE, geo_envfx_main),
+				GEO_CLOSE_NODE(),
+			GEO_CLOSE_NODE(),
+		GEO_CLOSE_NODE(),
+	GEO_CLOSE_NODE(),
+	GEO_END(),
+};

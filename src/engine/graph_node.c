@@ -377,6 +377,28 @@ struct GraphNodeBillboard *init_graph_node_billboard(struct AllocOnlyPool *pool,
 }
 
 /**
+ * Allocates and returns a newly created bgmodel node
+ */
+struct GraphNodeBgModel *init_graph_node_bgmodel(struct AllocOnlyPool *pool,
+                                                     struct GraphNodeBgModel *graphNode,
+                                                     s32 drawingLayer, void *displayList,
+                                                     Vec3s translation) {
+    if (pool != NULL) {
+        graphNode = alloc_only_pool_alloc(pool, sizeof(struct GraphNodeBgModel));
+    }
+
+    if (graphNode != NULL) {
+        init_scene_graph_node_links(&graphNode->node, GRAPH_NODE_TYPE_BGMODEL);
+        vec3s_copy(graphNode->translation, translation);
+        SET_GRAPH_NODE_LAYER(graphNode->node.flags, drawingLayer);
+        graphNode->displayList = displayList;
+    }
+
+    return graphNode;
+}
+
+
+/**
  * Allocates and returns a newly created displaylist node
  */
 struct GraphNodeDisplayList *init_graph_node_display_list(struct AllocOnlyPool *pool,
@@ -517,6 +539,25 @@ struct GraphNodeHeldObject *init_graph_node_held_object(struct AllocOnlyPool *po
         if (nodeFunc != NULL) {
             nodeFunc(GEO_CONTEXT_CREATE, &graphNode->fnNode.node, pool);
         }
+    }
+
+    return graphNode;
+}
+
+/**
+ * Allocates and returns a newly created Z offset node
+ */
+struct GraphNodeZOffset* init_graph_node_z_offset(struct AllocOnlyPool* pool,
+                                                  struct GraphNodeZOffset* graphNode,
+                                                  s16 zOffset) {
+    if (pool != NULL) {
+        graphNode = alloc_only_pool_alloc(pool, sizeof(struct GraphNodeZOffset));
+    }
+
+    if (graphNode != NULL) {
+        init_scene_graph_node_links(&graphNode->node, GRAPH_NODE_TYPE_Z_OFFSET);
+        graphNode->displayList = NULL;
+        graphNode->zOffset = zOffset;
     }
 
     return graphNode;

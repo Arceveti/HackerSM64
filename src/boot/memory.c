@@ -29,6 +29,7 @@
 struct MemoryPool *gEffectsMemoryPool;
 
 
+
 uintptr_t sSegmentTable[32];
 uintptr_t sSegmentSizes[32];
 uintptr_t sSegmentROMTable[32];

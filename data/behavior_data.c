@@ -388,6 +388,84 @@ enum BehaviorCommands {
 #define SPAWN_WATER_DROPLET(dropletParams) \
     BC_BPTR(BHV_CMD_SPAWN_WATER_DROPLET, dropletParams)
 
+const BehaviorScript bhvScan[] = {
+    BEGIN(OBJ_LIST_DEFAULT),
+    OR_INT(oFlags, (0 | OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE)),
+    CALL_NATIVE(bhv_scan_init),
+    BEGIN_LOOP(),
+        // ADD_INT(oFaceAngleYaw, 0x10),
+        CALL_NATIVE(bhv_scan_loop),
+    END_LOOP(),
+};
+
+const BehaviorScript bhvShield[] = {
+    BEGIN(OBJ_LIST_DEFAULT),
+    OR_INT(oFlags, (0 | OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE)),
+    CALL_NATIVE(bhv_shield_init),
+    BEGIN_LOOP(),
+        // ADD_INT(oFaceAngleYaw, 0x10),
+        CALL_NATIVE(bhv_shield_loop),
+    END_LOOP(),
+};
+
+const BehaviorScript bhvRobot[] = {
+    BEGIN(OBJ_LIST_DEFAULT),
+    // OR_INT(oFlags, (OBJ_FLAG_SET_FACE_YAW_TO_MOVE_YAW | OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE)),
+    CALL_NATIVE(bhv_robot_init),
+    BEGIN_LOOP(),
+        // ADD_INT(oFaceAngleYaw, 0x10),
+        CALL_NATIVE(bhv_robot_loop),
+    END_LOOP(),
+};
+
+
+const BehaviorScript bhvDLG[] = {
+    BEGIN(OBJ_LIST_LEVEL),
+    // OR_INT(oFlags, (OBJ_FLAG_SET_FACE_YAW_TO_MOVE_YAW | OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE)),
+    OR_INT(oFlags, OBJ_FLAG_COMPUTE_DIST_TO_MARIO),
+    // SET_INT(oInteractType, INTERACT_NONE),
+    SET_INT(oIntangibleTimer, 0),
+    BEGIN_LOOP(),
+        CALL_NATIVE(bhv_dlg_trigger_loop),
+    END_LOOP(),
+};
+
+
+const BehaviorScript bhvBackground[] = {
+    BEGIN(OBJ_LIST_DEFAULT),
+    // OR_INT(oFlags, (OBJ_FLAG_SET_FACE_YAW_TO_MOVE_YAW | OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE)),
+    CALL_NATIVE(bhv_background_init),
+    BEGIN_LOOP(),
+        // ADD_INT(oFaceAngleYaw, 0x10),
+        CALL_NATIVE(bhv_background_loop),
+    END_LOOP(),
+};
+
+const BehaviorScript bhvRainbowPath[] = {
+    BEGIN(OBJ_LIST_SURFACE),
+    LOAD_COLLISION_DATA(rainbow_path_collision),
+    OR_INT(oFlags, (OBJ_FLAG_COMPUTE_DIST_TO_MARIO | OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE)),
+    SET_FLOAT(oDrawingDistance, 40000),
+    SET_FLOAT(oCollisionDistance, 8192),
+    CALL_NATIVE(bhv_rainbow_path_init),
+    BEGIN_LOOP(),
+        // CALL_NATIVE(load_object_collision_model),
+        CALL_NATIVE(bhv_rainbow_path_loop),
+    END_LOOP(),
+};
+
+const BehaviorScript bhvBlackHole[] = {
+    BEGIN(OBJ_LIST_SURFACE),
+    LOAD_COLLISION_DATA(black_hole_collision),
+    OR_INT(oFlags, (/*OBJ_FLAG_ACTIVE_FROM_AFAR | */OBJ_FLAG_COMPUTE_DIST_TO_MARIO/* | OBJ_FLAG_SET_FACE_YAW_TO_MOVE_YAW*/ | OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE)),
+    SET_FLOAT(oDrawingDistance, 40000),
+    SET_FLOAT(oCollisionDistance, 8192),
+    CALL_NATIVE(load_object_static_model),
+    BEGIN_LOOP(),
+        // ADD_INT(oFaceAngleYaw, 0x10),
+        CALL_NATIVE(bhv_black_hole_loop),
+    END_LOOP(),
+};
 
 const BehaviorScript bhvStarDoor[] = {
     BEGIN(OBJ_LIST_SURFACE),

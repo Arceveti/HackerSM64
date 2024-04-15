@@ -16,6 +16,19 @@ void play_penguin_walking_sound(s32 walk);
 s32 update_angle_from_move_flags(s32 *angle);
 void cur_obj_spawn_strong_wind_particles(s32 windSpread, f32 scale, f32 relPosX, f32 relPosY, f32 relPosZ);
 
+void bhv_shield_init(void);
+void bhv_shield_loop(void);
+void bhv_robot_init(void);
+void bhv_robot_loop(void);
+void bhv_scan_init(void);
+void bhv_scan_loop(void);
+void bhv_dlg_trigger_init(void);
+void bhv_dlg_trigger_loop(void);
+void bhv_background_init(void);
+void bhv_background_loop(void);
+void bhv_rainbow_path_init(void);
+void bhv_rainbow_path_loop(void);
+void bhv_black_hole_loop(void);
 //! Lots of these are duplicates
 void bhv_cap_switch_loop(void);
 void bhv_tiny_star_particles_init(void);

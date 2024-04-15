@@ -38,7 +38,7 @@
 /**
  * Stars don't kick you out of the level (does not play nicely with vanilla).
  */
-// #define NON_STOP_STARS
+#define NON_STOP_STARS
 
 /**
  * Bowser keys always exit the level. Only has an effect if NON_STOP_STARS is enabled.
@@ -97,4 +97,4 @@
  * The level that the game starts with immediately after file select.
  * The levelscript needs to have a MARIO_POS command for this to work.
  */
-#define START_LEVEL LEVEL_CASTLE_GROUNDS
+#define START_LEVEL LEVEL_BOB

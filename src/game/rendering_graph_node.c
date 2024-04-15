@@ -531,7 +531,9 @@ void geo_process_switch(struct GraphNodeSwitchCase *node) {
 Mat4 gCameraTransform;
 
 Lights1 defaultLight = gdSPDefLights1(
-    0x3F, 0x3F, 0x3F, 0xFF, 0xFF, 0xFF, 0x00, 0x00, 0x00
+    0x3F, 0x3F, 0x3F,
+    0xFF, 0xFF, 0xFF,
+    0x00, 0x00, 0x00
 );
 
 Vec3f globalLightDirection = { 0x28, 0x28, 0x28 };
@@ -690,7 +692,94 @@ void geo_process_billboard(struct GraphNodeBillboard *node) {
         vec3f_copy(scale, gCurGraphNodeObject->scale);
     }
 
-    mtxf_billboard(gMatStack[gMatStackIndex + 1], gMatStack[gMatStackIndex], translation, scale, gCurGraphNodeCamera->roll);
+    Mat4 tempCameraTransform;
+    // bzero(&tempCameraTransform, sizeof(Mat4));
+    // bcopy(&tempCameraTransform, &gCameraTransform, sizeof(Mat4));
+    mtxf_lookat(tempCameraTransform, gCurGraphNodeCamera->pos, gCurGraphNodeObject->pos, gCurGraphNodeCamera->roll);
+    mtxf_billboard(gMatStack[gMatStackIndex + 1], gMatStack[gMatStackIndex], tempCameraTransform, translation, scale, gCurGraphNodeCamera->roll);
+    // bcopy(&gCameraTransform, &tempCameraTransform, sizeof(Mat4));
+
+
+    // Vec3s angleToCamera = {0x0, 0x0, 0x0};
+    // f32 dist = 0.0f;
+    // vec3_get_dist_and_angle(gCurGraphNodeObject->pos, gCurGraphNodeCamera->pos, &dist, &angleToCamera[0], &angleToCamera[1]);
+    // mtxf_rotate_zxy_and_translate_and_mul(angleToCamera, translation, gMatStack[gMatStackIndex + 1], gMatStack[gMatStackIndex]);
+
+    inc_mat_stack();
+    append_dl_and_return((struct GraphNodeDisplayList *)node);
+}
+
+#include "levels/bob/header.h"
+#include "levels/wf/header.h"
+#include "levels/jrb/header.h"
+
+f32 gBlackHoleDistortion = 1.0f;
+
+Gfx *background_translate(s32 callContext, UNUSED struct GraphNode *node, UNUSED f32 b[4][4]) {
+    Mat4 mat;
+    Vec3f translation;
+    Mtx *mtx = alloc_display_list(sizeof(*mtx));
+    if (callContext == GEO_CONTEXT_RENDER && gCurGraphNodeCamera != NULL) {
+        // the closer to 1 the further away
+        struct GraphNodeGenerated *asGenerated = (struct GraphNodeGenerated*)node;
+        u32 param = asGenerated->parameter;
+        f32 farawayness = param ? 1.0f : 0.99f;
+        Gfx* dl = NULL;
+        
+        switch (gCurrLevelNum) {
+            case LEVEL_BOB:
+                if (param == 0) {
+                    dl = bob_dl_Mountain_bg_rings_mesh_layer_0;
+                    farawayness = 0.98f;
+                } else {
+                    dl = bob_dl_mountain_moon_mesh_layer_0;
+                    farawayness = 1.0f;
+                }
+                break;
+                
+            case LEVEL_WF:
+                dl = wf_dl_Lava__Background_mesh_layer_0;
+                farawayness = 0.99f;
+                break;
+            case LEVEL_JRB:
+                if (param == 0) {
+                    dl = jrb_dl_Space__Background_mesh_layer_0;
+                    f32 distortAmount = 0.75f;
+                    farawayness = 1.0f * (distortAmount + (gBlackHoleDistortion * (1.0f - distortAmount)));
+                } else {
+
+                }
+                break;
+        }
+// #define FARAWAYNESS .99f
+        translation[0] = gCurGraphNodeCamera->pos[0] * farawayness;
+        translation[1] = gCurGraphNodeCamera->pos[1] * farawayness;
+        translation[2] = gCurGraphNodeCamera->pos[2] * farawayness;
+// #undef FARAWAYNESS
+        // vec3_copy(translation, gCurGraphNodeCamera->pos);
+        // mtxf_translate(mat, translation);
+        Vec3s rot = { 0x7FFF * gBlackHoleDistortion, 0x7FFF * gBlackHoleDistortion, 0x7FFF * gBlackHoleDistortion };
+        mtxf_rotate_zxy_and_translate(mat, translation, rot);
+        mtxf_mul(gMatStack[gMatStackIndex + 1], mat, gMatStack[gMatStackIndex]);
+        gMatStackIndex++;
+        mtxf_to_mtx(mtx, gMatStack[gMatStackIndex]);
+        gMatStackFixed[gMatStackIndex] = mtx;
+        geo_append_display_list(dl, 0); //DL pointer
+        gMatStackIndex--;
+    }
+    return NULL;
+}
+
+void geo_process_bgmodel(struct GraphNodeBgModel *node) {
+    Mat4 mat;
+    Vec3f translation = { 0.0f, 0.0f, 0.0f, };
+#define FARAWAYNESS 1.0f//.95f // the closer to 1 the further away
+    translation[0] = gCurGraphNodeCamera->pos[0] * FARAWAYNESS;
+    translation[1] = gCurGraphNodeCamera->pos[1] * FARAWAYNESS;
+    translation[2] = gCurGraphNodeCamera->pos[2] * FARAWAYNESS;
+#undef FARAWAYNESS
+    mtxf_translate(mat, translation);
+    mtxf_mul(gMatStack[gMatStackIndex + 1], mat, gMatStack[gMatStackIndex]);
 
     inc_mat_stack();
     append_dl_and_return((struct GraphNodeDisplayList *)node);
@@ -749,8 +838,8 @@ void geo_process_background(struct GraphNodeBackground *node) {
         gDPPipeSync(gfx++);
         gDPSetCycleType(gfx++, G_CYC_FILL);
         gDPSetFillColor(gfx++, node->background);
-        gDPFillRectangle(gfx++, GFX_DIMENSIONS_RECT_FROM_LEFT_EDGE(0), gBorderHeight,
-        GFX_DIMENSIONS_RECT_FROM_RIGHT_EDGE(0) - 1, SCREEN_HEIGHT - gBorderHeight - 1);
+        gDPFillRectangle(gfx++, GFX_DIMENSIONS_RECT_FROM_LEFT_EDGE(gBorderWidth), gBorderHeight,
+        GFX_DIMENSIONS_RECT_FROM_RIGHT_EDGE(gBorderWidth) - 1, SCREEN_HEIGHT - gBorderHeight - 1);
         gDPPipeSync(gfx++);
         gDPSetCycleType(gfx++, G_CYC_1CYCLE);
         gSPEndDisplayList(gfx++);
@@ -1047,12 +1136,11 @@ void geo_process_object(struct Object *node) {
         // This still updates translation since it is needed for sound.
         if (isInvisible && noThrowMatrix) {
             mtxf_translate(gMatStack[gMatStackIndex + 1], node->header.gfx.pos);
-        }
-        else{
+        } else {
             if (!noThrowMatrix) {
                 mtxf_scale_vec3f(gMatStack[gMatStackIndex + 1], *node->header.gfx.throwMatrix, node->header.gfx.scale);
             } else if (node->header.gfx.node.flags & GRAPH_RENDER_BILLBOARD) {
-                mtxf_billboard(gMatStack[gMatStackIndex + 1], gMatStack[gMatStackIndex],
+                mtxf_billboard(gMatStack[gMatStackIndex + 1], gMatStack[gMatStackIndex], gCameraTransform,
                             node->header.gfx.pos, node->header.gfx.scale, gCurGraphNodeCamera->roll);
             } else {
                 mtxf_rotate_zxy_and_translate(gMatStack[gMatStackIndex + 1], node->header.gfx.pos, node->header.gfx.angle);
@@ -1168,6 +1256,30 @@ void geo_process_held_object(struct GraphNodeHeldObject *node) {
 }
 
 /**
+ * Process a Z offset node. It shifts the node either towards or away from the camera,
+ * keeping it centered on the original position in view.
+ */
+void geo_process_z_offset(struct GraphNodeZOffset* node) {
+    f32 zOffset = node->zOffset;
+    Vec3f dirFromCamera;
+
+    if (zOffset != 0 && gCurGraphNodeCamera != NULL) {
+        vec3f_diff(dirFromCamera, gMatStack[gMatStackIndex][3], gCurGraphNodeCamera->pos);
+        vec3f_normalize(dirFromCamera);
+
+        f32* pos = gMatStack[gMatStackIndex][3];
+        for (s32 i = 0; i < 3; i++) {
+            *pos++ += dirFromCamera[i] * zOffset;
+        }
+    }
+
+    mtxf_copy(gMatStack[gMatStackIndex + 1], gMatStack[gMatStackIndex]);
+
+    inc_mat_stack();
+    append_dl_and_return((struct GraphNodeDisplayList*)node);
+}
+
+/**
  * Processes the children of the given GraphNode if it has any
  */
 void geo_try_process_children(struct GraphNode *node) {
@@ -1199,9 +1311,11 @@ static GeoProcessFunc GeoProcessJumpTable[] = {
     [GRAPH_NODE_TYPE_GENERATED_LIST      ] = geo_process_generated_list,
     [GRAPH_NODE_TYPE_BACKGROUND          ] = geo_process_background,
     [GRAPH_NODE_TYPE_HELD_OBJ            ] = geo_process_held_object,
+    [GRAPH_NODE_TYPE_Z_OFFSET            ] = geo_process_z_offset,
     [GRAPH_NODE_TYPE_CULLING_RADIUS      ] = geo_try_process_children,
     [GRAPH_NODE_TYPE_ROOT                ] = geo_try_process_children,
     [GRAPH_NODE_TYPE_START               ] = geo_try_process_children,
+    [GRAPH_NODE_TYPE_BGMODEL              ] = geo_process_bgmodel,
 };
 
 /**
@@ -1259,9 +1373,7 @@ void geo_process_root(struct GraphNodeRoot *node, Vp *b, Vp *c, s32 clearColor) 
             clear_framebuffer(clearColor);
             make_viewport_clip_rect(b);
             *viewport = *b;
-        }
-
-        else if (c != NULL) {
+        } else if (c != NULL) {
             clear_framebuffer(clearColor);
             make_viewport_clip_rect(c);
         }

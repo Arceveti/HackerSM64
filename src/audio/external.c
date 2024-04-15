@@ -167,15 +167,15 @@ s16 sDynDdd[] = {
     DYN2(MARIO_Y_GE, 100, MARIO_IS_IN_AREA, AREA_DDD_SUB & 0xf, 2),
     1,
 };
-s16 sDynJrb[] = {
-    SEQ_LEVEL_WATER,
-    DYN2(MARIO_Y_GE, 945, MARIO_X_LT, -5260, 0),
-    DYN1(MARIO_IS_IN_AREA, AREA_JRB_SHIP & 0xf, 0),
-    DYN1(MARIO_Y_GE, 1000, 0),
-    DYN2(MARIO_Y_GE, -3100, MARIO_Z_LT, -900, 2),
-    1,
-    5, // bogus entry, ignored (was JRB originally intended to have spooky music?)
-};
+// s16 sDynJrb[] = {
+//     SEQ_LEVEL_WATER,
+//     DYN2(MARIO_Y_GE, 945, MARIO_X_LT, -5260, 0),
+//     DYN1(MARIO_IS_IN_AREA, AREA_JRB_SHIP & 0xf, 0),
+//     DYN1(MARIO_Y_GE, 1000, 0),
+//     DYN2(MARIO_Y_GE, -3100, MARIO_Z_LT, -900, 2),
+//     1,
+//     5, // bogus entry, ignored (was JRB originally intended to have spooky music?)
+// };
 s16 sDynWdw[] = {
     SEQ_LEVEL_UNDERGROUND, DYN2(MARIO_Y_LT, -670, MARIO_IS_IN_AREA, AREA_WDW_MAIN & 0xf, 4),
     DYN1(MARIO_IS_IN_AREA, AREA_WDW_TOWN & 0xf, 4), 3,
@@ -200,6 +200,7 @@ u8 sBackgroundMusicForDynamics = SEQUENCE_NONE;
 #define DEFINE_LEVEL(_0, _1, _2, _3, _4, _5, _6, _7, _8, leveldyn, _10) leveldyn,
 
 #define _ sDynNone
+#define sDynJrb sDynNone
 s16 *sLevelDynamics[LEVEL_COUNT] = {
     _, // LEVEL_NONE
 #include "levels/level_defines.h"
@@ -223,8 +224,8 @@ struct MusicDynamic sMusicDynamics[8] = {
     { 0x0e43, 127, 200, 0x0000, 0, 200 }, // SEQ_LEVEL_WATER
     { 0x02ff, 127, 100, 0x0100, 0, 100 }, // SEQ_LEVEL_UNDERGROUND
     { 0x03f7, 127, 100, 0x0008, 0, 100 }, // SEQ_LEVEL_UNDERGROUND
-    { 0x0070, 127, 10, 0x0000, 0, 100 },  // SEQ_LEVEL_SPOOKY
-    { 0x0000, 127, 100, 0x0070, 0, 10 },  // SEQ_LEVEL_SPOOKY
+    { 0x0070, 127, 10, 0x0000, 0, 100 }, // SEQ_LEVEL_SPOOKY
+    { 0x0000, 127, 100, 0x0070, 0, 10 }, // SEQ_LEVEL_SPOOKY
     { 0xffff, 127, 100, 0x0000, 0, 100 }, // any (unused)
 };
 

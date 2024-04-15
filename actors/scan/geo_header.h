@@ -1,0 +1,15 @@
+extern const GeoLayout scan_geo[];
+extern u8 scan_ccm_textures_04000_rgba16_ci4[];
+extern u8 scan_ccm_textures_04000_rgba16_pal_rgba16[];
+extern Vtx scan_Circle_mesh_layer_5_vtx_cull[8];
+extern Vtx scan_Circle_mesh_layer_5_vtx_0[21];
+extern Gfx scan_Circle_mesh_layer_5_tri_0[];
+extern Vtx scan_Circle_mesh_layer_2_vtx_cull[8];
+extern Vtx scan_Circle_mesh_layer_2_vtx_0[21];
+extern Gfx scan_Circle_mesh_layer_2_tri_0[];
+extern Gfx mat_scan_f3dlite_material_scan[];
+extern Gfx mat_revert_scan_f3dlite_material_scan[];
+extern Gfx mat_scan_f3dlite_material_scandecal[];
+extern Gfx mat_revert_scan_f3dlite_material_scandecal[];
+extern Gfx scan_Circle_mesh_layer_5[];
+extern Gfx scan_Circle_mesh_layer_2[];

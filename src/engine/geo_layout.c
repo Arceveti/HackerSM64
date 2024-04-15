@@ -42,6 +42,8 @@ GeoLayoutCommandProc GeoLayoutJumpTable[] = {
     /*GEO_CMD_NOP_1E                    */ geo_layout_cmd_nop2,
     /*GEO_CMD_NOP_1F                    */ geo_layout_cmd_nop3,
     /*GEO_CMD_NODE_CULLING_RADIUS       */ geo_layout_cmd_node_culling_radius,
+    /*GEO_CMD_NODE_Z_OFFSET             */ geo_layout_cmd_node_z_offset,
+    /*GEO_CMD_NODE_BGMODEL              */ geo_layout_cmd_node_bgmodel,
 };
 
 struct GraphNode gObjParentGraphNode;
@@ -606,6 +608,28 @@ void geo_layout_cmd_node_billboard(void) {
 
     gGeoLayoutCommand = (u8 *) cmdPos;
 }
+void geo_layout_cmd_node_bgmodel(void) {
+    struct GraphNodeBgModel *graphNode;
+    Vec3s translation;
+    s16 drawingLayer = LAYER_FIRST;
+    s16 params = cur_geo_cmd_u8(0x01);
+    s16 *cmdPos = (s16 *) gGeoLayoutCommand;
+    void *displayList = NULL;
+
+    cmdPos = read_vec3s(translation, &cmdPos[1]);
+
+    if (params & 0x80) {
+        displayList = *(void **) &cmdPos[0];
+        drawingLayer = params & 0x0F;
+        cmdPos += 2 << CMD_SIZE_SHIFT;
+    }
+
+    graphNode = init_graph_node_bgmodel(gGraphNodePool, NULL, drawingLayer, displayList, translation);
+
+    register_scene_graph_node(&graphNode->node);
+
+    gGeoLayoutCommand = (u8 *) cmdPos;
+}
 
 /*
   0x15: Create plain display list scene graph node
@@ -748,6 +772,15 @@ void geo_layout_cmd_node_culling_radius(void) {
     struct GraphNodeCullingRadius *graphNode = init_graph_node_culling_radius(gGraphNodePool, NULL, cur_geo_cmd_s16(0x02));
     register_scene_graph_node(&graphNode->node);
     gGeoLayoutCommand += 0x04 << CMD_SIZE_SHIFT;
+}
+
+/*
+  GEO_CMD_NODE_Z_OFFSET: Create a z offset scene graph node.
+*/
+void geo_layout_cmd_node_z_offset(void) {
+    struct GraphNodeZOffset* graphNode = init_graph_node_z_offset(gGraphNodePool, NULL, cur_geo_cmd_s16(0x02));
+    register_scene_graph_node(&graphNode->node);
+    gGeoLayoutCommand += (0x04 << CMD_SIZE_SHIFT);
 }
 
 extern const char* get_segment_name(u8 segmentId);
