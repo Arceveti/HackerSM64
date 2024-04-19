@@ -1698,7 +1698,7 @@ void queue_rumble_particles(struct MarioState *m) {
     }
 }
 #endif
-extern void set_onscreen_dlg(int id);
+// extern void set_onscreen_dlg(int id);
 /**
  * Main function for executing Mario's behavior. Returns particleFlags.
  */
@@ -1711,12 +1711,12 @@ s32 execute_mario_action(UNUSED struct Object *obj) {
     vec3f_copy(gMarioState->prevPos, gMarioState->pos);
 
     if (gMarioState->action) {
-// #ifdef DEBUG_FORCE_CRASH_ON_L
-        if (gPlayer1Controller->buttonDown & L_TRIG) {
-            // FORCE_CRASH();
-            set_onscreen_dlg(1);
-        }
-// #endif
+// // #ifdef DEBUG_FORCE_CRASH_ON_L
+//         if (gPlayer1Controller->buttonDown & L_TRIG) {
+//             // FORCE_CRASH();
+//             set_onscreen_dlg(1);
+//         }
+// // #endif
 #ifdef ENABLE_DEBUG_FREE_MOVE
         if (
             (gMarioState->controller->buttonDown & U_JPAD) &&

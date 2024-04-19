@@ -283,20 +283,20 @@ void set_mario_initial_cap_powerup(struct MarioState *m) {
 void set_mario_initial_action(struct MarioState *m, u32 spawnType, u32 actionArg) {
     
 
-    switch (gCurrLevelNum) {
-        case LEVEL_BOB:
-            set_onscreen_dlg(DLG_BOOTING);
-            break;
-        case LEVEL_WF:
-            set_onscreen_dlg(DLG_UPHILL);
-            break;
-        case LEVEL_JRB:
-            set_onscreen_dlg(DLG_BLACK_HOLE);
-            break;
-        default:
-            set_onscreen_dlg(DLG_NONE);
-            break;
-    }
+    // switch (gCurrLevelNum) {
+    //     case LEVEL_BOB:
+    //         set_onscreen_dlg(DLG_BOOTING);
+    //         break;
+    //     case LEVEL_WF:
+    //         set_onscreen_dlg(DLG_UPHILL);
+    //         break;
+    //     case LEVEL_JRB:
+    //         set_onscreen_dlg(DLG_BLACK_HOLE);
+    //         break;
+    //     default:
+    //         set_onscreen_dlg(DLG_NONE);
+    //         break;
+    // }
     switch (spawnType) {
         case MARIO_SPAWN_DOOR_WARP:
             set_mario_action(m, ACT_WARP_DOOR_SPAWN, actionArg);

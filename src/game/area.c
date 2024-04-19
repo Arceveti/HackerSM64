@@ -451,11 +451,11 @@ SuitDialogue sOnScreenDialogues[] = {
     [DLG_WELCOME_HOME] = { .txt = "WELCOME TO MY HOME!", },
     [DLG_HOTTER] = {.txt = "TEMP xxxx DEGREES HOTTER THAN PREV RECORD"},
     [DLG_SHIELD] = {.txt = "ACTIVATING HEAT SHIELD..."},
-    [DLG_UPHILL] = {.txt = "THE HEAT REDUCES FRICTION, YOU CAN SLIDE UPHILL"},
+    [DLG_UPHILL] = {.txt = "THE HEAT REDUCES FRICTION, YOU CAN  SLIDE UPHILL."},
     // Boss
     [DLG_OFFSCREEN] = {.txt = "A LOT JUST HAPPENED OFFSCREEN (RAN OUT OF TIME)"},
     [DLG_OFFSCREEN_2] = {.txt = "WE'RE IN SPACE NOW, DON'T WORRY ABOUT IT."},
-    [DLG_BLACK_HOLE] = {.txt = "FLY AROUND THE BLACK HOLE TO FINISH THE HACK"},
+    [DLG_BLACK_HOLE] = {.txt = "FLY AROUND THE BLACK HOLE TO FINISH THE HACK."},
     // Space
     [DLG_GOODBYE_FRIEND] = { .txt = "GOODBYE FRIEND.", .speed = 0.75f },
     [DLG_LIGHTS_2] = { .txt = "LOOK AT ALL THOSE PRETTY LIGHTS" },
@@ -474,7 +474,9 @@ const SuitDialogue defaultDLGinfo = {
     .b = 0xFF,
 };
 
-char currOnScreenDlgBuffer[48] = "";
+char currOnScreenDlgBuffer[36 * 2] = "";
+char currOnScreenDlgBufferLine1[36] = "";
+char currOnScreenDlgBufferLine2[36] = "";
 int prevOnScreenDlgID = 0;
 int currOnScreenDlgID = 0;
 
@@ -605,7 +607,6 @@ void print_onscreen_dlg(void) {
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wimplicit-function-declaration"
     strncpy(currOnScreenDlgBuffer, src, numCharsToPrint);
-#pragma GCC diagnostic pop
     currOnScreenDlgPrevFrameNumCharsShown = numCharsToPrint;
     if (currOnScreenDlgDonePrinting) {
         timeSinceFinished++;
@@ -628,11 +629,11 @@ void render_suit_overlay(void) {
     // Allow drawing outside the screen borders.
     gDPSetScissor(dlHead++, G_SC_NON_INTERLACE, 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
 
-    gSPDisplayList(dlHead++, dl_texrect_rgba16_begin);
     if (currOnScreenDlgPrevFrameNumCharsShown > 0) {
+        gSPDisplayList(dlHead++, dl_texrect_rgba16_begin);
         texrect_rgba16(&dlHead, texture_robot, 32, 32, 32, 32, 32, 32);
+        gSPDisplayList(dlHead++, dl_texrect_rgba16_end);
     }
-    gSPDisplayList(dlHead++, dl_texrect_rgba16_end);
     gSPDisplayList(dlHead++, dl_fasttext_begin);
     print_onscreen_dlg();
     SuitDialogue* dlg = &sOnScreenDialogues[currOnScreenDlgID];
@@ -651,12 +652,26 @@ void render_suit_overlay(void) {
         }
     }
     // Color col = 255;
-    
+
+    bzero(currOnScreenDlgBufferLine1, sizeof(currOnScreenDlgBufferLine1));
+    bzero(currOnScreenDlgBufferLine2, sizeof(currOnScreenDlgBufferLine2));
+    strncpy(currOnScreenDlgBufferLine1, currOnScreenDlgBuffer, 36);
+    strncpy(currOnScreenDlgBufferLine2, (currOnScreenDlgBuffer + 36), 36);
     drawSmallStringCol(&dlHead,
-        64+8, 32,//(20 + random_f32_around_zero(sOnScreenDialogues[currOnScreenDlgID].speed)),
-        currOnScreenDlgBuffer,
+        64+8, 32,
+        currOnScreenDlgBufferLine1,
         dlg->r, dlg->g, dlg->b
     );
+    drawSmallStringCol(&dlHead,
+        64+8, 32+8,
+        currOnScreenDlgBufferLine2,
+        dlg->r, dlg->g, dlg->b
+    );
+    // drawSmallStringCol(&dlHead,
+    //     64+8, 32,//(20 + random_f32_around_zero(sOnScreenDialogues[currOnScreenDlgID].speed)),
+    //     currOnScreenDlgBuffer,
+    //     dlg->r, dlg->g, dlg->b
+    // );
     gSPDisplayList(dlHead++, dl_fasttext_end);
 
     // Disallow drawing outside the screen borders.
@@ -664,6 +679,7 @@ void render_suit_overlay(void) {
 
     gDisplayListHead = dlHead;
 }
+#pragma GCC diagnostic pop
 
 void render_game(void) {
     PROFILER_GET_SNAPSHOT_TYPE(PROFILER_DELTA_COLLISION);

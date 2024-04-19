@@ -177,6 +177,9 @@ void bhv_dlg_trigger_loop(void) {
     if (o->oDistanceToMario < 100.0f * (f32)size) {
         gInitialTextIndex = 0xFFFF;
         set_onscreen_dlg(dlgId);
+        if (o->oTimer > 1 && (dlgId == DLG_BOOTING || dlgId == DLG_UPHILL/* || dlgId == DLG_BLACK_HOLE*/)) {
+            obj_mark_for_deletion(o);
+        }
     }
 }
 

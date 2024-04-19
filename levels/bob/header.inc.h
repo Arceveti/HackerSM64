@@ -64,7 +64,7 @@ extern Vtx bob_dl_Terrain_mesh_layer_4_vtx_0[36];
 extern Gfx bob_dl_Terrain_mesh_layer_4_tri_0[];
 extern Vtx bob_dl_Terrain_mesh_layer_4_vtx_1[20];
 extern Gfx bob_dl_Terrain_mesh_layer_4_tri_1[];
-extern Vtx bob_dl_Terrain_mesh_layer_4_vtx_2[164];
+extern Vtx bob_dl_Terrain_mesh_layer_4_vtx_2[162];
 extern Gfx bob_dl_Terrain_mesh_layer_4_tri_2[];
 extern Gfx mat_bob_dl_f3dlite_material_bg_moon[];
 extern Gfx mat_revert_bob_dl_f3dlite_material_bg_moon[];
